@@ -13,7 +13,12 @@
       "surrender": "surrender"
     },
     "rules": null,
-    "enemyStats": null
+    "enemyStats": null,
+    "placeId": "junkyard",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "robot"
+    ]
   },
   "B03": {
     "id": "B03",
@@ -29,7 +34,12 @@
       "surrender": "surrender"
     },
     "rules": null,
-    "enemyStats": null
+    "enemyStats": null,
+    "placeId": "hive",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "ike"
+    ]
   },
   "B04": {
     "id": "B04",
@@ -45,7 +55,12 @@
       "surrender": "surrender"
     },
     "rules": null,
-    "enemyStats": null
+    "enemyStats": null,
+    "placeId": "alley",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "gang"
+    ]
   },
   "B05A": {
     "id": "B05A",
@@ -61,7 +76,12 @@
       "surrender": "surrender"
     },
     "rules": null,
-    "enemyStats": null
+    "enemyStats": null,
+    "placeId": "port",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "richard"
+    ]
   },
   "B05B": {
     "id": "B05B",
@@ -77,7 +97,12 @@
       "surrender": "surrender"
     },
     "rules": null,
-    "enemyStats": null
+    "enemyStats": null,
+    "placeId": "port",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "lumina"
+    ]
   },
   "B08": {
     "id": "B08",
@@ -93,7 +118,12 @@
       "surrender": "surrender"
     },
     "rules": null,
-    "enemyStats": null
+    "enemyStats": null,
+    "placeId": "block5",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "psycho"
+    ]
   },
   "B09": {
     "id": "B09",
@@ -109,7 +139,12 @@
       "surrender": "surrender"
     },
     "rules": null,
-    "enemyStats": null
+    "enemyStats": null,
+    "placeId": "power",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "wolves"
+    ]
   },
   "B10": {
     "id": "B10",
@@ -126,7 +161,12 @@
       "surrender": "surrender"
     },
     "rules": null,
-    "enemyStats": null
+    "enemyStats": null,
+    "placeId": "power",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "company_robot"
+    ]
   },
   "B11": {
     "id": "B11",
@@ -142,7 +182,12 @@
       "surrender": "surrender"
     },
     "rules": null,
-    "enemyStats": null
+    "enemyStats": null,
+    "placeId": "pump",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "fish"
+    ]
   },
   "B12": {
     "id": "B12",
@@ -158,6 +203,11 @@
       "surrender": "surrender"
     },
     "rules": null,
-    "enemyStats": null
+    "enemyStats": null,
+    "placeId": "hive",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "mech_boss"
+    ]
   }
 }

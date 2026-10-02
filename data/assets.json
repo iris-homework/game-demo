@@ -118,5 +118,20 @@
   "fish": {
     "path": "",
     "kind": "pending"
+  },
+  "city_map": {
+    "path": "",
+    "kind": "city_map",
+    "note": "城市总览插画待提供；港口场景不可代替城市地图"
+  },
+  "noren_battle": {
+    "path": "res://assets/characters/noren_battle.png",
+    "kind": "battle_portrait",
+    "whiteKey": true
+  },
+  "mech_battle": {
+    "path": "res://assets/characters/mech_battle.png",
+    "kind": "battle_portrait",
+    "whiteKey": true
   }
 }

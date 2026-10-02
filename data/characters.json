@@ -1,66 +1,82 @@
 {
   "noren": {
     "displayName": "诺伦",
-    "portraitAssetId": "noren"
+    "portraitAssetId": "noren",
+    "battlePortraitAssetId": "noren_battle"
   },
   "bartender": {
     "displayName": "老板娘",
-    "portraitAssetId": "bartender"
+    "portraitAssetId": "bartender",
+    "battlePortraitAssetId": ""
   },
   "gang": {
     "displayName": "黑帮头目",
-    "portraitAssetId": "gang"
+    "portraitAssetId": "gang",
+    "battlePortraitAssetId": ""
   },
   "reception": {
     "displayName": "前台小姐",
-    "portraitAssetId": "reception"
+    "portraitAssetId": "reception",
+    "battlePortraitAssetId": ""
   },
   "ike": {
     "displayName": "艾克",
-    "portraitAssetId": "ike"
+    "portraitAssetId": "ike",
+    "battlePortraitAssetId": ""
   },
   "richard": {
     "displayName": "理查德",
-    "portraitAssetId": "richard"
+    "portraitAssetId": "richard",
+    "battlePortraitAssetId": ""
   },
   "lumina": {
     "displayName": "卢米娜",
-    "portraitAssetId": "lumina"
+    "portraitAssetId": "lumina",
+    "battlePortraitAssetId": ""
   },
   "rift": {
     "displayName": "里夫特",
-    "portraitAssetId": "rift"
+    "portraitAssetId": "rift",
+    "battlePortraitAssetId": ""
   },
   "victor": {
     "displayName": "维克多",
-    "portraitAssetId": "victor"
+    "portraitAssetId": "victor",
+    "battlePortraitAssetId": ""
   },
   "fitz": {
     "displayName": "菲茨杰拉德",
-    "portraitAssetId": "fitz"
+    "portraitAssetId": "fitz",
+    "battlePortraitAssetId": ""
   },
   "robot": {
     "displayName": "故障机器人",
-    "portraitAssetId": "robot"
+    "portraitAssetId": "robot",
+    "battlePortraitAssetId": ""
   },
   "company_robot": {
     "displayName": "公司机器人",
-    "portraitAssetId": "robot"
+    "portraitAssetId": "robot",
+    "battlePortraitAssetId": ""
   },
   "ally_robot": {
     "displayName": "机器人",
-    "portraitAssetId": "robot"
+    "portraitAssetId": "robot",
+    "battlePortraitAssetId": ""
   },
   "psycho": {
     "displayName": "赛博精神病",
-    "portraitAssetId": "psycho"
+    "portraitAssetId": "psycho",
+    "battlePortraitAssetId": ""
   },
   "wolves": {
     "displayName": "野狼部队",
-    "portraitAssetId": "wolves"
+    "portraitAssetId": "wolves",
+    "battlePortraitAssetId": ""
   },
   "fish": {
     "displayName": "变异的鱼",
-    "portraitAssetId": "fish"
+    "portraitAssetId": "fish",
+    "battlePortraitAssetId": ""
   }
 }

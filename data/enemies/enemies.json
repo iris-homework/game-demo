@@ -1,0 +1,92 @@
+{
+  "robot": {
+    "id": "robot",
+    "characterId": "robot",
+    "displayName": "故障机器人",
+    "battlePortraitAssetId": "",
+    "maxHp": null,
+    "intentSequence": [],
+    "prototype": true
+  },
+  "ike": {
+    "id": "ike",
+    "characterId": "ike",
+    "displayName": "艾克",
+    "battlePortraitAssetId": "",
+    "maxHp": null,
+    "intentSequence": [],
+    "prototype": true
+  },
+  "gang": {
+    "id": "gang",
+    "characterId": "gang",
+    "displayName": "黑帮头目",
+    "battlePortraitAssetId": "",
+    "maxHp": null,
+    "intentSequence": [],
+    "prototype": true
+  },
+  "richard": {
+    "id": "richard",
+    "characterId": "richard",
+    "displayName": "理查德",
+    "battlePortraitAssetId": "",
+    "maxHp": null,
+    "intentSequence": [],
+    "prototype": true
+  },
+  "lumina": {
+    "id": "lumina",
+    "characterId": "lumina",
+    "displayName": "卢米娜",
+    "battlePortraitAssetId": "",
+    "maxHp": null,
+    "intentSequence": [],
+    "prototype": true
+  },
+  "psycho": {
+    "id": "psycho",
+    "characterId": "psycho",
+    "displayName": "赛博精神病",
+    "battlePortraitAssetId": "",
+    "maxHp": null,
+    "intentSequence": [],
+    "prototype": true
+  },
+  "wolves": {
+    "id": "wolves",
+    "characterId": "wolves",
+    "displayName": "野狼部队",
+    "battlePortraitAssetId": "",
+    "maxHp": null,
+    "intentSequence": [],
+    "prototype": true
+  },
+  "company_robot": {
+    "id": "company_robot",
+    "characterId": "company_robot",
+    "displayName": "公司机器人",
+    "battlePortraitAssetId": "",
+    "maxHp": null,
+    "intentSequence": [],
+    "prototype": true
+  },
+  "fish": {
+    "id": "fish",
+    "characterId": "fish",
+    "displayName": "变异的鱼",
+    "battlePortraitAssetId": "",
+    "maxHp": null,
+    "intentSequence": [],
+    "prototype": true
+  },
+  "mech_boss": {
+    "id": "mech_boss",
+    "characterId": "gang",
+    "displayName": "复仇机甲",
+    "battlePortraitAssetId": "mech_battle",
+    "maxHp": null,
+    "intentSequence": [],
+    "prototype": true
+  }
+}

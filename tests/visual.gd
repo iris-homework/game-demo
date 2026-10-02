@@ -2,6 +2,8 @@ extends Node
 var app: Control
 
 func capture(label_text: String) -> void:
+	while Game.transition_locked or Game.battle_busy:
+		await get_tree().process_frame
 	await get_tree().create_timer(0.6).timeout
 	if Game.page == "dialogue": app.view.text_label.visible_characters = -1
 	await RenderingServer.frame_post_draw

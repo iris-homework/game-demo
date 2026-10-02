@@ -2,5 +2,7 @@
   "developmentMode": true,
   "initialCredits": 0,
   "initialCreditsNote": "演示初始值，正式初始信用点待确认；F1 可测试支付分支。",
-  "saveSchemaVersion": 1
+  "saveSchemaVersion": 2,
+  "initialMaxHp": 100,
+  "initialDay": 1
 }

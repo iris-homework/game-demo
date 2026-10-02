@@ -1,6 +1,7 @@
 extends Node
 ## Owns state, condition evaluation, transactional actions and checkpoints.
 ## Views only request transitions; authored content lives in data/.
+signal status_changed
 signal changed
 signal notice(message: String)
 var assets: Dictionary
@@ -16,6 +17,17 @@ var save_path := "user://checkpoint.json"
 var save_enabled := true
 var last_error := ""
 var revision := 0
+var card_catalog: Dictionary = {}
+var enemy_catalog: Dictionary
+var item_catalog: Dictionary
+var prototype_rules: Dictionary
+var map_config: Dictionary
+var meta_profile := {"schemaVersion":1, "cyberwareState":{}}
+var meta_path := "user://meta_profile.json"
+var transition_locked := false
+var battle_busy := false
+var training_mode := false
+var training_backup: Dictionary = {}
 
 func read_data(path: String):
 	return JSON.parse_string(FileAccess.get_file_as_string("res://data/" + path))
@@ -28,11 +40,21 @@ func _ready() -> void:
 	battles = read_data("battles.json")
 	rewards = read_data("rewards.json")
 	config = read_data("config.json")
+	for definition in read_data("cards/cards.json"):
+		if definition is Dictionary and definition.has("id"): card_catalog[definition.id] = definition
+	enemy_catalog = read_data("enemies/enemies.json")
+	item_catalog = read_data("items/items.json")
+	prototype_rules = read_data("prototype/combat.json")
+	map_config = read_data("map.json")
+	load_meta()
 
 func initial_state() -> Dictionary:
-	return {"schemaVersion":1, "currentWeek":1, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "faction":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "battleId":"", "result":"", "battleHistory":[], "deck":[], "portraits":{"left":"noren", "right":"bartender"}}
+	return {"schemaVersion":2, "currentWeek":1, "currentDay":1, "currentHp":100, "maxHp":100, "combat":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "faction":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "battleId":"", "result":"", "battleHistory":[], "deck":[], "portraits":{"left":"noren", "right":"bartender"}}
 
 func new_game() -> void:
+	if transition_locked or battle_busy: return
+	if training_mode: restore_training()
+	if save_enabled: save_meta()
 	state = initial_state()
 	enter_node("intro_01")
 
@@ -112,15 +134,17 @@ func texture(id: String) -> Texture2D:
 
 func checkpoint() -> void:
 	revision += 1
-	if save_enabled: save_game()
+	if save_enabled and not training_mode: save_game()
 	page = state.currentScene
 	changed.emit()
 
 func go_map() -> void:
+	if transition_locked or battle_busy: return
 	state.currentScene = "map"
 	checkpoint()
 
 func visit(id: String) -> void:
+	if transition_locked or battle_busy: return
 	var p := place_data(id)
 	if p.is_empty() or not meets(p.unlockCondition): return
 	state.currentPlaceId = id
@@ -128,6 +152,7 @@ func visit(id: String) -> void:
 	checkpoint()
 
 func start_event(id: String) -> bool:
+	if transition_locked or battle_busy: return false
 	if not events.has(id): return false
 	var e: Dictionary = events[id]
 	if id in state.completedEventIds or not meets(e.unlockCondition): return false
@@ -136,6 +161,7 @@ func start_event(id: String) -> bool:
 	state.currentPlaceId = e.placeId
 	state.battleId = ""
 	state.result = ""
+	state.combat = {}
 	state.portraits = {"left":"noren", "right":""}
 	enter_node(e.startNodeId)
 	return true
@@ -165,6 +191,14 @@ func apply_actions(actions: Array) -> bool:
 			"completeEvent":
 				if not events.has(a.get("id", "")): return false
 				if not a.id in draft.completedEventIds: draft.completedEventIds.append(a.id)
+			"healHpPercent":
+				var percent := float(a.get("percent", -1.0))
+				if percent < 0.0 or percent > 1.0: return false
+				draft.currentHp = mini(int(draft.maxHp), int(draft.currentHp) + roundi(draft.maxHp * percent))
+			"advanceDay":
+				var days := int(a.get("days", 1))
+				if days < 0: return false
+				draft.currentDay = mini(7, int(draft.currentDay) + days)
 			"finishWeek":
 				draft.flags.week1Complete = true
 			"grantReward":
@@ -183,6 +217,7 @@ func apply_actions(actions: Array) -> bool:
 	return true
 
 func enter_node(id: String) -> void:
+	if transition_locked or battle_busy: return
 	if id == "@map":
 		go_map()
 		return
@@ -202,6 +237,7 @@ func enter_node(id: String) -> void:
 		"battle":
 			state.battleId = n.battleId
 			state.currentScene = "battle"
+			initialize_combat()
 		_:
 			state.currentScene = "dialogue"
 			var side: String = n.get("speakerSide", "")
@@ -213,12 +249,12 @@ func enter_node(id: String) -> void:
 	checkpoint()
 
 func advance(expected_revision: int) -> void:
-	if expected_revision != revision or state.currentScene != "dialogue": return
+	if transition_locked or battle_busy or expected_revision != revision or state.currentScene != "dialogue": return
 	var n := node_data()
 	if n.has("next"): enter_node(n.next)
 
 func choose(index: int, expected_revision: int) -> bool:
-	if expected_revision != revision or state.currentScene != "dialogue": return false
+	if transition_locked or battle_busy or expected_revision != revision or state.currentScene != "dialogue": return false
 	var choices: Array = node_data().get("choices", [])
 	if index < 0 or index >= choices.size(): return false
 	var c: Dictionary = choices[index]
@@ -230,16 +266,19 @@ func choose(index: int, expected_revision: int) -> bool:
 	return true
 
 func battle_exit(result: String, expected_revision: int) -> bool:
-	if expected_revision != revision or state.currentScene != "battle": return false
+	if transition_locked or battle_busy or expected_revision != revision or state.currentScene != "battle": return false
 	var b: Dictionary = battles.get(state.battleId, {})
 	if not b.get("returnNodeByResult", {}).has(result): return false
+	if training_mode:
+		finish_training(result)
+		return true
 	state.result = result
 	state.battleHistory.append({"battleId":state.battleId, "result":result})
 	enter_node(b.returnNodeByResult[result])
 	return true
 
 func claim_rewards(expected_revision: int) -> bool:
-	if expected_revision != revision or state.currentScene != "result": return false
+	if transition_locked or battle_busy or expected_revision != revision or state.currentScene != "result": return false
 	var actions: Array = []
 	for id in event_data().get("rewardIds", []): actions.append({"op":"grantReward", "id":id})
 	if not apply_actions(actions): return false
@@ -266,9 +305,16 @@ func save_game() -> bool:
 	return err == OK
 
 func valid_save(s) -> bool:
-	if not s is Dictionary or s.get("schemaVersion", 0) != 1: return false
+	if not s is Dictionary or s.get("schemaVersion", 0) != 2: return false
 	for k in initial_state():
 		if not s.has(k): return false
+	for key in ["currentScene", "currentPlaceId", "activeEventId", "activeNodeId", "targetId", "faction", "battleId", "result"]:
+		if not s[key] is String: return false
+	for key in ["maxHp", "currentHp", "currentDay", "credits"]:
+		if not (s[key] is int or s[key] is float): return false
+	if s.maxHp <= 0 or s.currentHp < 0 or s.currentHp > s.maxHp or s.currentDay < 1 or s.currentDay > 7: return false
+	if not s.combat is Dictionary or not s.inventory is Dictionary: return false
+	if not s.combat.is_empty() and not valid_combat(s.combat): return false
 	if not s.completedEventIds is Array or not s.flags is Dictionary or not s.choiceHistory is Dictionary or not s.portraits is Dictionary: return false
 	if not s.claimedRewardIds is Array or not s.battleHistory is Array: return false
 	if not (s.credits is float or s.credits is int) or s.credits < 0: return false
@@ -277,7 +323,9 @@ func valid_save(s) -> bool:
 	if not s.portraits.has("left") or not s.portraits.has("right"): return false
 	if place_data(s.currentPlaceId).is_empty(): return false
 	if not events.has(s.activeEventId) or not events[s.activeEventId].nodes.has(s.activeNodeId): return false
-	if s.currentScene == "battle" and not battles.has(s.battleId): return false
+	if s.currentScene == "battle":
+		if not battles.has(s.battleId): return false
+		if not s.combat.is_empty() and (s.combat.battleId != s.battleId or s.combat.playerHp != s.currentHp): return false
 	return true
 
 func has_save() -> bool:
@@ -288,7 +336,7 @@ func load_game() -> bool:
 		if not FileAccess.file_exists(path): continue
 		var parser := JSON.new()
 		if parser.parse(FileAccess.get_file_as_string(path)) != OK: continue
-		var data = parser.data
+		var data = migrate_save(parser.data)
 		if not valid_save(data): continue
 		state = data
 		state.credits = int(state.credits)
@@ -302,6 +350,8 @@ func load_game() -> bool:
 	return false
 
 func menu() -> void:
+	if transition_locked or battle_busy: return
+	if training_mode: restore_training()
 	page = "menu"
 	changed.emit()
 
@@ -310,3 +360,117 @@ func resume() -> void:
 	else:
 		page = state.currentScene
 		changed.emit()
+
+
+func initialize_combat() -> void:
+	var battle: Dictionary = battles[state.battleId]
+	var definitions: Array = []
+	for id in battle.enemyIds: definitions.append(enemy_catalog[id])
+	var model := CombatModel.new()
+	model.initialize(state.battleId, int(state.currentHp), int(state.maxHp), prototype_rules, definitions, card_catalog)
+	state.combat = model.snapshot()
+
+func commit_combat(model: CombatModel) -> void:
+	state.combat = model.snapshot()
+	state.currentHp = model.player_hp
+	revision += 1
+	if save_enabled and not training_mode: save_game()
+	status_changed.emit()
+
+func heal_at(place_id: String) -> bool:
+	if transition_locked or battle_busy or not state.currentScene in ["map", "place"]: return false
+	var p := place_data(place_id)
+	if p.is_empty() or not meets(p.unlockCondition): return false
+	for service in p.get("services", []):
+		if service.type == "healHpPercent":
+			var previous := int(state.currentHp)
+			if not apply_actions([{"op":"healHpPercent", "percent":service.percent}]): return false
+			checkpoint()
+			notice.emit("生命恢复 +%d  /  %d HP" % [int(state.currentHp)-previous, state.maxHp])
+			return true
+	return false
+
+func start_training(battle_id: String = "B12") -> void:
+	if transition_locked or battle_busy or training_mode or not battles.has(battle_id): return
+	training_backup = state.duplicate(true)
+	training_mode = true
+	state = initial_state()
+	state.targetId = "richard"
+	state.activeEventId = battles[battle_id].eventId
+	state.currentPlaceId = battles[battle_id].placeId
+	enter_node("battle")
+
+func restore_training() -> void:
+	state = training_backup.duplicate(true)
+	training_backup.clear()
+	training_mode = false
+
+func finish_training(result: String) -> void:
+	restore_training()
+	page = "menu"
+	revision += 1
+	changed.emit()
+	notice.emit("演练结束：%s。冒险进度和血量未改变。" % {"win":"胜利","lose":"失败","surrender":"投降"}.get(result,result))
+
+func open_cyberware() -> void:
+	if transition_locked or battle_busy: return
+	page = "cyberware"
+	changed.emit()
+
+func load_meta() -> bool:
+	if not FileAccess.file_exists(meta_path): return false
+	var json := JSON.new()
+	if json.parse(FileAccess.get_file_as_string(meta_path)) != OK: return false
+	if not json.data is Dictionary or json.data.get("schemaVersion",0) != 1 or not json.data.get("cyberwareState") is Dictionary: return false
+	meta_profile = json.data
+	return true
+
+func save_meta() -> bool:
+	var file := FileAccess.open(meta_path + ".tmp", FileAccess.WRITE)
+	if file == null: return false
+	file.store_string(JSON.stringify(meta_profile, "\t"))
+	file.close()
+	return DirAccess.rename_absolute(meta_path + ".tmp", meta_path) == OK
+
+func migrate_save(data):
+	if not data is Dictionary: return data
+	if data.get("schemaVersion",0) == 1:
+		data = data.duplicate(true)
+		data.schemaVersion = 2
+		data.currentHp = 100
+		data.maxHp = 100
+		data.currentDay = 1
+		data.combat = {}
+		data.inventory = {}
+	return data
+
+func valid_combat(c: Dictionary) -> bool:
+	for key in ["battleId","turn","playerHp","maxHp","drawPile","hand","discardPile","instances","enemies","outcome","log","profile","cardCatalog"]:
+		if not c.has(key): return false
+	if not c.battleId is String or not battles.has(c.battleId): return false
+	for key in ["turn", "playerHp", "maxHp"]:
+		if not (c[key] is float or c[key] is int): return false
+	if c.turn < 1 or c.maxHp <= 0 or c.playerHp < 0 or c.playerHp > c.maxHp: return false
+	for key in ["drawPile","hand","discardPile","enemies","log"]:
+		if not c[key] is Array: return false
+	for key in ["instances","profile","cardCatalog"]:
+		if not c[key] is Dictionary: return false
+	if not c.outcome in ["", "win", "lose", "surrender"]: return false
+	var seen: Array = []
+	for uid in c.drawPile + c.hand + c.discardPile:
+		if not uid is String or uid in seen or not c.instances.has(uid): return false
+		seen.append(uid)
+		if not c.cardCatalog.has(c.instances[uid]): return false
+	if seen.size() != c.instances.size(): return false
+	for enemy in c.enemies:
+		if not enemy is Dictionary: return false
+		for key in ["id","displayName","hp","maxHp","intent","intentIndex","battlePortraitAssetId"]:
+			if not enemy.has(key): return false
+		if not enemy.intent is Dictionary: return false
+		for key in ["hp", "maxHp", "intentIndex"]:
+			if not (enemy[key] is float or enemy[key] is int): return false
+		if enemy.hp < 0 or enemy.maxHp <= 0 or enemy.hp > enemy.maxHp: return false
+		if not enemy.intent.get("amount",0) is float and not enemy.intent.get("amount",0) is int: return false
+		if not enemy.intent.get("hits",1) is float and not enemy.intent.get("hits",1) is int: return false
+		if enemy.intent.get("amount",0) < 0 or enemy.intent.get("hits",1) < 1: return false
+	return true

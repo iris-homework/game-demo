@@ -2,92 +2,136 @@
   {
     "id": "bar",
     "name": "地下酒馆",
-    "mapPosition": [
-      235,
-      425
-    ],
     "backgroundAssetId": "bar",
     "unlockCondition": {},
     "lockHint": "",
-    "description": "藏在后巷的午夜酒馆。酒杯与闲谈掩护着消息交换和委托交易。"
+    "description": "藏在后巷的午夜酒馆。酒杯与闲谈掩护着消息交换和委托交易。",
+    "mapAnchor": [
+      0.2829,
+      0.5882
+    ],
+    "hitArea": {
+      "type": "rect",
+      "size": [
+        0.13,
+        0.065
+      ]
+    },
+    "services": []
   },
   {
     "id": "junkyard",
     "name": "垃圾场",
-    "mapPosition": [
-      205,
-      190
-    ],
     "backgroundAssetId": "junkyard",
     "unlockCondition": {
       "completed": "E01"
     },
     "lockHint": "先在地下酒馆接下委托",
-    "description": "城市边缘的废弃物层层堆叠，可回收零件与故障设备散落其间。"
+    "description": "城市边缘的废弃物层层堆叠，可回收零件与故障设备散落其间。",
+    "mapAnchor": [
+      0.2543,
+      0.2789
+    ],
+    "hitArea": {
+      "type": "rect",
+      "size": [
+        0.13,
+        0.065
+      ]
+    },
+    "services": []
   },
   {
     "id": "alley",
     "name": "后巷",
-    "mapPosition": [
-      300,
-      315
-    ],
     "backgroundAssetId": "alley",
     "unlockCondition": {
       "flag": "alleyClue"
     },
     "lockHint": "从蜂巢城寨取得线索",
-    "description": "巷道交错，出口难辨。外来者很容易误入别人的地盘。"
+    "description": "巷道交错，出口难辨。外来者很容易误入别人的地盘。",
+    "mapAnchor": [
+      0.3448,
+      0.4434
+    ],
+    "hitArea": {
+      "type": "rect",
+      "size": [
+        0.13,
+        0.065
+      ]
+    },
+    "services": []
   },
   {
     "id": "camp",
     "name": "革命军营地",
-    "mapPosition": [
-      80,
-      115
-    ],
     "backgroundAssetId": "camp",
     "unlockCondition": {
       "faction": "resistance"
     },
     "lockHint": "沿卢米娜委托加入革命军",
-    "description": "革命军的根据地。居住、集会与备战空间紧邻，像一座自给自足的村落。"
+    "description": "革命军的根据地。居住、集会与备战空间紧邻，像一座自给自足的村落。",
+    "mapAnchor": [
+      0.1352,
+      0.1803
+    ],
+    "hitArea": {
+      "type": "rect",
+      "size": [
+        0.13,
+        0.065
+      ]
+    },
+    "services": []
   },
   {
     "id": "tower",
     "name": "沃斯大楼",
-    "mapPosition": [
-      450,
-      225
-    ],
     "backgroundAssetId": "tower",
     "unlockCondition": {
       "faction": "company"
     },
     "lockHint": "沿理查德委托加入公司",
-    "description": "城市最高的建筑，沃斯集团总部。高处的办公空间彰显集团的权势。"
+    "description": "城市最高的建筑，沃斯集团总部。高处的办公空间彰显集团的权势。",
+    "mapAnchor": [
+      0.4876,
+      0.325
+    ],
+    "hitArea": {
+      "type": "rect",
+      "size": [
+        0.13,
+        0.065
+      ]
+    },
+    "services": []
   },
   {
     "id": "port",
     "name": "港口",
-    "mapPosition": [
-      805,
-      555
-    ],
     "backgroundAssetId": "city",
     "unlockCondition": {
       "flag": "portClue"
     },
     "lockHint": "在后巷取得港口线索",
-    "description": "货轮与人潮不断往来。码头和仓库为追踪与逃跑提供复杂地形。"
+    "description": "货轮与人潮不断往来。码头和仓库为追踪与逃跑提供复杂地形。",
+    "mapAnchor": [
+      0.8257,
+      0.7592
+    ],
+    "hitArea": {
+      "type": "rect",
+      "size": [
+        0.13,
+        0.065
+      ]
+    },
+    "services": []
   },
   {
     "id": "block5",
     "name": "五号街区",
-    "mapPosition": [
-      660,
-      320
-    ],
     "backgroundAssetId": "block5",
     "unlockCondition": {
       "any": [
@@ -100,15 +144,23 @@
       ]
     },
     "lockHint": "完成阵营入门事件",
-    "description": "密集的中产居民区。稳定的生活节奏让突发暴力事件更加显眼。"
+    "description": "密集的中产居民区。稳定的生活节奏让突发暴力事件更加显眼。",
+    "mapAnchor": [
+      0.6876,
+      0.45
+    ],
+    "hitArea": {
+      "type": "rect",
+      "size": [
+        0.13,
+        0.065
+      ]
+    },
+    "services": []
   },
   {
     "id": "power",
     "name": "发电厂",
-    "mapPosition": [
-      850,
-      325
-    ],
     "backgroundAssetId": "power",
     "unlockCondition": {
       "any": [
@@ -121,29 +173,45 @@
       ]
     },
     "lockHint": "完成阵营入门事件",
-    "description": "城市的能源心脏，也是公司与革命军争夺控制权的关键设施。"
+    "description": "城市的能源心脏，也是公司与革命军争夺控制权的关键设施。",
+    "mapAnchor": [
+      0.8686,
+      0.4566
+    ],
+    "hitArea": {
+      "type": "rect",
+      "size": [
+        0.13,
+        0.065
+      ]
+    },
+    "services": []
   },
   {
     "id": "hive",
     "name": "蜂巢城寨",
-    "mapPosition": [
-      390,
-      490
-    ],
     "backgroundAssetId": "hive",
     "unlockCondition": {
       "completed": "E01"
     },
     "lockHint": "先在地下酒馆接下委托",
-    "description": "微型住房像蜂巢般堆叠。城市最底层的人在拥挤与混乱中维持着生活秩序。"
+    "description": "微型住房像蜂巢般堆叠。城市最底层的人在拥挤与混乱中维持着生活秩序。",
+    "mapAnchor": [
+      0.4305,
+      0.6737
+    ],
+    "hitArea": {
+      "type": "rect",
+      "size": [
+        0.13,
+        0.065
+      ]
+    },
+    "services": []
   },
   {
     "id": "pump",
     "name": "黑潮泵站",
-    "mapPosition": [
-      830,
-      435
-    ],
     "backgroundAssetId": "pump",
     "unlockCondition": {
       "any": [
@@ -156,15 +224,23 @@
       ]
     },
     "lockHint": "完成阵营入门事件",
-    "description": "污水与工业废水在此汇合，经主排污口流向港口外海。"
+    "description": "污水与工业废水在此汇合，经主排污口流向港口外海。",
+    "mapAnchor": [
+      0.8495,
+      0.6013
+    ],
+    "hitArea": {
+      "type": "rect",
+      "size": [
+        0.13,
+        0.065
+      ]
+    },
+    "services": []
   },
   {
     "id": "garden",
     "name": "白昼庭院",
-    "mapPosition": [
-      685,
-      140
-    ],
     "backgroundAssetId": "garden",
     "unlockCondition": {
       "any": [
@@ -177,76 +253,140 @@
       ]
     },
     "lockHint": "完成阵营入门事件",
-    "description": "富人居住区。与五号街区仅隔一条街，却有独立门禁与专人维护的庭院。"
+    "description": "富人居住区。与五号街区仅隔一条街，却有独立门禁与专人维护的庭院。",
+    "mapAnchor": [
+      0.7114,
+      0.2132
+    ],
+    "hitArea": {
+      "type": "rect",
+      "size": [
+        0.13,
+        0.065
+      ]
+    },
+    "services": []
   },
   {
     "id": "hotel",
     "name": "末班车旅馆",
-    "mapPosition": [
-      555,
-      450
-    ],
     "backgroundAssetId": "hotel",
     "unlockCondition": {
       "completed": "E01"
     },
     "lockHint": "先在地下酒馆接下委托",
-    "description": "旧环线终点站旁的候车楼改建而成。招牌彻夜亮着，夜班工人与过路人来去频繁。"
+    "description": "旧环线终点站旁的候车楼改建而成。招牌彻夜亮着，夜班工人与过路人来去频繁。",
+    "mapAnchor": [
+      0.5876,
+      0.6211
+    ],
+    "hitArea": {
+      "type": "rect",
+      "size": [
+        0.13,
+        0.065
+      ]
+    },
+    "services": []
   },
   {
     "id": "mall",
     "name": "沃斯商场",
-    "mapPosition": [
-      485,
-      330
-    ],
     "backgroundAssetId": "mall",
     "unlockCondition": {
       "completed": "E01"
     },
     "lockHint": "先在地下酒馆接下委托",
-    "description": "沃斯集团拥有的城市最大商场。商品与补给功能待设计。"
+    "description": "沃斯集团拥有的城市最大商场。商品与补给功能待设计。",
+    "mapAnchor": [
+      0.521,
+      0.4632
+    ],
+    "hitArea": {
+      "type": "rect",
+      "size": [
+        0.13,
+        0.065
+      ]
+    },
+    "services": []
   },
   {
     "id": "market",
     "name": "黑市",
-    "mapPosition": [
-      245,
-      560
-    ],
     "backgroundAssetId": "market",
     "unlockCondition": {
       "completed": "E01"
     },
     "lockHint": "先在地下酒馆接下委托",
-    "description": "隐藏在城寨里的交易场所。商品、卡牌和交易规则待设计。"
+    "description": "隐藏在城寨里的交易场所。商品、卡牌和交易规则待设计。",
+    "mapAnchor": [
+      0.2924,
+      0.7658
+    ],
+    "hitArea": {
+      "type": "rect",
+      "size": [
+        0.13,
+        0.065
+      ]
+    },
+    "services": []
   },
   {
     "id": "hospital",
     "name": "医院",
-    "mapPosition": [
-      620,
-      230
-    ],
     "backgroundAssetId": "hospital",
     "unlockCondition": {
       "completed": "E01"
     },
     "lockHint": "先在地下酒馆接下委托",
-    "description": "城市最大的正规医疗机构。诊疗与恢复功能待设计。"
+    "description": "城市最大的正规医疗机构，承担急救与诊疗。原型治疗每次回复 30% 最大生命。",
+    "mapAnchor": [
+      0.6495,
+      0.3316
+    ],
+    "hitArea": {
+      "type": "rect",
+      "size": [
+        0.13,
+        0.065
+      ]
+    },
+    "services": [
+      {
+        "id": "heal",
+        "type": "healHpPercent",
+        "percent": 0.3
+      }
+    ]
   },
   {
     "id": "clinic",
     "name": "地下诊所",
-    "mapPosition": [
-      440,
-      605
-    ],
     "backgroundAssetId": "clinic",
     "unlockCondition": {
       "completed": "E01"
     },
     "lockHint": "先在地下酒馆接下委托",
-    "description": "城寨内不起眼的诊所。具体服务与费用待设计。"
+    "description": "蜂巢城寨内不起眼的小诊所。原型治疗每次回复 30% 最大生命；正式费用与限制待设计。",
+    "mapAnchor": [
+      0.4781,
+      0.825
+    ],
+    "hitArea": {
+      "type": "rect",
+      "size": [
+        0.13,
+        0.065
+      ]
+    },
+    "services": [
+      {
+        "id": "heal",
+        "type": "healHpPercent",
+        "percent": 0.3
+      }
+    ]
   }
 ]

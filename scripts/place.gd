@@ -13,7 +13,7 @@ func _ready() -> void:
 	var available := Game.available_events(p.id)
 	if available.is_empty():
 		label(self, "此刻，一切安静。", Vector2(861,350), Vector2(455,60), 27)
-		label(self, "这里暂时没有新的事件。\n常驻服务与后续内容待设计。", Vector2(861,425), Vector2(455,100), 20, MUTED)
+		label(self, "这里暂时没有新的事件。\n未开放的服务与后续内容待设计。", Vector2(861,425), Vector2(455,100), 20, MUTED)
 	var scroll := ScrollContainer.new()
 	scroll.position = Vector2(859,290)
 	scroll.size = Vector2(485,460)
@@ -32,5 +32,8 @@ func _ready() -> void:
 			y += 275
 		else: y += 205
 	content.custom_minimum_size.y = y
+	if not p.get("services",[]).is_empty():
+		button(self,"治疗 · 回复 30% 最大 HP",Vector2(69,605),Vector2(460,63),func(): Game.heal_at(p.id),true)
+		label(self,"原型验证：免费；不推进日期；生命回复至上限。",Vector2(69,675),Vector2(650,30),16,CYAN)
 	button(self, "← 返回城市地图", Vector2(69,710), Vector2(290,61), Game.go_map)
 	fade_in()

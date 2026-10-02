@@ -1,12 +1,14 @@
 class_name DemoUI
 extends Control
-const INK := Color("100e19")
-const PANEL := Color("1c1828")
+const INK := Color("070e19")
+const PANEL := Color("111b2b")
 const PINK := Color("f04b88")
-const CYAN := Color("67daca")
+const CYAN := Color("58e1eb")
 const CREAM := Color("f3ebde")
 const MUTED := Color("aaa4b8")
 var base_font: Font
+var hp_fill: ColorRect
+var hp_label: Label
 
 func _init() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -44,7 +46,10 @@ func style(color: Color, border: Color, width: int = 1) -> StyleBoxFlat:
 	s.bg_color = color
 	s.border_color = border
 	s.set_border_width_all(width)
-	s.set_corner_radius_all(4)
+	s.set_corner_radius_all(2)
+	s.border_width_left = 3
+	s.shadow_color = Color(0.04,0.65,0.75,0.1)
+	s.shadow_size = 3
 	s.content_margin_left = 18
 	s.content_margin_right = 18
 	s.content_margin_top = 8
@@ -75,7 +80,7 @@ func button(parent: Node, text: String, pos: Vector2, dimensions: Vector2, actio
 	b.add_theme_color_override("font_hover_color", INK)
 	b.add_theme_color_override("font_pressed_color", CREAM)
 	b.add_theme_color_override("font_disabled_color", Color("6c647b"))
-	b.add_theme_stylebox_override("normal", style(PINK if accent else Color("241e30"), PINK if accent else Color("62536a")))
+	b.add_theme_stylebox_override("normal", style(PINK if accent else Color("142234"), PINK if accent else Color("44657b")))
 	b.add_theme_stylebox_override("hover", style(CREAM, CREAM))
 	b.add_theme_stylebox_override("pressed", style(Color("a72b5b"), PINK))
 	b.add_theme_stylebox_override("disabled", style(Color("17131f"), Color("393140")))
@@ -119,16 +124,34 @@ func background(id: String, darkness: float = 0.3) -> void:
 		label(self, "场景美术待补 / " + Game.place_data(Game.state.get("currentPlaceId", "")).get("name", ""), Vector2(64,828), Vector2(650,27), 15, MUTED)
 
 func chrome(section: String) -> void:
-	rect(self, Vector2.ZERO, Vector2(1440,82), Color("12101cec"))
-	rect(self, Vector2(34,25), Vector2(5,32), PINK)
-	label(self, "午夜委托", Vector2(53,17), Vector2(180,50), 29)
-	label(self, "/  " + section, Vector2(220,24), Vector2(320,42), 19, MUTED)
-	var faction: String = {"":"自由佣兵", "company":"公司特遣部", "resistance":"革命军"}.get(Game.state.get("faction", ""), "自由佣兵")
-	label(self, "第一周   /   " + faction, Vector2(780,27), Vector2(320,40), 18, CYAN)
-	label(self, "%s CR" % int(Game.state.get("credits", 0)), Vector2(1090,24), Vector2(180,42), 22)
-	button(self, "菜单", Vector2(1300,20), Vector2(105,43), Game.menu)
-	label(self, "W01   /   STORY PROTOTYPE", Vector2(36,858), Vector2(600,27), 13, MUTED)
-	label(self, "自动保存检查点    ·    F1 开发面板", Vector2(1080,856), Vector2(340,28), 14, MUTED)
+	rect(self,Vector2.ZERO,Vector2(1440,95),Color("09111ff5"))
+	rect(self,Vector2(0,94),Vector2(1440,1),Color("2f6178"))
+	label(self,Game.display_name("noren") + "  /  " + section,Vector2(36,8),Vector2(385,36),20,CREAM)
+	panel(self,Vector2(37,51),Vector2(277,17),Color("382333"),Color("805071"))
+	hp_fill = rect(self,Vector2(40,54),Vector2(271,11),PINK)
+	hp_label = label(self,"",Vector2(327,44),Vector2(140,33),18)
+	refresh_hp()
+	if not Game.status_changed.is_connected(refresh_hp): Game.status_changed.connect(refresh_hp)
+	for day in range(1,8):
+		var current: bool = day == int(Game.state.get("currentDay",1))
+		var x := 477+(day-1)*70
+		panel(self,Vector2(x,20),Vector2(65,42),Color("164250") if current else Color("111c2a"),CYAN if current else Color("354457"))
+		label(self,"第 %d 天" % day,Vector2(x+9,26),Vector2(60,28),15,CREAM if current else MUTED)
+	label(self,"WEEK 01 / 时间推进规则待定",Vector2(583,69),Vector2(420,23),11,MUTED)
+	var faction: String = {"":"自由佣兵","company":"公司特遣部","resistance":"革命军"}.get(Game.state.get("faction",""),"自由佣兵")
+	label(self,faction,Vector2(1026,13),Vector2(214,31),17,CYAN)
+	label(self,"%d CR" % int(Game.state.get("credits",0)),Vector2(1026,49),Vector2(210,30),17)
+	button(self,"退出演练" if Game.training_mode else "菜单",Vector2(1263,23),Vector2(145,49),Game.menu)
+	if section != "战斗":
+		label(self,"MIDNIGHT / W01",Vector2(36,864),Vector2(600,24),12,MUTED)
+		label(self,"检查点自动保存 · F1 开发面板",Vector2(1080,859),Vector2(340,27),13,MUTED)
+
+func refresh_hp() -> void:
+	if not is_instance_valid(hp_fill): return
+	var maximum := int(Game.state.get("maxHp",100))
+	var hp := int(Game.state.get("currentHp",100))
+	hp_fill.size.x = 271.0*hp/maxi(maximum,1)
+	hp_label.text = "%d / %d" % [hp,maximum]
 
 func tag(text: String, pos: Vector2, color: Color = CYAN, width: float = 180) -> void:
 	panel(self, pos, Vector2(width,32), Color("191623"), color)

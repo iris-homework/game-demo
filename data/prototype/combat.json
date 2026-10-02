@@ -1,0 +1,41 @@
+{
+  "id": "attack_flow_v1",
+  "prototype": true,
+  "note": "仅验证流程，正式卡牌/敌人数据独立。",
+  "handSize": 3,
+  "deck": [
+    "test_attack",
+    "test_attack",
+    "test_attack"
+  ],
+  "enemyMaxHp": 3,
+  "intent": {
+    "type": "attack",
+    "amount": 1,
+    "hits": 1
+  },
+  "discardHandAtTurnEnd": true,
+  "recycleDiscardWhenEmpty": true,
+  "cards": {
+    "test_attack": {
+      "id": "test_attack",
+      "name": "临时攻击",
+      "type": "attack",
+      "description": "对一名敌人造成 1 点伤害。",
+      "cost": null,
+      "artAssetId": "",
+      "prototype": true,
+      "effects": [
+        {
+          "type": "damage",
+          "amount": 1
+        }
+      ]
+    }
+  },
+  "visuals": {
+    "drawDuration": 0.26,
+    "discardDuration": 0.25,
+    "impactDuration": 0.2
+  }
+}

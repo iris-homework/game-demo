@@ -1,10 +1,18 @@
-验收日期：2026-10-02
+R1 验收日期：2026-10-02
 环境：macOS / Godot 4.7.2 stable / Compatibility
 
 Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
 TEST RESULTS: 690 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
 
-图形测试：菜单、地图、地点、对话、选项、战斗、失败、事件结算与首周结算已运行并截图检查。
-原图验证：8 幅接入美术与原始文件 SHA-256 一致。
-中文字体：Noto Sans CJK SC，附带 OFL 许可。
+COMBAT TESTS: 191 checks, 0 failures
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.1 Metal - 90.5 - Compatibility - Using Device: Apple - Apple M5
+
+VISUAL INTEGRATION: 0 failures; screenshots: /var/folders/mc/lbzb_hd50lg7htqnl3vfd1c40000gn/T/midnight_r1_
+
+总计 881 项逻辑检查，0 失败；图形集成 0 失败。
+实际鼠标操作验证：机甲演练进入、选牌目标提示、出牌伤害 1、弃牌数量变化、结束回合 HP 100→99、手牌补充。
+素材验证：接入的 10 幅原图副本与用户提供原文件 SHA-256 一致；原始 Word 与图片未改动。
+未实现内容：正式城市总览插画及精确热点、正式卡牌/能量/道具/义体效果、其他未提供敌方图与场景、第二三周剧情。
