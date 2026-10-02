@@ -7,6 +7,7 @@ const CYAN := Color("58e1eb")
 const CREAM := Color("f3ebde")
 const MUTED := Color("aaa4b8")
 var base_font: Font
+var button_font: FontVariation
 var hp_fill: ColorRect
 var hp_label: Label
 
@@ -21,6 +22,13 @@ func _init() -> void:
 	var t := Theme.new()
 	t.default_font = base_font
 	t.default_font_size = 20
+	button_font = FontVariation.new()
+	button_font.base_font = base_font
+	button_font.variation_embolden = 0.45
+	t.set_font("font", "Button", button_font)
+	t.set_font_size("font_size", "Button", 19)
+	for state_name in ["normal", "hover", "pressed", "disabled", "focus"]:
+		t.set_stylebox(state_name, "Button", button_style(state_name, false))
 	theme = t
 
 func rect(parent: Node, pos: Vector2, dimensions: Vector2, color: Color) -> ColorRect:
@@ -69,22 +77,51 @@ func label(parent: Node, text: String, pos: Vector2, dimensions: Vector2, font_s
 	n.size = dimensions
 	return n
 
+func button_style(state_name: String, accent: bool) -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.set_corner_radius_all(7)
+	s.set_border_width_all(1)
+	s.content_margin_left = 10
+	s.content_margin_right = 10
+	s.content_margin_top = 4
+	s.content_margin_bottom = 4
+	s.bg_color = Color("bc3067") if accent else Color("132638")
+	s.border_color = Color("ff72a9") if accent else Color("426679")
+	match state_name:
+		"hover":
+			s.bg_color = Color("e24583") if accent else Color("1b3e50")
+			s.border_color = Color("ffb0cf") if accent else CYAN
+			s.shadow_color = Color(0.95,0.2,0.5,0.18) if accent else Color(0.2,0.8,0.95,0.15)
+			s.shadow_size = 5
+		"pressed":
+			s.bg_color = Color("862449") if accent else Color("0c202e")
+			s.border_color = CREAM
+		"disabled":
+			s.bg_color = Color("141c28")
+			s.border_color = Color("303c4b")
+		"focus":
+			s.bg_color = Color.TRANSPARENT
+			s.border_color = CYAN
+			s.set_border_width_all(2)
+	return s
+
 func button(parent: Node, text: String, pos: Vector2, dimensions: Vector2, action: Callable, accent: bool = false) -> Button:
 	var b := Button.new()
+	b.set_script(preload("res://scripts/widgets/neon_button.gd"))
+	b.set("accent", accent)
 	b.text = text
+	b.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	b.position = pos
 	b.size = dimensions
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	b.add_theme_font_size_override("font_size", 20)
-	b.add_theme_color_override("font_color", INK if accent else CREAM)
-	b.add_theme_color_override("font_hover_color", INK)
+	b.add_theme_font_override("font", button_font)
+	b.add_theme_font_size_override("font_size", 19)
+	b.add_theme_color_override("font_color", CREAM)
+	b.add_theme_color_override("font_hover_color", Color("ffffff"))
 	b.add_theme_color_override("font_pressed_color", CREAM)
-	b.add_theme_color_override("font_disabled_color", Color("6c647b"))
-	b.add_theme_stylebox_override("normal", style(PINK if accent else Color("142234"), PINK if accent else Color("44657b")))
-	b.add_theme_stylebox_override("hover", style(CREAM, CREAM))
-	b.add_theme_stylebox_override("pressed", style(Color("a72b5b"), PINK))
-	b.add_theme_stylebox_override("disabled", style(Color("17131f"), Color("393140")))
-	b.add_theme_stylebox_override("focus", style(Color(0,0,0,0), CYAN, 2))
+	b.add_theme_color_override("font_disabled_color", Color("667384"))
+	for state_name in ["normal", "hover", "pressed", "disabled", "focus"]:
+		b.add_theme_stylebox_override(state_name, button_style(state_name, accent))
 	b.pressed.connect(action)
 	parent.add_child(b)
 	return b

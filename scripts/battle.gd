@@ -4,8 +4,12 @@ var model: CombatModel
 var battle: Dictionary
 var expected_revision: int
 var selected_uid := ""
+var held_card_uid := ""
 var cards: Dictionary = {}
 var enemy_hud: Control
+var targets: Array[Button] = []
+var aim: Node2D
+var hovered_target := -1
 var player_portrait: TextureRect
 var enemy_portraits: Array = []
 var message_label: Label
@@ -49,11 +53,16 @@ func enter(params: Dictionary) -> void:
 		var portrait_node := battle_portrait(model.enemies[i].battlePortraitAssetId,pos,Vector2(460,317))
 		enemy_portraits.append(portrait_node)
 	refresh_enemy_hud()
-	message_label = label(self,"选取手牌，再点击敌方目标",Vector2(571,318),Vector2(292,95),19,CREAM)
+	message_label = label(self,"选取手牌，再点击敌方目标",Vector2(570,482),Vector2(290,62),17,CREAM)
+	message_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pile_button(DRAW_POS,"抽牌堆",func(): show_pile("抽牌堆",model.draw_pile))
 	pile_button(DISCARD_POS,"弃牌堆",func(): show_pile("弃牌堆",model.discard_pile))
 	draw_count = label(self,"",DRAW_POS+Vector2(17,21),Vector2(75,55),35,CYAN)
-	discard_count = label(self,"",DISCARD_POS+Vector2(17,21),Vector2(75,55),35,PINK)
+	discard_count = label(self,"",DISCARD_POS+Vector2(0,21),Vector2(107,55),35,PINK)
+	draw_count.position.x = DRAW_POS.x
+	draw_count.size.x = 107
+	draw_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	discard_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	end_button = button(self,"结束回合  →",Vector2(1180,620),Vector2(216,56),end_turn_pressed,true)
 	end_button.tooltip_text = "敌方执行头顶意图；未使用手牌弃置，再抽取新手牌。临时规则不限制出牌次数。"
 	label(self,"道具栏",Vector2(51,272),Vector2(130,30),14,MUTED)
@@ -65,7 +74,12 @@ func enter(params: Dictionary) -> void:
 	if Game.config.developmentMode:
 		button(self,"调试结果",Vector2(1235,197),Vector2(156,42),show_debug_results).add_theme_font_size_override("font_size",15)
 	button(self,"投降",Vector2(1270,492),Vector2(122,41),func(): finish("surrender")).add_theme_font_size_override("font_size",15)
-	label(self,"点击卡牌 → 点击敌方    /    右键取消",Vector2(405,868),Vector2(720,25),13,MUTED)
+	label(self,"按下卡牌 → 拖向敌方 → 松开出牌  /  也可点选  /  右键或 Esc 取消",Vector2(350,868),Vector2(890,25),13,MUTED)
+	aim = Node2D.new()
+	aim.set_script(preload("res://scripts/combat/targeting_line.gd"))
+	aim.z_index = 35
+	aim.visible = false
+	add_child(aim)
 	refresh_counts()
 	set_busy(true)
 	start_hand.call_deferred()
@@ -85,7 +99,9 @@ func refresh_enemy_hud() -> void:
 	if is_instance_valid(enemy_hud):
 		remove_child(enemy_hud)
 		enemy_hud.queue_free()
+	targets.clear()
 	enemy_hud = Control.new()
+	enemy_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(enemy_hud)
 	for i in model.enemies.size():
 		var enemy: Dictionary = model.enemies[i]
@@ -100,17 +116,25 @@ func refresh_enemy_hud() -> void:
 		panel(enemy_hud,Vector2(center.x-125,585),Vector2(250,13),Color("331d33"),Color("594858"))
 		rect(enemy_hud,Vector2(center.x-123,587),Vector2(246*float(enemy.hp)/enemy.maxHp,9),PINK)
 		label(enemy_hud,"%d / %d" % [enemy.hp,enemy.maxHp],Vector2(center.x+92,551),Vector2(104,32),19,PINK)
-		var target := button(enemy_hud,"",Vector2(center.x-151,259),Vector2(302,287),func(): play_selected(i))
+		var target := Button.new()
+		target.position = Vector2(center.x-151,259)
+		target.size = Vector2(302,287)
+		target.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		target.pressed.connect(func(): play_selected(i))
+		enemy_hud.add_child(target)
+		targets.append(target)
 		var clear := StyleBoxFlat.new()
 		clear.bg_color = Color(0,0,0,0)
 		clear.border_color = CYAN if not selected_uid.is_empty() else Color(0,0,0,0)
 		clear.set_border_width_all(1)
 		target.add_theme_stylebox_override("normal",clear)
 		var hover := clear.duplicate()
-		hover.bg_color = Color(0.08,0.8,0.9,0.035)
-		hover.border_color = CYAN
+		hover.bg_color = Color(0.95,0.2,0.5,0.06) if not selected_uid.is_empty() else Color(0.08,0.8,0.9,0.035)
+		hover.border_color = PINK if not selected_uid.is_empty() else CYAN
 		target.add_theme_stylebox_override("hover",hover)
 		target.add_theme_stylebox_override("pressed",hover)
+		target.add_theme_stylebox_override("focus",StyleBoxEmpty.new())
+		target.add_theme_stylebox_override("disabled",StyleBoxEmpty.new())
 		target.disabled = enemy.hp <= 0
 		target.tooltip_text = "攻击目标：" + enemy.displayName + "\n下次行动：" + intent_text
 		if not selected_uid.is_empty():
@@ -120,7 +144,8 @@ func pile_button(pos: Vector2, title: String, action: Callable) -> void:
 	panel(self,pos+Vector2(10,-10),Vector2(107,127),Color("0d1728"),Color("335671"))
 	panel(self,pos+Vector2(5,-5),Vector2(107,127),Color("0d1728"),Color("335671"))
 	button(self,"",pos,Vector2(107,127),action)
-	label(self,title,pos+Vector2(17,83),Vector2(98,29),17)
+	var title_label := label(self,title,pos+Vector2(0,83),Vector2(107,29),17)
+	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 func hand_position(index: int, count: int) -> Vector2:
 	var spacing := minf(199,800.0/maxi(count,1))
@@ -131,7 +156,7 @@ func create_card(uid: String, index: int, count: int, animate: bool) -> CombatCa
 	view.setup(uid,model.card(uid))
 	view.home = hand_position(index,count)
 	add_child(view)
-	view.chosen.connect(select_card)
+	view.chosen.connect(begin_card_aim)
 	view.position = DRAW_POS if animate else view.home
 	view.scale = Vector2(0.5,0.5) if animate else Vector2.ONE
 	view.rotation_degrees = -9 if animate else 0
@@ -150,66 +175,127 @@ func start_hand() -> void:
 	if first_draw:
 		model.draw_cards()
 		commit()
-	for i in model.hand.size():
-		var card_view := create_card(model.hand[i],i,model.hand.size(),first_draw)
-		if first_draw:
-			var t := create_tween().set_parallel(true)
-			t.tween_property(card_view,"position",card_view.home,timing("drawDuration",0.26)).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-			t.tween_property(card_view,"scale",Vector2.ONE,timing("drawDuration",0.26))
-			t.tween_property(card_view,"rotation_degrees",0.0,timing("drawDuration",0.26))
-			await t.finished
+	await deal_hand(first_draw)
 	refresh_counts()
 	initialized = true
 	set_busy(false)
 
+func deal_hand(animate: bool) -> void:
+	if model.hand.is_empty(): return
+	var deal := create_tween().set_parallel(true) if animate else null
+	var duration := timing("drawDuration",0.26)
+	for i in model.hand.size():
+		var view := create_card(model.hand[i],i,model.hand.size(),animate)
+		if animate:
+			var delay := i * 0.045
+			deal.tween_property(view,"position",view.home,duration).set_delay(delay).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+			deal.tween_property(view,"scale",Vector2.ONE,duration).set_delay(delay)
+			deal.tween_property(view,"rotation_degrees",0.0,duration).set_delay(delay)
+	if animate: await deal.finished
+
+func _process(_delta: float) -> void:
+	if not is_instance_valid(aim): return
+	aim.visible = not selected_uid.is_empty() and not Game.battle_busy and not Game.transition_locked and not is_instance_valid(pile_overlay)
+	if not aim.visible or not cards.has(selected_uid): return
+	var view: CombatCard = cards[selected_uid]
+	aim.set("origin", view.get_global_transform() * Vector2(90, 8))
+	aim.set("tip", get_global_mouse_position())
+	hovered_target = target_at_pointer()
+	aim.set("locked", hovered_target >= 0)
+	if hovered_target >= 0:
+		aim.set("target_center", enemy_position(hovered_target) + Vector2(230,150))
+		message_label.text = "锁定 · " + str(model.enemies[hovered_target].displayName) + ("\n松开释放攻击" if not held_card_uid.is_empty() else "\n点击释放攻击")
+	else:
+		message_label.text = "指向敌方目标\n右键 / Esc 取消"
+
+func cancel_selection() -> void:
+	held_card_uid = ""
+	if selected_uid.is_empty(): return
+	selected_uid = ""
+	for uid in cards: cards[uid].set_selected(false)
+	if is_instance_valid(aim): aim.visible = false
+	message_label.text = "选取手牌，再点击敌方目标"
+	refresh_enemy_hud()
+
 func select_card(uid: String) -> void:
 	if Game.transition_locked or Game.battle_busy or not initialized or is_instance_valid(pile_overlay): return
+	if not cards.has(uid): return
+	held_card_uid = ""
 	selected_uid = "" if selected_uid == uid else uid
 	for card_uid in cards: cards[card_uid].set_selected(card_uid == selected_uid)
 	message_label.text = "选取手牌，再点击敌方目标" if selected_uid.is_empty() else "选择攻击目标  /  右键取消"
 	refresh_enemy_hud()
+	_process(0.0)
+
+func begin_card_aim(uid: String) -> void:
+	select_card(uid)
+	if selected_uid == uid and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		held_card_uid = uid
+	_process(0.0)
+
+func target_at_pointer() -> int:
+	for i in targets.size():
+		if not targets[i].disabled and targets[i].get_global_rect().has_point(get_global_mouse_position()):
+			return i
+	return -1
 
 func play_selected(target: int) -> void:
-	if selected_uid.is_empty() or Game.transition_locked or Game.battle_busy: return
+	if selected_uid.is_empty() or Game.transition_locked or Game.battle_busy or is_instance_valid(pile_overlay): return
 	var uid := selected_uid
 	var result := model.play_card(uid,target)
 	if result.is_empty(): return
 	set_busy(true)
 	selected_uid = ""
+	aim.visible = false
 	commit()
 	var card_view: CombatCard = cards[uid]
+	cards.erase(uid)
+	card_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card_view.card_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	card_view.set_selected(false)
 	if card_view.hover_tween: card_view.hover_tween.kill()
 	card_view.z_index = 40
-	var t := create_tween().set_parallel(true)
-	t.tween_property(card_view,"position",Vector2(663,391),0.18)
-	t.tween_property(card_view,"scale",Vector2(0.8,0.8),0.18)
-	await t.finished
-	refresh_enemy_hud()
-	await impact(enemy_position(target)+Vector2(230,150),"−%d" % result.damage,PINK)
-	var fly := create_tween().set_parallel(true)
-	fly.tween_property(card_view,"position",DISCARD_POS,timing("discardDuration",0.25)).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	fly.tween_property(card_view,"scale",Vector2(0.4,0.4),timing("discardDuration",0.25))
-	fly.tween_property(card_view,"modulate:a",0.0,timing("discardDuration",0.25))
-	await fly.finished
-	cards.erase(uid)
-	card_view.queue_free()
+	# Remove this card from the live hand immediately; the visual can finish later.
 	arrange_hand()
+	var hit_pos := enemy_position(target)+Vector2(230,150)
+	var launch := create_tween().set_parallel(true)
+	launch.tween_property(card_view,"position",hit_pos-Vector2(90,115),0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	launch.tween_property(card_view,"scale",Vector2(0.48,0.48),0.16)
+	launch.tween_property(card_view,"rotation_degrees",12.0,0.16)
+	await launch.finished
+	refresh_enemy_hud()
+	impact(hit_pos,"−%d" % result.damage,PINK)
+	var burst := Node2D.new()
+	burst.set_script(preload("res://scripts/combat/hit_fx.gd"))
+	burst.position = hit_pos
+	burst.z_index = 45
+	add_child(burst)
+	var fly := create_tween().set_parallel(true)
+	var duration := minf(timing("discardDuration",0.25),0.22)
+	fly.tween_property(card_view,"position",DISCARD_POS,duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	fly.tween_property(card_view,"scale",Vector2(0.18,0.18),duration)
+	fly.tween_property(card_view,"modulate:a",0.0,duration)
+	fly.chain().tween_callback(card_view.queue_free)
 	refresh_counts()
-	set_busy(false)
-	if not model.outcome.is_empty(): finish(model.outcome)
-	else: message_label.text = "攻击命中 · 造成 %d 点伤害" % result.damage
+	message_label.text = "攻击命中 · 造成 %d 点伤害" % result.damage
+	if not model.outcome.is_empty():
+		await get_tree().create_timer(0.24).timeout
+		set_busy(false)
+		finish(model.outcome)
+	else:
+		# Impact numbers and discard travel never hold up the next selection.
+		set_busy(false)
 
 func arrange_hand() -> void:
 	for i in model.hand.size():
 		var view: CombatCard = cards[model.hand[i]]
-		view.home = hand_position(i,model.hand.size())
-		create_tween().tween_property(view,"position",view.home,0.16)
+		view.move_home(hand_position(i,model.hand.size()))
 
 func end_turn_pressed() -> void:
 	if Game.transition_locked or Game.battle_busy or is_instance_valid(pile_overlay): return
 	set_busy(true)
 	selected_uid = ""
+	aim.visible = false
 	var result := model.end_turn()
 	if result.is_empty():
 		set_busy(false)
@@ -234,13 +320,7 @@ func end_turn_pressed() -> void:
 		return
 	refresh_enemy_hud()
 	turn_label.text = "回合 %02d  /  你的回合" % model.turn
-	for i in model.hand.size():
-		var view := create_card(model.hand[i],i,model.hand.size(),true)
-		var t := create_tween().set_parallel(true)
-		t.tween_property(view,"position",view.home,timing("drawDuration",0.26)).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-		t.tween_property(view,"scale",Vector2.ONE,timing("drawDuration",0.26))
-		t.tween_property(view,"rotation_degrees",0.0,timing("drawDuration",0.26))
-		await t.finished
+	await deal_hand(true)
 	refresh_counts()
 	message_label.text = "你的回合 · 手牌已补充"
 	set_busy(false)
@@ -260,6 +340,7 @@ func refresh_counts() -> void:
 
 func set_busy(value: bool) -> void:
 	Game.battle_busy = value
+	if value: held_card_uid = ""
 	if is_instance_valid(end_button): end_button.disabled = value
 	for view in cards.values(): view.set_enabled(not value)
 
@@ -268,7 +349,7 @@ func commit() -> void:
 	expected_revision = Game.revision
 
 func finish(result: String) -> void:
-	if Game.transition_locked or Game.battle_busy: return
+	if Game.transition_locked or Game.battle_busy or is_instance_valid(pile_overlay): return
 	Game.battle_exit(result,Game.revision)
 
 func use_item(item_id: String) -> void:
@@ -277,18 +358,24 @@ func use_item(item_id: String) -> void:
 	Game.notice.emit(response.reason)
 
 func show_pile(title: String, contents: Array) -> void:
-	if Game.battle_busy or Game.transition_locked: return
-	var popup := AcceptDialog.new()
-	popup.title = title + " / " + str(contents.size())
-	var lines: Array[String] = []
-	for uid in contents: lines.append(model.card(uid).name + "  ·  攻击 1")
-	popup.dialog_text = "当前牌堆为空。" if lines.is_empty() else "\n".join(lines)
-	popup.ok_button_text = "返回战斗"
-	add_child(popup)
-	popup.popup_centered(Vector2i(460,280))
+	if Game.battle_busy or Game.transition_locked or is_instance_valid(pile_overlay): return
+	cancel_selection()
+	pile_overlay = preload("res://scripts/combat/pile_view.gd").new()
+	pile_overlay.setup(model, title, contents)
+	pile_overlay.closed.connect(close_pile)
+	add_child(pile_overlay)
+
+func close_pile() -> void:
+	if not is_instance_valid(pile_overlay): return
+	var previous := pile_overlay
+	pile_overlay = null
+	remove_child(previous)
+	previous.queue_free()
+	end_button.grab_focus()
 
 func show_debug_results() -> void:
-	if Game.battle_busy or Game.transition_locked: return
+	if Game.battle_busy or Game.transition_locked or is_instance_valid(pile_overlay): return
+	cancel_selection()
 	var popup := ConfirmationDialog.new()
 	popup.title = "开发结果模拟"
 	popup.dialog_text = "仅用于验证剧情返回；正常胜负由卡牌和生命判定。"
@@ -300,9 +387,22 @@ func show_debug_results() -> void:
 	add_child(popup)
 	popup.popup_centered(Vector2i(610,185))
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
-		if not selected_uid.is_empty(): select_card(selected_uid)
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
+		var released_uid := held_card_uid
+		held_card_uid = ""
+		if not released_uid.is_empty() and selected_uid == released_uid and not Game.battle_busy and not Game.transition_locked and not is_instance_valid(pile_overlay):
+			var target := target_at_pointer()
+			if target >= 0:
+				get_viewport().set_input_as_handled()
+				play_selected(target)
+		return
+	if selected_uid.is_empty() or Game.battle_busy or Game.transition_locked: return
+	var right_click: bool = event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT
+	var escape: bool = event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE
+	if right_click or escape:
+		cancel_selection()
+		get_viewport().set_input_as_handled()
 
 func timing(key: String, fallback: float) -> float:
 	return maxf(0.01,float(model.profile.get("visuals",{}).get(key,fallback)))

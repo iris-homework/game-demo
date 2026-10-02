@@ -91,6 +91,7 @@ func _input(event: InputEvent) -> void:
 	elif is_instance_valid(debug_panel): get_viewport().set_input_as_handled()
 
 func toggle_debug() -> void:
+	if Game.page == "battle" and view.has_method("cancel_selection"): view.cancel_selection()
 	if is_instance_valid(debug_panel):
 		debug_panel.queue_free()
 		debug_panel = null
