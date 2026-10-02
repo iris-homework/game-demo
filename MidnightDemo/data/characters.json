@@ -1,0 +1,66 @@
+{
+  "noren": {
+    "displayName": "诺伦",
+    "portraitAssetId": "noren"
+  },
+  "bartender": {
+    "displayName": "老板娘",
+    "portraitAssetId": "bartender"
+  },
+  "gang": {
+    "displayName": "黑帮头目",
+    "portraitAssetId": "gang"
+  },
+  "reception": {
+    "displayName": "前台小姐",
+    "portraitAssetId": "reception"
+  },
+  "ike": {
+    "displayName": "艾克",
+    "portraitAssetId": "ike"
+  },
+  "richard": {
+    "displayName": "理查德",
+    "portraitAssetId": "richard"
+  },
+  "lumina": {
+    "displayName": "卢米娜",
+    "portraitAssetId": "lumina"
+  },
+  "rift": {
+    "displayName": "里夫特",
+    "portraitAssetId": "rift"
+  },
+  "victor": {
+    "displayName": "维克多",
+    "portraitAssetId": "victor"
+  },
+  "fitz": {
+    "displayName": "菲茨杰拉德",
+    "portraitAssetId": "fitz"
+  },
+  "robot": {
+    "displayName": "故障机器人",
+    "portraitAssetId": "robot"
+  },
+  "company_robot": {
+    "displayName": "公司机器人",
+    "portraitAssetId": "robot"
+  },
+  "ally_robot": {
+    "displayName": "机器人",
+    "portraitAssetId": "robot"
+  },
+  "psycho": {
+    "displayName": "赛博精神病",
+    "portraitAssetId": "psycho"
+  },
+  "wolves": {
+    "displayName": "野狼部队",
+    "portraitAssetId": "wolves"
+  },
+  "fish": {
+    "displayName": "变异的鱼",
+    "portraitAssetId": "fish"
+  }
+}

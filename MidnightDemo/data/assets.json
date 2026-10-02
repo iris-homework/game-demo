@@ -1,0 +1,122 @@
+{
+  "city": {
+    "path": "res://assets/backgrounds/city.png",
+    "kind": "background"
+  },
+  "bar": {
+    "path": "res://assets/backgrounds/bar.png",
+    "kind": "background"
+  },
+  "alley": {
+    "path": "res://assets/backgrounds/alley.png",
+    "kind": "background"
+  },
+  "tower": {
+    "path": "res://assets/backgrounds/tower.png",
+    "kind": "background"
+  },
+  "noren": {
+    "path": "res://assets/characters/noren.png",
+    "kind": "portrait"
+  },
+  "bartender": {
+    "path": "res://assets/characters/bartender.png",
+    "kind": "portrait"
+  },
+  "gang": {
+    "path": "res://assets/characters/gang.png",
+    "kind": "portrait"
+  },
+  "reception": {
+    "path": "res://assets/characters/reception.png",
+    "kind": "portrait"
+  },
+  "junkyard": {
+    "path": "",
+    "kind": "pending"
+  },
+  "hive": {
+    "path": "",
+    "kind": "pending"
+  },
+  "camp": {
+    "path": "",
+    "kind": "pending"
+  },
+  "block5": {
+    "path": "",
+    "kind": "pending"
+  },
+  "power": {
+    "path": "",
+    "kind": "pending"
+  },
+  "pump": {
+    "path": "",
+    "kind": "pending"
+  },
+  "garden": {
+    "path": "",
+    "kind": "pending"
+  },
+  "hotel": {
+    "path": "",
+    "kind": "pending"
+  },
+  "mall": {
+    "path": "",
+    "kind": "pending"
+  },
+  "market": {
+    "path": "",
+    "kind": "pending"
+  },
+  "hospital": {
+    "path": "",
+    "kind": "pending"
+  },
+  "clinic": {
+    "path": "",
+    "kind": "pending"
+  },
+  "ike": {
+    "path": "",
+    "kind": "pending"
+  },
+  "richard": {
+    "path": "",
+    "kind": "pending"
+  },
+  "lumina": {
+    "path": "",
+    "kind": "pending"
+  },
+  "rift": {
+    "path": "",
+    "kind": "pending"
+  },
+  "victor": {
+    "path": "",
+    "kind": "pending"
+  },
+  "fitz": {
+    "path": "",
+    "kind": "pending"
+  },
+  "robot": {
+    "path": "",
+    "kind": "pending"
+  },
+  "psycho": {
+    "path": "",
+    "kind": "pending"
+  },
+  "wolves": {
+    "path": "",
+    "kind": "pending"
+  },
+  "fish": {
+    "path": "",
+    "kind": "pending"
+  }
+}

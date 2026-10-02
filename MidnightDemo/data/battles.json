@@ -1,0 +1,163 @@
+{
+  "B02": {
+    "id": "B02",
+    "eventId": "E02",
+    "name": "骚动的垃圾场",
+    "participants": [
+      "noren",
+      "robot"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null
+  },
+  "B03": {
+    "id": "B03",
+    "eventId": "E03",
+    "name": "蜂巢城寨的艾克",
+    "participants": [
+      "noren",
+      "ike"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null
+  },
+  "B04": {
+    "id": "B04",
+    "eventId": "E04",
+    "name": "后巷深处",
+    "participants": [
+      "noren",
+      "gang"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null
+  },
+  "B05A": {
+    "id": "B05A",
+    "eventId": "E05A",
+    "name": "港口追击 · 理查德",
+    "participants": [
+      "noren",
+      "richard"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null
+  },
+  "B05B": {
+    "id": "B05B",
+    "eventId": "E05B",
+    "name": "港口追击 · 卢米娜",
+    "participants": [
+      "noren",
+      "lumina"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null
+  },
+  "B08": {
+    "id": "B08",
+    "eventId": "E08",
+    "name": "赛博精神病",
+    "participants": [
+      "noren",
+      "psycho"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null
+  },
+  "B09": {
+    "id": "B09",
+    "eventId": "E09",
+    "name": "危险的野狼",
+    "participants": [
+      "noren",
+      "wolves"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null
+  },
+  "B10": {
+    "id": "B10",
+    "eventId": "E10",
+    "name": "进攻发电厂",
+    "participants": [
+      "noren",
+      "wolves",
+      "company_robot"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null
+  },
+  "B11": {
+    "id": "B11",
+    "eventId": "E11",
+    "name": "变异的鱼",
+    "participants": [
+      "noren",
+      "fish"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null
+  },
+  "B12": {
+    "id": "B12",
+    "eventId": "E12",
+    "name": "机甲复仇",
+    "participants": [
+      "noren",
+      "gang"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null
+  }
+}

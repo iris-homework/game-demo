@@ -1,0 +1,10 @@
+验收日期：2026-10-02
+环境：macOS / Godot 4.7.2 stable / Compatibility
+
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+TEST RESULTS: 690 checks, 0 failures
+
+图形测试：菜单、地图、地点、对话、选项、战斗、失败、事件结算与首周结算已运行并截图检查。
+原图验证：8 幅接入美术与原始文件 SHA-256 一致。
+中文字体：Noto Sans CJK SC，附带 OFL 许可。

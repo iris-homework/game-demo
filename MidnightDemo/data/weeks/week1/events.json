@@ -1,0 +1,1496 @@
+{
+  "E01": {
+    "id": "E01",
+    "title": "午夜酒馆",
+    "placeId": "bar",
+    "unlockCondition": {},
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "在地下酒馆接下你的第一份委托。",
+    "optional": false,
+    "demoNote": "",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "bartender",
+        "speakerSide": "right",
+        "text": "欢迎来到午夜酒馆，小姑娘。最近城里不太平，革命军又在找公司的麻烦。你这时候来，是想喝酒，还是想找活干？",
+        "next": "intro_02"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "找活干。听说你这里门路不少。",
+        "next": "intro_03"
+      },
+      "intro_03": {
+        "id": "intro_03",
+        "speakerId": "bartender",
+        "speakerSide": "right",
+        "text": "消息是有的，黑市上的事我也知道一些。正好有两份没人接的委托，你要不要试试？办成了，报酬少不了。",
+        "next": "intro_04"
+      },
+      "intro_04": {
+        "id": "intro_04",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "成交。",
+        "next": "intro_05"
+      },
+      "intro_05": {
+        "id": "intro_05",
+        "speakerId": "bartender",
+        "speakerSide": "right",
+        "text": "爽快。来，挑一个吧。",
+        "next": "contract"
+      },
+      "contract": {
+        "id": "contract",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "选择一份委托",
+        "choices": [
+          {
+            "id": "richard",
+            "label": "理查德  /  追捕拖欠公司债务的欠债人",
+            "next": "chosen_01",
+            "effects": [
+              {
+                "op": "setTarget",
+                "value": "richard"
+              }
+            ],
+            "condition": {}
+          },
+          {
+            "id": "lumina",
+            "label": "卢米娜  /  追捕袭击公司设施的革命军成员",
+            "next": "chosen_01",
+            "effects": [
+              {
+                "op": "setTarget",
+                "value": "lumina"
+              }
+            ],
+            "condition": {}
+          }
+        ]
+      },
+      "chosen_01": {
+        "id": "chosen_01",
+        "speakerId": "bartender",
+        "speakerSide": "right",
+        "text": "选好了？那就祝你好运，小姑娘。我看好你。",
+        "next": "finish"
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": []
+      }
+    }
+  },
+  "E02": {
+    "id": "E02",
+    "title": "骚动的垃圾场",
+    "placeId": "junkyard",
+    "unlockCondition": {
+      "completed": "E01"
+    },
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "垃圾场传出怪动静，也许能找到目标的线索。",
+    "optional": true,
+    "demoNote": "",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "喂，你见过{目标姓名}吗？",
+        "next": "intro_02"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "robot",
+        "speakerSide": "right",
+        "text": "检索中……目、目标……错误！存储区损坏。请重试！",
+        "next": "intro_03"
+      },
+      "intro_03": {
+        "id": "intro_03",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "看来问不出什么。先走吧。",
+        "next": "intro_04"
+      },
+      "intro_04": {
+        "id": "intro_04",
+        "speakerId": "",
+        "speakerSide": "right",
+        "text": "机器人发出刺耳的警报，动作失控，转向诺伦。",
+        "next": "battle",
+        "type": "stage"
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "robot",
+        "speakerSide": "right",
+        "text": "警报！目标……滋——清除……清除……",
+        "next": "win_02"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "",
+        "speakerSide": "right",
+        "text": "机器人倒下，彻底停止运转。",
+        "next": "win_03",
+        "type": "stage"
+      },
+      "win_03": {
+        "id": "win_03",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "白忙一场。去别处找线索吧。",
+        "next": "finish"
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B02"
+      },
+      "lose": {
+        "id": "lose",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "surrender": {
+        "id": "surrender",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": []
+      }
+    }
+  },
+  "E03": {
+    "id": "E03",
+    "title": "蜂巢城寨的艾克",
+    "placeId": "hive",
+    "unlockCondition": {
+      "completed": "E01"
+    },
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "艾克似乎知道委托目标的下落。",
+    "optional": false,
+    "demoNote": "",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "你知道{目标姓名}在哪儿吗？",
+        "next": "intro_02"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "ike",
+        "speakerSide": "right",
+        "text": "知道啊。三百信用点，一口价。",
+        "next": "payment"
+      },
+      "payment": {
+        "id": "payment",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "情报的价码：300 信用点",
+        "choices": [
+          {
+            "id": "pay",
+            "label": "支付 300 信用点",
+            "next": "paid_01",
+            "effects": [
+              {
+                "op": "spendCredits",
+                "amount": 300
+              },
+              {
+                "op": "setFlag",
+                "key": "alleyClue",
+                "value": true
+              }
+            ],
+            "condition": {
+              "creditsAtLeast": 300
+            }
+          },
+          {
+            "id": "refuse",
+            "label": "拒绝支付",
+            "next": "refuse_01",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "paid_01": {
+        "id": "paid_01",
+        "speakerId": "ike",
+        "speakerSide": "right",
+        "text": "嘿嘿，痛快。{目标姓名}躲在后巷。",
+        "next": "paid_02"
+      },
+      "paid_02": {
+        "id": "paid_02",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "谢了。",
+        "next": "paid_03"
+      },
+      "paid_03": {
+        "id": "paid_03",
+        "speakerId": "ike",
+        "speakerSide": "right",
+        "text": "不用谢，一手交钱，一手交消息。",
+        "next": "finish"
+      },
+      "refuse_01": {
+        "id": "refuse_01",
+        "speakerId": "ike",
+        "speakerSide": "right",
+        "text": "不肯付？那我可什么都不知道。",
+        "next": "refuse_02"
+      },
+      "refuse_02": {
+        "id": "refuse_02",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "你确定要这么谈？",
+        "next": "refuse_03"
+      },
+      "refuse_03": {
+        "id": "refuse_03",
+        "speakerId": "",
+        "speakerSide": "right",
+        "text": "艾克摆出架势。",
+        "next": "battle",
+        "type": "stage"
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "ike",
+        "speakerSide": "right",
+        "text": "停停停！我说！{目标姓名}在后巷！",
+        "next": "win_02"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "早说不就好了。",
+        "next": "finish"
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B03"
+      },
+      "lose": {
+        "id": "lose",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "surrender": {
+        "id": "surrender",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": [
+          {
+            "op": "setFlag",
+            "key": "alleyClue",
+            "value": true
+          }
+        ]
+      }
+    }
+  },
+  "E04": {
+    "id": "E04",
+    "title": "后巷深处",
+    "placeId": "alley",
+    "unlockCondition": {
+      "flag": "alleyClue"
+    },
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "根据艾克的线索，前往后巷深处。",
+    "optional": false,
+    "demoNote": "",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "gang",
+        "speakerSide": "right",
+        "text": "又来一个外地人。艾克把你骗来的？",
+        "next": "intro_02"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "……那家伙果然没说实话。",
+        "next": "intro_03"
+      },
+      "intro_03": {
+        "id": "intro_03",
+        "speakerId": "",
+        "speakerSide": "right",
+        "text": "黑帮头目带人围上来。",
+        "next": "battle",
+        "type": "stage"
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "gang",
+        "speakerSide": "right",
+        "text": "等等！别动手！你想知道什么，我都说！",
+        "next": "win_02"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "{目标姓名}在哪儿？",
+        "next": "win_03"
+      },
+      "win_03": {
+        "id": "win_03",
+        "speakerId": "gang",
+        "speakerSide": "right",
+        "text": "港口！我听说他就在港口，去那儿准能找到！",
+        "next": "win_04"
+      },
+      "win_04": {
+        "id": "win_04",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "最好是真的。",
+        "next": "finish"
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B04"
+      },
+      "lose": {
+        "id": "lose",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "surrender": {
+        "id": "surrender",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": [
+          {
+            "op": "setFlag",
+            "key": "portClue",
+            "value": true
+          }
+        ]
+      }
+    }
+  },
+  "E05A": {
+    "id": "E05A",
+    "title": "港口追击 · 理查德",
+    "placeId": "port",
+    "unlockCondition": {
+      "all": [
+        {
+          "flag": "portClue"
+        },
+        {
+          "target": "richard"
+        }
+      ]
+    },
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "在港口追上欠债人理查德。",
+    "optional": false,
+    "demoNote": "",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "richard",
+        "speakerSide": "right",
+        "text": "你是谁？跟着我干什么？",
+        "next": "intro_02"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "有人托我请你走一趟。别让我为难。",
+        "next": "intro_03"
+      },
+      "intro_03": {
+        "id": "intro_03",
+        "speakerId": "richard",
+        "speakerSide": "right",
+        "text": "别过来！再过来我就开枪！",
+        "next": "intro_04"
+      },
+      "intro_04": {
+        "id": "intro_04",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "看来得换种说法。",
+        "next": "battle"
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "richard",
+        "speakerSide": "right",
+        "text": "可恶……",
+        "next": "win_02"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "结束了，别再反抗。等等，这些人是谁？",
+        "next": "win_03"
+      },
+      "win_03": {
+        "id": "win_03",
+        "speakerId": "fitz",
+        "speakerSide": "right",
+        "text": "多谢你替公司抓到他，小姑娘。理查德欠了我们两千万；按公司的规矩，恐怕得在强制劳动所待很久。警卫，带走。",
+        "next": "win_04"
+      },
+      "win_04": {
+        "id": "win_04",
+        "speakerId": "richard",
+        "speakerSide": "right",
+        "text": "菲茨杰拉德先生，等等！求您——",
+        "next": "win_05"
+      },
+      "win_05": {
+        "id": "win_05",
+        "speakerId": "",
+        "speakerSide": "right",
+        "text": "警卫将理查德带离。",
+        "next": "win_06",
+        "type": "stage"
+      },
+      "win_06": {
+        "id": "win_06",
+        "speakerId": "fitz",
+        "speakerSide": "right",
+        "text": "你身手不错。有没有兴趣加入公司特遣部？待遇优厚。",
+        "next": "join"
+      },
+      "join": {
+        "id": "join",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "回应菲茨杰拉德的邀请",
+        "choices": [
+          {
+            "id": "accept",
+            "label": "接受",
+            "next": "accept_01",
+            "effects": [],
+            "condition": {}
+          },
+          {
+            "id": "refuse",
+            "label": "拒绝",
+            "next": "refuse_01",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "accept_01": {
+        "id": "accept_01",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "我接受。",
+        "next": "accept_02"
+      },
+      "accept_02": {
+        "id": "accept_02",
+        "speakerId": "fitz",
+        "speakerSide": "right",
+        "text": "很好。以后你归我管，薪水照发。跟我去总部办入职手续。",
+        "next": "accept_03"
+      },
+      "accept_03": {
+        "id": "accept_03",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "总算有份正经工作了……大概吧。（心想）",
+        "next": "finish"
+      },
+      "refuse_01": {
+        "id": "refuse_01",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "我拒绝。",
+        "next": "refuse_02"
+      },
+      "refuse_02": {
+        "id": "refuse_02",
+        "speakerId": "fitz",
+        "speakerSide": "right",
+        "text": "可惜，这恐怕不是你能拒绝的事。",
+        "next": "refuse_03"
+      },
+      "refuse_03": {
+        "id": "refuse_03",
+        "speakerId": "",
+        "speakerSide": "right",
+        "text": "菲茨杰拉德向警卫使了个眼色。",
+        "next": "refuse_04",
+        "type": "stage"
+      },
+      "refuse_04": {
+        "id": "refuse_04",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "……行，我加入。",
+        "next": "refuse_05"
+      },
+      "refuse_05": {
+        "id": "refuse_05",
+        "speakerId": "fitz",
+        "speakerSide": "right",
+        "text": "明智的选择。跟我去总部办入职手续。",
+        "next": "finish"
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B05A"
+      },
+      "lose": {
+        "id": "lose",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "surrender": {
+        "id": "surrender",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": [
+          {
+            "op": "setFaction",
+            "value": "company"
+          }
+        ]
+      }
+    }
+  },
+  "E05B": {
+    "id": "E05B",
+    "title": "港口追击 · 卢米娜",
+    "placeId": "port",
+    "unlockCondition": {
+      "all": [
+        {
+          "flag": "portClue"
+        },
+        {
+          "target": "lumina"
+        }
+      ]
+    },
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "在港口追上被悬赏的革命军成员卢米娜。",
+    "optional": false,
+    "demoNote": "",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "lumina",
+        "speakerSide": "right",
+        "text": "你是谁？找我做什么？",
+        "next": "intro_02"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "受人之托，来请你跟我走一趟。",
+        "next": "intro_03"
+      },
+      "intro_03": {
+        "id": "intro_03",
+        "speakerId": "lumina",
+        "speakerSide": "right",
+        "text": "公司派来的？",
+        "next": "intro_04"
+      },
+      "intro_04": {
+        "id": "intro_04",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "我不是公司的人。",
+        "next": "intro_05"
+      },
+      "intro_05": {
+        "id": "intro_05",
+        "speakerId": "lumina",
+        "speakerSide": "right",
+        "text": "那你也没安好心。少废话！",
+        "next": "battle"
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "lumina",
+        "speakerSide": "right",
+        "text": "要不是伤还没好……我不会输给你。",
+        "next": "win_02"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "你已经输了。跟我走。",
+        "next": "win_03"
+      },
+      "win_03": {
+        "id": "win_03",
+        "speakerId": "rift",
+        "speakerSide": "right",
+        "text": "等一下。",
+        "next": "win_04"
+      },
+      "win_04": {
+        "id": "win_04",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "你又是谁？",
+        "next": "win_05"
+      },
+      "win_05": {
+        "id": "win_05",
+        "speakerId": "rift",
+        "speakerSide": "right",
+        "text": "革命军干部，里夫特。先别动她。你是公司的人？",
+        "next": "win_06"
+      },
+      "win_06": {
+        "id": "win_06",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "误会。我只是接了委托。",
+        "next": "win_07"
+      },
+      "win_07": {
+        "id": "win_07",
+        "speakerId": "rift",
+        "speakerSide": "right",
+        "text": "看着不像公司的走狗，身手倒是不错。愿不愿意加入革命军？",
+        "next": "join"
+      },
+      "join": {
+        "id": "join",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "回应里夫特的邀请",
+        "choices": [
+          {
+            "id": "accept",
+            "label": "接受",
+            "next": "accept_01",
+            "effects": [],
+            "condition": {}
+          },
+          {
+            "id": "refuse",
+            "label": "拒绝",
+            "next": "refuse_01",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "accept_01": {
+        "id": "accept_01",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "我加入。",
+        "next": "accept_02"
+      },
+      "accept_02": {
+        "id": "accept_02",
+        "speakerId": "rift",
+        "speakerSide": "left",
+        "text": "好。从现在起，我们就是同志。",
+        "next": "accept_03"
+      },
+      "accept_03": {
+        "id": "accept_03",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "这事可比委托麻烦多了。（心想）",
+        "next": "finish"
+      },
+      "refuse_01": {
+        "id": "refuse_01",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "没兴趣。",
+        "next": "refuse_02"
+      },
+      "refuse_02": {
+        "id": "refuse_02",
+        "speakerId": "rift",
+        "speakerSide": "right",
+        "text": "那你今天就别想离开港口。",
+        "next": "refuse_03"
+      },
+      "refuse_03": {
+        "id": "refuse_03",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "……等等。我加入。",
+        "next": "refuse_04"
+      },
+      "refuse_04": {
+        "id": "refuse_04",
+        "speakerId": "rift",
+        "speakerSide": "left",
+        "text": "这才对。从现在起，我们就是同志。",
+        "next": "finish"
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B05B"
+      },
+      "lose": {
+        "id": "lose",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "surrender": {
+        "id": "surrender",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": [
+          {
+            "op": "setFaction",
+            "value": "resistance"
+          }
+        ]
+      }
+    }
+  },
+  "E06": {
+    "id": "E06",
+    "title": "入职公司",
+    "placeId": "tower",
+    "unlockCondition": {
+      "completed": "E05A"
+    },
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "前往沃斯大楼，办理公司特遣部入职手续。",
+    "optional": false,
+    "demoNote": "",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "reception",
+        "speakerSide": "right",
+        "text": "你是新来的吧？这是员工证，还有配发的装备。",
+        "next": "intro_02"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "谢谢。",
+        "next": "intro_03"
+      },
+      "intro_03": {
+        "id": "intro_03",
+        "speakerId": "reception",
+        "speakerSide": "right",
+        "text": "今天还是第一次有人跟我说谢谢。加油，新人。",
+        "next": "intro_04"
+      },
+      "intro_04": {
+        "id": "intro_04",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "我会的。",
+        "next": "finish"
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": []
+      }
+    }
+  },
+  "E07": {
+    "id": "E07",
+    "title": "加入革命军",
+    "placeId": "camp",
+    "unlockCondition": {
+      "completed": "E05B"
+    },
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "随里夫特前往营地，与维克多会面。",
+    "optional": false,
+    "demoNote": "",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "我们这是去哪儿？",
+        "next": "intro_02"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "rift",
+        "speakerSide": "left",
+        "text": "带你见老大。到了。",
+        "next": "intro_03"
+      },
+      "intro_03": {
+        "id": "intro_03",
+        "speakerId": "victor",
+        "speakerSide": "right",
+        "text": "你好，新人。里夫特说你很能打。",
+        "next": "intro_04"
+      },
+      "intro_04": {
+        "id": "intro_04",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "他夸大了。",
+        "next": "intro_05"
+      },
+      "intro_05": {
+        "id": "intro_05",
+        "speakerId": "victor",
+        "speakerSide": "right",
+        "text": "不用谦虚。能从港口走到这里，就有资格留下。",
+        "next": "finish"
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": []
+      }
+    }
+  },
+  "E08": {
+    "id": "E08",
+    "title": "赛博精神病",
+    "placeId": "block5",
+    "unlockCondition": {
+      "any": [
+        {
+          "completed": "E06"
+        },
+        {
+          "completed": "E07"
+        }
+      ]
+    },
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "一名装载过量义体的男子在街区失控。",
+    "optional": true,
+    "demoNote": "演示条件：完成阵营入门后开放，正式条件待确认。",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "psycho",
+        "speakerSide": "right",
+        "text": "这该死的社会……全都毁掉！",
+        "next": "intro_02"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "他已经听不进去了。",
+        "next": "battle"
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "psycho",
+        "speakerSide": "right",
+        "text": "克拉拉……爸爸很快就回……家……",
+        "next": "win_02"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "……抱歉。",
+        "next": "finish"
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B08"
+      },
+      "lose": {
+        "id": "lose",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "surrender": {
+        "id": "surrender",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": []
+      }
+    }
+  },
+  "E09": {
+    "id": "E09",
+    "title": "危险的野狼",
+    "placeId": "power",
+    "unlockCondition": {
+      "all": [
+        {
+          "completed": "E06"
+        },
+        {
+          "faction": "company"
+        }
+      ]
+    },
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "公司命你清剿在发电厂活动的野狼部队。",
+    "optional": false,
+    "demoNote": "",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "就是你们？",
+        "next": "intro_02"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "",
+        "speakerSide": "right",
+        "text": "野狼部队沉默地摆开阵势。",
+        "next": "intro_03",
+        "type": "stage"
+      },
+      "intro_03": {
+        "id": "intro_03",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "不打算谈？那就来吧。",
+        "next": "battle"
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "真难缠……好在公司配的装备够用。",
+        "next": "win_02"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "ally_robot",
+        "speakerSide": "left",
+        "text": "胜利。胜利。",
+        "next": "finish"
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B09"
+      },
+      "lose": {
+        "id": "lose",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "surrender": {
+        "id": "surrender",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": []
+      }
+    }
+  },
+  "E10": {
+    "id": "E10",
+    "title": "进攻发电厂",
+    "placeId": "power",
+    "unlockCondition": {
+      "all": [
+        {
+          "completed": "E07"
+        },
+        {
+          "faction": "resistance"
+        }
+      ]
+    },
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "与野狼部队一起切断公司的能源供应。",
+    "optional": false,
+    "demoNote": "",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "这些是公司的新型号？看着不太好对付。",
+        "next": "intro_02"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "",
+        "speakerSide": "right",
+        "text": "野狼部队沉默地向前推进。",
+        "next": "intro_03",
+        "type": "stage"
+      },
+      "intro_03": {
+        "id": "intro_03",
+        "speakerId": "company_robot",
+        "speakerSide": "right",
+        "text": "发现入侵者。执行歼灭。",
+        "next": "battle"
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "还好有野狼部队在，不然真要栽在这儿。",
+        "next": "win_02"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "company_robot",
+        "speakerSide": "right",
+        "text": "机体……损坏……",
+        "next": "finish"
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B10"
+      },
+      "lose": {
+        "id": "lose",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "surrender": {
+        "id": "surrender",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": []
+      }
+    }
+  },
+  "E11": {
+    "id": "E11",
+    "title": "变异的鱼",
+    "placeId": "pump",
+    "unlockCondition": {
+      "any": [
+        {
+          "completed": "E06"
+        },
+        {
+          "completed": "E07"
+        }
+      ]
+    },
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "处理受污染水域中异变的鱼群。",
+    "optional": true,
+    "demoNote": "演示条件：阵营入门后开放；暂挂黑潮泵站外海入口。",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "",
+        "speakerSide": "right",
+        "text": "变异鱼群从污水中跃出，露出尖齿。",
+        "next": "intro_02",
+        "type": "stage"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "这些到底是什么东西？",
+        "next": "battle"
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "呼……全是黏液。得赶紧回去洗个澡。",
+        "next": "finish"
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B11"
+      },
+      "lose": {
+        "id": "lose",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "surrender": {
+        "id": "surrender",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": []
+      }
+    }
+  },
+  "E12": {
+    "id": "E12",
+    "title": "机甲复仇",
+    "placeId": "hive",
+    "unlockCondition": {
+      "any": [
+        {
+          "completed": "E09"
+        },
+        {
+          "completed": "E10"
+        }
+      ]
+    },
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "黑帮头目驾驶公司机甲，回到蜂巢城寨复仇。",
+    "optional": false,
+    "demoNote": "演示前置：完成本阵营发电厂任务，正式前置待确认。",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "gang",
+        "speakerSide": "right",
+        "text": "终于找到你了！这次我要把你撕成碎片！",
+        "next": "intro_02"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "上次的教训还不够？那就再来一次。",
+        "next": "battle"
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "noren",
+        "speakerSide": "left",
+        "text": "到此为止。",
+        "next": "win_02"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "gang",
+        "speakerSide": "right",
+        "text": "你这小鬼……啊——！",
+        "next": "finish"
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B12"
+      },
+      "lose": {
+        "id": "lose",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "surrender": {
+        "id": "surrender",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "choices": [
+          {
+            "id": "return",
+            "label": "返回城市地图（保留结果）",
+            "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": [
+          {
+            "op": "finishWeek"
+          }
+        ]
+      }
+    }
+  }
+}
