@@ -164,10 +164,8 @@ func portrait(id: String, side: String, active: bool = true, top: float = 150, h
 	var pic := image_asset(self, aid, Vector2(x,top), Vector2(390,height), false)
 	if pic:
 		# Original RGB art is preserved; white paper is keyed only at render time.
-		var shader := Shader.new()
-		shader.code = "shader_type canvas_item; varying vec4 tint; void vertex(){ tint=COLOR; } void fragment(){ vec4 c=texture(TEXTURE,UV); float paper=smoothstep(0.94,0.995,min(c.r,min(c.g,c.b))); COLOR=vec4(c.rgb,c.a*(1.0-paper))*tint; }"
 		var mat := ShaderMaterial.new()
-		mat.shader = shader
+		mat.shader = preload("res://shaders/white_key.gdshader")
 		pic.material = mat
 		pic.modulate = Color.WHITE if active else Color(0.72,0.66,0.79,0.95)
 		pic.position.x += -20 if side == "left" else 20
