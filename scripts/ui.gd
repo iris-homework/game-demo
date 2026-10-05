@@ -1,11 +1,11 @@
 class_name DemoUI
 extends Control
-const INK := Color("070e19")
-const PANEL := Color("111b2b")
-const PINK := Color("f04b88")
-const CYAN := Color("58e1eb")
-const CREAM := Color("f3ebde")
-const MUTED := Color("aaa4b8")
+const INK := Color("090b12")
+const PANEL := Color("121722")
+const PINK := Color("ff3158")
+const CYAN := Color("64ffe1")
+const CREAM := Color("f5f3eb")
+const MUTED := Color("a7b0be")
 var base_font: Font
 var button_font: FontVariation
 var hp_fill: ColorRect
@@ -24,7 +24,7 @@ func _init() -> void:
 	t.default_font_size = 20
 	button_font = FontVariation.new()
 	button_font.base_font = base_font
-	button_font.variation_embolden = 0.45
+	button_font.variation_embolden = 0.8
 	t.set_font("font", "Button", button_font)
 	t.set_font_size("font_size", "Button", 19)
 	for state_name in ["normal", "hover", "pressed", "disabled", "focus"]:
@@ -54,10 +54,10 @@ func style(color: Color, border: Color, width: int = 1) -> StyleBoxFlat:
 	s.bg_color = color
 	s.border_color = border
 	s.set_border_width_all(width)
-	s.set_corner_radius_all(2)
+	s.set_corner_radius_all(0)
 	s.border_width_left = 3
 	s.shadow_color = Color(0.04,0.65,0.75,0.1)
-	s.shadow_size = 3
+	s.shadow_size = 0
 	s.content_margin_left = 18
 	s.content_margin_right = 18
 	s.content_margin_top = 8
@@ -71,6 +71,8 @@ func label(parent: Node, text: String, pos: Vector2, dimensions: Vector2, font_s
 	n.size = dimensions
 	n.add_theme_font_size_override("font_size", font_size)
 	n.add_theme_color_override("font_color", color)
+	if font_size >= 28:
+		n.add_theme_font_override("font", button_font)
 	n.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	parent.add_child(n)
@@ -79,22 +81,23 @@ func label(parent: Node, text: String, pos: Vector2, dimensions: Vector2, font_s
 
 func button_style(state_name: String, accent: bool) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
-	s.set_corner_radius_all(7)
+	s.set_corner_radius_all(0)
+	s.skew = Vector2(0.12, 0)
 	s.set_border_width_all(1)
-	s.content_margin_left = 10
-	s.content_margin_right = 10
+	s.content_margin_left = 16
+	s.content_margin_right = 16
 	s.content_margin_top = 4
 	s.content_margin_bottom = 4
-	s.bg_color = Color("bc3067") if accent else Color("132638")
-	s.border_color = Color("ff72a9") if accent else Color("426679")
+	s.bg_color = PINK if accent else Color("151c28")
+	s.border_color = PINK if accent else Color("586373")
 	match state_name:
 		"hover":
-			s.bg_color = Color("e24583") if accent else Color("1b3e50")
-			s.border_color = Color("ffb0cf") if accent else CYAN
+			s.bg_color = CREAM if accent else Color("234039")
+			s.border_color = CREAM if accent else CYAN
 			s.shadow_color = Color(0.95,0.2,0.5,0.18) if accent else Color(0.2,0.8,0.95,0.15)
 			s.shadow_size = 5
 		"pressed":
-			s.bg_color = Color("862449") if accent else Color("0c202e")
+			s.bg_color = Color("cf2347") if accent else Color("0d211e")
 			s.border_color = CREAM
 		"disabled":
 			s.bg_color = Color("141c28")
@@ -116,8 +119,8 @@ func button(parent: Node, text: String, pos: Vector2, dimensions: Vector2, actio
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	b.add_theme_font_override("font", button_font)
 	b.add_theme_font_size_override("font_size", 19)
-	b.add_theme_color_override("font_color", CREAM)
-	b.add_theme_color_override("font_hover_color", Color("ffffff"))
+	b.add_theme_color_override("font_color", INK if accent else CREAM)
+	b.add_theme_color_override("font_hover_color", INK if accent else Color("ffffff"))
 	b.add_theme_color_override("font_pressed_color", CREAM)
 	b.add_theme_color_override("font_disabled_color", Color("667384"))
 	for state_name in ["normal", "hover", "pressed", "disabled", "focus"]:
@@ -161,9 +164,11 @@ func background(id: String, darkness: float = 0.3) -> void:
 		label(self, "场景美术待补 / " + Game.place_data(Game.state.get("currentPlaceId", "")).get("name", ""), Vector2(64,828), Vector2(650,27), 15, MUTED)
 
 func chrome(section: String) -> void:
-	rect(self,Vector2.ZERO,Vector2(1440,95),Color("09111ff5"))
-	rect(self,Vector2(0,94),Vector2(1440,1),Color("2f6178"))
-	label(self,Game.display_name("noren") + "  /  " + section,Vector2(36,8),Vector2(385,36),20,CREAM)
+	rect(self,Vector2.ZERO,Vector2(1440,95),Color("090b12f5"))
+	polygon(self,[Vector2.ZERO,Vector2(457,0),Vector2(432,95),Vector2(0,95)],Color("202331"))
+	rect(self,Vector2(0,94),Vector2(1440,1),Color("4a505e"))
+	rect(self,Vector2(0,94),Vector2(314,3),PINK)
+	label(self,Game.display_name("noren") + "  /  " + section,Vector2(36,8),Vector2(395,36),20,CREAM)
 	panel(self,Vector2(37,51),Vector2(277,17),Color("382333"),Color("805071"))
 	hp_fill = rect(self,Vector2(40,54),Vector2(271,11),PINK)
 	hp_label = label(self,"",Vector2(327,44),Vector2(140,33),18)
@@ -172,16 +177,17 @@ func chrome(section: String) -> void:
 	for day in range(1,8):
 		var current: bool = day == int(Game.state.get("currentDay",1))
 		var x := 477+(day-1)*70
-		panel(self,Vector2(x,20),Vector2(65,42),Color("164250") if current else Color("111c2a"),CYAN if current else Color("354457"))
-		label(self,"第 %d 天" % day,Vector2(x+9,26),Vector2(60,28),15,CREAM if current else MUTED)
-	label(self,"WEEK 01 / 时间推进规则待定",Vector2(583,69),Vector2(420,23),11,MUTED)
-	var faction: String = {"":"自由佣兵","company":"公司特遣部","resistance":"革命军"}.get(Game.state.get("faction",""),"自由佣兵")
+		panel(self,Vector2(x,17),Vector2(65,47),CREAM if current else Color("141922"),CREAM if current else Color("35404b"))
+		label(self,"第 %d 天" % day,Vector2(x+9,26),Vector2(60,28),15,INK if current else MUTED)
+		if current: rect(self,Vector2(x,66),Vector2(65,3),PINK)
+	label(self,"W E E K  0 1    /    午夜开场",Vector2(583,72),Vector2(420,20),11,MUTED)
+	var faction: String = {"":"自由佣兵","company":"公司特遣部","resistance":"归零运动"}.get(Game.state.get("faction",""),"自由佣兵")
 	label(self,faction,Vector2(1026,13),Vector2(214,31),17,CYAN)
 	label(self,"%d CR" % int(Game.state.get("credits",0)),Vector2(1026,49),Vector2(210,30),17)
 	button(self,"退出演练" if Game.training_mode else "菜单",Vector2(1263,23),Vector2(145,49),Game.menu)
 	if section != "战斗":
 		label(self,"MIDNIGHT / W01",Vector2(36,864),Vector2(600,24),12,MUTED)
-		label(self,"检查点自动保存 · F1 开发面板",Vector2(1080,859),Vector2(340,27),13,MUTED)
+		label(self,"● 自动保存    /    F1 开发面板",Vector2(1100,859),Vector2(310,27),12,MUTED)
 
 func refresh_hp() -> void:
 	if not is_instance_valid(hp_fill): return
@@ -191,7 +197,7 @@ func refresh_hp() -> void:
 	hp_label.text = "%d / %d" % [hp,maximum]
 
 func tag(text: String, pos: Vector2, color: Color = CYAN, width: float = 180) -> void:
-	panel(self, pos, Vector2(width,32), Color("191623"), color)
+	cut_panel(self, pos, Vector2(width,32), INK, color, 9)
 	label(self, text, pos + Vector2(12,2), Vector2(width-20,28), 14, color)
 
 func portrait(id: String, side: String, active: bool = true, top: float = 150, height: float = 590) -> void:
@@ -218,3 +224,23 @@ func portrait(id: String, side: String, active: bool = true, top: float = 150, h
 func fade_in() -> void:
 	modulate.a = 0
 	create_tween().tween_property(self, "modulate:a", 1.0, 0.16)
+
+# Decorative geometry never participates in mouse or keyboard input.
+func polygon(parent: Node, points: Array, color: Color) -> Polygon2D:
+	var shape := Polygon2D.new()
+	shape.polygon = PackedVector2Array(points)
+	shape.color = color
+	parent.add_child(shape)
+	return shape
+
+func cut_panel(parent: Node, pos: Vector2, dimensions: Vector2, fill: Color, edge: Color = CYAN, cut: float = 22) -> Control:
+	var holder := Control.new()
+	holder.position = pos
+	holder.size = dimensions
+	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(holder)
+	var w := dimensions.x
+	var h := dimensions.y
+	polygon(holder,[Vector2(cut,0),Vector2(w,0),Vector2(w,h-cut),Vector2(w-cut,h),Vector2(0,h),Vector2(0,cut)],edge)
+	polygon(holder,[Vector2(cut+1,2),Vector2(w-2,2),Vector2(w-2,h-cut-1),Vector2(w-cut-1,h-2),Vector2(2,h-2),Vector2(2,cut+1)],fill)
+	return holder

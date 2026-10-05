@@ -17,6 +17,8 @@ var turn_label: Label
 var draw_count: Label
 var discard_count: Label
 var end_button: Button
+var cyberware_button: Button
+var cyberware_status: Label
 var pile_overlay: Control
 var initialized := false
 const DRAW_POS := Vector2(75,711)
@@ -33,7 +35,8 @@ func enter(params: Dictionary) -> void:
 	expected_revision = Game.revision
 	background(Game.place_data(battle.placeId).backgroundAssetId,0.15)
 	# A restrained lower tint separates readable cards from the scene.
-	rect(self,Vector2(0,610),Vector2(1440,290),Color("08111bca"))
+	polygon(self,[Vector2(0,629),Vector2(1440,606),Vector2(1440,900),Vector2(0,900)],Color("090b12e5"))
+	polygon(self,[Vector2(0,622),Vector2(330,617),Vector2(327,625),Vector2(0,630)],PINK)
 	var arena := Node2D.new()
 	arena.set_script(preload("res://scripts/combat/arena_fx.gd"))
 	add_child(arena)
@@ -43,7 +46,8 @@ func enter(params: Dictionary) -> void:
 	tag("演练模式 · 不影响冒险" if Game.training_mode else "临时规则 / 攻击 1 · 敌方 HP 3",Vector2(1030,117),CYAN,360)
 	if Game.texture(Game.place_data(battle.placeId).backgroundAssetId) == null:
 		label(self,"场景美术待补",Vector2(43,203),Vector2(330,26),13,MUTED)
-	turn_label = label(self,"回合 %02d  /  你的回合" % model.turn,Vector2(583,210),Vector2(410,37),20,CYAN)
+	cut_panel(self,Vector2(565,204),Vector2(310,45),INK,CYAN,12)
+	turn_label = label(self,"回合 %02d  /  你的回合" % model.turn,Vector2(592,210),Vector2(275,37),18,CYAN)
 	var n_asset: String = Game.characters.noren.get("battlePortraitAssetId", "")
 	player_portrait = battle_portrait(n_asset,Vector2(90,215),Vector2(630,335))
 	label(self,Game.display_name("noren"),Vector2(305,552),Vector2(280,33),23)
@@ -65,6 +69,14 @@ func enter(params: Dictionary) -> void:
 	discard_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	end_button = button(self,"结束回合  →",Vector2(1180,620),Vector2(216,56),end_turn_pressed,true)
 	end_button.tooltip_text = "敌方执行头顶意图；未使用手牌弃置，再抽取新手牌。临时规则不限制出牌次数。"
+	cyberware_button = button(self,"激活义体",Vector2(51,620),Vector2(250,56),show_cyberware)
+	for state_name in ["normal","hover","pressed","focus"]:
+		var purple_style := button_style(state_name,false)
+		purple_style.border_color = Color("c895ff")
+		if state_name != "focus": purple_style.bg_color = Color("482866") if state_name == "hover" else Color("251638")
+		cyberware_button.add_theme_stylebox_override(state_name,purple_style)
+	cyberware_status = label(self,"",Vector2(51,678),Vector2(310,28),15,Color("c895ff"))
+	refresh_cyberware()
 	label(self,"道具栏",Vector2(51,272),Vector2(130,30),14,MUTED)
 	for i in 3:
 		var slot := button(self,"＋",Vector2(51+i*61,312),Vector2(52,44),func(): use_item(""))
@@ -108,7 +120,7 @@ func refresh_enemy_hud() -> void:
 		var center := enemy_position(i) + Vector2(230,0)
 		var intent_text := "攻击 %d" % int(enemy.intent.get("amount",0))
 		if int(enemy.intent.get("hits",1)) > 1: intent_text += " ×%d" % int(enemy.intent.hits)
-		panel(enemy_hud,Vector2(center.x-98,181),Vector2(196,65),Color("291826ed"),PINK)
+		cut_panel(enemy_hud,Vector2(center.x-98,181),Vector2(196,65),INK,PINK,13)
 		label(enemy_hud,"↗",Vector2(center.x-83,184),Vector2(55,50),38,PINK)
 		label(enemy_hud,intent_text,Vector2(center.x-28,185),Vector2(135,35),24)
 		label(enemy_hud,"下回合意图",Vector2(center.x-28,218),Vector2(140,22),12,MUTED)
@@ -143,7 +155,13 @@ func refresh_enemy_hud() -> void:
 func pile_button(pos: Vector2, title: String, action: Callable) -> void:
 	panel(self,pos+Vector2(10,-10),Vector2(107,127),Color("0d1728"),Color("335671"))
 	panel(self,pos+Vector2(5,-5),Vector2(107,127),Color("0d1728"),Color("335671"))
-	button(self,"",pos,Vector2(107,127),action)
+	var pile := button(self,"",pos,Vector2(107,127),action)
+	# Piles retain their upright card-stack silhouette in every input state.
+	for state_name in ["normal", "hover", "pressed", "disabled", "focus"]:
+		var upright := pile.get_theme_stylebox(state_name).duplicate() as StyleBoxFlat
+		upright.skew = Vector2.ZERO
+		upright.set_corner_radius_all(7)
+		pile.add_theme_stylebox_override(state_name, upright)
 	var title_label := label(self,title,pos+Vector2(0,83),Vector2(107,29),17)
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
@@ -342,11 +360,34 @@ func set_busy(value: bool) -> void:
 	Game.battle_busy = value
 	if value: held_card_uid = ""
 	if is_instance_valid(end_button): end_button.disabled = value
+	if is_instance_valid(cyberware_button): cyberware_button.disabled = value
 	for view in cards.values(): view.set_enabled(not value)
 
 func commit() -> void:
 	Game.commit_combat(model)
 	expected_revision = Game.revision
+	refresh_cyberware()
+
+func refresh_cyberware() -> void:
+	if not is_instance_valid(cyberware_status): return
+	cyberware_button.text = "激活义体 · %d/8" % (model.cyberware_cards().size()-model.used_cyberware.size())
+	cyberware_status.text = "下次攻击伤害 +%d" % model.next_attack_bonus if model.next_attack_bonus > 0 else "临时义体 / 点击查看"
+
+func show_cyberware() -> void:
+	if not initialized or Game.battle_busy or Game.transition_locked or is_instance_valid(pile_overlay): return
+	cancel_selection()
+	pile_overlay = preload("res://scripts/combat/cyberware_view.gd").new()
+	pile_overlay.setup(model)
+	pile_overlay.closed.connect(close_pile)
+	pile_overlay.activation_requested.connect(activate_cyberware)
+	add_child(pile_overlay)
+
+func activate_cyberware(id: String) -> void:
+	if not initialized or Game.battle_busy or Game.transition_locked or not is_instance_valid(pile_overlay): return
+	if not pile_overlay.has_signal("activation_requested"): return
+	if not model.activate_cyberware(id): return
+	commit()
+	pile_overlay.refresh()
 
 func finish(result: String) -> void:
 	if Game.transition_locked or Game.battle_busy or is_instance_valid(pile_overlay): return

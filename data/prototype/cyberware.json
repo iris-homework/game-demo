@@ -1,0 +1,54 @@
+{
+  "prototype": true,
+  "note": "战斗义体临时规则；名称及效果待正式设计；每张冷却 1 回合，使用当回合计入，下个玩家回合可再次激活。",
+  "cards": [
+    {
+      "id": "test_cyberware_01",
+      "name": "临时义体 01",
+      "description": "下次攻击伤害 +1",
+      "nextAttackBonus": 1
+    },
+    {
+      "id": "test_cyberware_02",
+      "name": "临时义体 02",
+      "description": "下次攻击伤害 +1",
+      "nextAttackBonus": 1
+    },
+    {
+      "id": "test_cyberware_03",
+      "name": "临时义体 03",
+      "description": "下次攻击伤害 +1",
+      "nextAttackBonus": 1
+    },
+    {
+      "id": "test_cyberware_04",
+      "name": "临时义体 04",
+      "description": "下次攻击伤害 +1",
+      "nextAttackBonus": 1
+    },
+    {
+      "id": "test_cyberware_05",
+      "name": "临时义体 05",
+      "description": "下次攻击伤害 +1",
+      "nextAttackBonus": 1
+    },
+    {
+      "id": "test_cyberware_06",
+      "name": "临时义体 06",
+      "description": "下次攻击伤害 +1",
+      "nextAttackBonus": 1
+    },
+    {
+      "id": "test_cyberware_07",
+      "name": "临时义体 07",
+      "description": "下次攻击伤害 +1",
+      "nextAttackBonus": 1
+    },
+    {
+      "id": "test_cyberware_08",
+      "name": "临时义体 08",
+      "description": "下次攻击伤害 +1",
+      "nextAttackBonus": 1
+    }
+  ]
+}

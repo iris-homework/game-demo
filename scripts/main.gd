@@ -66,7 +66,7 @@ func show_notice(message: String) -> void:
 	add_child(ui)
 	ui.z_index = 110
 	ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	ui.panel(ui,Vector2(320,104),Vector2(800,62),Color("132639"),DemoUI.CYAN)
+	ui.cut_panel(ui,Vector2(320,104),Vector2(800,62),DemoUI.INK,DemoUI.CYAN,14)
 	ui.label(ui,message,Vector2(342,114),Vector2(760,48),18)
 	get_tree().create_timer(4.0).timeout.connect(func(): if is_instance_valid(ui): ui.queue_free())
 

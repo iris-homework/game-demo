@@ -15,7 +15,7 @@
         "id": "intro_01",
         "speakerId": "bartender",
         "speakerSide": "right",
-        "text": "欢迎来到午夜酒馆，小姑娘。最近城里不太平，革命军又在找公司的麻烦。你这时候来，是想喝酒，还是想找活干？",
+        "text": "欢迎来到午夜酒馆，小姑娘。最近城里不太平，归零运动又在找公司的麻烦。你这时候来，是想喝酒，还是想找活干？",
         "next": "intro_02"
       },
       "intro_02": {
@@ -66,7 +66,7 @@
           },
           {
             "id": "lumina",
-            "label": "卢米娜  /  追捕袭击公司设施的革命军成员",
+            "label": "卢米娜  /  追捕袭击公司设施的归零运动成员",
             "next": "chosen_01",
             "effects": [
               {
@@ -712,7 +712,7 @@
     },
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
-    "description": "在港口追上被悬赏的革命军成员卢米娜。",
+    "description": "在港口追上被悬赏的归零运动成员卢米娜。",
     "optional": false,
     "demoNote": "",
     "rewardIds": [],
@@ -784,7 +784,7 @@
         "id": "win_05",
         "speakerId": "rift",
         "speakerSide": "right",
-        "text": "革命军干部，里夫特。先别动她。你是公司的人？",
+        "text": "归零运动干部，里夫特。先别动她。你是公司的人？",
         "next": "win_06"
       },
       "win_06": {
@@ -798,7 +798,7 @@
         "id": "win_07",
         "speakerId": "rift",
         "speakerSide": "right",
-        "text": "看着不像公司的走狗，身手倒是不错。愿不愿意加入革命军？",
+        "text": "看着不像公司的走狗，身手倒是不错。愿不愿意加入归零运动？",
         "next": "join"
       },
       "join": {
@@ -970,7 +970,7 @@
   },
   "E07": {
     "id": "E07",
-    "title": "加入革命军",
+    "title": "加入归零运动",
     "placeId": "camp",
     "unlockCondition": {
       "completed": "E05B"

@@ -9,7 +9,9 @@
 - [开发接入说明](docs/开发接入说明.md)：卡牌、敌人、资源和剧情接口的接入方式。
 - [验收记录](docs/验收记录.txt)：保留历次实际测试输出；历史通过不代表本次已重新测试。
 
-当前工程版本为 **0.2.3-r1**。文档维护基线更新于 **2026-10-03**；本次仅补充维护资料，没有改变游戏规则或存档格式。
+当前工程版本为 **0.3.2-cyberware**，更新于 **2026-10-05**。沿用赛博朋克 UI，新增战斗内“激活义体”入口和八张紫色临时义体卡。抽牌堆、弃牌堆入口保持竖直圆角样式。
+
+实际画面：[主菜单](docs/预览/UI改版/主菜单.png)、[剧情对白](docs/预览/UI改版/剧情对白.png)、[机甲战斗](docs/预览/UI改版/机甲战斗.png)。
 
 ## 立即体验
 
@@ -23,6 +25,10 @@
 正常剧情的所有战斗入口都已接入同一套战斗，不需要从演练进入。
 
 ## 战斗操作与本轮规则
+
+点击左下角“激活义体”，打开两行四列的八张紫色卡牌。名称暂用“临时义体 01—08”，效果均为下次攻击伤害 +1。点击卡牌或按数字 1—8 即可激活，卡面变灰并标记冷却中；Esc、右键或返回按钮关闭。
+
+**每张义体冷却 1 回合，使用当回合计入冷却，下个玩家回合恢复可用；多张加成叠加。** 例如激活两张后，下一次临时攻击造成 3 点伤害，再下一次恢复 1 点。未使用的加成跨回合保留；无效目标与取消瞄准不消耗加成。当回合冷却状态与待生效加成随战斗存档保存，新战斗重置。名称、效果和次数限制均为原型规则，独立放在临时系统中，局外义体档案仍为预留入口。
 
 1. 开场从左侧抽牌堆飞入三张临时攻击卡。
 2. 按下手牌立即选中并显示指向线，按住拖到敌方后松开出牌；也可先点选，再点击敌方出牌。弧形箭头跟随鼠标，指向有效敌人时变为洋红色并显示锁定环。再次点卡牌、右键或 Esc 取消。
@@ -79,7 +85,8 @@ R1 使用 schemaVersion 2，自动读取并迁移初版存档：保留原剧情�
 | 敌人 ID、显示名、战斗图与意图序列 | `data/enemies/enemies.json` |
 | 战斗参战敌人、地点与剧情返回节点 | `data/battles.json` |
 | 正式道具目录，当前为空 | `data/items/items.json` |
-| 义体目录，当前为空 | `data/cyberware/cyberware.json` |
+| 战斗临时义体卡配置 | `data/prototype/cyberware.json` |
+| 正式局外义体目录，当前为空 | `data/cyberware/cyberware.json` |
 | 人物双立绘配置 | `data/characters.json` |
 | 美术路径与空资源 | `data/assets.json` |
 
@@ -91,6 +98,8 @@ R1 使用 schemaVersion 2，自动读取并迁移初版存档：保留原剧情�
 godot --headless --path . --editor --import --quit
 godot --headless --path . res://tests/run.tscn
 godot --headless --path . res://tests/combat_tests.tscn
+godot --headless --path . res://tests/cyberware_tests.tscn
+godot --path . res://tests/cyberware_visual.tscn
 godot --path . res://tests/r1_visual.tscn
 godot --path . res://tests/interaction_visual.tscn
 godot --path . res://tests/pile_visual.tscn

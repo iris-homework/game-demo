@@ -48,3 +48,51 @@ VISUAL INTEGRATION: 0 failures; screenshots: /var/folders/mc/lbzb_hd50lg7htqnl3v
 - 本轮实际执行：tests/combat_tests.tscn：191 checks, 0 failures。
 - 本轮未重跑图形测试；维护文档中的交互通过结果引用此前验收。
 - 已知扩展边界及文档与代码差异已单列；首回合空手恢复补牌问题为静态代码审查推导，未作为已复现修复记录。
+
+阵营名称统一（2026-10-03，0.2.3-r1 同版本文案补丁）：
+- 4 个文件、12 处文本统一为归零运动；内部 resistance ID 与存档结构不变。
+- 工程文本检索旧名称无残留；所有 data JSON 解析通过。
+- 实际菜单截图已检查并更新；INTERACTION VISUAL：16 checks, 0 failures。
+
+2026-10-04 UI 0.3.0-ui（Asia/Shanghai）
+Godot 4.7.2 standard / Compatibility
+编辑器导入完成，未出现 SCRIPT ERROR / Parse Error。
+1280x800 res://tests/r1_visual.tscn
+VISUAL INTEGRATION: 0 failures
+1280x800 res://tests/interaction_visual.tscn
+INTERACTION VISUAL: 16 checks, 0 failures
+1280x800 res://tests/pile_visual.tscn
+PILE VISUAL: 18 checks, 0 failures
+1600x1000 res://tests/drag_visual.tscn
+DRAG VISUAL: 11 checks, 0 failures
+1600x1000 res://tests/r1_visual.tscn
+VISUAL INTEGRATION: 0 failures
+补充 res://tests/visual.tscn，正常退出；人工检查菜单、对白、选项、结算截图。
+人工检查牌堆容量顶部及底部、战斗、地图选中状态、地点与义体布局。
+本轮未改规则或 JSON，未重跑 run.tscn / combat_tests.tscn。
+截图：docs/预览/UI改版；容量测试截图仍为系统临时目录下 midnight_pile_capacity_*，30 张卡仅在测试内存中生成。
+
+2026-10-05 0.3.1-cyberware 战斗义体原型（Asia/Shanghai）
+Godot 4.7.2 standard / Compatibility，导入完成，无脚本错误。
+CYBERWARE TESTS: 45 checks, 0 failures
+COMBAT TESTS: 191 checks, 0 failures
+TEST RESULTS: 690 checks, 0 failures
+1280x800 CYBERWARE VISUAL: 21 checks, 0 failures
+1600x1000 CYBERWARE VISUAL: 21 checks, 0 failures
+VISUAL INTEGRATION: 0 failures
+DRAG VISUAL: 11 checks, 0 failures
+PILE VISUAL: 18 checks, 0 failures
+人工检查八张紫色卡、激活后状态、战斗入口及加成显示。
+新规则测试用 user://cyberware_test_checkpoint.json，结束删除；所有图形测试禁用存档。
+规则包括重复激活拒绝、无效目标保留加成、跨回合、多段只加一次、正常后续攻击、磁盘恢复、旧档缺字段、损坏字段和新战斗重置。
+本轮未单独重跑 interaction_visual.tscn；新义体图形检查与拖牌回归覆盖相关鼠标输入。
+截图：docs/预览/战斗义体；其中 20HP 为测试内存样本，正式数据未提高敌方血量。
+
+2026-10-05 0.3.2-cyberware 义体冷却（Asia/Shanghai）
+Godot 4.7.2 standard / Compatibility
+CYBERWARE TESTS: 57 checks, 0 failures
+COMBAT TESTS: 191 checks, 0 failures
+1280x800 CYBERWARE VISUAL: 26 checks, 0 failures
+检查冷却含当回合、每卡独立、攻击不提前解锁、下回合恢复并可再次使用、冷却前后专用存档恢复、跨回合加成超过8仍有效。
+人工检查实际渲染卡面：使用后整体变灰并显示“冷却中 · 下回合可用”，下一回合恢复紫色。
+本轮未重新执行剧情、牌堆、拖牌等其他专项测试。

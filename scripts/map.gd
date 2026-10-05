@@ -1,6 +1,7 @@
 extends DemoUI
 var detail: Control
 var selected_id := ""
+var hotspots: Dictionary = {}
 var map_rect := Rect2(34,162,976,660)
 
 func _ready() -> void:
@@ -13,9 +14,12 @@ func _ready() -> void:
 		map_rect = Rect2(map_rect.position+(map_rect.size-dimensions)/2.0,dimensions)
 		image_asset(self,map_asset,map_rect.position,map_rect.size,false)
 	else:
-		panel(self,map_rect.position,map_rect.size,Color("0e1928"),Color("264256"))
+		cut_panel(self,map_rect.position,map_rect.size,Color("10151e"),Color("45515d"))
+		for x in range(72,1000,48):
+			for y in range(194,758,48): rect(self,Vector2(x,y),Vector2(2,2),Color("29333d"))
+		label(self,"CITY / OFFLINE",Vector2(67,178),Vector2(800,89),52,Color("ffffff0d"))
 		label(self,"城市地图插画待补",Vector2(62,773),Vector2(850,42),25,MUTED)
-		label(self,"以下为地区热点调试层 · 正式插画和精确锚点待接入",Vector2(38,118),Vector2(985,37),16,MUTED)
+		label(self,"以下为地区热点调试层 · 正式插画和精确锚点待接入",Vector2(38,124),Vector2(790,37),14,MUTED)
 	chrome("城市地区")
 	for p in Game.places:
 		var anchor := map_rect.position + Vector2(p.mapAnchor[0],p.mapAnchor[1])*map_rect.size
@@ -28,8 +32,11 @@ func _ready() -> void:
 		var status := "×" if not open else "✓" if completed and available.is_empty() else "·"
 		var hotspot := button(self,status+" "+p.name,anchor-dimensions/2.0,dimensions,func(): select_place(p.id))
 		hotspot.add_theme_font_size_override("font_size",16)
-		var fill := Color(0.02,0.06,0.12,0.25) if texture else Color("15283b")
-		hotspot.add_theme_stylebox_override("normal",style(fill,Color("486576") if open else Color("303e52")))
+		var fill := Color(0.02,0.06,0.12,0.25) if texture else Color("171e2a")
+		hotspot.add_theme_stylebox_override("normal",style(fill,Color("73818b") if open else Color("303e52")))
+		hotspot.set_meta("idle_style",hotspot.get_theme_stylebox("normal"))
+		hotspot.set_meta("idle_color",CREAM if open else Color("7d8297"))
+		hotspots[p.id] = hotspot
 		hotspot.tooltip_text = p.description if open else p.lockHint
 		if not open: hotspot.add_theme_color_override("font_color",Color("7d8297"))
 		if not available.is_empty():
@@ -37,13 +44,19 @@ func _ready() -> void:
 			var marker := button(self,("!" if main_event else "?")+str(available.size()),anchor+Vector2(dimensions.x/2-10,-dimensions.y/2-20),Vector2(40,33),func(): select_place(p.id),main_event)
 			marker.add_theme_font_size_override("font_size",13)
 			marker.tooltip_text = available[0].title
-	panel(self,Vector2(1035,120),Vector2(370,716),Color("101b2bf5"),Color("36546a"))
+	cut_panel(self,Vector2(1035,120),Vector2(370,716),PANEL,CREAM)
+	rect(self,Vector2(1059,242),Vector2(72,4),PINK)
 	var available := Game.available_events()
 	select_place(available[0].placeId if not available.is_empty() else Game.state.currentPlaceId)
 	button(self,"周次档案",Vector2(844,112),Vector2(163,40),show_weeks).add_theme_font_size_override("font_size",16)
 
 func select_place(id: String) -> void:
 	selected_id = id
+	for place_id in hotspots:
+		var hotspot: Button = hotspots[place_id]
+		var selected: bool = place_id == id
+		hotspot.add_theme_stylebox_override("normal",style(CREAM,CYAN) if selected else hotspot.get_meta("idle_style"))
+		hotspot.add_theme_color_override("font_color",INK if selected else hotspot.get_meta("idle_color"))
 	if is_instance_valid(detail):
 		remove_child(detail)
 		detail.queue_free()

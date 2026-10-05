@@ -5,7 +5,8 @@ func _ready() -> void:
 	var complete: bool = Game.state.flags.get("week1Complete", false) and e.id == "E12"
 	background("city", 0.53)
 	chrome("事件结算")
-	panel(self, Vector2(231,147), Vector2(978,644), Color("171321f2"), PINK)
+	polygon(self,[Vector2(222,166),Vector2(1218,131),Vector2(1232,778),Vector2(238,813)],PINK)
+	cut_panel(self, Vector2(231,147), Vector2(978,644), INK, CREAM,32)
 	tag("WEEK 01 COMPLETE" if complete else "CASE CLOSED / " + e.id, Vector2(285,186), CYAN, 330)
 	label(self, "第一周 · 落幕" if complete else "事件完成", Vector2(280,254), Vector2(873,95), 58)
 	label(self, e.title, Vector2(285,373), Vector2(870,55), 28, PINK)

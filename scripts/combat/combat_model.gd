@@ -14,6 +14,24 @@ var outcome := ""
 var profile: Dictionary = {}
 var card_catalog: Dictionary = {}
 var log_lines: Array = []
+# IDs on cooldown for this player turn; retained under the legacy save key.
+var used_cyberware: Array = []
+var next_attack_bonus := 0
+
+func cyberware_cards() -> Array:
+	return profile.get("cyberware", {}).get("cards", [])
+
+func activate_cyberware(id: String) -> bool:
+	if not outcome.is_empty() or player_hp <= 0 or id in used_cyberware: return false
+	for definition in cyberware_cards():
+		if definition.id != id: continue
+		var bonus := int(definition.get("nextAttackBonus", 0))
+		if bonus <= 0: return false
+		used_cyberware.append(id)
+		next_attack_bonus += bonus
+		log_lines.append("%s 已激活，下次攻击伤害 +%d。" % [definition.name, next_attack_bonus])
+		return true
+	return false
 
 func initialize(id: String, hp: int, maximum: int, rules: Dictionary, enemy_defs: Array, cards: Dictionary = {}) -> void:
 	battle_id = id
@@ -68,10 +86,15 @@ func play_card(uid: String, target_index: int) -> Dictionary:
 		if effect.get("type", "") != "damage" or not effect.get("amount") is float and not effect.get("amount") is int: return {}
 		if effect.amount < 0: return {}
 	var damage := 0
+	# Apply once to the first damage effect of a valid attack, never per hit.
+	var bonus := next_attack_bonus if definition.get("type", "") == "attack" else 0
 	for effect in effects:
-		var amount := mini(int(effect.amount), int(enemies[target_index].hp))
+		var amount := mini(int(effect.amount) + bonus, int(enemies[target_index].hp))
 		enemies[target_index].hp -= amount
 		damage += amount
+		if bonus > 0:
+			next_attack_bonus = 0
+			bonus = 0
 	hand.erase(uid)
 	discard_pile.append(uid)
 	log_lines.append("%s → %s，造成 %d 点伤害。" % [definition.name, enemies[target_index].displayName, damage])
@@ -101,6 +124,7 @@ func end_turn() -> Dictionary:
 			break
 	if outcome.is_empty():
 		turn += 1
+		used_cyberware.clear()
 		for enemy in enemies:
 			enemy.intentIndex += 1
 			enemy.intent = intent_for(enemy, int(enemy.intentIndex))
@@ -111,7 +135,7 @@ func use_item(_item_id: String, _target_index: int, _inventory: Dictionary, _cat
 	return {"ok":false, "reason":"道具效果待设计；当前没有可使用道具。"}
 
 func snapshot() -> Dictionary:
-	return {"battleId":battle_id,"turn":turn,"playerHp":player_hp,"maxHp":max_hp,"drawPile":draw_pile.duplicate(),"hand":hand.duplicate(),"discardPile":discard_pile.duplicate(),"instances":instances.duplicate(true),"enemies":enemies.duplicate(true),"outcome":outcome,"log":log_lines.slice(-30),"profile":profile.duplicate(true),"cardCatalog":card_catalog.duplicate(true)}
+	return {"battleId":battle_id,"turn":turn,"playerHp":player_hp,"maxHp":max_hp,"drawPile":draw_pile.duplicate(),"hand":hand.duplicate(),"discardPile":discard_pile.duplicate(),"instances":instances.duplicate(true),"enemies":enemies.duplicate(true),"outcome":outcome,"log":log_lines.slice(-30),"profile":profile.duplicate(true),"cardCatalog":card_catalog.duplicate(true),"usedCyberware":used_cyberware.duplicate(),"nextAttackBonus":next_attack_bonus}
 
 func restore(data: Dictionary) -> void:
 	battle_id = data.battleId
@@ -127,3 +151,5 @@ func restore(data: Dictionary) -> void:
 	log_lines = data.log.duplicate()
 	profile = data.profile.duplicate(true)
 	card_catalog = data.cardCatalog.duplicate(true)
+	used_cyberware = data.get("usedCyberware", []).duplicate()
+	next_attack_bonus = int(data.get("nextAttackBonus", 0))

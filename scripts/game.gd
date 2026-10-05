@@ -45,6 +45,7 @@ func _ready() -> void:
 	enemy_catalog = read_data("enemies/enemies.json")
 	item_catalog = read_data("items/items.json")
 	prototype_rules = read_data("prototype/combat.json")
+	prototype_rules.cyberware = read_data("prototype/cyberware.json")
 	map_config = read_data("map.json")
 	load_meta()
 
@@ -434,6 +435,7 @@ func save_meta() -> bool:
 
 func migrate_save(data):
 	if not data is Dictionary: return data
+	data = data.duplicate(true)
 	if data.get("schemaVersion",0) == 1:
 		data = data.duplicate(true)
 		data.schemaVersion = 2
@@ -442,6 +444,12 @@ func migrate_save(data):
 		data.currentDay = 1
 		data.combat = {}
 		data.inventory = {}
+	# Additive schema-2 upgrade: old battles gain the temporary catalog, with
+	# no used cards or pending buff. Existing snapshots retain their own rules.
+	var combat = data.get("combat", {})
+	if combat is Dictionary and not combat.is_empty():
+		if combat.get("profile") is Dictionary and not combat.profile.has("cyberware"):
+			combat.profile.cyberware = prototype_rules.cyberware.duplicate(true)
 	return data
 
 func valid_combat(c: Dictionary) -> bool:
@@ -456,6 +464,7 @@ func valid_combat(c: Dictionary) -> bool:
 	for key in ["instances","profile","cardCatalog"]:
 		if not c[key] is Dictionary: return false
 	if not c.outcome in ["", "win", "lose", "surrender"]: return false
+	if not valid_cyberware_state(c): return false
 	var seen: Array = []
 	for uid in c.drawPile + c.hand + c.discardPile:
 		if not uid is String or uid in seen or not c.instances.has(uid): return false
@@ -474,3 +483,30 @@ func valid_combat(c: Dictionary) -> bool:
 		if not enemy.intent.get("hits",1) is float and not enemy.intent.get("hits",1) is int: return false
 		if enemy.intent.get("amount",0) < 0 or enemy.intent.get("hits",1) < 1: return false
 	return true
+
+func valid_cyberware_state(c: Dictionary) -> bool:
+	var used = c.get("usedCyberware", [])
+	var bonus = c.get("nextAttackBonus", 0)
+	if not used is Array or not (bonus is int or bonus is float): return false
+	if not is_finite(float(bonus)) or bonus < 0 or bonus != floor(float(bonus)): return false
+	var rules = c.profile.get("cyberware", {})
+	if not rules is Dictionary or not rules.get("cards", []) is Array: return false
+	var catalog := {}
+	for definition in rules.get("cards", []):
+		if not definition is Dictionary: return false
+		if not definition.get("id") is String or not definition.get("name") is String: return false
+		if catalog.has(definition.id): return false
+		var amount = definition.get("nextAttackBonus", 0)
+		if not (amount is int or amount is float): return false
+		if not is_finite(float(amount)) or amount <= 0 or amount != floor(float(amount)): return false
+		catalog[definition.id] = int(amount)
+	var seen := []
+	var maximum := 0
+	# Unspent buffs can carry over from earlier turns, while cooldown IDs only
+	# describe the current turn. Allow at most one activation per card per turn.
+	for amount in catalog.values(): maximum += amount * (int(c.turn) - 1)
+	for id in used:
+		if not id is String or id in seen or not catalog.has(id): return false
+		seen.append(id)
+		maximum += catalog[id]
+	return bonus <= maximum
