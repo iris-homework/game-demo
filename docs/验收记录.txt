@@ -142,3 +142,29 @@ Godot 4.7.2 standard / Compatibility；最终编辑器导入完成，无脚本�
 1280x800 / 1600x1000 实际录帧检查：单次命中闪光、连续命中错位、残影上浮、玩家受伤 HP 数字。
 截图及 GIF：docs/预览/伤害数字。录帧使用默认机甲演练，两次攻击与回合伤害均真实结算；临时脚本已移除。
 测试关闭写档，本轮未重跑纯剧情、战斗模型、拖牌、义体和牌堆专项。
+
+2026-10-07 电子屏回合提示 0.3.7-fx（Asia/Shanghai）
+Godot 4.7.2 standard / Compatibility
+1280x800 turn_banner_visual.tscn: TURN BANNER VISUAL: 15 checks, 0 failures
+1600x1000 turn_banner_visual.tscn: TURN BANNER VISUAL: 15 checks, 0 failures
+1280x800 interaction_visual.tscn: INTERACTION VISUAL: 16 checks, 0 failures
+1280x800 r1_visual.tscn: VISUAL INTEGRATION: 0 failures
+回合专项覆盖第1/2/3回合顺序、提示前不扣血、重复操作隔离、已有快照恢复、战败不显示下一回合、日期值不变及地图保留日期条。
+两种尺寸检查文字自下向上显示／消失及完整字样；实际录帧制作 GIF，截图位于 docs/预览/回合提示。
+所有图形测试关闭写档，未写正式存档。本轮未重跑纯剧情、战斗模型、拖牌、义体和牌堆专项。
+
+最终 Godot 编辑器导入完成，无脚本错误；交付包排除 .godot、临时文件及用户存档，并逐文件校验与工程一致。
+
+2026-10-07 敌方回合提示同步弃牌 0.3.8-fx（Asia/Shanghai）
+1280x800 turn_banner_visual.tscn: TURN BANNER VISUAL: 17 checks, 0 failures
+1280x800 interaction_visual.tscn: INTERACTION VISUAL: 16 checks, 0 failures
+实际录帧：敌方提示出现时卡牌已飞行，完整提示阶段手牌已入堆，下一玩家回合正常补牌。
+测试关闭写档；本轮未重跑另一尺寸、R1、纯剧情、战斗模型、拖牌、义体和牌堆专项。
+预览：docs/预览/同步弃牌。
+
+本轮 Godot 编辑器导入完成，无脚本错误；交付 ZIP 完整性及所有文件内容已核对，排除缓存和用户存档。
+
+2026-10-07 己方回合亮蓝配色，0.3.8-fx 同版本补丁
+1280x800 turn_banner_visual.tscn: TURN BANNER VISUAL: 17 checks, 0 failures
+实际检查第1／2回合蓝色与敌方红色；截图 docs/预览/己方亮蓝回合。
+仅修改提示配色；未新增测试、未重跑其他尺寸或专项、未写正式存档。

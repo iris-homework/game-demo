@@ -163,7 +163,7 @@ func background(id: String, darkness: float = 0.3) -> void:
 	if Game.texture(id) == null:
 		label(self, "场景美术待补 / " + Game.place_data(Game.state.get("currentPlaceId", "")).get("name", ""), Vector2(64,828), Vector2(650,27), 15, MUTED)
 
-func chrome(section: String) -> void:
+func chrome(section: String, show_days: bool = true) -> void:
 	rect(self,Vector2.ZERO,Vector2(1440,95),Color("090b12f5"))
 	polygon(self,[Vector2.ZERO,Vector2(457,0),Vector2(432,95),Vector2(0,95)],Color("202331"))
 	rect(self,Vector2(0,94),Vector2(1440,1),Color("4a505e"))
@@ -174,13 +174,14 @@ func chrome(section: String) -> void:
 	hp_label = label(self,"",Vector2(327,44),Vector2(140,33),18)
 	refresh_hp()
 	if not Game.status_changed.is_connected(refresh_hp): Game.status_changed.connect(refresh_hp)
-	for day in range(1,8):
-		var current: bool = day == int(Game.state.get("currentDay",1))
-		var x := 477+(day-1)*70
-		panel(self,Vector2(x,17),Vector2(65,47),CREAM if current else Color("141922"),CREAM if current else Color("35404b"))
-		label(self,"第 %d 天" % day,Vector2(x+9,26),Vector2(60,28),15,INK if current else MUTED)
-		if current: rect(self,Vector2(x,66),Vector2(65,3),PINK)
-	label(self,"W E E K  0 1    /    午夜开场",Vector2(583,72),Vector2(420,20),11,MUTED)
+	if show_days:
+		for day in range(1,8):
+			var current: bool = day == int(Game.state.get("currentDay",1))
+			var x := 477+(day-1)*70
+			panel(self,Vector2(x,17),Vector2(65,47),CREAM if current else Color("141922"),CREAM if current else Color("35404b"))
+			label(self,"第 %d 天" % day,Vector2(x+9,26),Vector2(60,28),15,INK if current else MUTED)
+			if current: rect(self,Vector2(x,66),Vector2(65,3),PINK)
+		label(self,"W E E K  0 1    /    午夜开场",Vector2(583,72),Vector2(420,20),11,MUTED)
 	var faction: String = {"":"自由佣兵","company":"公司特遣部","resistance":"归零运动"}.get(Game.state.get("faction",""),"自由佣兵")
 	label(self,faction,Vector2(1026,13),Vector2(214,31),17,CYAN)
 	label(self,"%d CR" % int(Game.state.get("credits",0)),Vector2(1026,49),Vector2(210,30),17)

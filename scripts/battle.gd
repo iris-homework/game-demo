@@ -14,6 +14,7 @@ var player_portrait: TextureRect
 var enemy_portraits: Array = []
 var message_label: Label
 var turn_label: Label
+var turn_banner: Control
 var draw_count: Label
 var discard_count: Label
 var end_button: Button
@@ -40,7 +41,7 @@ func enter(params: Dictionary) -> void:
 	var arena := Node2D.new()
 	arena.set_script(preload("res://scripts/combat/arena_fx.gd"))
 	add_child(arena)
-	chrome("战斗")
+	chrome("战斗",false)
 	label(self,battle.name,Vector2(41,112),Vector2(700,55),33)
 	label(self,"COMBAT // " + Game.place_data(battle.placeId).name,Vector2(43,166),Vector2(670,29),14,CYAN)
 	tag("演练模式 · 不影响冒险" if Game.training_mode else "临时规则 / 攻击 1 · 敌方 HP 3",Vector2(1030,117),CYAN,360)
@@ -189,6 +190,7 @@ func start_hand() -> void:
 		return
 	var first_draw: bool = model.hand.is_empty() and model.turn == 1
 	if first_draw:
+		await announce_turn("第%d回合" % model.turn)
 		model.draw_cards()
 		commit()
 	await deal_hand(first_draw)
@@ -312,22 +314,27 @@ func animate_discard(view: CombatCard, delay: float = 0.0, turn_cleanup: bool = 
 	fx.start(view,DISCARD_POS+Vector2(53.5,63.5),0.32 if turn_cleanup else 0.40,delay,0.55 if turn_cleanup else 1.0)
 
 func end_turn_pressed() -> void:
-	if Game.transition_locked or Game.battle_busy or is_instance_valid(pile_overlay): return
+	if not initialized or not model.outcome.is_empty() or Game.transition_locked or Game.battle_busy or is_instance_valid(pile_overlay): return
 	set_busy(true)
 	selected_uid = ""
 	aim.visible = false
+	turn_label.text = "敌方回合 / 执行意图"
+	# Retire hand visuals while the banner plays; the model resolves only once below.
+	var discarded_views := cards.values()
+	cards.clear()
+	for i in discarded_views.size():
+		animate_discard(discarded_views[i],i*0.045,true)
+	var discard_wait: SceneTreeTimer
+	if not discarded_views.is_empty():
+		discard_wait = get_tree().create_timer(0.33+(discarded_views.size()-1)*0.045)
+	await announce_turn("敌方回合",true)
+	if discard_wait != null and discard_wait.time_left > 0.0:
+		await discard_wait.timeout
 	var result := model.end_turn()
 	if result.is_empty():
 		set_busy(false)
 		return
 	commit()
-	turn_label.text = "敌方回合 / 执行意图"
-	var discarded_views := cards.values()
-	cards.clear()
-	for i in discarded_views.size():
-		animate_discard(discarded_views[i],i*0.045,true)
-	if not discarded_views.is_empty():
-		await get_tree().create_timer(0.33+(discarded_views.size()-1)*0.045).timeout
 	for attack in result.attacks:
 		await impact(Vector2(418,421),"−%d HP" % attack.damage,PINK)
 	if not model.outcome.is_empty():
@@ -336,10 +343,20 @@ func end_turn_pressed() -> void:
 		return
 	refresh_enemy_hud()
 	turn_label.text = "回合 %02d  /  你的回合" % model.turn
+	await announce_turn("第%d回合" % model.turn)
 	await deal_hand(true)
 	refresh_counts()
 	message_label.text = "你的回合 · 手牌已补充"
 	set_busy(false)
+
+func announce_turn(text: String, enemy: bool = false) -> void:
+	var banner := preload("res://scripts/combat/turn_banner.gd").new()
+	turn_banner = banner
+	add_child(banner)
+	await banner.play(text,button_font,enemy)
+	remove_child(banner)
+	banner.queue_free()
+	turn_banner = null
 
 func impact(pos: Vector2, text: String, color: Color) -> void:
 	var occupied: Array[int] = []
