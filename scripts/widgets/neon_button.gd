@@ -9,7 +9,7 @@ var halo := StyleBoxFlat.new()
 func _ready() -> void:
 	halo.bg_color = Color.TRANSPARENT
 	halo.shadow_size = 7
-	halo.set_corner_radius_all(7)
+	halo.set_corner_radius_all(0)
 	set_process(false)
 	mouse_entered.connect(refresh_feedback)
 	mouse_exited.connect(refresh_feedback)
@@ -33,7 +33,7 @@ func _process(_delta: float) -> void:
 
 func _draw() -> void:
 	if disabled: return
-	var ink := Color("ffe9f2") if accent else Color("58e1eb")
+	var ink := Color("090b12") if accent else Color("64ffe1")
 	ink.a = 0.25 + hover_amount * 0.65
 	var inset := 5.0 + press_amount * 2.0
 	var length := 9.0 + hover_amount * 15.0

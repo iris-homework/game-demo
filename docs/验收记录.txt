@@ -48,3 +48,210 @@ VISUAL INTEGRATION: 0 failures; screenshots: /var/folders/mc/lbzb_hd50lg7htqnl3v
 - 本轮实际执行：tests/combat_tests.tscn：191 checks, 0 failures。
 - 本轮未重跑图形测试；维护文档中的交互通过结果引用此前验收。
 - 已知扩展边界及文档与代码差异已单列；首回合空手恢复补牌问题为静态代码审查推导，未作为已复现修复记录。
+
+阵营名称统一（2026-10-03，0.2.3-r1 同版本文案补丁）：
+- 4 个文件、12 处文本统一为归零运动；内部 resistance ID 与存档结构不变。
+- 工程文本检索旧名称无残留；所有 data JSON 解析通过。
+- 实际菜单截图已检查并更新；INTERACTION VISUAL：16 checks, 0 failures。
+
+2026-10-04 UI 0.3.0-ui（Asia/Shanghai）
+Godot 4.7.2 standard / Compatibility
+编辑器导入完成，未出现 SCRIPT ERROR / Parse Error。
+1280x800 res://tests/r1_visual.tscn
+VISUAL INTEGRATION: 0 failures
+1280x800 res://tests/interaction_visual.tscn
+INTERACTION VISUAL: 16 checks, 0 failures
+1280x800 res://tests/pile_visual.tscn
+PILE VISUAL: 18 checks, 0 failures
+1600x1000 res://tests/drag_visual.tscn
+DRAG VISUAL: 11 checks, 0 failures
+1600x1000 res://tests/r1_visual.tscn
+VISUAL INTEGRATION: 0 failures
+补充 res://tests/visual.tscn，正常退出；人工检查菜单、对白、选项、结算截图。
+人工检查牌堆容量顶部及底部、战斗、地图选中状态、地点与义体布局。
+本轮未改规则或 JSON，未重跑 run.tscn / combat_tests.tscn。
+截图：docs/预览/UI改版；容量测试截图仍为系统临时目录下 midnight_pile_capacity_*，30 张卡仅在测试内存中生成。
+
+2026-10-05 0.3.1-cyberware 战斗义体原型（Asia/Shanghai）
+Godot 4.7.2 standard / Compatibility，导入完成，无脚本错误。
+CYBERWARE TESTS: 45 checks, 0 failures
+COMBAT TESTS: 191 checks, 0 failures
+TEST RESULTS: 690 checks, 0 failures
+1280x800 CYBERWARE VISUAL: 21 checks, 0 failures
+1600x1000 CYBERWARE VISUAL: 21 checks, 0 failures
+VISUAL INTEGRATION: 0 failures
+DRAG VISUAL: 11 checks, 0 failures
+PILE VISUAL: 18 checks, 0 failures
+人工检查八张紫色卡、激活后状态、战斗入口及加成显示。
+新规则测试用 user://cyberware_test_checkpoint.json，结束删除；所有图形测试禁用存档。
+规则包括重复激活拒绝、无效目标保留加成、跨回合、多段只加一次、正常后续攻击、磁盘恢复、旧档缺字段、损坏字段和新战斗重置。
+本轮未单独重跑 interaction_visual.tscn；新义体图形检查与拖牌回归覆盖相关鼠标输入。
+截图：docs/预览/战斗义体；其中 20HP 为测试内存样本，正式数据未提高敌方血量。
+
+2026-10-05 0.3.2-cyberware 义体冷却（Asia/Shanghai）
+Godot 4.7.2 standard / Compatibility
+CYBERWARE TESTS: 57 checks, 0 failures
+COMBAT TESTS: 191 checks, 0 failures
+1280x800 CYBERWARE VISUAL: 26 checks, 0 failures
+检查冷却含当回合、每卡独立、攻击不提前解锁、下回合恢复并可再次使用、冷却前后专用存档恢复、跨回合加成超过8仍有效。
+人工检查实际渲染卡面：使用后整体变灰并显示“冷却中 · 下回合可用”，下一回合恢复紫色。
+本轮未重新执行剧情、牌堆、拖牌等其他专项测试。
+
+2026-10-05 0.3.3-cyberware 六张义体（Asia/Shanghai）
+CYBERWARE TESTS: 60 checks, 0 failures
+1280x800 CYBERWARE VISUAL: 25 checks, 0 failures
+检查六卡布局、1—6 激活、7／8 无效、HUD 6/6、冷却恢复与旧八卡快照保留加成。
+其他专项本轮未重跑。截图：docs/预览/六张义体。
+
+2026-10-07 手牌对齐 UI 补丁（0.3.3-cyberware，Asia/Shanghai）
+Godot 4.7.2 standard / Compatibility
+编辑器导入完成，无 SCRIPT ERROR / Parse Error。
+1280x800、1600x1000 实际渲染：起手三张、出牌后两张、下一回合三张，静止位置 y 均为 627，scale 均为 (1,1)。
+六张截图已逐张人工检查，卡面水平对齐，底部常驻操作提示已移除。
+截图：docs/预览/手牌对齐；机甲演练共用战斗布局，不写用户存档。
+1280x800 res://tests/drag_visual.tscn
+DRAG VISUAL: 11 checks, 0 failures
+未重跑其他专项测试。
+
+2026-10-07 霓虹弃牌动画 0.3.4-fx（Asia/Shanghai）
+Godot 4.7.2 standard / Compatibility
+1280x800 res://tests/interaction_visual.tscn: INTERACTION VISUAL: 16 checks, 0 failures
+1600x1000 res://tests/drag_visual.tscn: DRAG VISUAL: 11 checks, 0 failures
+1280x800 res://tests/r1_visual.tscn: VISUAL INTEGRATION: 0 failures
+真实渲染录帧：1280x800 / 1600x1000，检查单张旋转拖尾、入堆脉冲与回合末多张弃牌。
+图片和动态预览：docs/预览/弃牌动画；录帧用临时场景已移除。
+交互检查包含上一张尾动画期间继续出牌、结束回合安全回收与致命命中返回。
+本轮未重跑纯剧情、战斗模型、义体和牌堆专项。未写入正式存档。
+
+本次最终 Godot 编辑器导入完成，无脚本错误；交付 ZIP 全文件内容与工程核对一致，已排除缓存、临时录帧工具及用户存档。
+
+2026-10-07 霓虹抽牌动画 0.3.5-fx（Asia/Shanghai）
+Godot 4.7.2 standard / Compatibility，最终编辑器导入完成，无脚本错误。
+1280x800 interaction_visual.tscn: INTERACTION VISUAL: 16 checks, 0 failures
+1600x1000 drag_visual.tscn: DRAG VISUAL: 11 checks, 0 failures
+1280x800 r1_visual.tscn: VISUAL INTEGRATION: 0 failures
+1280x800 / 1600x1000 临时录帧检查各 4 项、0 失败；三张牌落稳后 position=home，scale=(1,1)，rotation=0，输入已解锁。
+首次录帧 1600x1000 的静止检查因第三张牌悬停抬升出现 1 项失败；将指针移至空白区后分别重录，两种尺寸通过。
+截图与 GIF：docs/预览/抽牌动画。临时录帧场景已删除，未写正式存档。
+本轮未重跑纯剧情、战斗模型、义体、牌堆专项；历史结果不视为本轮验证。
+
+2026-10-07 霓虹伤害数字 0.3.6-fx（Asia/Shanghai）
+Godot 4.7.2 standard / Compatibility；最终编辑器导入完成，无脚本错误。
+1280x800 interaction_visual.tscn: INTERACTION VISUAL: 16 checks, 0 failures
+1600x1000 r1_visual.tscn: VISUAL INTEGRATION: 0 failures
+1280x800 / 1600x1000 实际录帧检查：单次命中闪光、连续命中错位、残影上浮、玩家受伤 HP 数字。
+截图及 GIF：docs/预览/伤害数字。录帧使用默认机甲演练，两次攻击与回合伤害均真实结算；临时脚本已移除。
+测试关闭写档，本轮未重跑纯剧情、战斗模型、拖牌、义体和牌堆专项。
+
+2026-10-07 电子屏回合提示 0.3.7-fx（Asia/Shanghai）
+Godot 4.7.2 standard / Compatibility
+1280x800 turn_banner_visual.tscn: TURN BANNER VISUAL: 15 checks, 0 failures
+1600x1000 turn_banner_visual.tscn: TURN BANNER VISUAL: 15 checks, 0 failures
+1280x800 interaction_visual.tscn: INTERACTION VISUAL: 16 checks, 0 failures
+1280x800 r1_visual.tscn: VISUAL INTEGRATION: 0 failures
+回合专项覆盖第1/2/3回合顺序、提示前不扣血、重复操作隔离、已有快照恢复、战败不显示下一回合、日期值不变及地图保留日期条。
+两种尺寸检查文字自下向上显示／消失及完整字样；实际录帧制作 GIF，截图位于 docs/预览/回合提示。
+所有图形测试关闭写档，未写正式存档。本轮未重跑纯剧情、战斗模型、拖牌、义体和牌堆专项。
+
+最终 Godot 编辑器导入完成，无脚本错误；交付包排除 .godot、临时文件及用户存档，并逐文件校验与工程一致。
+
+2026-10-07 敌方回合提示同步弃牌 0.3.8-fx（Asia/Shanghai）
+1280x800 turn_banner_visual.tscn: TURN BANNER VISUAL: 17 checks, 0 failures
+1280x800 interaction_visual.tscn: INTERACTION VISUAL: 16 checks, 0 failures
+实际录帧：敌方提示出现时卡牌已飞行，完整提示阶段手牌已入堆，下一玩家回合正常补牌。
+测试关闭写档；本轮未重跑另一尺寸、R1、纯剧情、战斗模型、拖牌、义体和牌堆专项。
+预览：docs/预览/同步弃牌。
+
+本轮 Godot 编辑器导入完成，无脚本错误；交付 ZIP 完整性及所有文件内容已核对，排除缓存和用户存档。
+
+2026-10-07 己方回合亮蓝配色，0.3.8-fx 同版本补丁
+1280x800 turn_banner_visual.tscn: TURN BANNER VISUAL: 17 checks, 0 failures
+实际检查第1／2回合蓝色与敌方红色；截图 docs/预览/己方亮蓝回合。
+仅修改提示配色；未新增测试、未重跑其他尺寸或专项、未写正式存档。
+
+2026-10-07 战斗布局整理 0.3.9-ui
+1280x800 interaction_visual: 16 checks, 0 failures
+1280x800 r1_visual: VISUAL INTEGRATION: 0 failures
+1280x800 / 1600x1000 临时布局点击检查：各 4 checks, 0 failures
+最终截图：docs/预览/战斗布局；检查后巷两种尺寸及机甲1600x1000。
+交互与R1在最后右上按钮位置微调前执行；最终布局使用临时点击检查。测试禁用写档；未重跑其他专项。临时工具已移除。
+
+2026-10-07 布局整理：最终编辑器导入无脚本错误；交付包逐文件核对一致，排除缓存、临时工具与用户存档。
+
+2026-10-07 移除战斗道具栏，0.3.9-ui 同版本补丁
+1280x800 后巷真实渲染检查：道具栏标题、三个空槽、暂无道具提示均已移除，其余布局正常。
+未重跑其他尺寸或回归专项；未写正式存档；临时预览工具已移除。交付ZIP逐文件核对一致。
+
+2026-10-07 移除中央操作提示，0.3.9-ui 同版本补丁
+1280x800 interaction_visual: 16 checks, 0 failures
+实际命中截图确认中央提示移除、伤害飘字保留。未重跑其他尺寸及专项，未写正式存档。交付包逐文件核对一致。
+
+2026-10-07 角色落地表现 0.3.10-ui
+后巷、机甲真实画面检查：1280x800 初次预览及1600x1000 最终层级布局。
+1280x800 interaction_visual: 16 checks, 0 failures
+地面与脚底阴影正常，缺图敌人不显示空阴影。测试禁用写档，临时预览工具已移除。未重跑其他专项。
+
+2026-10-07 角色落地：最终编辑器导入无脚本错误；工程包逐文件核对一致，排除缓存、临时工具与用户存档。
+
+2026-10-07 移除诺伦脚底阴影，0.3.10-ui 同版本补丁
+编辑器导入无脚本错误。1600x1000 后巷实际渲染：碎片状投影已消失，双鞋完整。原立绘文件与修改前备份逐字节一致。
+未重跑其他尺寸、其他场景或交互与规则专项。禁用写档，临时预览工具移除。工程包逐文件核对一致。
+
+2026-10-07 紧凑底栏与十张扇形手牌 0.3.11-ui
+1280x800 /1600x1000 hand_fan_visual: 各94 checks, 0 failures
+1280x800 interaction_visual: 16 checks, 0 failures
+1600x1000 drag_visual: 11 checks, 0 failures
+1280x800 pile_visual: 18 checks, 0 failures
+1280扇形与交互在最终重叠判定微调前运行；1600扇形、拖牌和1280牌堆在最终代码通过。
+十张与100 HP均是内存样本，JSON未变，禁用写档。实际查看两种尺寸十张／悬停及1600三张画面。未重跑其他专项。
+
+2026-10-07 扇形手牌：最终编辑器导入完成，无脚本错误；数据配置、Game和CombatModel与修改前逐字节一致。交付ZIP逐文件核对一致，排除缓存与用户存档。
+
+2026-10-07 五张测试手牌（0.3.11-ui 配置补丁）
+COMBAT TESTS: 191 checks, 0 failures
+1280x800 HAND FAN VISUAL: 94 checks, 0 failures
+1280x800 INTERACTION VISUAL: 16 checks, 0 failures
+已查看五张手牌真实截图；其他专项未重跑。模型测试使用专用路径，图形测试禁用写档。工程包逐文件核对一致。
+
+2026-10-07 手牌重叠调整（0.3.11-ui）
+1280x800 HAND FAN VISUAL: 94 checks, 0 failures
+1280x800 INTERACTION VISUAL: 16 checks, 0 failures
+已查看五张与十张实际画面；未重跑其他尺寸及专项。测试禁用写档，交付ZIP逐文件核对一致。
+
+2026-10-07 手牌下沉与悬停浮出 0.3.12-ui
+1280x800 HAND FAN VISUAL: 144 checks, 0 failures
+1600x1000 HAND FAN VISUAL: 145 checks, 0 failures（增加移开恢复断言）
+1280x800 DRAG VISUAL: 11 checks, 0 failures
+查看1280五张静止／悬停，1600五张悬停／十张静止截图。测试禁用写档；未重跑其他专项。工程包逐文件核对一致。
+
+2026-10-07 后巷战斗背景与地面连通 0.3.13-ui
+编辑器导入无脚本错误。后巷1280x800/1600x1000真实画面检查；1280x800机甲占位回退画面检查。
+1280x800 R1: VISUAL INTEGRATION: 0 failures
+图形测试禁用写档；临时预览工具已移除，其他专项未重跑。原alley.png与修改前逐字节一致。交付包逐文件核对一致。
+
+2026-10-07 0.3.14-ui 角色下移与手牌放大
+编辑器导入：无脚本错误。
+1280x800 hand_fan_visual: 145 checks, 0 failures
+1600x1000 hand_fan_visual: 145 checks, 0 failures
+1280x800 drag_visual: 11 checks, 0 failures
+实际查看6张截图，存放于docs/预览/角色下移手牌放大；测试禁用写档。其他专项未运行。
+
+2026-10-07 角色下移与手牌放大交付包逐文件核对一致，排除缓存、临时文件与用户存档。
+
+2026-10-07 0.3.15-fix 牌堆数量同步
+修复前 pile_count_visual: 14 checks, 2 failures（回合弃牌显示1/0，应为5）
+修复后最终1280x800 pile_count_visual: 17 checks, 0 failures
+1280x800 turn_banner_visual: 17 checks, 0 failures
+最终编辑器导入无脚本错误；已查看两张计数截图。内存样本，禁用正式写档；其他专项未运行。
+工程包逐文件核对一致，排除缓存、临时文件与用户存档。
+
+2026-10-07 0.3.16-art 用户修改版后巷背景替换
+用户PNG 1586x992直接复制，与上传文件字节一致。
+编辑器重新导入无脚本错误；1280x800和1600x1000静止/悬停四张实际截图均已查看。
+禁用写档，临时预览工具已移除，其他专项未运行。
+工程包逐文件核对一致，排除缓存、临时文件与用户存档。
+
+2026-10-07 0.3.17-art 暗色路面版后巷背景
+素材与用户最新上传PNG字节一致；编辑器导入无脚本错误。
+实际查看1280x800与1600x1000静止/悬停共4张截图。禁用写档，临时工具已移除；其他专项未运行。
+工程包逐文件核对一致，排除缓存、临时工具及用户存档。

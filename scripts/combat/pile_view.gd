@@ -34,7 +34,7 @@ func _ready() -> void:
 	z_index = 70
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	rect(self, Vector2.ZERO, Vector2(1440,900), Color("030810ee"))
-	panel(self, Vector2(64,34), Vector2(1312,828), Color("0a1525"), Color("36576e"))
+	cut_panel(self, Vector2(64,34), Vector2(1312,828), INK, CREAM,28)
 	var accent := CYAN if pile_title == "抽牌堆" else PINK
 	rect(self, Vector2(102,70), Vector2(5,67), accent)
 	label(self, pile_title, Vector2(122,68), Vector2(230,56), 36)

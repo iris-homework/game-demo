@@ -4,6 +4,9 @@ shader_type canvas_item;
 // Removing the white contribution as well as alpha prevents pale fringes when
 // large RGB portraits are filtered down to their in-game size.
 uniform float edge_radius : hint_range(0.5, 3.0) = 1.5;
+// Optional alpha mask only for the painted ground shadow on Noren battle art.
+uniform bool ground_mask_enabled = false;
+uniform sampler2D ground_mask : filter_linear;
 varying vec4 tint;
 void vertex() { tint = COLOR; }
 
@@ -29,5 +32,9 @@ void fragment() {
     float matte_alpha = 1.0 - smoothstep(0.90, 0.98, value);
     float a = mix(matte_alpha, coverage * matte_alpha, edge);
     vec3 clean = clamp((c.rgb - vec3(1.0 - a)) / max(a, 0.001), vec3(0.0), vec3(1.0));
-    COLOR = vec4(clean, c.a * a) * tint;
+    float ground_alpha = 1.0;
+    if (ground_mask_enabled && UV.y >= 0.90) {
+        ground_alpha = texture(ground_mask, UV).a;
+    }
+    COLOR = vec4(clean, c.a * a * ground_alpha) * tint;
 }

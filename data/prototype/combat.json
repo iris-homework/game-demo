@@ -2,8 +2,10 @@
   "id": "attack_flow_v1",
   "prototype": true,
   "note": "仅验证流程，正式卡牌/敌人数据独立。",
-  "handSize": 3,
+  "handSize": 5,
   "deck": [
+    "test_attack",
+    "test_attack",
     "test_attack",
     "test_attack",
     "test_attack"

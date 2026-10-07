@@ -98,13 +98,13 @@
   },
   {
     "id": "camp",
-    "name": "革命军营地",
+    "name": "归零运动营地",
     "backgroundAssetId": "camp",
     "unlockCondition": {
       "faction": "resistance"
     },
-    "lockHint": "沿卢米娜委托加入革命军",
-    "description": "革命军的根据地。居住、集会与备战空间紧邻，像一座自给自足的村落。",
+    "lockHint": "沿卢米娜委托加入归零运动",
+    "description": "归零运动的根据地。居住、集会与备战空间紧邻，像一座自给自足的村落。",
     "mapAnchor": [
       0.075,
       0.15
@@ -250,7 +250,7 @@
       ]
     },
     "lockHint": "完成阵营入门事件",
-    "description": "城市的能源心脏，也是公司与革命军争夺控制权的关键设施。",
+    "description": "城市的能源心脏，也是公司与归零运动争夺控制权的关键设施。",
     "mapAnchor": [
       0.919,
       0.408

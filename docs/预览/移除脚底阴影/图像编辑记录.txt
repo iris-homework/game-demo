@@ -1,0 +1,7 @@
+工具：内置 image_gen；编辑类型：precise-object-edit / background-extraction。
+输入：assets/characters/noren_battle.png，原文件未修改。
+输出：assets/characters/noren_shadow_mask.png（1536×1024 RGBA）。
+接入：只将输出图的 alpha 用于原立绘 UV.y >= 0.90 的区域；显示颜色仍来自原图，避免生成结果改变人物主体。
+另外取消诺伦的程序接触阴影和左侧大椭圆反光；地面保留，敌方阴影不变。
+完整提示词：
+Use case: precise-object-edit / background-extraction. Edit target: supplied full-body game character sprite. Remove ONLY the entire jagged gray-black ground cast shadow and all detached fragments beneath and beside the boots. Also remove the white background to genuine transparent alpha. Preserve the character exactly: face, pose, black magenta angular cape and outfit, every accessory, both entire boots and soles, drawing style, proportions, original framing and pixel placement. Keep original 1536x1024 canvas and original scale. Do NOT redraw or redesign the character. No ground, no shadow, no reflections, no glows, no new elements. Output an otherwise identical transparent sprite ready for a game.

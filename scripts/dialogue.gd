@@ -23,18 +23,19 @@ func _ready() -> void:
 			var text: String = "%s   %s" % [i+1,c.label]
 			if not allowed and c.get("condition", {}).has("creditsAtLeast"):
 				text += "  （还差 %s CR）" % (int(c.condition.creditsAtLeast)-int(Game.state.credits))
-			var b := button(self, text, Vector2(390,347+i*80), Vector2(860,64), func(): select(i), true)
+			var b := button(self, text, Vector2(427-i*12,320+i*78), Vector2(845,62), func(): select(i), true)
 			b.disabled = not allowed
 			b.tooltip_text = "信用点不足，可选择拒绝支付或按 F1 测试支付分支。" if not allowed else ""
 			choice_buttons.append(b)
-	panel(self, Vector2(57,623), Vector2(1327,204), Color("15111ff5"), Color("a4517b"))
-	rect(self, Vector2(57,623), Vector2(6,204), PINK)
+	polygon(self,[Vector2(79,603),Vector2(1406,626),Vector2(1365,843),Vector2(35,817)],PINK)
+	polygon(self,[Vector2(57,631),Vector2(1378,604),Vector2(1391,815),Vector2(72,836)],CREAM)
+	polygon(self,[Vector2(66,639),Vector2(1369,613),Vector2(1381,807),Vector2(80,827)],INK)
 	var speaker: String = node.get("speakerId", "")
-	panel(self, Vector2(88,587), Vector2(290,57), PINK, PINK)
-	label(self, Game.display_name(speaker) if not speaker.is_empty() else "场景", Vector2(108,592), Vector2(255,45), 25, INK)
-	text_label = label(self, Game.render_text(node.get("text", "")), Vector2(96,668), Vector2(1222,98), 25)
+	polygon(self,[Vector2(88,592),Vector2(383,577),Vector2(366,637),Vector2(74,650)],PINK)
+	label(self, Game.display_name(speaker) if not speaker.is_empty() else "场景", Vector2(108,588), Vector2(255,45), 25, INK)
+	text_label = label(self, Game.render_text(node.get("text", "")), Vector2(107,661), Vector2(1210,112), 25)
 	text_label.visible_characters = 0
-	label(self, "SPACE / ENTER  推进    ·    1 / 2  选择", Vector2(96,784), Vector2(770,29), 14, MUTED)
+	label(self, "SPACE / ENTER  推进    ·    1 / 2  选择", Vector2(107,783), Vector2(770,29), 14, MUTED)
 	if node.has("next"):
 		advance_button = button(self, "继续  ▸", Vector2(1190,769), Vector2(151,42), advance)
 	else:
