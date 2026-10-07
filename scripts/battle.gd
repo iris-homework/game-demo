@@ -12,7 +12,6 @@ var aim: Node2D
 var hovered_target := -1
 var player_portrait: TextureRect
 var enemy_portraits: Array = []
-var message_label: Label
 var turn_label: Label
 var turn_banner: Control
 var draw_count: Label
@@ -36,12 +35,12 @@ func enter(params: Dictionary) -> void:
 	model.restore(Game.state.combat)
 	expected_revision = Game.revision
 	background(Game.place_data(battle.placeId).backgroundAssetId,0.15)
-	# A restrained lower tint separates readable cards from the scene.
-	polygon(self,[Vector2(0,629),Vector2(1440,606),Vector2(1440,900),Vector2(0,900)],Color("090b12e5"))
-	polygon(self,[Vector2(0,622),Vector2(330,617),Vector2(327,625),Vector2(0,630)],PINK)
 	var arena := Node2D.new()
 	arena.set_script(preload("res://scripts/combat/arena_fx.gd"))
 	add_child(arena)
+	# Keep the hand rail above the floor and below portraits and controls.
+	polygon(self,[Vector2(0,629),Vector2(1440,606),Vector2(1440,900),Vector2(0,900)],Color("090b12e5"))
+	polygon(self,[Vector2(0,622),Vector2(330,617),Vector2(327,625),Vector2(0,630)],PINK)
 	chrome("战斗",false)
 	label(self,battle.name,Vector2(41,112),Vector2(700,55),33)
 	label(self,"COMBAT // " + Game.place_data(battle.placeId).name,Vector2(43,166),Vector2(670,29),14,CYAN)
@@ -59,9 +58,8 @@ func enter(params: Dictionary) -> void:
 		var pos := enemy_position(i)
 		var portrait_node := battle_portrait(model.enemies[i].battlePortraitAssetId,pos,Vector2(460,317))
 		enemy_portraits.append(portrait_node)
+		if portrait_node: arena.contact_points.append(pos+Vector2(230,307))
 	refresh_enemy_hud()
-	message_label = label(self,"选取手牌，再点击敌方目标",Vector2(570,482),Vector2(290,62),17,CREAM)
-	message_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pile_button(DRAW_POS,"抽牌堆",func(): show_pile("抽牌堆",model.draw_pile))
 	pile_button(DISCARD_POS,"弃牌堆",func(): show_pile("弃牌堆",model.discard_pile))
 	draw_count = label(self,"",DRAW_POS+Vector2(0,8),Vector2(PILE_SIZE.x,43),28,CYAN)
@@ -96,6 +94,9 @@ func battle_portrait(asset_id: String, pos: Vector2, dimensions: Vector2) -> Tex
 	if node and Game.assets.get(asset_id,{}).get("whiteKey",false):
 		var material := ShaderMaterial.new()
 		material.shader = preload("res://shaders/white_key.gdshader")
+		if asset_id == "noren_battle":
+			material.set_shader_parameter("ground_mask_enabled",true)
+			material.set_shader_parameter("ground_mask",preload("res://assets/characters/noren_shadow_mask.png"))
 		node.material = material
 	return node
 
@@ -217,9 +218,6 @@ func _process(_delta: float) -> void:
 	aim.set("locked", hovered_target >= 0)
 	if hovered_target >= 0:
 		aim.set("target_center", enemy_position(hovered_target) + Vector2(230,150))
-		message_label.text = "锁定 · " + str(model.enemies[hovered_target].displayName) + ("\n松开释放攻击" if not held_card_uid.is_empty() else "\n点击释放攻击")
-	else:
-		message_label.text = "指向敌方目标\n右键 / Esc 取消"
 
 func cancel_selection() -> void:
 	held_card_uid = ""
@@ -227,7 +225,6 @@ func cancel_selection() -> void:
 	selected_uid = ""
 	for uid in cards: cards[uid].set_selected(false)
 	if is_instance_valid(aim): aim.visible = false
-	message_label.text = "选取手牌，再点击敌方目标"
 	refresh_enemy_hud()
 
 func select_card(uid: String) -> void:
@@ -236,7 +233,6 @@ func select_card(uid: String) -> void:
 	held_card_uid = ""
 	selected_uid = "" if selected_uid == uid else uid
 	for card_uid in cards: cards[card_uid].set_selected(card_uid == selected_uid)
-	message_label.text = "选取手牌，再点击敌方目标" if selected_uid.is_empty() else "选择攻击目标  /  右键取消"
 	refresh_enemy_hud()
 	_process(0.0)
 
@@ -285,7 +281,6 @@ func play_selected(target: int) -> void:
 	add_child(burst)
 	animate_discard(card_view)
 	refresh_counts()
-	message_label.text = "攻击命中 · 造成 %d 点伤害" % result.damage
 	if not model.outcome.is_empty():
 		await get_tree().create_timer(0.52).timeout
 		set_busy(false)
@@ -341,7 +336,6 @@ func end_turn_pressed() -> void:
 	await announce_turn("第%d回合" % model.turn)
 	await deal_hand(true)
 	refresh_counts()
-	message_label.text = "你的回合 · 手牌已补充"
 	set_busy(false)
 
 func announce_turn(text: String, enemy: bool = false) -> void:

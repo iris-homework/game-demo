@@ -1,15 +1,33 @@
 extends Node2D
-## Vector environment accents, independent of place backgrounds and character art.
+## A street plane and contact shadows anchor the portraits to the environment.
+## Presentation only; no target or combat state is owned here.
+var contact_points: Array[Vector2] = []
+
+func ellipse(center: Vector2, radii: Vector2, color: Color) -> void:
+	var points := PackedVector2Array()
+	for i in 64:
+		var angle := float(i)/64.0*TAU
+		points.append(center+Vector2(cos(angle)*radii.x,sin(angle)*radii.y))
+	draw_colored_polygon(points,color)
+
 func _draw() -> void:
-	for center in [Vector2(408,543),Vector2(1020,546)]:
-		for ring in range(3):
-			var points := PackedVector2Array()
-			for i in 81:
-				var angle := float(i)/80.0*TAU
-				points.append(center+Vector2(cos(angle)*(171+ring*12),sin(angle)*(13+ring*4)))
-			draw_polyline(points,Color(0.2,0.8,0.91,0.18-ring*0.035),1.2,true)
-		draw_line(center+Vector2(-204,5),center+Vector2(-185,5),Color("509bac"),2,true)
-		draw_line(center+Vector2(185,5),center+Vector2(204,5),Color("509bac"),2,true)
-	for x in [44,1389]:
-		draw_line(Vector2(x,398),Vector2(x,480),Color("345569"),1,true)
-		for j in 5: draw_line(Vector2(x,399+j*16),Vector2(x+9,399+j*16),Color("345569"),1,true)
+	# Blend the distant edge into the location art instead of adding a raised stage.
+	for y in range(448,630):
+		var depth := clampf((y-448.0)/65.0,0.0,1.0)
+		var tone := Color("181822").lerp(Color("10121a"),(y-448.0)/182.0)
+		tone.a = smoothstep(0.0,1.0,depth)*0.98
+		draw_rect(Rect2(0,y,1440,1),tone)
+	# Paving joints share a vanishing point; subdued reflections stay on the floor.
+	var vanishing := Vector2(720,368)
+	for x in [-1400,-600,0,480,960,1440,2040,2840]:
+		var end := Vector2(x,630)
+		var start := vanishing.lerp(end,(493.0-368.0)/(630.0-368.0))
+		draw_line(start,end,Color("35313c70"),1.0,true)
+	for y in [506,548,607]:
+		draw_line(Vector2(0,y),Vector2(1440,y),Color("34313d70"),1.0,true)
+	ellipse(Vector2(1085,535),Vector2(215,17),Color("447f8e08"))
+	for center in contact_points:
+		# Broad faint penumbra, then a tight dark contact patch under the soles.
+		for layer in range(12,0,-1):
+			ellipse(center+Vector2(-12,2),Vector2(38+layer*3.5,3+layer*0.85),Color(0.01,0.01,0.018,0.035))
+		ellipse(center,Vector2(36,4),Color(0.008,0.008,0.014,0.42))
