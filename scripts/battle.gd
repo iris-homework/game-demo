@@ -22,8 +22,9 @@ var cyberware_button: Button
 var cyberware_status: Label
 var pile_overlay: Control
 var initialized := false
-const DRAW_POS := Vector2(75,711)
-const DISCARD_POS := Vector2(1250,711)
+const PILE_SIZE := Vector2(80,96)
+const DRAW_POS := Vector2(134,752)
+const DISCARD_POS := Vector2(1226,752)
 
 func _ready() -> void:
 	enter({"battleId":Game.state.battleId,"eventId":Game.state.activeEventId})
@@ -47,8 +48,9 @@ func enter(params: Dictionary) -> void:
 	tag("演练模式 · 不影响冒险" if Game.training_mode else "临时规则 / 攻击 1 · 敌方 HP 3",Vector2(1030,117),CYAN,360)
 	if Game.texture(Game.place_data(battle.placeId).backgroundAssetId) == null:
 		label(self,"场景美术待补",Vector2(43,203),Vector2(330,26),13,MUTED)
-	cut_panel(self,Vector2(565,204),Vector2(310,45),INK,CYAN,12)
-	turn_label = label(self,"回合 %02d  /  你的回合" % model.turn,Vector2(592,210),Vector2(275,37),18,CYAN)
+	cut_panel(self,Vector2(550,24),Vector2(340,48),INK,Color("3d9eff"),12)
+	turn_label = label(self,"回合 %02d  /  你的回合" % model.turn,Vector2(566,29),Vector2(308,37),19,Color("8fcaff"))
+	turn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	var n_asset: String = Game.characters.noren.get("battlePortraitAssetId", "")
 	player_portrait = battle_portrait(n_asset,Vector2(90,215),Vector2(630,335))
 	label(self,Game.display_name("noren"),Vector2(305,552),Vector2(280,33),23)
@@ -62,31 +64,24 @@ func enter(params: Dictionary) -> void:
 	message_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pile_button(DRAW_POS,"抽牌堆",func(): show_pile("抽牌堆",model.draw_pile))
 	pile_button(DISCARD_POS,"弃牌堆",func(): show_pile("弃牌堆",model.discard_pile))
-	draw_count = label(self,"",DRAW_POS+Vector2(17,21),Vector2(75,55),35,CYAN)
-	discard_count = label(self,"",DISCARD_POS+Vector2(0,21),Vector2(107,55),35,PINK)
-	draw_count.position.x = DRAW_POS.x
-	draw_count.size.x = 107
+	draw_count = label(self,"",DRAW_POS+Vector2(0,8),Vector2(PILE_SIZE.x,43),28,CYAN)
+	discard_count = label(self,"",DISCARD_POS+Vector2(0,8),Vector2(PILE_SIZE.x,43),28,PINK)
 	draw_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	discard_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	end_button = button(self,"结束回合  →",Vector2(1180,620),Vector2(216,56),end_turn_pressed,true)
+	end_button = button(self,"结束回合  →",Vector2(1158,650),Vector2(216,52),end_turn_pressed,true)
 	end_button.tooltip_text = "敌方执行头顶意图；未使用手牌弃置，再抽取新手牌。临时规则不限制出牌次数。"
-	cyberware_button = button(self,"激活义体",Vector2(51,620),Vector2(250,56),show_cyberware)
+	cyberware_button = button(self,"激活义体",Vector2(66,650),Vector2(216,52),show_cyberware)
 	for state_name in ["normal","hover","pressed","focus"]:
 		var purple_style := button_style(state_name,false)
 		purple_style.border_color = Color("c895ff")
 		if state_name != "focus": purple_style.bg_color = Color("482866") if state_name == "hover" else Color("251638")
 		cyberware_button.add_theme_stylebox_override(state_name,purple_style)
-	cyberware_status = label(self,"",Vector2(51,678),Vector2(310,28),15,Color("c895ff"))
+	cyberware_status = label(self,"",Vector2(66,709),Vector2(216,28),13,Color("c895ff"))
+	cyberware_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	refresh_cyberware()
-	label(self,"道具栏",Vector2(51,272),Vector2(130,30),14,MUTED)
-	for i in 3:
-		var slot := button(self,"＋",Vector2(51+i*61,312),Vector2(52,44),func(): use_item(""))
-		slot.disabled = true
-		slot.tooltip_text = "道具待配置"
-	label(self,"暂无道具",Vector2(51,366),Vector2(180,26),13,MUTED)
 	if Game.config.developmentMode:
-		button(self,"调试结果",Vector2(1235,197),Vector2(156,42),show_debug_results).add_theme_font_size_override("font_size",15)
-	button(self,"投降",Vector2(1270,492),Vector2(122,41),func(): finish("surrender")).add_theme_font_size_override("font_size",15)
+		button(self,"调试结果",Vector2(1230,163),Vector2(160,36),show_debug_results).add_theme_font_size_override("font_size",15)
+	button(self,"投降",Vector2(1230,211),Vector2(160,36),func(): finish("surrender")).add_theme_font_size_override("font_size",15)
 	aim = Node2D.new()
 	aim.set_script(preload("res://scripts/combat/targeting_line.gd"))
 	aim.z_index = 35
@@ -153,16 +148,16 @@ func refresh_enemy_hud() -> void:
 			label(enemy_hud,"⌖  点击攻击",Vector2(center.x-87,455),Vector2(245,50),23,CYAN)
 
 func pile_button(pos: Vector2, title: String, action: Callable) -> void:
-	panel(self,pos+Vector2(10,-10),Vector2(107,127),Color("0d1728"),Color("335671"))
-	panel(self,pos+Vector2(5,-5),Vector2(107,127),Color("0d1728"),Color("335671"))
-	var pile := button(self,"",pos,Vector2(107,127),action)
+	panel(self,pos+Vector2(8,-8),PILE_SIZE,Color("0d1728"),Color("335671"))
+	panel(self,pos+Vector2(4,-4),PILE_SIZE,Color("0d1728"),Color("335671"))
+	var pile := button(self,"",pos,PILE_SIZE,action)
 	# Piles retain their upright card-stack silhouette in every input state.
 	for state_name in ["normal", "hover", "pressed", "disabled", "focus"]:
 		var upright := pile.get_theme_stylebox(state_name).duplicate() as StyleBoxFlat
 		upright.skew = Vector2.ZERO
 		upright.set_corner_radius_all(7)
 		pile.add_theme_stylebox_override(state_name, upright)
-	var title_label := label(self,title,pos+Vector2(0,83),Vector2(107,29),17)
+	var title_label := label(self,title,pos+Vector2(0,59),Vector2(PILE_SIZE.x,26),14)
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 func hand_position(index: int, count: int) -> Vector2:
@@ -207,7 +202,7 @@ func deal_hand(animate: bool) -> void:
 		if animate:
 			var fx := preload("res://scripts/combat/draw_fx.gd").new()
 			add_child(fx)
-			fx.start(view,DRAW_POS+Vector2(53.5,63.5),duration,i*0.055)
+			fx.start(view,DRAW_POS+PILE_SIZE/2.0,duration,i*0.055)
 			last_flight = fx
 	if animate: await last_flight.landed
 
@@ -311,7 +306,7 @@ func animate_discard(view: CombatCard, delay: float = 0.0, turn_cleanup: bool = 
 	view.card_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var fx := preload("res://scripts/combat/discard_fx.gd").new()
 	add_child(fx)
-	fx.start(view,DISCARD_POS+Vector2(53.5,63.5),0.32 if turn_cleanup else 0.40,delay,0.55 if turn_cleanup else 1.0)
+	fx.start(view,DISCARD_POS+PILE_SIZE/2.0,0.32 if turn_cleanup else 0.40,delay,0.55 if turn_cleanup else 1.0)
 
 func end_turn_pressed() -> void:
 	if not initialized or not model.outcome.is_empty() or Game.transition_locked or Game.battle_busy or is_instance_valid(pile_overlay): return
