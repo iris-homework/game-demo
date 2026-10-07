@@ -90,7 +90,7 @@ func _input(event: InputEvent) -> void:
 		if is_instance_valid(debug_panel):
 			debug_panel.queue_free()
 			debug_panel = null
-		elif Game.page == "map" and view.has_method("handle_escape") and view.handle_escape():
+		elif Game.page in ["map", "menu"] and view.has_method("handle_escape") and view.handle_escape():
 			pass
 		elif Game.page == "menu" and not Game.state.is_empty(): Game.resume()
 		else: Game.menu()

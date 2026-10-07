@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-07",
+  "version": "0.2.6-r1",
+  "origin": "User-approved seated Noren animation derived from the supplied tavern and character references",
+  "generatedImageUsed": true,
+  "runtime": {
+    "approvedSource": "res://assets/menu/noren-bar-idle-motion-v2-neon.gif",
+    "sha256": "3DAA68A2DAF93B60F2C99DAF645B8F1DEBBF104738638E06651135D946E17169",
+    "frames": "res://assets/menu/noren_idle_frames/source-manifest.json",
+    "method": "Lossless decoding only; 60/60 RGB pixel matches",
+    "sourceFrameDurationMs": 80,
+    "sourceLoopSeconds": 4.8,
+    "defaultPlaybackSpeed": 1.5,
+    "effectiveLoopSeconds": 3.2,
+    "runtimeEffects": "Approved frames only; no additional rain, character or neon overlay"
+  },
+  "historicalP0": {
+    "date": "2026-10-07",
+    "origin": "User-provided source assets",
+    "generatedImageUsed": false,
+    "background": {
+      "source": "D:/Major Project/GodotGameDemo/asset/source/场景/地下酒馆.png",
+      "project": "res://assets/backgrounds/bar.png",
+      "sha256": "1808F0F830DA05C2C19E47BC62EB4F88A6E86D10C6518AF48A7AC04BED7A6F41"
+    },
+    "portrait": {
+      "source": "D:/Major Project/GodotGameDemo/asset/source/角色/诺伦.png",
+      "project": "res://assets/characters/noren.png",
+      "sha256": "8A661915E889ADD26372F6B0792EBDA4414B7543BF27BC8D4802988E602F8C2A"
+    },
+    "runtimeEffects": "Window rain shader, localized neon polygon, programmatic terminal lamp. Original PNGs unchanged."
+  }
+}

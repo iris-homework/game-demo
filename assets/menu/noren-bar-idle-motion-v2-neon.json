@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-07",
+  "source": "res://assets/menu/noren-bar-idle-motion-v2.gif",
+  "output": "res://assets/menu/noren-bar-idle-motion-v2-neon.gif",
+  "request": "Only the two bottle-shaped neon signs marked in the user's image flicker; strictly preserve everything else",
+  "method": "Node patches decoded source GIF pixels only inside two sign polygons and maps them to the unchanged original palette. Format-only indexed GIF encoder avoids re-quantization.",
+  "renderer": "tools/render_noren_neon_patch.mjs",
+  "encoder": "tools/encode_indexed_gif.py",
+  "timing": "60 frames, 80ms per frame, 4.8s, infinite loop; identical to source",
+  "reference_canvas": [
+    1672,
+    941
+  ],
+  "left_sign_polygon": [
+    [
+      741,
+      353
+    ],
+    [
+      788,
+      364
+    ],
+    [
+      795,
+      494
+    ],
+    [
+      740,
+      502
+    ]
+  ],
+  "right_sign_polygon": [
+    [
+      1510,
+      270
+    ],
+    [
+      1572,
+      264
+    ],
+    [
+      1585,
+      401
+    ],
+    [
+      1521,
+      415
+    ]
+  ],
+  "evidence": "artifacts/noren-neon-v2-2026-10-07/final/verification.json",
+  "validation": {
+    "all_60_decoded_frames_compared": true,
+    "outside_sign_masks_changed_pixels": 0,
+    "inside_sign_masks_changed_pixels_total": 28628,
+    "dimensions_match": true,
+    "timing_matches": true,
+    "loop_matches": true
+  },
+  "status": "Approved source connected to Godot 0.2.6-r1 through lossless PNG frames; source V2 and GIF timing preserved",
+  "runtime": {
+    "framesManifest": "res://assets/menu/noren_idle_frames/source-manifest.json",
+    "defaultPlaybackSpeed": 1.5,
+    "effectiveLoopSeconds": 3.2
+  }
+}

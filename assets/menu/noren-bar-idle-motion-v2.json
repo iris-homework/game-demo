@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-07",
+  "source": "res://assets/menu/noren-bar-seated-v1.png",
+  "output": "res://assets/menu/noren-bar-idle-motion-v2.gif",
+  "preset": "motion",
+  "dimensions": [
+    1008,
+    567
+  ],
+  "frames": 60,
+  "frame_duration_ms": 80,
+  "duration_ms": 4800,
+  "loop": 0,
+  "changes": {
+    "cup_angle_degrees": 4.95,
+    "cup_multiplier_vs_v1": 3,
+    "forward_leg_angle_degrees": 4.29,
+    "other_leg_angle_degrees": 3.25,
+    "legs_multiplier_vs_v1": 2.6,
+    "lighting": "Same slow subtle modulation as v1"
+  },
+  "renderer": "tools/render_noren_idle.mjs",
+  "encoder": "tools/assemble_animation_gif.py",
+  "evidence": "artifacts/noren-gif-motion-v2-2026-10-07/render-metrics.json",
+  "validation": "Decoded all 60 GIF frames at 80ms, loop=0; visually inspected four motion phases. Loop seam mean difference 0.17345, adjacent first-step 0.16530; static staircase difference 0.",
+  "status": "Preview only; not integrated into Godot menu"
+}

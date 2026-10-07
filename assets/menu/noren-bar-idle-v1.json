@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-07",
+  "status": "Looping GIF preview; not connected to the running Godot main menu",
+  "source": "res://assets/menu/noren-bar-seated-v1.png",
+  "source_sha256": "754ED7C4944D106957E9AD28F65EA493E2ED37606F4319AF62C6FD7E41E136D6",
+  "user_reference": "codex-clipboard-52a42d7a-ff9a-46ec-b779-d2aaf8b553e6.png; identical SHA256 to seated-v1",
+  "output": "res://assets/menu/noren-bar-idle-v1.gif",
+  "output_sha256": "F54ED05470B08BD7F3D3AA5B1F0D14DA4346D640F273D8FFB5F5258EEA0312B7",
+  "dimensions": [
+    1008,
+    567
+  ],
+  "frames": 60,
+  "frame_duration_ms": 80,
+  "duration_ms": 4800,
+  "loop": 0,
+  "file_size_bytes": 21640287,
+  "method": "Deterministic local mesh animation from the supplied still: cup/hand rotation up to 1.65 degrees, two lower-leg rotations up to 1.65 and 1.25 degrees with different phases, subtle periodic warm/neon intensity. Node.js and Sharp render frames; Pillow only encodes existing frames into GIF with one shared 256-color palette and no dithering.",
+  "render_script": "tools/render_noren_idle.mjs",
+  "encoder_script": "tools/assemble_animation_gif.py",
+  "render_command": "Set CODEX_NODE_MODULES to the bundled Node modules directory, then: node tools/render_noren_idle.mjs assets/menu/noren-bar-seated-v1.png artifacts/noren-gif-2026-10-07/frames",
+  "encode_command": "python tools/assemble_animation_gif.py --frames-dir artifacts/noren-gif-2026-10-07/frames --duration-ms 80 --output assets/menu/noren-bar-idle-v1.gif",
+  "evidence": "artifacts/noren-gif-2026-10-07/render-metrics.json",
+  "validation": [
+    "Decoded GIF confirms all 60 frames, 80 ms each, total 4800 ms, infinite loop.",
+    "Visually inspected four motion phases and decoded GIF frame 15.",
+    "Raw-render mean RGB difference 0->1: 0.0741; 59->0: 0.0800, similar adjacent motion at wraparound.",
+    "Static staircase region difference at quarter-cycle is zero.",
+    "Original still SHA256 unchanged. No Godot runtime tests or menu integration performed."
+  ],
+  "limitations": [
+    "Subtle 2D deformation animation, not a generated full drinking performance.",
+    "GIF has 256 colors and is smaller in resolution than the source still."
+  ],
+  "rejected_attempt": {
+    "tool": "Built-in image_gen.imagegen",
+    "sheet": "artifacts/noren-gif-2026-10-07/rejected-imagegen-sheet.png",
+    "prompt_record": "artifacts/noren-gif-2026-10-07/rejected-imagegen-sheet.json",
+    "reason": "Background drift, inconsistent frame layout and truncated bottom row; rejected and not used in final GIF."
+  }
+}
