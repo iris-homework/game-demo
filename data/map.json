@@ -1,6 +1,6 @@
 {
   "cityMapAssetId": "city_map",
-  "coordinatesStatus": "prototype",
-  "note": "正式城市总览图与精确地区边界待补；比例坐标仅为调试布局。",
+  "coordinatesStatus": "illustration-calibrated",
+  "note": "城市插画使用 map.jpg，16 地点以图钉尖端锚定建筑；教会保留为无交互地标。",
   "designAspect": 1.78
 }

@@ -1,0 +1,6 @@
+{
+  "godot": "absolute path to the Godot executable",
+  "node": "absolute path to node.exe",
+  "python": "absolute path to python.exe",
+  "mcpRoot": "absolute path to the Godot MCP installation"
+}

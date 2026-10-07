@@ -100,10 +100,46 @@ func available_events(place_id: String = "") -> Array:
 	found.sort_custom(func(a, b): return int(a.optional) < int(b.optional))
 	return found
 
+func map_target_events() -> Array:
+	# UI targets are derived from authored progress, never the last activeEventId.
+	if state.get("flags", {}).get("week1Complete", false): return []
+	var targets: Array = []
+	for e in available_events():
+		var p := place_data(e.placeId)
+		if not e.optional and not p.is_empty() and meets(p.unlockCondition):
+			targets.append(e)
+	targets.sort_custom(func(a, b): return str(a.id) < str(b.id))
+	return targets
+
+func map_place_state(id: String) -> Dictionary:
+	var p := place_data(id)
+	if p.is_empty(): return {}
+	var open := meets(p.unlockCondition)
+	var available: Array = available_events(id) if open else []
+	available.sort_custom(func(a, b):
+		if bool(a.optional) != bool(b.optional): return not bool(a.optional)
+		return str(a.id) < str(b.id))
+	var main_events: Array = []
+	var optional_events: Array = []
+	for e in available:
+		if e.optional: optional_events.append(e)
+		else: main_events.append(e)
+	var completed := false
+	for e in events.values():
+		if e.placeId == id and e.id in state.get("completedEventIds", []):
+			completed = true
+			break
+	return {"place":p, "open":open, "available":available,
+		"main_events":main_events, "optional_events":optional_events,
+		"current":state.get("currentPlaceId", "") == id,
+		"target":not main_events.is_empty() and not state.get("flags", {}).get("week1Complete", false),
+		"completed":completed and available.is_empty(), "services":p.get("services", [])}
+
 func objective() -> String:
 	if state.get("flags", {}).get("week1Complete", false): return "第一周已完成 · 可继续探索支线"
-	for e in available_events():
-		if not e.optional: return e.title + "  /  " + place_data(e.placeId).name
+	var targets := map_target_events()
+	if targets.size() == 1: return targets[0].title + "  /  " + place_data(targets[0].placeId).name
+	if targets.size() > 1: return "%d 个可推进的主线目标" % targets.size()
 	return "探索城市，寻找新的线索"
 
 func event_data() -> Dictionary:

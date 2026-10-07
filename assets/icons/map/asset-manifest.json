@@ -1,0 +1,497 @@
+{
+  "date": "2026-10-07",
+  "timezone": "Asia/Shanghai",
+  "generation": "built-in image_gen",
+  "count": 17,
+  "status": "art-assets-only-not-gameplay-integrated",
+  "existing_assets_unchanged": true,
+  "runtime_files_unchanged": true,
+  "frame_canvas": [
+    64,
+    72
+  ],
+  "symbol_safe_rect": [
+    12,
+    12,
+    40,
+    34
+  ],
+  "assets": [
+    {
+      "id": "camp",
+      "name": "归零运动营地",
+      "file": "camp.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bounds_alpha_gt_16": [
+        94,
+        134,
+        1156,
+        1090
+      ],
+      "sha256": "917fc35ba4dd41af923fc6838f2b99b93bb7df0a0bd613183dd1227e5cb170d7",
+      "preserved_from_first_batch": false
+    },
+    {
+      "id": "junkyard",
+      "name": "垃圾场",
+      "file": "junkyard.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bounds_alpha_gt_16": [
+        93,
+        69,
+        1161,
+        1187
+      ],
+      "sha256": "9fd39fed19874cd19f15d20dbf5498be9490774e544eddaf4847c2b631075581",
+      "preserved_from_first_batch": false
+    },
+    {
+      "id": "alley",
+      "name": "后巷",
+      "file": "alley.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bounds_alpha_gt_16": [
+        126,
+        61,
+        1151,
+        1155
+      ],
+      "sha256": "e345023e3640ea9c5b25bfc175f3fc270dba6c981132fc10fce1afe7f172363a",
+      "preserved_from_first_batch": false
+    },
+    {
+      "id": "bar",
+      "name": "地下酒馆",
+      "file": "bar.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bounds_alpha_gt_16": [
+        135,
+        80,
+        1146,
+        1127
+      ],
+      "sha256": "081e111ae21d061125133d7a79dcb2d5d33c6eef7e3188d050396f6480c6cc9b",
+      "preserved_from_first_batch": true
+    },
+    {
+      "id": "hive",
+      "name": "蜂巢城寨",
+      "file": "hive.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bounds_alpha_gt_16": [
+        168,
+        134,
+        1090,
+        1120
+      ],
+      "sha256": "fda21d9289b1d92ab8a066cd08de683a72361e7432089913a3604bd534a0e7d6",
+      "preserved_from_first_batch": true
+    },
+    {
+      "id": "hotel",
+      "name": "末班车旅馆",
+      "file": "hotel.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bounds_alpha_gt_16": [
+        70,
+        131,
+        1184,
+        1126
+      ],
+      "sha256": "2a2c775c4c0fb945bd1e59feeb10183b6378e7a823374112b37be4342cd9aa76",
+      "preserved_from_first_batch": false
+    },
+    {
+      "id": "church",
+      "name": "义体教会",
+      "file": "church.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bounds_alpha_gt_16": [
+        151,
+        22,
+        1103,
+        1154
+      ],
+      "sha256": "1a8fc6f0512bba1c62e7c49f287b7dadc35c7853badf0230ce888489fde3f4e3",
+      "preserved_from_first_batch": false
+    },
+    {
+      "id": "block5",
+      "name": "五号街区",
+      "file": "block5.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bounds_alpha_gt_16": [
+        83,
+        174,
+        1190,
+        1048
+      ],
+      "sha256": "ead74387aae3ffcae69c8177a559c675a9460169b409568ae8121ec8400fdd42",
+      "preserved_from_first_batch": false
+    },
+    {
+      "id": "tower",
+      "name": "沃斯大楼",
+      "file": "tower.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bounds_alpha_gt_16": [
+        340,
+        49,
+        941,
+        1195
+      ],
+      "sha256": "def52a92c428dab206031d06abdd4656b87a945a39bf3ebc716c94468c34473e",
+      "preserved_from_first_batch": true
+    },
+    {
+      "id": "garden",
+      "name": "白昼庭院",
+      "file": "garden.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bounds_alpha_gt_16": [
+        78,
+        122,
+        1177,
+        1121
+      ],
+      "sha256": "f0700db1d5bee5420619cdec201476df278a11e7f4fd73ea5f69c629c0e1f442",
+      "preserved_from_first_batch": false
+    },
+    {
+      "id": "power",
+      "name": "发电厂",
+      "file": "power.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bounds_alpha_gt_16": [
+        40,
+        143,
+        1214,
+        1041
+      ],
+      "sha256": "bf184fdb16dfe4052c7847401c6c7f7b2ae997c01ef813ece83880e4db6dfdfa",
+      "preserved_from_first_batch": false
+    },
+    {
+      "id": "pump",
+      "name": "黑潮泵站",
+      "file": "pump.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bounds_alpha_gt_16": [
+        138,
+        105,
+        1130,
+        1132
+      ],
+      "sha256": "d8ea8504bb46366452408708b81cc89fce360f094880ca53ff410474ad48b337",
+      "preserved_from_first_batch": false
+    },
+    {
+      "id": "port",
+      "name": "港口",
+      "file": "port.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bounds_alpha_gt_16": [
+        105,
+        107,
+        1158,
+        1124
+      ],
+      "sha256": "6b6da6117c8f7c05af8d7f3aca1a8c5cf033d45acf9eaed21e2e286a45926e03",
+      "preserved_from_first_batch": false
+    },
+    {
+      "id": "mall",
+      "name": "沃斯商场",
+      "file": "mall-v2.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bounds_alpha_gt_16": [
+        141,
+        128,
+        1112,
+        1128
+      ],
+      "sha256": "eec787c56c40d647daff9005856eb533ac7b85a0ff47a959be32d8e006a1544c",
+      "preserved_from_first_batch": false
+    },
+    {
+      "id": "market",
+      "name": "黑市",
+      "file": "market.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bounds_alpha_gt_16": [
+        101,
+        143,
+        1153,
+        1111
+      ],
+      "sha256": "4590811dde99675cc64219ebd1c76d33512396ca8833f1b60aa25c4e4d6ff7ca",
+      "preserved_from_first_batch": false
+    },
+    {
+      "id": "hospital",
+      "name": "医院",
+      "file": "hospital.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bounds_alpha_gt_16": [
+        68,
+        90,
+        1186,
+        1106
+      ],
+      "sha256": "bce0a89b1dabadcc5da0ed39f6e2b5e6423538d65d6b81c49b8f4c1237b61f44",
+      "preserved_from_first_batch": true
+    },
+    {
+      "id": "clinic",
+      "name": "地下诊所",
+      "file": "clinic.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "corner_alpha": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bounds_alpha_gt_16": [
+        138,
+        147,
+        1165,
+        1156
+      ],
+      "sha256": "c5b17ef641b0d79c21b9ab8a1310b2edcb384de7f4e449896fceed5addf78250",
+      "preserved_from_first_batch": true
+    }
+  ]
+}

@@ -68,7 +68,11 @@ func show_notice(message: String) -> void:
 	ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ui.panel(ui,Vector2(320,104),Vector2(800,62),Color("132639"),DemoUI.CYAN)
 	ui.label(ui,message,Vector2(342,114),Vector2(760,48),18)
-	get_tree().create_timer(4.0).timeout.connect(func(): if is_instance_valid(ui): ui.queue_free())
+	# 后一条提示会提前释放旧节点；计时器捕获 WeakRef，避免访问已释放的 lambda 对象。
+	var toast_ref: WeakRef = weakref(ui)
+	get_tree().create_timer(4.0).timeout.connect(func():
+		var notice_ui = toast_ref.get_ref()
+		if is_instance_valid(notice_ui): notice_ui.queue_free())
 
 func _input(event: InputEvent) -> void:
 	if Game.transition_locked:
@@ -86,6 +90,8 @@ func _input(event: InputEvent) -> void:
 		if is_instance_valid(debug_panel):
 			debug_panel.queue_free()
 			debug_panel = null
+		elif Game.page == "map" and view.has_method("handle_escape") and view.handle_escape():
+			pass
 		elif Game.page == "menu" and not Game.state.is_empty(): Game.resume()
 		else: Game.menu()
 	elif is_instance_valid(debug_panel): get_viewport().set_input_as_handled()

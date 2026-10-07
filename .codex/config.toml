@@ -1,0 +1,6 @@
+# 午夜委托项目专用：主会话模型不在此设置。
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 1
+default_subagent_model = "deepseek/deepseek-flash"
+default_subagent_reasoning_effort = "high"

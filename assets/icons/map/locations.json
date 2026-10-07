@@ -1,0 +1,186 @@
+{
+  "status": "art-assets-only",
+  "anchorStatus": "visual-preview-not-gameplay",
+  "frameCanvas": [
+    64,
+    72
+  ],
+  "symbolSafeRect": [
+    12,
+    12,
+    40,
+    34
+  ],
+  "locations": [
+    {
+      "id": "camp",
+      "name": "归零运动营地",
+      "symbol": "帐篷与小旗",
+      "icon": "camp.png",
+      "previewAnchor": [
+        0.075,
+        0.15
+      ]
+    },
+    {
+      "id": "junkyard",
+      "name": "垃圾场",
+      "symbol": "废料与断齿轮",
+      "icon": "junkyard.png",
+      "previewAnchor": [
+        0.23,
+        0.255
+      ]
+    },
+    {
+      "id": "alley",
+      "name": "后巷",
+      "symbol": "两侧墙体夹折线通道",
+      "icon": "alley.png",
+      "previewAnchor": [
+        0.173,
+        0.414
+      ]
+    },
+    {
+      "id": "bar",
+      "name": "地下酒馆",
+      "symbol": "酒杯",
+      "icon": "bar.png",
+      "previewAnchor": [
+        0.106,
+        0.432
+      ]
+    },
+    {
+      "id": "hive",
+      "name": "蜂巢城寨",
+      "symbol": "错落堆叠住房",
+      "icon": "hive.png",
+      "previewAnchor": [
+        0.244,
+        0.583
+      ]
+    },
+    {
+      "id": "hotel",
+      "name": "末班车旅馆",
+      "symbol": "床铺与候车楼顶棚",
+      "icon": "hotel.png",
+      "previewAnchor": [
+        0.455,
+        0.808
+      ]
+    },
+    {
+      "id": "church",
+      "name": "义体教会",
+      "symbol": "尖拱内的机械手掌",
+      "icon": "church.png",
+      "previewAnchor": [
+        0.51,
+        0.635
+      ]
+    },
+    {
+      "id": "block5",
+      "name": "五号街区",
+      "symbol": "三栋并列住宅",
+      "icon": "block5.png",
+      "previewAnchor": [
+        0.742,
+        0.56
+      ]
+    },
+    {
+      "id": "tower",
+      "name": "沃斯大楼",
+      "symbol": "细长高塔",
+      "icon": "tower.png",
+      "previewAnchor": [
+        0.503,
+        0.351
+      ]
+    },
+    {
+      "id": "garden",
+      "name": "白昼庭院",
+      "symbol": "拱门内的树",
+      "icon": "garden.png",
+      "previewAnchor": [
+        0.699,
+        0.253
+      ]
+    },
+    {
+      "id": "power",
+      "name": "发电厂",
+      "symbol": "闪电与工业设备",
+      "icon": "power.png",
+      "previewAnchor": [
+        0.919,
+        0.408
+      ]
+    },
+    {
+      "id": "pump",
+      "name": "黑潮泵站",
+      "symbol": "弯管出口与水滴",
+      "icon": "pump.png",
+      "previewAnchor": [
+        0.877,
+        0.634
+      ]
+    },
+    {
+      "id": "port",
+      "name": "港口",
+      "symbol": "吊机吊钩与水平水线",
+      "icon": "port.png",
+      "previewAnchor": [
+        0.85,
+        0.86
+      ]
+    },
+    {
+      "id": "mall",
+      "name": "沃斯商场",
+      "symbol": "购物袋",
+      "icon": "mall-v2.png",
+      "previewAnchor": [
+        0.449,
+        0.398
+      ]
+    },
+    {
+      "id": "market",
+      "name": "黑市",
+      "symbol": "带遮棚的摊位",
+      "icon": "market.png",
+      "previewAnchor": [
+        0.182,
+        0.77
+      ]
+    },
+    {
+      "id": "hospital",
+      "name": "医院",
+      "symbol": "医疗十字与规整建筑",
+      "icon": "hospital.png",
+      "previewAnchor": [
+        0.631,
+        0.416
+      ]
+    },
+    {
+      "id": "clinic",
+      "name": "地下诊所",
+      "symbol": "医疗十字与扳手",
+      "icon": "clinic.png",
+      "previewAnchor": [
+        0.329,
+        0.739
+      ]
+    }
+  ]
+}
