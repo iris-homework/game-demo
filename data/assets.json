@@ -9,7 +9,8 @@
   },
   "alley": {
     "path": "res://assets/backgrounds/alley.png",
-    "kind": "background"
+    "kind": "background",
+    "battleAssetId": "alley_battle"
   },
   "tower": {
     "path": "res://assets/backgrounds/tower.png",
@@ -133,5 +134,9 @@
     "path": "res://assets/characters/mech_battle.png",
     "kind": "battle_portrait",
     "whiteKey": true
+  },
+  "alley_battle": {
+    "path": "res://assets/backgrounds/alley_battle.png",
+    "kind": "battle_background"
   }
 }

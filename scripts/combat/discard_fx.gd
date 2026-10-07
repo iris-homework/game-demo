@@ -1,5 +1,6 @@
 extends Node2D
 ## Owns only a detached visual card. Never touches combat state or input locks.
+signal landed
 const CYAN := Color("64ffe1")
 const PINK := Color("ff3158")
 var outline := PackedVector2Array([Vector2(-90,-103),Vector2(-78,-115),Vector2(74,-115),Vector2(90,-99),Vector2(90,101),Vector2(76,115),Vector2(-90,115),Vector2(-90,-103)])
@@ -28,7 +29,7 @@ func start(view: CombatCard, target: Vector2, duration: float, delay: float, int
 	var tween := create_tween()
 	if delay > 0.0: tween.tween_interval(delay)
 	tween.tween_method(update_flight,0.0,1.0,duration)
-	tween.tween_callback(func(): card.visible = false)
+	tween.tween_callback(func(): card.visible = false; landed.emit())
 	tween.tween_method(update_arrival,0.0,1.0,0.24)
 	tween.tween_callback(queue_free)
 

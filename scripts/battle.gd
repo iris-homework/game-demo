@@ -16,11 +16,15 @@ var turn_label: Label
 var turn_banner: Control
 var draw_count: Label
 var discard_count: Label
+var shown_draw_count := 0
+var shown_discard_count := 0
 var end_button: Button
 var cyberware_button: Button
 var cyberware_status: Label
 var pile_overlay: Control
 var initialized := false
+const ACTOR_OFFSET := Vector2(0,24)
+const HAND_SCALE := 0.75
 const PILE_SIZE := Vector2(58,72)
 const DRAW_POS := Vector2(30,800)
 const DISCARD_POS := Vector2(1352,800)
@@ -34,13 +38,28 @@ func enter(params: Dictionary) -> void:
 	model = CombatModel.new()
 	model.restore(Game.state.combat)
 	expected_revision = Game.revision
-	background(Game.place_data(battle.placeId).backgroundAssetId,0.15)
+	var integrated_ground := battle_background()
 	var arena := Node2D.new()
 	arena.set_script(preload("res://scripts/combat/arena_fx.gd"))
+	arena.paint_ground = not integrated_ground
 	add_child(arena)
-	# Keep the hand rail above the floor and below portraits and controls.
-	polygon(self,[Vector2(0,704),Vector2(1440,681),Vector2(1440,900),Vector2(0,900)],Color("090b12e5"))
-	polygon(self,[Vector2(0,697),Vector2(238,692),Vector2(235,698),Vector2(0,704)],PINK)
+	if integrated_ground:
+		# Let the illustrated road continue behind the hand, with a soft readability fade.
+		var gradient := Gradient.new()
+		gradient.colors = PackedColorArray([Color("090b1200"),Color("090b12bd")])
+		var texture := GradientTexture2D.new()
+		texture.gradient = gradient
+		texture.fill_from = Vector2.ZERO
+		texture.fill_to = Vector2(0,1)
+		var shade := TextureRect.new()
+		shade.texture = texture
+		shade.position = Vector2(0,650)
+		shade.size = Vector2(1440,250)
+		shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(shade)
+	else:
+		polygon(self,[Vector2(0,704),Vector2(1440,681),Vector2(1440,900),Vector2(0,900)],Color("090b12e5"))
+		polygon(self,[Vector2(0,697),Vector2(238,692),Vector2(235,698),Vector2(0,704)],PINK)
 	chrome("战斗",false)
 	label(self,battle.name,Vector2(41,112),Vector2(700,55),33)
 	label(self,"COMBAT // " + Game.place_data(battle.placeId).name,Vector2(43,166),Vector2(670,29),14,CYAN)
@@ -51,9 +70,9 @@ func enter(params: Dictionary) -> void:
 	turn_label = label(self,"回合 %02d  /  你的回合" % model.turn,Vector2(566,29),Vector2(308,37),19,Color("8fcaff"))
 	turn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	var n_asset: String = Game.characters.noren.get("battlePortraitAssetId", "")
-	player_portrait = battle_portrait(n_asset,Vector2(90,215),Vector2(630,335))
-	label(self,Game.display_name("noren"),Vector2(305,552),Vector2(280,33),23)
-	label(self,"NEURAL LINK / ONLINE",Vector2(268,590),Vector2(340,27),12,CYAN)
+	player_portrait = battle_portrait(n_asset,Vector2(90,215)+ACTOR_OFFSET,Vector2(630,335))
+	label(self,Game.display_name("noren"),Vector2(305,552)+ACTOR_OFFSET,Vector2(280,33),23)
+	label(self,"NEURAL LINK / ONLINE",Vector2(268,590)+ACTOR_OFFSET,Vector2(340,27),12,CYAN)
 	for i in model.enemies.size():
 		var pos := enemy_position(i)
 		var portrait_node := battle_portrait(model.enemies[i].battlePortraitAssetId,pos,Vector2(460,317))
@@ -91,6 +110,17 @@ func enter(params: Dictionary) -> void:
 	set_busy(true)
 	start_hand.call_deferred()
 
+func battle_background() -> bool:
+	var place_asset: String = Game.place_data(battle.placeId).backgroundAssetId
+	var stage_asset: String = Game.assets.get(place_asset,{}).get("battleAssetId","")
+	if stage_asset.is_empty() or Game.texture(stage_asset) == null:
+		background(place_asset,0.15)
+		return false
+	rect(self,Vector2.ZERO,Vector2(1440,900),INK)
+	image_asset(self,stage_asset,Vector2.ZERO,Vector2(1440,900),true)
+	rect(self,Vector2.ZERO,Vector2(1440,900),Color(0.025,0.015,0.045,0.16))
+	return true
+
 func battle_portrait(asset_id: String, pos: Vector2, dimensions: Vector2) -> TextureRect:
 	var node := image_asset(self,asset_id,pos,dimensions,false)
 	if node and Game.assets.get(asset_id,{}).get("whiteKey",false):
@@ -103,7 +133,7 @@ func battle_portrait(asset_id: String, pos: Vector2, dimensions: Vector2) -> Tex
 	return node
 
 func enemy_position(index: int) -> Vector2:
-	return Vector2(791 + index*180 - (model.enemies.size()-1)*100,229)
+	return Vector2(791 + index*180 - (model.enemies.size()-1)*100,229)+ACTOR_OFFSET
 
 func refresh_enemy_hud() -> void:
 	if is_instance_valid(enemy_hud):
@@ -111,6 +141,7 @@ func refresh_enemy_hud() -> void:
 		enemy_hud.queue_free()
 	targets.clear()
 	enemy_hud = Control.new()
+	enemy_hud.position = ACTOR_OFFSET
 	enemy_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(enemy_hud)
 	for i in model.enemies.size():
@@ -165,7 +196,7 @@ func pile_button(pos: Vector2, title: String, action: Callable) -> void:
 
 func hand_position(index: int, count: int) -> Vector2:
 	var offset := index-(count-1)/2.0
-	var spacing := minf(84.0,820.0/maxi(count-1,1))
+	var spacing := minf(92.0,820.0/maxi(count-1,1))
 	var normalized := offset/maxf((count-1)/2.0,1.0)
 	return Vector2(720+offset*spacing-90,760+normalized*normalized*minf(24.0,(count-1)*3.0))
 
@@ -200,7 +231,7 @@ func update_hand_hover() -> void:
 func create_card(uid: String, index: int, count: int, animate: bool) -> CombatCard:
 	var view := CombatCard.new()
 	view.managed_input = true
-	view.home_scale = 0.68
+	view.home_scale = HAND_SCALE
 	view.home_rotation = hand_rotation(index,count)
 	view.home_z = 10+index
 	view.setup(uid,model.card(uid))
@@ -241,6 +272,7 @@ func deal_hand(animate: bool) -> void:
 		if animate:
 			var fx := preload("res://scripts/combat/draw_fx.gd").new()
 			add_child(fx)
+			fx.departed.connect(on_card_drawn)
 			fx.start(view,DRAW_POS+PILE_SIZE/2.0,duration,i*0.055)
 			last_flight = fx
 	if animate: await last_flight.landed
@@ -319,7 +351,6 @@ func play_selected(target: int) -> void:
 	burst.z_index = 45
 	add_child(burst)
 	animate_discard(card_view)
-	refresh_counts()
 	if not model.outcome.is_empty():
 		await get_tree().create_timer(0.52).timeout
 		set_busy(false)
@@ -342,6 +373,7 @@ func animate_discard(view: CombatCard, delay: float = 0.0, turn_cleanup: bool = 
 	view.card_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var fx := preload("res://scripts/combat/discard_fx.gd").new()
 	add_child(fx)
+	fx.landed.connect(on_card_discarded)
 	fx.start(view,DISCARD_POS+PILE_SIZE/2.0,0.32 if turn_cleanup else 0.40,delay,0.55 if turn_cleanup else 1.0)
 
 func end_turn_pressed() -> void:
@@ -367,7 +399,7 @@ func end_turn_pressed() -> void:
 		return
 	commit()
 	for attack in result.attacks:
-		await impact(Vector2(418,421),"−%d HP" % attack.damage,PINK)
+		await impact(Vector2(418,421)+ACTOR_OFFSET,"−%d HP" % attack.damage,PINK)
 	if not model.outcome.is_empty():
 		set_busy(false)
 		finish(model.outcome)
@@ -405,8 +437,29 @@ func impact(pos: Vector2, text: String, color: Color) -> void:
 	await get_tree().create_timer(timing("impactDuration",0.36)+0.1).timeout
 
 func refresh_counts() -> void:
-	draw_count.text = str(model.draw_pile.size())
-	discard_count.text = str(model.discard_pile.size())
+	# Initialize/reset after a complete deal, never during an in-flight discard.
+	shown_draw_count = model.draw_pile.size()
+	shown_discard_count = model.discard_pile.size()
+	render_counts()
+
+func render_counts() -> void:
+	draw_count.text = str(shown_draw_count)
+	discard_count.text = str(shown_discard_count)
+
+func on_card_drawn() -> void:
+	# Model drawing is already committed. Mirror its recycling only when the
+	# next visible card leaves an empty deck, including mid-deal recycling.
+	if shown_draw_count == 0 and model.profile.get("recycleDiscardWhenEmpty",true):
+		shown_draw_count = shown_discard_count
+		shown_discard_count = 0
+	shown_draw_count -= 1
+	render_counts()
+
+func on_card_discarded() -> void:
+	# Each flight reports arrival once; overlapping attacks and turn cleanup
+	# share this path without changing any model pile or saved state.
+	shown_discard_count += 1
+	render_counts()
 
 func set_busy(value: bool) -> void:
 	Game.battle_busy = value

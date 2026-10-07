@@ -1,5 +1,6 @@
 extends Node2D
 ## Presentation only: the battle retains ownership of the live hand card.
+signal departed
 signal landed
 const CYAN := Color("64ffe1")
 const PINK := Color("ff3158")
@@ -26,7 +27,7 @@ func start(view: CombatCard, source: Vector2, duration: float, delay: float) -> 
 	view.visible = false
 	var tween := create_tween()
 	if delay > 0.0: tween.tween_interval(delay)
-	tween.tween_callback(func(): active = true; card.visible = true)
+	tween.tween_callback(func(): active = true; card.visible = true; departed.emit())
 	tween.tween_method(update_flight,0.0,1.0,duration)
 	tween.tween_callback(land)
 	tween.tween_method(update_arrival,0.0,1.0,0.18)

@@ -104,5 +104,5 @@ func refresh_pose(force: bool = false) -> void:
 	z_index = (31 if selected else 30) if lifted else home_z
 	hover_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	hover_tween.tween_property(self,"position",home + Vector2(0,-150 if selected else (-140 if lifted else 0)),0.14)
-	hover_tween.tween_property(self,"scale",Vector2.ONE * (1.05 if lifted else home_scale),0.14)
+	hover_tween.tween_property(self,"scale",Vector2.ONE * (1.12 if lifted else home_scale),0.14)
 	hover_tween.tween_property(self,"rotation",0.0 if lifted else home_rotation,0.14)

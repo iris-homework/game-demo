@@ -35,7 +35,7 @@ func _ready() -> void:
 	verify(view.cards.size() == 10,"Ten cards dealt into fan")
 	for uid in view.model.hand:
 		var card: CombatCard = view.cards[uid]
-		verify(card.scale.is_equal_approx(Vector2.ONE*0.68) and is_equal_approx(card.rotation,card.home_rotation),"Draw animation restores fan pose")
+		verify(card.scale.is_equal_approx(Vector2.ONE*0.75) and is_equal_approx(card.rotation,card.home_rotation),"Draw animation restores fan pose")
 		for corner in [Vector2.ZERO,Vector2(180,0),Vector2(180,230),Vector2(0,230)]:
 			verify(Rect2(205,620,1030,420).has_point(card.get_global_transform()*corner),"Resting cards stay horizontally between side controls within the bottom tray")
 		verify((card.get_global_transform()*Vector2(90,230)).y > 900.0 and (card.get_global_transform()*Vector2(90,0)).y < 900.0,"Resting card is partially submerged below screen")

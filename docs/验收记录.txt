@@ -223,3 +223,24 @@ COMBAT TESTS: 191 checks, 0 failures
 1600x1000 HAND FAN VISUAL: 145 checks, 0 failures（增加移开恢复断言）
 1280x800 DRAG VISUAL: 11 checks, 0 failures
 查看1280五张静止／悬停，1600五张悬停／十张静止截图。测试禁用写档；未重跑其他专项。工程包逐文件核对一致。
+
+2026-10-07 后巷战斗背景与地面连通 0.3.13-ui
+编辑器导入无脚本错误。后巷1280x800/1600x1000真实画面检查；1280x800机甲占位回退画面检查。
+1280x800 R1: VISUAL INTEGRATION: 0 failures
+图形测试禁用写档；临时预览工具已移除，其他专项未重跑。原alley.png与修改前逐字节一致。交付包逐文件核对一致。
+
+2026-10-07 0.3.14-ui 角色下移与手牌放大
+编辑器导入：无脚本错误。
+1280x800 hand_fan_visual: 145 checks, 0 failures
+1600x1000 hand_fan_visual: 145 checks, 0 failures
+1280x800 drag_visual: 11 checks, 0 failures
+实际查看6张截图，存放于docs/预览/角色下移手牌放大；测试禁用写档。其他专项未运行。
+
+2026-10-07 角色下移与手牌放大交付包逐文件核对一致，排除缓存、临时文件与用户存档。
+
+2026-10-07 0.3.15-fix 牌堆数量同步
+修复前 pile_count_visual: 14 checks, 2 failures（回合弃牌显示1/0，应为5）
+修复后最终1280x800 pile_count_visual: 17 checks, 0 failures
+1280x800 turn_banner_visual: 17 checks, 0 failures
+最终编辑器导入无脚本错误；已查看两张计数截图。内存样本，禁用正式写档；其他专项未运行。
+工程包逐文件核对一致，排除缓存、临时文件与用户存档。
