@@ -121,9 +121,9 @@
     "kind": "pending"
   },
   "city_map": {
-    "path": "",
+    "path": "res://assets/map/map.jpg",
     "kind": "city_map",
-    "note": "城市总览插画待提供；港口场景不可代替城市地图"
+    "note": "用户提供的城市总览插画；地点背景独立配置"
   },
   "noren_battle": {
     "path": "res://assets/characters/noren_battle.png",

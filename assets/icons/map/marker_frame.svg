@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 午夜委托 · 地点标记统一外框（normal / 未选中）
+     64x72 viewBox，画布外部保持透明。
+     符号安全区：x12 y12 w40 h34（与 hover / selected 完全一致）。
+     形状：切角金属牌 + 下方短尖角，尖端约在 (32,67)。 -->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="72" viewBox="0 0 64 72" shape-rendering="geometricPrecision">
+  <!-- 深蓝紫不透明牌面 + 近黑外描边 -->
+  <path d="M8 3 L53 3 L61 11 L61 53 L38 53 L32 67 L25 53 L3 53 L3 12 Z"
+        fill="#101421" stroke="#070E19" stroke-width="2.4" stroke-linejoin="miter" stroke-miterlimit="6"/>
+  <!-- 低饱和金属亮边（内圈） -->
+  <path d="M9.3 4.6 L51.7 4.6 L59.4 12.6 L59.4 51.4 L37.4 51.4 L32 65.3 L26.6 51.4 L4.6 51.4 L4.6 13.6 Z"
+        fill="none" stroke="#55637c" stroke-width="1" stroke-linejoin="miter" stroke-miterlimit="6"/>
+  <!-- 金属高光：上沿与左上切角，控制在很短的亮段 -->
+  <path d="M10 4.6 L50.6 4.6" fill="none" stroke="#8f9db8" stroke-width="1" stroke-linecap="round"/>
+  <path d="M4.6 14 L4.6 33" fill="none" stroke="#6e7c96" stroke-width="1" stroke-linecap="round"/>
+</svg>

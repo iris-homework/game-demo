@@ -1,0 +1,377 @@
+{
+  "date": "2026-10-07",
+  "source": "res://assets/menu/noren-bar-idle-motion-v2-neon.gif",
+  "source_sha256": "3DAA68A2DAF93B60F2C99DAF645B8F1DEBBF104738638E06651135D946E17169",
+  "width": 1008,
+  "height": 567,
+  "frame_count": 60,
+  "frame_duration_ms": 80,
+  "loop_duration_ms": 4800,
+  "loop": 0,
+  "pixel_verification": "60/60 lossless RGB matches",
+  "method": "Decode reviewed GIF frames only; no re-rendering, redraw or color adjustment",
+  "decoded_rgb_bytes": 102876480,
+  "frames": [
+    {
+      "index": 0,
+      "file": "frame_000.png",
+      "duration_ms": 80,
+      "sha256": "DC46E70E950AAF1A0B91C7441BBBF37167E39BA036B8169935FD5952D4D7B752"
+    },
+    {
+      "index": 1,
+      "file": "frame_001.png",
+      "duration_ms": 80,
+      "sha256": "F37AEA244970617FFDEFDD9E743CE753B9772D3B7D21C77CBD77220B730B4650"
+    },
+    {
+      "index": 2,
+      "file": "frame_002.png",
+      "duration_ms": 80,
+      "sha256": "72C59D52362D68984DFB6F8EC02DDE1EDBF0C05D7066A6AF73E9B4AAC2025453"
+    },
+    {
+      "index": 3,
+      "file": "frame_003.png",
+      "duration_ms": 80,
+      "sha256": "589035EC9FC5C0542A72011E8316F8781FEEE0CFDE4037FC24026759AE3CBDDA"
+    },
+    {
+      "index": 4,
+      "file": "frame_004.png",
+      "duration_ms": 80,
+      "sha256": "9C4688C79D6B054A5BB9C85D7B073E5EC2EB78238A25B314C16C21A2A9964163"
+    },
+    {
+      "index": 5,
+      "file": "frame_005.png",
+      "duration_ms": 80,
+      "sha256": "9B4900C500AA64D0D7A83654F94E847ED918D2685CCD205DF9F0BEC6967A0964"
+    },
+    {
+      "index": 6,
+      "file": "frame_006.png",
+      "duration_ms": 80,
+      "sha256": "569917633D0D733BCEAECBF73227010E1DB9783EE3557DE3099373E249ABA48A"
+    },
+    {
+      "index": 7,
+      "file": "frame_007.png",
+      "duration_ms": 80,
+      "sha256": "60F21F21F3E4DB0AB1B15B9A320A9F425EA47766B60553B936406D307A42E1E0"
+    },
+    {
+      "index": 8,
+      "file": "frame_008.png",
+      "duration_ms": 80,
+      "sha256": "F9A9859349CD53965175FA5C8B4831834D863E736E9E3F7223234BDC91745B63"
+    },
+    {
+      "index": 9,
+      "file": "frame_009.png",
+      "duration_ms": 80,
+      "sha256": "03F7605E4910441893A3B6539DDC48A4CD9FF9B2F83BA15B05169A62735F0AAE"
+    },
+    {
+      "index": 10,
+      "file": "frame_010.png",
+      "duration_ms": 80,
+      "sha256": "FD16B2865D4001C538B47C5518BCFE7D7507640896031A3E569E9940873626C0"
+    },
+    {
+      "index": 11,
+      "file": "frame_011.png",
+      "duration_ms": 80,
+      "sha256": "D4E21E9F2671B1B8920881C7B5DC52758E413D84E02A35F2F2A84F07F6324992"
+    },
+    {
+      "index": 12,
+      "file": "frame_012.png",
+      "duration_ms": 80,
+      "sha256": "905971B83E8018C38D8F44ED7DC87D4B20111F1FA1D86BBF153ADB2B8EF7E7E5"
+    },
+    {
+      "index": 13,
+      "file": "frame_013.png",
+      "duration_ms": 80,
+      "sha256": "A02CB881ECE364044042FC5F4CCB0EFDC9A9079EA6E5BBEEF6B8D915EC653595"
+    },
+    {
+      "index": 14,
+      "file": "frame_014.png",
+      "duration_ms": 80,
+      "sha256": "062BB86B53E47C12682DF5D2729DC919CBBC9FC88B479996C541EE300B941707"
+    },
+    {
+      "index": 15,
+      "file": "frame_015.png",
+      "duration_ms": 80,
+      "sha256": "42AF30B2F9EE3E883409367C1DE294DC5720B78124CDC5C6A33D1266149A6B7A"
+    },
+    {
+      "index": 16,
+      "file": "frame_016.png",
+      "duration_ms": 80,
+      "sha256": "CA3B50ACB6B0EF0E965040D7590CA5F9DF9E576BCC1D04B5FCAF01B5B5195542"
+    },
+    {
+      "index": 17,
+      "file": "frame_017.png",
+      "duration_ms": 80,
+      "sha256": "7A55D0195B8D751F272AF0840E0BBEDBED8C4E977D0230E578ED8FD386ACD23E"
+    },
+    {
+      "index": 18,
+      "file": "frame_018.png",
+      "duration_ms": 80,
+      "sha256": "5D45DC3D6A44984E85EBFFF93BA08E34FE9B7D6AB5A8D31B0F2333002D2F1095"
+    },
+    {
+      "index": 19,
+      "file": "frame_019.png",
+      "duration_ms": 80,
+      "sha256": "68E7EF1667CDAA6E14C3AEA1236EA2840264D5D3A762EF8CB284160F2A5D6D2F"
+    },
+    {
+      "index": 20,
+      "file": "frame_020.png",
+      "duration_ms": 80,
+      "sha256": "E21C15987AADBE5E3686BAE890361ABA86F91BFD40472F4985018E3F63D22841"
+    },
+    {
+      "index": 21,
+      "file": "frame_021.png",
+      "duration_ms": 80,
+      "sha256": "1CA14D110C559132B88F0987059220A3FA917F197BE1430E22CF7DE8C9057B3E"
+    },
+    {
+      "index": 22,
+      "file": "frame_022.png",
+      "duration_ms": 80,
+      "sha256": "C9066F479F01E078FCE0166A0ACD4F90838C5410237D421C2B374A2243D1552F"
+    },
+    {
+      "index": 23,
+      "file": "frame_023.png",
+      "duration_ms": 80,
+      "sha256": "3A6A7F08D6CDECA46D43F995749DBB61433543D16798D6AF4FABEC7416B60C86"
+    },
+    {
+      "index": 24,
+      "file": "frame_024.png",
+      "duration_ms": 80,
+      "sha256": "09EB3E9D3577FA76A063FC2326BD6017E5295DEC0A7432F105A4E2B9216B218C"
+    },
+    {
+      "index": 25,
+      "file": "frame_025.png",
+      "duration_ms": 80,
+      "sha256": "8E39599FD12293398B39B41E05DD95CA181DD676ED07A9DD01CD696B1402EE0B"
+    },
+    {
+      "index": 26,
+      "file": "frame_026.png",
+      "duration_ms": 80,
+      "sha256": "54AAE8CE46F94780F752FA85A19C5C4476E157878D502E74DA7727603F64609A"
+    },
+    {
+      "index": 27,
+      "file": "frame_027.png",
+      "duration_ms": 80,
+      "sha256": "C2ED960E7209700116A88474D4FC456BEAE3F3C5753CB7A15EFFE096395F667B"
+    },
+    {
+      "index": 28,
+      "file": "frame_028.png",
+      "duration_ms": 80,
+      "sha256": "1AE4BC4D856116849C83F04A586535EBAD3890494A49103B40C7A0E7B218375D"
+    },
+    {
+      "index": 29,
+      "file": "frame_029.png",
+      "duration_ms": 80,
+      "sha256": "A60B4905A7EA840B88F5DF73B76694BAB67C87F6DCA235243C1A08C1EFE7A9F3"
+    },
+    {
+      "index": 30,
+      "file": "frame_030.png",
+      "duration_ms": 80,
+      "sha256": "BDF81A2EAE8380BB7303DBC7746E3C5CE92A5581EEAC8EA8E1CF6F2059BB1B9F"
+    },
+    {
+      "index": 31,
+      "file": "frame_031.png",
+      "duration_ms": 80,
+      "sha256": "E9F41156CB766459729BE99ACC5A0E199C5474C533B475D23F8229C0EEDE50F3"
+    },
+    {
+      "index": 32,
+      "file": "frame_032.png",
+      "duration_ms": 80,
+      "sha256": "C46C780D3AAEEEBCB394A331A3DDB528F5D03A0B3F7DE20419AE2DB2AC324A68"
+    },
+    {
+      "index": 33,
+      "file": "frame_033.png",
+      "duration_ms": 80,
+      "sha256": "DECEEF417941496FD1AE2C3ECA36EFB68C2D9EFF9A2FAB1000DA03C7A7398018"
+    },
+    {
+      "index": 34,
+      "file": "frame_034.png",
+      "duration_ms": 80,
+      "sha256": "D2043DB98E2BF52F2CC506C6AF4E7A393A80C6830CA74834EBFB7C8760181BA6"
+    },
+    {
+      "index": 35,
+      "file": "frame_035.png",
+      "duration_ms": 80,
+      "sha256": "8BDD12B8656FEB212F637AFC9C5408883027691D6C48330F7793C423DC3472E3"
+    },
+    {
+      "index": 36,
+      "file": "frame_036.png",
+      "duration_ms": 80,
+      "sha256": "17DD2E3CFE17D030310BB359B0025BD7D6C628DAB78A09144DA4BF686E3EED49"
+    },
+    {
+      "index": 37,
+      "file": "frame_037.png",
+      "duration_ms": 80,
+      "sha256": "E595A16F2A549069AC10C7B69AD9CDE0F6F5AF4A3A47829CAAA43B407D26B8CC"
+    },
+    {
+      "index": 38,
+      "file": "frame_038.png",
+      "duration_ms": 80,
+      "sha256": "59C81D4D08CD7D7293641F8D2E95C382BB507A0B93A8D12B99B90727D85C292F"
+    },
+    {
+      "index": 39,
+      "file": "frame_039.png",
+      "duration_ms": 80,
+      "sha256": "45016470C946DFD05C96D58B21CEF05C70E65FA19C68541BB74AF3BFA6AAFE05"
+    },
+    {
+      "index": 40,
+      "file": "frame_040.png",
+      "duration_ms": 80,
+      "sha256": "C58149953BABB0D6F3F1B34303B897358A1156DFDDC50332A300920CB40D6BED"
+    },
+    {
+      "index": 41,
+      "file": "frame_041.png",
+      "duration_ms": 80,
+      "sha256": "865D7334B64C4B8438A110DC6F90BA35A31029B7E0D85506A2F2DC8D08BFB561"
+    },
+    {
+      "index": 42,
+      "file": "frame_042.png",
+      "duration_ms": 80,
+      "sha256": "D7315009CF65B9C4F819BE55C9323333BC45E5FF9B05770892D0E5A5544E8E3E"
+    },
+    {
+      "index": 43,
+      "file": "frame_043.png",
+      "duration_ms": 80,
+      "sha256": "7D91E5BF6E672CC6C6F09C89D3430D53E9B03F4EDA2B52DF52B60E8036D7DC9C"
+    },
+    {
+      "index": 44,
+      "file": "frame_044.png",
+      "duration_ms": 80,
+      "sha256": "7D51CD28DCC535CD440EA6789B33E86C14C31E13066EF2A612E6219918486500"
+    },
+    {
+      "index": 45,
+      "file": "frame_045.png",
+      "duration_ms": 80,
+      "sha256": "E4139AAB0A97361EA15C287B0E2777F17FEE81D893213A742C04FD30D6B3ECE7"
+    },
+    {
+      "index": 46,
+      "file": "frame_046.png",
+      "duration_ms": 80,
+      "sha256": "60A22A318D0BC2CFA765C2840DD69468DF8F94936C6612E3D68D4932960D741B"
+    },
+    {
+      "index": 47,
+      "file": "frame_047.png",
+      "duration_ms": 80,
+      "sha256": "D5572B9199B8C8E757771BD7E68E6654CA05B8FC4F8EBDECDDA2A88C578EC03D"
+    },
+    {
+      "index": 48,
+      "file": "frame_048.png",
+      "duration_ms": 80,
+      "sha256": "4C621E502C180EF03B47BE3722B846A268AC5553B1EC0F47DF00BC69D2BDAA86"
+    },
+    {
+      "index": 49,
+      "file": "frame_049.png",
+      "duration_ms": 80,
+      "sha256": "8CA6351A8F14F7A5572F45D7858EE904AA7EAA00D0F196F855A71706605724CF"
+    },
+    {
+      "index": 50,
+      "file": "frame_050.png",
+      "duration_ms": 80,
+      "sha256": "B5A3651EF51E6F662B762683BD904A34B8168EA9CE9843FEBB149DD0D0818564"
+    },
+    {
+      "index": 51,
+      "file": "frame_051.png",
+      "duration_ms": 80,
+      "sha256": "64B367E3EC2BF495110ECE2F255B99F1E67A1C95342C080C1605ED224FFD7A4E"
+    },
+    {
+      "index": 52,
+      "file": "frame_052.png",
+      "duration_ms": 80,
+      "sha256": "FE62618E86BB57FAF2AFC4639DF098E61A900E6940B7372BA9221BE504F233A5"
+    },
+    {
+      "index": 53,
+      "file": "frame_053.png",
+      "duration_ms": 80,
+      "sha256": "3E338056D04C2C8916FB8676AF04355333F052CB4AA175577698769AEE8F46FF"
+    },
+    {
+      "index": 54,
+      "file": "frame_054.png",
+      "duration_ms": 80,
+      "sha256": "2204422B11A542C56C50440458D308BB056D99AA352538A2645586472C1DE853"
+    },
+    {
+      "index": 55,
+      "file": "frame_055.png",
+      "duration_ms": 80,
+      "sha256": "87C5BBEEEF9A16E96F79D4314CC36F9B47D0B3D750D536C3992E7A27E412B08E"
+    },
+    {
+      "index": 56,
+      "file": "frame_056.png",
+      "duration_ms": 80,
+      "sha256": "DEB0A213A837E7B9505C12C5180110F140C33440E0B03D1F2C43A081E8256F40"
+    },
+    {
+      "index": 57,
+      "file": "frame_057.png",
+      "duration_ms": 80,
+      "sha256": "0F85AE81A6C1C4330E186E6F212687FD144C5385193A7D987A3F2679B5296597"
+    },
+    {
+      "index": 58,
+      "file": "frame_058.png",
+      "duration_ms": 80,
+      "sha256": "0E7FCA6DA1645B661DEDDF98AD647342500A5081789C0FEB6774BBE9691C3C02"
+    },
+    {
+      "index": 59,
+      "file": "frame_059.png",
+      "duration_ms": 80,
+      "sha256": "5747B96DEBCE8BD03658DC1B680916E5D257B4E12AE59A5CE592578AB7CF4C3D"
+    }
+  ],
+  "source_playback_speed": 1.0
+}

@@ -7,17 +7,28 @@
     "lockHint": "",
     "description": "藏在后巷的午夜酒馆。酒杯与闲谈掩护着消息交换和委托交易。",
     "mapAnchor": [
-      0.2829,
-      0.5882
+      0.106,
+      0.432
     ],
     "hitArea": {
       "type": "rect",
       "size": [
-        0.13,
-        0.065
+        0.034,
+        0.07
       ]
     },
-    "services": []
+    "services": [],
+    "mapDisplay": {
+      "offset": [
+        0,
+        0
+      ],
+      "labelOffset": [
+        0,
+        0
+      ],
+      "avatarSide": "left"
+    }
   },
   {
     "id": "junkyard",
@@ -29,17 +40,28 @@
     "lockHint": "先在地下酒馆接下委托",
     "description": "城市边缘的废弃物层层堆叠，可回收零件与故障设备散落其间。",
     "mapAnchor": [
-      0.2543,
-      0.2789
+      0.23,
+      0.255
     ],
     "hitArea": {
       "type": "rect",
       "size": [
-        0.13,
-        0.065
+        0.034,
+        0.07
       ]
     },
-    "services": []
+    "services": [],
+    "mapDisplay": {
+      "offset": [
+        0,
+        0
+      ],
+      "labelOffset": [
+        0,
+        0
+      ],
+      "avatarSide": "left"
+    }
   },
   {
     "id": "alley",
@@ -51,17 +73,28 @@
     "lockHint": "从蜂巢城寨取得线索",
     "description": "巷道交错，出口难辨。外来者很容易误入别人的地盘。",
     "mapAnchor": [
-      0.3448,
-      0.4434
+      0.173,
+      0.414
     ],
     "hitArea": {
       "type": "rect",
       "size": [
-        0.13,
-        0.065
+        0.034,
+        0.07
       ]
     },
-    "services": []
+    "services": [],
+    "mapDisplay": {
+      "offset": [
+        0,
+        0
+      ],
+      "labelOffset": [
+        0,
+        0
+      ],
+      "avatarSide": "left"
+    }
   },
   {
     "id": "camp",
@@ -73,17 +106,28 @@
     "lockHint": "沿卢米娜委托加入归零运动",
     "description": "归零运动的根据地。居住、集会与备战空间紧邻，像一座自给自足的村落。",
     "mapAnchor": [
-      0.1352,
-      0.1803
+      0.075,
+      0.15
     ],
     "hitArea": {
       "type": "rect",
       "size": [
-        0.13,
-        0.065
+        0.034,
+        0.07
       ]
     },
-    "services": []
+    "services": [],
+    "mapDisplay": {
+      "offset": [
+        0,
+        0
+      ],
+      "labelOffset": [
+        0,
+        0
+      ],
+      "avatarSide": "left"
+    }
   },
   {
     "id": "tower",
@@ -95,17 +139,28 @@
     "lockHint": "沿理查德委托加入公司",
     "description": "城市最高的建筑，沃斯集团总部。高处的办公空间彰显集团的权势。",
     "mapAnchor": [
-      0.4876,
-      0.325
+      0.503,
+      0.351
     ],
     "hitArea": {
       "type": "rect",
       "size": [
-        0.13,
-        0.065
+        0.034,
+        0.07
       ]
     },
-    "services": []
+    "services": [],
+    "mapDisplay": {
+      "offset": [
+        0,
+        0
+      ],
+      "labelOffset": [
+        0,
+        0
+      ],
+      "avatarSide": "left"
+    }
   },
   {
     "id": "port",
@@ -117,17 +172,28 @@
     "lockHint": "在后巷取得港口线索",
     "description": "货轮与人潮不断往来。码头和仓库为追踪与逃跑提供复杂地形。",
     "mapAnchor": [
-      0.8257,
-      0.7592
+      0.85,
+      0.86
     ],
     "hitArea": {
       "type": "rect",
       "size": [
-        0.13,
-        0.065
+        0.034,
+        0.07
       ]
     },
-    "services": []
+    "services": [],
+    "mapDisplay": {
+      "offset": [
+        0,
+        0
+      ],
+      "labelOffset": [
+        0,
+        0
+      ],
+      "avatarSide": "left"
+    }
   },
   {
     "id": "block5",
@@ -146,17 +212,28 @@
     "lockHint": "完成阵营入门事件",
     "description": "密集的中产居民区。稳定的生活节奏让突发暴力事件更加显眼。",
     "mapAnchor": [
-      0.6876,
-      0.45
+      0.742,
+      0.56
     ],
     "hitArea": {
       "type": "rect",
       "size": [
-        0.13,
-        0.065
+        0.034,
+        0.07
       ]
     },
-    "services": []
+    "services": [],
+    "mapDisplay": {
+      "offset": [
+        0,
+        0
+      ],
+      "labelOffset": [
+        0,
+        0
+      ],
+      "avatarSide": "left"
+    }
   },
   {
     "id": "power",
@@ -175,17 +252,28 @@
     "lockHint": "完成阵营入门事件",
     "description": "城市的能源心脏，也是公司与归零运动争夺控制权的关键设施。",
     "mapAnchor": [
-      0.8686,
-      0.4566
+      0.919,
+      0.408
     ],
     "hitArea": {
       "type": "rect",
       "size": [
-        0.13,
-        0.065
+        0.034,
+        0.07
       ]
     },
-    "services": []
+    "services": [],
+    "mapDisplay": {
+      "offset": [
+        0,
+        0
+      ],
+      "labelOffset": [
+        0,
+        0
+      ],
+      "avatarSide": "left"
+    }
   },
   {
     "id": "hive",
@@ -197,17 +285,28 @@
     "lockHint": "先在地下酒馆接下委托",
     "description": "微型住房像蜂巢般堆叠。城市最底层的人在拥挤与混乱中维持着生活秩序。",
     "mapAnchor": [
-      0.4305,
-      0.6737
+      0.244,
+      0.583
     ],
     "hitArea": {
       "type": "rect",
       "size": [
-        0.13,
-        0.065
+        0.034,
+        0.07
       ]
     },
-    "services": []
+    "services": [],
+    "mapDisplay": {
+      "offset": [
+        0,
+        0
+      ],
+      "labelOffset": [
+        0,
+        0
+      ],
+      "avatarSide": "left"
+    }
   },
   {
     "id": "pump",
@@ -226,17 +325,28 @@
     "lockHint": "完成阵营入门事件",
     "description": "污水与工业废水在此汇合，经主排污口流向港口外海。",
     "mapAnchor": [
-      0.8495,
-      0.6013
+      0.877,
+      0.634
     ],
     "hitArea": {
       "type": "rect",
       "size": [
-        0.13,
-        0.065
+        0.034,
+        0.07
       ]
     },
-    "services": []
+    "services": [],
+    "mapDisplay": {
+      "offset": [
+        0,
+        0
+      ],
+      "labelOffset": [
+        0,
+        0
+      ],
+      "avatarSide": "left"
+    }
   },
   {
     "id": "garden",
@@ -255,17 +365,28 @@
     "lockHint": "完成阵营入门事件",
     "description": "富人居住区。与五号街区仅隔一条街，却有独立门禁与专人维护的庭院。",
     "mapAnchor": [
-      0.7114,
-      0.2132
+      0.699,
+      0.253
     ],
     "hitArea": {
       "type": "rect",
       "size": [
-        0.13,
-        0.065
+        0.034,
+        0.07
       ]
     },
-    "services": []
+    "services": [],
+    "mapDisplay": {
+      "offset": [
+        0,
+        0
+      ],
+      "labelOffset": [
+        0,
+        0
+      ],
+      "avatarSide": "left"
+    }
   },
   {
     "id": "hotel",
@@ -277,17 +398,28 @@
     "lockHint": "先在地下酒馆接下委托",
     "description": "旧环线终点站旁的候车楼改建而成。招牌彻夜亮着，夜班工人与过路人来去频繁。",
     "mapAnchor": [
-      0.5876,
-      0.6211
+      0.455,
+      0.808
     ],
     "hitArea": {
       "type": "rect",
       "size": [
-        0.13,
-        0.065
+        0.034,
+        0.07
       ]
     },
-    "services": []
+    "services": [],
+    "mapDisplay": {
+      "offset": [
+        0,
+        0
+      ],
+      "labelOffset": [
+        0,
+        0
+      ],
+      "avatarSide": "left"
+    }
   },
   {
     "id": "mall",
@@ -299,17 +431,28 @@
     "lockHint": "先在地下酒馆接下委托",
     "description": "沃斯集团拥有的城市最大商场。商品与补给功能待设计。",
     "mapAnchor": [
-      0.521,
-      0.4632
+      0.449,
+      0.398
     ],
     "hitArea": {
       "type": "rect",
       "size": [
-        0.13,
-        0.065
+        0.034,
+        0.07
       ]
     },
-    "services": []
+    "services": [],
+    "mapDisplay": {
+      "offset": [
+        0,
+        0
+      ],
+      "labelOffset": [
+        0,
+        0
+      ],
+      "avatarSide": "left"
+    }
   },
   {
     "id": "market",
@@ -321,17 +464,28 @@
     "lockHint": "先在地下酒馆接下委托",
     "description": "隐藏在城寨里的交易场所。商品、卡牌和交易规则待设计。",
     "mapAnchor": [
-      0.2924,
-      0.7658
+      0.182,
+      0.77
     ],
     "hitArea": {
       "type": "rect",
       "size": [
-        0.13,
-        0.065
+        0.034,
+        0.07
       ]
     },
-    "services": []
+    "services": [],
+    "mapDisplay": {
+      "offset": [
+        0,
+        0
+      ],
+      "labelOffset": [
+        0,
+        0
+      ],
+      "avatarSide": "left"
+    }
   },
   {
     "id": "hospital",
@@ -343,14 +497,14 @@
     "lockHint": "先在地下酒馆接下委托",
     "description": "城市最大的正规医疗机构，承担急救与诊疗。原型治疗每次回复 30% 最大生命。",
     "mapAnchor": [
-      0.6495,
-      0.3316
+      0.631,
+      0.416
     ],
     "hitArea": {
       "type": "rect",
       "size": [
-        0.13,
-        0.065
+        0.034,
+        0.07
       ]
     },
     "services": [
@@ -359,7 +513,18 @@
         "type": "healHpPercent",
         "percent": 0.3
       }
-    ]
+    ],
+    "mapDisplay": {
+      "offset": [
+        0,
+        0
+      ],
+      "labelOffset": [
+        0,
+        0
+      ],
+      "avatarSide": "left"
+    }
   },
   {
     "id": "clinic",
@@ -371,14 +536,14 @@
     "lockHint": "先在地下酒馆接下委托",
     "description": "蜂巢城寨内不起眼的小诊所。原型治疗每次回复 30% 最大生命；正式费用与限制待设计。",
     "mapAnchor": [
-      0.4781,
-      0.825
+      0.329,
+      0.739
     ],
     "hitArea": {
       "type": "rect",
       "size": [
-        0.13,
-        0.065
+        0.034,
+        0.07
       ]
     },
     "services": [
@@ -387,6 +552,17 @@
         "type": "healHpPercent",
         "percent": 0.3
       }
-    ]
+    ],
+    "mapDisplay": {
+      "offset": [
+        0,
+        0
+      ],
+      "labelOffset": [
+        0,
+        0
+      ],
+      "avatarSide": "left"
+    }
   }
 ]

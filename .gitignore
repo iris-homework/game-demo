@@ -16,3 +16,11 @@ export_credentials.cfg
 data_*/
 mono_crash.*.json
 .DS_Store
+
+# Local development tools and generated QA evidence
+tools/local_paths.json
+artifacts/
+
+# Python bytecode caches
+__pycache__/
+*.py[cod]
