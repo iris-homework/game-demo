@@ -4,6 +4,10 @@ signal chosen(uid: String)
 var uid := ""
 var data: Dictionary = {}
 var home := Vector2.ZERO
+var home_scale := 1.0
+var home_rotation := 0.0
+var home_z := 10
+var managed_input := false
 var enabled := false
 var selected := false
 var hovered := false
@@ -18,7 +22,7 @@ func setup(card_uid: String, definition: Dictionary, read_only: bool = false) ->
 	set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	size = Vector2(180,230)
 	pivot_offset = Vector2(90,115)
-	mouse_filter = Control.MOUSE_FILTER_PASS
+	mouse_filter = Control.MOUSE_FILTER_IGNORE if managed_input else Control.MOUSE_FILTER_PASS
 	queue_redraw()
 
 func _ready() -> void:
@@ -48,8 +52,11 @@ func _ready() -> void:
 	card_button.tooltip_text = data.get("description", "") + "\n按下立即瞄准，拖到敌方松开出牌；也可点击选牌后再点击敌方。"
 	if preview_only: card_button.tooltip_text = data.get("description", "")
 	card_button.pressed.connect(func(): if enabled: chosen.emit(uid))
-	card_button.mouse_entered.connect(func(): hover(true))
-	card_button.mouse_exited.connect(func(): hover(false))
+	if managed_input:
+		card_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	else:
+		card_button.mouse_entered.connect(func(): hover(true))
+		card_button.mouse_exited.connect(func(): hover(false))
 	add_child(card_button)
 
 func _draw() -> void:
@@ -79,6 +86,7 @@ func set_enabled(value: bool) -> void:
 	if value and (hovered or selected): refresh_pose()
 
 func hover(value: bool) -> void:
+	if hovered == value: return
 	hovered = value
 	queue_redraw()
 	refresh_pose()
@@ -93,7 +101,8 @@ func refresh_pose(force: bool = false) -> void:
 	if hover_tween: hover_tween.kill()
 	hover_tween = create_tween().set_parallel(true)
 	var lifted := hovered or selected
-	z_index = 25 if lifted else 10
+	z_index = (31 if selected else 30) if lifted else home_z
 	hover_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	hover_tween.tween_property(self,"position",home + Vector2(0,-58 if selected else (-32 if lifted else 0)),0.14)
-	hover_tween.tween_property(self,"scale",Vector2.ONE * (1.055 if lifted else 1.0),0.14)
+	hover_tween.tween_property(self,"position",home + Vector2(0,-150 if selected else (-140 if lifted else 0)),0.14)
+	hover_tween.tween_property(self,"scale",Vector2.ONE * (1.05 if lifted else home_scale),0.14)
+	hover_tween.tween_property(self,"rotation",0.0 if lifted else home_rotation,0.14)

@@ -10,9 +10,13 @@ var destination := Vector2.ZERO
 var progress := 0.0
 var arrival := -1.0
 var active := false
+var final_scale := 1.0
+var final_angle := 0.0
 
 func start(view: CombatCard, source: Vector2, duration: float, delay: float) -> void:
 	card = view
+	final_scale = view.home_scale
+	final_angle = view.home_rotation
 	origin = source
 	destination = view.home+view.pivot_offset
 	z_index = 9
@@ -35,10 +39,10 @@ func path_at(t: float) -> Vector2:
 func scale_at(t: float) -> Vector2:
 	var unfold := smoothstep(0.0,0.88,t)
 	var bounce := sin(smoothstep(0.65,1.0,t)*PI)*0.035
-	return Vector2.ONE*(lerpf(0.25,1.0,unfold)+bounce)
+	return Vector2.ONE*(lerpf(0.25,final_scale,unfold)+bounce)
 
 func angle_at(t: float) -> float:
-	return lerpf(-1.1,0.0,1.0-pow(1.0-t,3.0))
+	return lerpf(-1.1,final_angle,1.0-pow(1.0-t,3.0))
 
 func update_flight(t: float) -> void:
 	progress = t
@@ -50,8 +54,8 @@ func update_flight(t: float) -> void:
 func land() -> void:
 	# Tail effects must never move, free or disable a card after input resumes.
 	card.position = card.home
-	card.scale = Vector2.ONE
-	card.rotation = 0.0
+	card.scale = Vector2.ONE*final_scale
+	card.rotation = final_angle
 	card = null
 	landed.emit()
 
@@ -80,7 +84,7 @@ func _draw() -> void:
 	var launch := clampf(progress*2.5,0.0,1.0)
 	draw_arc(origin,20.0+launch*43.0,-PI*0.8,PI*0.8,32,Color(CYAN,(1.0-launch)*0.55),2.0,true)
 	if arrival >= 0.0:
-		draw_set_transform(destination,0.0,Vector2.ONE*(1.0+arrival*0.075))
+		draw_set_transform(destination,final_angle,Vector2.ONE*(final_scale+arrival*0.075))
 		draw_polyline(outline,Color(CYAN,fade*0.7),2.0,true)
 		draw_set_transform(Vector2.ZERO)
 		for side in [-1.0,1.0]:

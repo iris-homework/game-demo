@@ -21,9 +21,9 @@ var cyberware_button: Button
 var cyberware_status: Label
 var pile_overlay: Control
 var initialized := false
-const PILE_SIZE := Vector2(80,96)
-const DRAW_POS := Vector2(134,752)
-const DISCARD_POS := Vector2(1226,752)
+const PILE_SIZE := Vector2(58,72)
+const DRAW_POS := Vector2(30,800)
+const DISCARD_POS := Vector2(1352,800)
 
 func _ready() -> void:
 	enter({"battleId":Game.state.battleId,"eventId":Game.state.activeEventId})
@@ -39,8 +39,8 @@ func enter(params: Dictionary) -> void:
 	arena.set_script(preload("res://scripts/combat/arena_fx.gd"))
 	add_child(arena)
 	# Keep the hand rail above the floor and below portraits and controls.
-	polygon(self,[Vector2(0,629),Vector2(1440,606),Vector2(1440,900),Vector2(0,900)],Color("090b12e5"))
-	polygon(self,[Vector2(0,622),Vector2(330,617),Vector2(327,625),Vector2(0,630)],PINK)
+	polygon(self,[Vector2(0,704),Vector2(1440,681),Vector2(1440,900),Vector2(0,900)],Color("090b12e5"))
+	polygon(self,[Vector2(0,697),Vector2(238,692),Vector2(235,698),Vector2(0,704)],PINK)
 	chrome("战斗",false)
 	label(self,battle.name,Vector2(41,112),Vector2(700,55),33)
 	label(self,"COMBAT // " + Game.place_data(battle.placeId).name,Vector2(43,166),Vector2(670,29),14,CYAN)
@@ -62,19 +62,21 @@ func enter(params: Dictionary) -> void:
 	refresh_enemy_hud()
 	pile_button(DRAW_POS,"抽牌堆",func(): show_pile("抽牌堆",model.draw_pile))
 	pile_button(DISCARD_POS,"弃牌堆",func(): show_pile("弃牌堆",model.discard_pile))
-	draw_count = label(self,"",DRAW_POS+Vector2(0,8),Vector2(PILE_SIZE.x,43),28,CYAN)
-	discard_count = label(self,"",DISCARD_POS+Vector2(0,8),Vector2(PILE_SIZE.x,43),28,PINK)
+	draw_count = label(self,"",DRAW_POS+Vector2(0,3),Vector2(PILE_SIZE.x,33),23,CYAN)
+	discard_count = label(self,"",DISCARD_POS+Vector2(0,3),Vector2(PILE_SIZE.x,33),23,PINK)
 	draw_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	discard_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	end_button = button(self,"结束回合  →",Vector2(1158,650),Vector2(216,52),end_turn_pressed,true)
+	end_button = button(self,"结束回合  →",Vector2(1240,719),Vector2(170,40),end_turn_pressed,true)
+	end_button.add_theme_font_size_override("font_size",16)
 	end_button.tooltip_text = "敌方执行头顶意图；未使用手牌弃置，再抽取新手牌。临时规则不限制出牌次数。"
-	cyberware_button = button(self,"激活义体",Vector2(66,650),Vector2(216,52),show_cyberware)
+	cyberware_button = button(self,"激活义体",Vector2(30,719),Vector2(170,40),show_cyberware)
+	cyberware_button.add_theme_font_size_override("font_size",15)
 	for state_name in ["normal","hover","pressed","focus"]:
 		var purple_style := button_style(state_name,false)
 		purple_style.border_color = Color("c895ff")
 		if state_name != "focus": purple_style.bg_color = Color("482866") if state_name == "hover" else Color("251638")
 		cyberware_button.add_theme_stylebox_override(state_name,purple_style)
-	cyberware_status = label(self,"",Vector2(66,709),Vector2(216,28),13,Color("c895ff"))
+	cyberware_status = label(self,"",Vector2(30,765),Vector2(170,24),11,Color("c895ff"))
 	cyberware_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	refresh_cyberware()
 	if Game.config.developmentMode:
@@ -158,22 +160,58 @@ func pile_button(pos: Vector2, title: String, action: Callable) -> void:
 		upright.skew = Vector2.ZERO
 		upright.set_corner_radius_all(7)
 		pile.add_theme_stylebox_override(state_name, upright)
-	var title_label := label(self,title,pos+Vector2(0,59),Vector2(PILE_SIZE.x,26),14)
+	var title_label := label(self,title,pos+Vector2(0,42),Vector2(PILE_SIZE.x,23),12)
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 func hand_position(index: int, count: int) -> Vector2:
-	var spacing := minf(199,800.0/maxi(count,1))
-	return Vector2(720-(count-1)*spacing/2.0-90+index*spacing,627)
+	var offset := index-(count-1)/2.0
+	var spacing := minf(84.0,820.0/maxi(count-1,1))
+	var normalized := offset/maxf((count-1)/2.0,1.0)
+	return Vector2(720+offset*spacing-90,760+normalized*normalized*minf(24.0,(count-1)*3.0))
+
+func hand_rotation(index: int, count: int) -> float:
+	return deg_to_rad((index-(count-1)/2.0)/maxf((count-1)/2.0,1.0)*minf(14.0,(count-1)*2.4))
+
+func hand_at_pointer() -> String:
+	var pointer := get_global_mouse_position()
+	var nearest := ""
+	# Stable resting footprints prevent enlarged cards from stealing their neighbours.
+	for uid in model.hand:
+		if not cards.has(uid): continue
+		var card: CombatCard = cards[uid]
+		var local := (pointer-card.home-card.pivot_offset).rotated(-card.home_rotation)/card.home_scale+card.pivot_offset
+		if Rect2(Vector2.ZERO,card.size).has_point(local):
+			# Later cards are drawn above earlier cards in overlapping resting areas.
+			nearest = uid
+	if not nearest.is_empty(): return nearest
+	# Keep the lifted preview selectable above the resting fan.
+	for uid in model.hand:
+		if not cards.has(uid): continue
+		var card: CombatCard = cards[uid]
+		if (card.hovered or card.selected) and Rect2(Vector2.ZERO,card.size).has_point(card.get_global_transform().affine_inverse()*pointer): return uid
+	return ""
+
+func update_hand_hover() -> void:
+	var uid := ""
+	if initialized and not Game.battle_busy and not Game.transition_locked and not is_instance_valid(pile_overlay):
+		uid = held_card_uid if not held_card_uid.is_empty() else hand_at_pointer()
+	for card_uid in cards: cards[card_uid].hover(card_uid == uid)
 
 func create_card(uid: String, index: int, count: int, animate: bool) -> CombatCard:
 	var view := CombatCard.new()
+	view.managed_input = true
+	view.home_scale = 0.68
+	view.home_rotation = hand_rotation(index,count)
+	view.home_z = 10+index
 	view.setup(uid,model.card(uid))
 	view.home = hand_position(index,count)
 	add_child(view)
 	view.chosen.connect(begin_card_aim)
 	view.position = view.home
 	view.visible = not animate
-	view.z_index = 10
+	view.z_index = view.home_z
+	view.scale = Vector2.ONE*view.home_scale
+	view.rotation = view.home_rotation
 	cards[uid] = view
 	return view
 
@@ -208,6 +246,7 @@ func deal_hand(animate: bool) -> void:
 	if animate: await last_flight.landed
 
 func _process(_delta: float) -> void:
+	update_hand_hover()
 	if not is_instance_valid(aim): return
 	aim.visible = not selected_uid.is_empty() and not Game.battle_busy and not Game.transition_locked and not is_instance_valid(pile_overlay)
 	if not aim.visible or not cards.has(selected_uid): return
@@ -292,6 +331,8 @@ func play_selected(target: int) -> void:
 func arrange_hand() -> void:
 	for i in model.hand.size():
 		var view: CombatCard = cards[model.hand[i]]
+		view.home_rotation = hand_rotation(i,model.hand.size())
+		view.home_z = 10+i
 		view.move_home(hand_position(i,model.hand.size()))
 
 func animate_discard(view: CombatCard, delay: float = 0.0, turn_cleanup: bool = false) -> void:
@@ -440,6 +481,13 @@ func show_debug_results() -> void:
 	popup.popup_centered(Vector2i(610,185))
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if initialized and not Game.battle_busy and not Game.transition_locked and not is_instance_valid(pile_overlay):
+			var uid := hand_at_pointer()
+			if not uid.is_empty():
+				get_viewport().set_input_as_handled()
+				begin_card_aim(uid)
+				return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
 		var released_uid := held_card_uid
 		held_card_uid = ""

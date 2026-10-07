@@ -34,7 +34,7 @@ func _ready() -> void:
 	await get_tree().create_timer(0.19).timeout
 	await shot("transition")
 	await idle()
-	verify(app.view.cards.size() == 3,"3 rendered cards")
+	verify(app.view.cards.size() == 5,"5 rendered cards")
 	await shot("battle")
 	await app.view.end_turn_pressed()
 	verify(Game.state.currentHp == 99,"UI end-turn damages HP")

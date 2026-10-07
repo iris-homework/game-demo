@@ -66,14 +66,14 @@ func _ready() -> void:
 	while view.turn_banner.erase < 0.5: await get_tree().process_frame
 	await shot("first_erase")
 	await idle()
-	verify(view.cards.size() == 3 and view.model.turn == 1 and not is_instance_valid(view.turn_banner),"Round one hands control back after dealing")
+	verify(view.cards.size() == 5 and view.model.turn == 1 and not is_instance_valid(view.turn_banner),"Round one hands control back after dealing")
 	var day: int = Game.state.currentDay
 	var departing: Array = view.cards.values()
 	var first_position: Vector2 = departing[0].position
 	view.end_turn_pressed()
 	await wait_banner("敌方回合")
 	verify(Game.battle_busy and view.model.turn == 1 and view.model.player_hp == 100,"Enemy announcement precedes damage and turn advance")
-	verify(view.cards.is_empty() and view.model.hand.size() == 3,"Hand visuals detach immediately without resolving the model early")
+	verify(view.cards.is_empty() and view.model.hand.size() == 5,"Hand visuals detach immediately without resolving the model early")
 	view.end_turn_pressed()
 	view.select_card(view.model.hand[0])
 	verify(view.selected_uid.is_empty() and view.model.player_hp == 100,"Repeated end turn and card selection cannot bypass announcement")
@@ -95,7 +95,7 @@ func _ready() -> void:
 	await idle()
 	await shot("second_ready")
 	record = false
-	verify(view.cards.size() == 3 and Game.state.currentDay == day,"Round changes preserve adventure date and restore hand")
+	verify(view.cards.size() == 5 and Game.state.currentDay == day,"Round changes preserve adventure date and restore hand")
 	view.end_turn_pressed()
 	await wait_banner("第3回合")
 	await idle()
@@ -105,7 +105,7 @@ func _ready() -> void:
 	app.swap_view()
 	await idle()
 	view = app.view
-	verify(view.model.turn == 3 and view.cards.size() == 3 and announcements.size() == 5,"Restoring existing hand does not replay a turn or draw extra cards")
+	verify(view.model.turn == 3 and view.cards.size() == 5 and announcements.size() == 5,"Restoring existing hand does not replay a turn or draw extra cards")
 	view.model.player_hp = 1
 	view.commit()
 	view.end_turn_pressed()

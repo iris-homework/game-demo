@@ -15,7 +15,7 @@ func _ready() -> void:
 	Game.start_training("B12")
 	await idle()
 	var view = app.view
-	await click(Vector2(125,760))
+	await click(view.DRAW_POS+view.PILE_SIZE/2)
 	await settle()
 	verify(is_instance_valid(view.pile_overlay), "Draw pile click opens full-screen browser")
 	verify(view.pile_overlay.displayed_uids.is_empty(), "Empty draw pile has no invented cards")
@@ -25,7 +25,7 @@ func _ready() -> void:
 	for i in 2:
 		view.select_card(view.model.hand[0])
 		await view.play_selected(0)
-	await click(Vector2(1300,760))
+	await click(view.DISCARD_POS+view.PILE_SIZE/2)
 	await settle()
 	verify(view.pile_overlay.grid.get_child_count() == 2, "Discard pile shows both complete cards")
 	await shot("discard")
@@ -52,7 +52,7 @@ func _ready() -> void:
 	view.model.draw_pile = fixture.duplicate()
 	view.refresh_counts()
 	var before: Dictionary = view.model.snapshot()
-	await click(Vector2(125,760))
+	await click(view.DRAW_POS+view.PILE_SIZE/2)
 	await settle()
 	var browser = view.pile_overlay
 	var order: Array = browser.displayed_uids.duplicate()

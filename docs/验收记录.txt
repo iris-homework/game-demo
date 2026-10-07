@@ -196,3 +196,30 @@ Godot 4.7.2 standard / Compatibility
 2026-10-07 移除诺伦脚底阴影，0.3.10-ui 同版本补丁
 编辑器导入无脚本错误。1600x1000 后巷实际渲染：碎片状投影已消失，双鞋完整。原立绘文件与修改前备份逐字节一致。
 未重跑其他尺寸、其他场景或交互与规则专项。禁用写档，临时预览工具移除。工程包逐文件核对一致。
+
+2026-10-07 紧凑底栏与十张扇形手牌 0.3.11-ui
+1280x800 /1600x1000 hand_fan_visual: 各94 checks, 0 failures
+1280x800 interaction_visual: 16 checks, 0 failures
+1600x1000 drag_visual: 11 checks, 0 failures
+1280x800 pile_visual: 18 checks, 0 failures
+1280扇形与交互在最终重叠判定微调前运行；1600扇形、拖牌和1280牌堆在最终代码通过。
+十张与100 HP均是内存样本，JSON未变，禁用写档。实际查看两种尺寸十张／悬停及1600三张画面。未重跑其他专项。
+
+2026-10-07 扇形手牌：最终编辑器导入完成，无脚本错误；数据配置、Game和CombatModel与修改前逐字节一致。交付ZIP逐文件核对一致，排除缓存与用户存档。
+
+2026-10-07 五张测试手牌（0.3.11-ui 配置补丁）
+COMBAT TESTS: 191 checks, 0 failures
+1280x800 HAND FAN VISUAL: 94 checks, 0 failures
+1280x800 INTERACTION VISUAL: 16 checks, 0 failures
+已查看五张手牌真实截图；其他专项未重跑。模型测试使用专用路径，图形测试禁用写档。工程包逐文件核对一致。
+
+2026-10-07 手牌重叠调整（0.3.11-ui）
+1280x800 HAND FAN VISUAL: 94 checks, 0 failures
+1280x800 INTERACTION VISUAL: 16 checks, 0 failures
+已查看五张与十张实际画面；未重跑其他尺寸及专项。测试禁用写档，交付ZIP逐文件核对一致。
+
+2026-10-07 手牌下沉与悬停浮出 0.3.12-ui
+1280x800 HAND FAN VISUAL: 144 checks, 0 failures
+1600x1000 HAND FAN VISUAL: 145 checks, 0 failures（增加移开恢复断言）
+1280x800 DRAG VISUAL: 11 checks, 0 failures
+查看1280五张静止／悬停，1600五张悬停／十张静止截图。测试禁用写档；未重跑其他专项。工程包逐文件核对一致。
