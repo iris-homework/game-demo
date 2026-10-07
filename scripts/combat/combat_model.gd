@@ -1,5 +1,6 @@
 class_name CombatModel
 extends RefCounted
+const CYBERWARE_LIMIT := 6
 ## Pure, serializable combat rules. Animation and scene navigation never live here.
 var battle_id := ""
 var turn := 1
@@ -19,7 +20,15 @@ var used_cyberware: Array = []
 var next_attack_bonus := 0
 
 func cyberware_cards() -> Array:
-	return profile.get("cyberware", {}).get("cards", [])
+	# Older snapshots retain eight definitions for validating earned bonuses,
+	# but only the first six are available in the current battle interface.
+	return profile.get("cyberware", {}).get("cards", []).slice(0, CYBERWARE_LIMIT)
+
+func available_cyberware_count() -> int:
+	var available := 0
+	for definition in cyberware_cards():
+		if not definition.id in used_cyberware: available += 1
+	return available
 
 func activate_cyberware(id: String) -> bool:
 	if not outcome.is_empty() or player_hp <= 0 or id in used_cyberware: return false

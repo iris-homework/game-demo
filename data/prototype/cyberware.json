@@ -37,18 +37,6 @@
       "name": "临时义体 06",
       "description": "下次攻击伤害 +1",
       "nextAttackBonus": 1
-    },
-    {
-      "id": "test_cyberware_07",
-      "name": "临时义体 07",
-      "description": "下次攻击伤害 +1",
-      "nextAttackBonus": 1
-    },
-    {
-      "id": "test_cyberware_08",
-      "name": "临时义体 08",
-      "description": "下次攻击伤害 +1",
-      "nextAttackBonus": 1
     }
   ]
 }

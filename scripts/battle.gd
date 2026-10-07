@@ -86,7 +86,6 @@ func enter(params: Dictionary) -> void:
 	if Game.config.developmentMode:
 		button(self,"调试结果",Vector2(1235,197),Vector2(156,42),show_debug_results).add_theme_font_size_override("font_size",15)
 	button(self,"投降",Vector2(1270,492),Vector2(122,41),func(): finish("surrender")).add_theme_font_size_override("font_size",15)
-	label(self,"按下卡牌 → 拖向敌方 → 松开出牌  /  也可点选  /  右键或 Esc 取消",Vector2(350,868),Vector2(890,25),13,MUTED)
 	aim = Node2D.new()
 	aim.set_script(preload("res://scripts/combat/targeting_line.gd"))
 	aim.z_index = 35
@@ -167,7 +166,7 @@ func pile_button(pos: Vector2, title: String, action: Callable) -> void:
 
 func hand_position(index: int, count: int) -> Vector2:
 	var spacing := minf(199,800.0/maxi(count,1))
-	return Vector2(720-(count-1)*spacing/2.0-90+index*spacing,627+absf(index-(count-1)/2.0)*7)
+	return Vector2(720-(count-1)*spacing/2.0-90+index*spacing,627)
 
 func create_card(uid: String, index: int, count: int, animate: bool) -> CombatCard:
 	var view := CombatCard.new()
@@ -175,9 +174,8 @@ func create_card(uid: String, index: int, count: int, animate: bool) -> CombatCa
 	view.home = hand_position(index,count)
 	add_child(view)
 	view.chosen.connect(begin_card_aim)
-	view.position = DRAW_POS if animate else view.home
-	view.scale = Vector2(0.5,0.5) if animate else Vector2.ONE
-	view.rotation_degrees = -9 if animate else 0
+	view.position = view.home
+	view.visible = not animate
 	view.z_index = 10
 	cards[uid] = view
 	return view
@@ -200,16 +198,16 @@ func start_hand() -> void:
 
 func deal_hand(animate: bool) -> void:
 	if model.hand.is_empty(): return
-	var deal := create_tween().set_parallel(true) if animate else null
-	var duration := timing("drawDuration",0.26)
+	var last_flight: Node2D
+	var duration := maxf(timing("drawDuration",0.26),0.38)
 	for i in model.hand.size():
 		var view := create_card(model.hand[i],i,model.hand.size(),animate)
 		if animate:
-			var delay := i * 0.045
-			deal.tween_property(view,"position",view.home,duration).set_delay(delay).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-			deal.tween_property(view,"scale",Vector2.ONE,duration).set_delay(delay)
-			deal.tween_property(view,"rotation_degrees",0.0,duration).set_delay(delay)
-	if animate: await deal.finished
+			var fx := preload("res://scripts/combat/draw_fx.gd").new()
+			add_child(fx)
+			fx.start(view,DRAW_POS+Vector2(53.5,63.5),duration,i*0.055)
+			last_flight = fx
+	if animate: await last_flight.landed
 
 func _process(_delta: float) -> void:
 	if not is_instance_valid(aim): return
@@ -288,16 +286,11 @@ func play_selected(target: int) -> void:
 	burst.position = hit_pos
 	burst.z_index = 45
 	add_child(burst)
-	var fly := create_tween().set_parallel(true)
-	var duration := minf(timing("discardDuration",0.25),0.22)
-	fly.tween_property(card_view,"position",DISCARD_POS,duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	fly.tween_property(card_view,"scale",Vector2(0.18,0.18),duration)
-	fly.tween_property(card_view,"modulate:a",0.0,duration)
-	fly.chain().tween_callback(card_view.queue_free)
+	animate_discard(card_view)
 	refresh_counts()
 	message_label.text = "攻击命中 · 造成 %d 点伤害" % result.damage
 	if not model.outcome.is_empty():
-		await get_tree().create_timer(0.24).timeout
+		await get_tree().create_timer(0.52).timeout
 		set_busy(false)
 		finish(model.outcome)
 	else:
@@ -308,6 +301,15 @@ func arrange_hand() -> void:
 	for i in model.hand.size():
 		var view: CombatCard = cards[model.hand[i]]
 		view.move_home(hand_position(i,model.hand.size()))
+
+func animate_discard(view: CombatCard, delay: float = 0.0, turn_cleanup: bool = false) -> void:
+	if view.hover_tween: view.hover_tween.kill()
+	view.set_enabled(false)
+	view.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	view.card_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var fx := preload("res://scripts/combat/discard_fx.gd").new()
+	add_child(fx)
+	fx.start(view,DISCARD_POS+Vector2(53.5,63.5),0.32 if turn_cleanup else 0.40,delay,0.55 if turn_cleanup else 1.0)
 
 func end_turn_pressed() -> void:
 	if Game.transition_locked or Game.battle_busy or is_instance_valid(pile_overlay): return
@@ -320,16 +322,12 @@ func end_turn_pressed() -> void:
 		return
 	commit()
 	turn_label.text = "敌方回合 / 执行意图"
-	for uid in cards:
-		var view: CombatCard = cards[uid]
-		if view.hover_tween: view.hover_tween.kill()
-		var t := create_tween().set_parallel(true)
-		t.tween_property(view,"position",DISCARD_POS,0.22)
-		t.tween_property(view,"scale",Vector2(0.3,0.3),0.22)
-		t.tween_property(view,"modulate:a",0.0,0.22)
-	await get_tree().create_timer(0.23).timeout
-	for view in cards.values(): view.queue_free()
+	var discarded_views := cards.values()
 	cards.clear()
+	for i in discarded_views.size():
+		animate_discard(discarded_views[i],i*0.045,true)
+	if not discarded_views.is_empty():
+		await get_tree().create_timer(0.33+(discarded_views.size()-1)*0.045).timeout
 	for attack in result.attacks:
 		await impact(Vector2(418,421),"−%d HP" % attack.damage,PINK)
 	if not model.outcome.is_empty():
@@ -344,13 +342,20 @@ func end_turn_pressed() -> void:
 	set_busy(false)
 
 func impact(pos: Vector2, text: String, color: Color) -> void:
-	var floating := label(self,text,pos-Vector2(70,0),Vector2(240,70),40,color)
-	floating.z_index = 50
-	var t := create_tween().set_parallel(true)
-	t.tween_property(floating,"position:y",pos.y-55,timing("impactDuration",0.36))
-	t.tween_property(floating,"modulate:a",0.0,timing("impactDuration",0.36)).set_delay(0.1)
-	await t.finished
-	floating.queue_free()
+	var occupied: Array[int] = []
+	for popup in get_tree().get_nodes_in_group("combat_damage_numbers"):
+		if popup.get_parent() == self and popup.anchor.distance_to(pos) < 10.0:
+			occupied.append(int(round(popup.drift/72.0)))
+	var lane := 0
+	for candidate in [0,-1,1,-2,2]:
+		if not occupied.has(candidate):
+			lane = candidate
+			break
+	var floating := preload("res://scripts/combat/damage_number_fx.gd").new()
+	add_child(floating)
+	floating.start(text,button_font,color,pos,lane)
+	# Preserve enemy-action pacing while the visual tail finishes independently.
+	await get_tree().create_timer(timing("impactDuration",0.36)+0.1).timeout
 
 func refresh_counts() -> void:
 	draw_count.text = str(model.draw_pile.size())
@@ -370,7 +375,7 @@ func commit() -> void:
 
 func refresh_cyberware() -> void:
 	if not is_instance_valid(cyberware_status): return
-	cyberware_button.text = "激活义体 · %d/8" % (model.cyberware_cards().size()-model.used_cyberware.size())
+	cyberware_button.text = "激活义体 · %d/%d" % [model.available_cyberware_count(),model.cyberware_cards().size()]
 	cyberware_status.text = "下次攻击伤害 +%d" % model.next_attack_bonus if model.next_attack_bonus > 0 else "临时义体 / 点击查看"
 
 func show_cyberware() -> void:

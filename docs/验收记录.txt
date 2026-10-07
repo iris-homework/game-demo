@@ -96,3 +96,49 @@ COMBAT TESTS: 191 checks, 0 failures
 检查冷却含当回合、每卡独立、攻击不提前解锁、下回合恢复并可再次使用、冷却前后专用存档恢复、跨回合加成超过8仍有效。
 人工检查实际渲染卡面：使用后整体变灰并显示“冷却中 · 下回合可用”，下一回合恢复紫色。
 本轮未重新执行剧情、牌堆、拖牌等其他专项测试。
+
+2026-10-05 0.3.3-cyberware 六张义体（Asia/Shanghai）
+CYBERWARE TESTS: 60 checks, 0 failures
+1280x800 CYBERWARE VISUAL: 25 checks, 0 failures
+检查六卡布局、1—6 激活、7／8 无效、HUD 6/6、冷却恢复与旧八卡快照保留加成。
+其他专项本轮未重跑。截图：docs/预览/六张义体。
+
+2026-10-07 手牌对齐 UI 补丁（0.3.3-cyberware，Asia/Shanghai）
+Godot 4.7.2 standard / Compatibility
+编辑器导入完成，无 SCRIPT ERROR / Parse Error。
+1280x800、1600x1000 实际渲染：起手三张、出牌后两张、下一回合三张，静止位置 y 均为 627，scale 均为 (1,1)。
+六张截图已逐张人工检查，卡面水平对齐，底部常驻操作提示已移除。
+截图：docs/预览/手牌对齐；机甲演练共用战斗布局，不写用户存档。
+1280x800 res://tests/drag_visual.tscn
+DRAG VISUAL: 11 checks, 0 failures
+未重跑其他专项测试。
+
+2026-10-07 霓虹弃牌动画 0.3.4-fx（Asia/Shanghai）
+Godot 4.7.2 standard / Compatibility
+1280x800 res://tests/interaction_visual.tscn: INTERACTION VISUAL: 16 checks, 0 failures
+1600x1000 res://tests/drag_visual.tscn: DRAG VISUAL: 11 checks, 0 failures
+1280x800 res://tests/r1_visual.tscn: VISUAL INTEGRATION: 0 failures
+真实渲染录帧：1280x800 / 1600x1000，检查单张旋转拖尾、入堆脉冲与回合末多张弃牌。
+图片和动态预览：docs/预览/弃牌动画；录帧用临时场景已移除。
+交互检查包含上一张尾动画期间继续出牌、结束回合安全回收与致命命中返回。
+本轮未重跑纯剧情、战斗模型、义体和牌堆专项。未写入正式存档。
+
+本次最终 Godot 编辑器导入完成，无脚本错误；交付 ZIP 全文件内容与工程核对一致，已排除缓存、临时录帧工具及用户存档。
+
+2026-10-07 霓虹抽牌动画 0.3.5-fx（Asia/Shanghai）
+Godot 4.7.2 standard / Compatibility，最终编辑器导入完成，无脚本错误。
+1280x800 interaction_visual.tscn: INTERACTION VISUAL: 16 checks, 0 failures
+1600x1000 drag_visual.tscn: DRAG VISUAL: 11 checks, 0 failures
+1280x800 r1_visual.tscn: VISUAL INTEGRATION: 0 failures
+1280x800 / 1600x1000 临时录帧检查各 4 项、0 失败；三张牌落稳后 position=home，scale=(1,1)，rotation=0，输入已解锁。
+首次录帧 1600x1000 的静止检查因第三张牌悬停抬升出现 1 项失败；将指针移至空白区后分别重录，两种尺寸通过。
+截图与 GIF：docs/预览/抽牌动画。临时录帧场景已删除，未写正式存档。
+本轮未重跑纯剧情、战斗模型、义体、牌堆专项；历史结果不视为本轮验证。
+
+2026-10-07 霓虹伤害数字 0.3.6-fx（Asia/Shanghai）
+Godot 4.7.2 standard / Compatibility；最终编辑器导入完成，无脚本错误。
+1280x800 interaction_visual.tscn: INTERACTION VISUAL: 16 checks, 0 failures
+1600x1000 r1_visual.tscn: VISUAL INTEGRATION: 0 failures
+1280x800 / 1600x1000 实际录帧检查：单次命中闪光、连续命中错位、残影上浮、玩家受伤 HP 数字。
+截图及 GIF：docs/预览/伤害数字。录帧使用默认机甲演练，两次攻击与回合伤害均真实结算；临时脚本已移除。
+测试关闭写档，本轮未重跑纯剧情、战斗模型、拖牌、义体和牌堆专项。

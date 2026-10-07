@@ -23,11 +23,14 @@ func _ready() -> void:
 	await click(view.cyberware_button.get_rect().get_center())
 	verify(is_instance_valid(view.pile_overlay) and view.selected_uid.is_empty(),"Button opens cyberware and clears targeting")
 	var overlay = view.pile_overlay
-	verify(overlay.card_buttons.size() == 8,"Eight cards are displayed")
+	verify(overlay.card_buttons.size() == 6,"Six cards are displayed")
+	await key(KEY_7)
+	await key(KEY_8)
+	verify(view.model.next_attack_bonus == 0,"Removed seventh and eighth shortcuts do nothing")
 	for b in overlay.card_buttons:
 		verify(Rect2(64,34,1312,828).encloses(b.get_global_rect()),"Entire cyberware card is visible")
 	await motion(Vector2(80,180))
-	await shot("eight_cards")
+	await shot("six_cards")
 	var turn: int = view.model.turn
 	view.end_turn_pressed()
 	view.show_pile("抽牌堆",view.model.draw_pile)
@@ -64,7 +67,7 @@ func _ready() -> void:
 	verify(not is_instance_valid(view.pile_overlay) and Game.page == "battle","Right-click closes without leaving battle")
 	await click(view.end_button.get_rect().get_center())
 	await idle()
-	verify(view.model.turn == turn+1 and view.cyberware_button.text.contains("8/8"),"Next turn restores all eight activations in HUD")
+	verify(view.model.turn == turn+1 and view.cyberware_button.text.contains("6/6"),"Next turn restores all six activations in HUD")
 	await click(view.cyberware_button.get_rect().get_center())
 	overlay = view.pile_overlay
 	verify(not overlay.card_buttons[0].disabled and overlay.state_labels[0].text.contains("点击激活"),"Next-turn card is available again")
