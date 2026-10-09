@@ -120,18 +120,22 @@ func _build_hud() -> void:
 	panel(self, Vector2(24.0, 46.0), Vector2(170.0, 12.0), Color("382333"), Color("805071"))
 	_hud_hp_fill = rect(self, Vector2(26.0, 48.0), Vector2(166.0, 8.0), PINK)
 	_hud_hp_text = label(self, "", Vector2(202.0, 34.0), Vector2(126.0, 28.0), 16, CREAM)
-	var day := int(Game.state.get("currentDay", 1))
-	label(self, "第 %d 天" % day, Vector2(340.0, 6.0), Vector2(180.0, 24.0), 17, CYAN)
-	for index in range(1, 8):
-		var current: bool = index == day
-		var x := 340.0 + float(index - 1) * 34.0
-		panel(self, Vector2(x, 34.0), Vector2(30.0, 30.0), Color("164250") if current else Color("111c2a"), CYAN if current else Color("354457"))
-		label(self, str(index), Vector2(x + 9.0, 38.0), Vector2(20.0, 24.0), 15, CREAM if current else MUTED)
-	label(self, "%d CR" % int(Game.state.get("credits", 0)), Vector2(600.0, 12.0), Vector2(160.0, 30.0), 20, CREAM)
-	label(self, "信用点", Vector2(600.0, 44.0), Vector2(130.0, 20.0), 12, MUTED)
+	label(self, "%d CR" % int(Game.state.get("credits", 0)), Vector2(340.0, 12.0), Vector2(116.0, 30.0), 20, CREAM)
+	label(self, "信用点", Vector2(340.0, 44.0), Vector2(116.0, 20.0), 12, MUTED)
 	var faction: String = {"": "自由佣兵", "company": "公司特遣部", "resistance": "革命军"}.get(Game.state.get("faction", ""), "自由佣兵")
-	label(self, faction, Vector2(780.0, 12.0), Vector2(230.0, 30.0), 19, CYAN)
-	label(self, "当前阵营", Vector2(780.0, 44.0), Vector2(200.0, 20.0), 12, MUTED)
+	label(self, faction, Vector2(470.0, 12.0), Vector2(116.0, 30.0), 19, CYAN)
+	label(self, "当前阵营", Vector2(470.0, 44.0), Vector2(116.0, 20.0), 12, MUTED)
+	# Keep the date centered on the canvas, independent of the fields to its left.
+	var day := clampi(int(Game.state.get("currentDay", 1)), 1, 7)
+	var date_width := 238.0
+	var date_x := (CANVAS.x - date_width) * 0.5
+	var date_label := label(self, "第 %d 天" % day, Vector2(date_x, 8.0), Vector2(date_width, 26.0), 19, CYAN)
+	date_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	rect(self, Vector2(date_x, 39.0), Vector2(date_width, 22.0), Color("456576"))
+	rect(self, Vector2(date_x + 1.0, 40.0), Vector2(date_width - 2.0, 20.0), Color("0b1520"))
+	for index in range(7):
+		var x := date_x + 6.0 + float(index) * 33.0
+		rect(self, Vector2(x, 45.0), Vector2(28.0, 10.0), CYAN if index < day else Color("253544"))
 	button(self, "周次", Vector2(1096.0, 16.0), Vector2(140.0, 44.0), show_weeks).add_theme_font_size_override("font_size", 17)
 	button(self, "菜单", Vector2(1248.0, 16.0), Vector2(140.0, 44.0), Game.menu)
 
