@@ -1,0 +1,21 @@
+{
+  "credits": 1000,
+  "note": "战后奖励占位：三张不同 ID 的测试攻击卡，均造成 1 点伤害，无费用。",
+  "cards": {
+    "test_reward_01": {
+      "id": "test_reward_01", "name": "测试卡 01", "type": "attack",
+      "description": "对一名敌人造成 1 点伤害。", "cost": null,
+      "artAssetId": "", "prototype": true, "effects": [{"type": "damage", "amount": 1}]
+    },
+    "test_reward_02": {
+      "id": "test_reward_02", "name": "测试卡 02", "type": "attack",
+      "description": "对一名敌人造成 1 点伤害。", "cost": null,
+      "artAssetId": "", "prototype": true, "effects": [{"type": "damage", "amount": 1}]
+    },
+    "test_reward_03": {
+      "id": "test_reward_03", "name": "测试卡 03", "type": "attack",
+      "description": "对一名敌人造成 1 点伤害。", "cost": null,
+      "artAssetId": "", "prototype": true, "effects": [{"type": "damage", "amount": 1}]
+    }
+  }
+}

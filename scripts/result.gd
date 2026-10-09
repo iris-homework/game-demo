@@ -1,6 +1,11 @@
 extends DemoUI
+var reward_view: Control
 
 func _ready() -> void:
+	if Game.has_battle_reward():
+		reward_view = preload("res://scripts/reward.gd").new()
+		add_child(reward_view)
+		return
 	var e := Game.event_data()
 	var complete: bool = Game.state.flags.get("week1Complete", false) and e.id == "E12"
 	background("city", 0.53)
@@ -20,8 +25,11 @@ func _ready() -> void:
 			parts.append(("已领取 · " if claimed else "可领取 · ") + str(r.get("name", id)))
 		reward_text = "\n".join(parts)
 	label(self, reward_text, Vector2(285,459), Vector2(860,85), 25)
-	label(self, "奖励池与卡牌体系尚未配置。" if reward_ids.is_empty() else "领取记录与物品在同一检查点保存。", Vector2(286,551), Vector2(850,40), 17, MUTED)
+	label(self, "本事件没有额外奖励。" if reward_ids.is_empty() else "领取记录与物品在同一检查点保存。", Vector2(286,551), Vector2(850,40), 17, MUTED)
 	label(self, "第二周与第三周：内容待设计。可返回城市探索剩余支线。" if complete else "新的线索已更新到城市地图。进度已自动保存。", Vector2(286,615), Vector2(850,53), 20, CYAN)
 	var rev := Game.revision
 	button(self, "返回城市地图    →" if reward_ids.is_empty() else "领取并返回城市地图    →", Vector2(765,704), Vector2(390,59), func(): Game.claim_rewards(rev), true)
 	fade_in()
+
+func handle_escape() -> bool:
+	return is_instance_valid(reward_view) and reward_view.handle_escape()

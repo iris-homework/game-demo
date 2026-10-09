@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('baseline','import','capture','input','performance')][string]$Suite = 'input',
+    [ValidateSet('baseline','import','capture','input','performance','native_art')][string]$Suite = 'input',
     [string]$Resolution = '1280x800',
     [string]$OutputDirectory = '',
     [string]$GodotPath = '',
@@ -31,7 +31,7 @@ try {
     $env:APPDATA = $menuQaData
     $env:LOCALAPPDATA = $menuQaData
     $menuQaWindow = 'Hidden'
-    if ($Suite -in @('input','performance')) { $menuQaWindow = 'Normal' }
+    if ($Suite -in @('input','performance','native_art')) { $menuQaWindow = 'Normal' }
     $menuQaProcess = Start-Process -FilePath $GodotPath -ArgumentList $menuQaCommandLine -WorkingDirectory $menuQaRoot -WindowStyle $menuQaWindow -RedirectStandardOutput $menuQaStdout -RedirectStandardError $menuQaStderr -PassThru
     $menuQaFocusRequest = Join-Path $menuQaOutput 'focus-request.json'
     $menuQaFocusAttempted = $false

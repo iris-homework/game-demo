@@ -253,7 +253,7 @@ func start_hand() -> void:
 		set_busy(false)
 		finish(model.outcome)
 		return
-	var first_draw: bool = model.hand.is_empty() and model.turn == 1
+	var first_draw: bool = model.hand.is_empty() and model.turn == 1 and model.discard_pile.is_empty()
 	if first_draw:
 		await announce_turn("第%d回合" % model.turn)
 		model.draw_cards()

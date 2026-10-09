@@ -1,6 +1,6 @@
 extends Node
 ## 实际主菜单输入与环境采样，所有保存写入测试专用目录。
-## 双脚与两块瓶形灯牌用审核帧源的原图归一坐标核对；动画采样记录帧号与纹理，不再采样旧雨／灯光。
+## 原生 PNG 与局部 shader；核对纹理尺寸、动作时钟、灯牌、开关和资源释放。
 ## 归一坐标由审核帧源 1672x941 的灯牌多边形中心换算；映射到画布约为 (654,411) 与 (1396,325)。
 const NOREN_FEET := Vector2(0.225, 0.92)
 const LEFT_BOTTLE_SIGN := Vector2(0.458, 0.455)
@@ -28,8 +28,7 @@ func clock_frame(env: Control) -> int:
 	return int(fmod(env.animation_time * env.playback_speed, env.loop_duration) / env.frame_duration)
 
 func frame_observation(env: Control, elapsed: float) -> Dictionary:
-	var index: int = clampi(env.frame_index, 0, env.frames.size() - 1)
-	var texture: Texture2D = env.frames[index]
+	var texture: Texture2D = env.source_texture
 	return {
 		"elapsedSeconds": elapsed,
 		"environmentClock": env.animation_time,
@@ -37,9 +36,10 @@ func frame_observation(env: Control, elapsed: float) -> Dictionary:
 		"effectiveLoopSeconds": env.loop_duration / env.playback_speed,
 		"frameIndex": env.frame_index,
 		"framePath": texture.resource_path,
-		"frameSource": str(env.get_script().get_script_constant_map().get("SOURCE_GIF", "")),
+		"artSource": str(env.get_script().get_script_constant_map().get("SOURCE_ART", "")),
+		"sourceSize": str(texture.get_size()),
 		"currentTextureId": texture.get_instance_id(),
-		"environmentFrameResources": env.frames.size(),
+		"environmentFrameResources": (1 if env.source_texture != null else 0),
 		"textureMemoryBytes": RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TEXTURE_MEM_USED),
 	}
 
@@ -124,11 +124,11 @@ func _ready() -> void:
 	check(button("continue_commission").disabled,"no save disables continue")
 	check(app.view.progress_summary.text == "暂无委托记录","no save summary is honest")
 	var env: Control = app.view.environment
-	check(env.frames.size() == 60 and env.frame_count == 60,"approved GIF supplies exactly 60 frames")
-	check(env.frames[0].resource_path == "res://assets/menu/noren_idle_frames/frame_000.png","first frame uses the approved frame_000")
-	check(env.frames[59].resource_path == "res://assets/menu/noren_idle_frames/frame_059.png","last frame uses the approved frame_059")
-	check(str(env.get_script().get_script_constant_map().get("SOURCE_GIF", "")) == "res://assets/menu/noren-bar-idle-motion-v2-neon.gif","environment records the approved GIF source")
-	check(is_equal_approx(env.frame_duration,0.08) and is_equal_approx(env.loop_duration,4.8) and is_equal_approx(env.playback_speed,1.5),"approved frames play at the requested 1.5x speed")
+	check(env.source_texture.get_size() == Vector2(1672,941),"native artwork retains full 1672x941 resolution")
+	check(env.source_texture.resource_path == "res://assets/menu/noren-bar-seated-v1.png","menu samples original full-color PNG")
+	check(env.background.material is ShaderMaterial and env.artwork_material == env.background.material,"local motion shader is connected")
+	check(not ResourceLoader.has_cached("res://assets/menu/noren_idle_frames/frame_000.png"),"low-resolution GIF frames are not loaded")
+	check(is_equal_approx(env.frame_duration,0.08) and is_equal_approx(env.loop_duration,4.8) and is_equal_approx(env.playback_speed,1.5),"original animation timing retains the requested 1.5x speed")
 	check(is_equal_approx(env.loop_duration / env.playback_speed,3.2),"effective loop duration is 3.2 seconds")
 	check(env.background is TextureRect and env.background.name == "tavern_art","background exposes the tavern_art texture node")
 	check(env.background.position.is_equal_approx(Vector2(-80.0,0.0)) and env.background.size.is_equal_approx(Vector2(1600.0,900.0)),"background keeps the approved -80,0 / 1600x900 mapping")
@@ -150,6 +150,7 @@ func _ready() -> void:
 	await shot("01-menu-no-save")
 	if suite == "input": await input_suite()
 	elif suite == "performance": await performance_suite()
+	elif suite == "native_art": await native_art_suite()
 	else:
 		var state := Game.initial_state()
 		state.currentScene = "map"
@@ -196,12 +197,12 @@ func input_suite() -> void:
 	check(Game.page == "menu" and not app.view.training_open,"Escape closes training before navigation")
 	# New game without progress routes to dialogue and the destroyed menu has no environment left.
 	var old_env: WeakRef = weakref(env)
-	var old_frame: WeakRef = weakref(env.frames[0])
+	var old_frame: WeakRef = weakref(env.source_texture)
 	await click(button("new_commission"))
 	check(Game.page == "dialogue" and Game.state.activeEventId == "E01","actual new click starts first event")
 	await settle()
 	check(old_env.get_ref() == null and get_tree().get_nodes_in_group("menu_environment").is_empty(),"leaving menu releases environment")
-	check(old_frame.get_ref() == null,"leaving menu releases the approved frame textures")
+	check(old_frame.get_ref() == null,"leaving menu releases the native artwork texture")
 	Game.go_map()
 	await settle()
 	Game.state.faction = "resistance"
@@ -338,9 +339,9 @@ func performance_suite() -> void:
 				last_frame = current_frame
 			var elapsed := float(now - started)/1000000.0
 			if mode and elapsed >= next_capture:
-				await shot("animation-%02d" % int(next_capture))
+				# Readback/PNG encoding stalls the render loop at large resolutions.
+				# Keep timed samples free of screenshots; native_art captures poses separately.
 				var observation := frame_observation(app.view.environment,elapsed)
-				observation["screenshot"] = "animation-%02d.png" % int(next_capture)
 				observations.append(observation)
 				next_capture += 5.0
 				previous = Time.get_ticks_usec()
@@ -353,16 +354,79 @@ func performance_suite() -> void:
 		var total := 0.0
 		for value in samples: total += float(value)
 		var mean: float = total / maxf(1,samples.size())
-		data["dynamic" if mode else "static"] = {"durationSeconds":duration,"sampleCount":samples.size(),"meanFrameMs":mean,"p95FrameMs":samples[int(samples.size()*0.95)],"meanFps":1000.0/maxf(0.001,mean),"clock":app.view.environment.animation_time,"frameIndex":app.view.environment.frame_index,"frameCount":app.view.environment.frame_count,"frameChanges":frame_changes,"environmentFrameResources":app.view.environment.frames.size(),"textureMemoryBytes":RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TEXTURE_MEM_USED)}
+		data["dynamic" if mode else "static"] = {"durationSeconds":duration,"sampleCount":samples.size(),"meanFrameMs":mean,"p95FrameMs":samples[int(samples.size()*0.95)],"meanFps":1000.0/maxf(0.001,mean),"clock":app.view.environment.animation_time,"frameIndex":app.view.environment.frame_index,"frameCount":app.view.environment.frame_count,"frameChanges":frame_changes,"environmentFrameResources":(1 if app.view.environment.source_texture != null else 0),"textureMemoryBytes":RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TEXTURE_MEM_USED)}
 	write_json("performance.json",data)
 	write_json("animation-observations.json", observations)
 	check(float(data.dynamic.meanFps) >= 59.0,"dynamic mean frame rate meets 60 FPS target within timing tolerance")
 	check(float(data.dynamic.p95FrameMs) <= 20.0,"dynamic 95th percentile frame time remains smooth")
 	check(float(data.dynamic.clock) >= 19.0,"environment clock advances throughout observed dynamic interval")
 	check(int(data.dynamic.frameChanges) >= 350,"1.5x playback advances at least 350 frames during the 20 second sample")
-	check(int(data.dynamic.environmentFrameResources) == 60,"dynamic run keeps the approved 60 frame resources resident")
+	check(int(data.dynamic.environmentFrameResources) == 1,"dynamic run keeps only one native artwork texture resident")
 	check(int(data.dynamic.textureMemoryBytes) > 0,"rendering texture memory is read from RenderingServer, not from PNG file size")
 
 func write_json(file_name: String, value) -> void:
 	var file := FileAccess.open(output_dir.path_join(file_name),FileAccess.WRITE)
 	file.store_string(JSON.stringify(value,"\t"))
+
+# Focused rendering regression: use real GPU output, not only shader parameter values.
+func native_art_image(env: Control, index: int) -> Image:
+	env._show_frame(index)
+	await RenderingServer.frame_post_draw
+	var image := get_viewport().get_texture().get_image()
+	check(image.save_png(output_dir.path_join("native-%02d.png" % index)) == OK, "capture native animation pose %d" % index)
+	return image
+
+func art_region_samples(env: Control, image: Image, region: Rect2) -> PackedColorArray:
+	var samples := PackedColorArray()
+	for y in range(12):
+		for x in range(12):
+			var source_point := region.position + region.size * Vector2((x + 0.5)/12.0, (y + 0.5)/12.0)
+			var logical := art_point(env, source_point / Vector2(1672,941))
+			var pixel := logical / Vector2(1440,900) * Vector2(image.get_size())
+			samples.append(image.get_pixel(int(pixel.x), int(pixel.y)))
+	return samples
+
+func region_delta(a: PackedColorArray, b: PackedColorArray) -> float:
+	var delta := 0.0
+	for i in a.size():
+		delta += absf(a[i].r-b[i].r) + absf(a[i].g-b[i].g) + absf(a[i].b-b[i].b)
+	return delta / float(a.size()*3)
+
+func region_brightness(samples: PackedColorArray) -> float:
+	var total := 0.0
+	for color in samples: total += color.get_luminance()
+	return total / float(samples.size())
+
+func native_art_suite() -> void:
+	var env: Control = app.view.environment
+	env.set_process(false)
+	var start := await native_art_image(env, 0)
+	var moved := await native_art_image(env, 15)
+	for region in [Rect2(395,350,55,90), Rect2(320,740,80,60), Rect2(450,780,60,70)]:
+		check(region_delta(art_region_samples(env,start,region),art_region_samples(env,moved,region)) > 0.002,"rendered hand/boot motion changes pixels " + str(region))
+	var left_dim := await native_art_image(env, 11)
+	var right_dim := await native_art_image(env, 17)
+	for pair in [[Rect2(750,370,30,115),left_dim],[Rect2(1530,285,35,105),right_dim]]:
+		check(region_brightness(art_region_samples(env,pair[1],pair[0])) < region_brightness(art_region_samples(env,start,pair[0])) * 0.65,"rendered bottle sign dims at original keyframe " + str(pair[0]))
+	await native_art_image(env,45)
+	env.set_process(true)
+	button("motion_toggle").grab_focus()
+	await key(KEY_SPACE)
+	check(not env.get_motion_enabled() and env.frame_index == 0,"keyboard dynamic toggle freezes native pose zero")
+	var frozen: float = env.animation_time
+	await settle(0.2)
+	check(is_equal_approx(env.animation_time,frozen),"native static clock stays frozen")
+	var old_env: WeakRef = weakref(env)
+	var old_texture: WeakRef = weakref(env.source_texture)
+	Game.open_cyberware()
+	await settle(0.3)
+	check(old_env.get_ref() == null and old_texture.get_ref() == null,"native menu and its single texture are released on exit")
+	Game.menu()
+	await settle(0.5)
+	env = app.view.environment
+	check(not env.get_motion_enabled() and env.frame_index == 0,"native static preference survives menu recreation")
+	button("motion_toggle").grab_focus()
+	await key(KEY_SPACE)
+	await settle(0.3)
+	check(env.get_motion_enabled() and env.animation_time > 0.0,"native animation resumes through keyboard input")
+	write_json("native-observation.json",frame_observation(env,0.0))

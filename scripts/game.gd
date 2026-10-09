@@ -21,6 +21,7 @@ var card_catalog: Dictionary = {}
 var enemy_catalog: Dictionary
 var item_catalog: Dictionary
 var prototype_rules: Dictionary
+var reward_rules: Dictionary
 var map_config: Dictionary
 var meta_profile := {"schemaVersion":1, "cyberwareState":{}}
 var meta_path := "user://meta_profile.json"
@@ -46,11 +47,12 @@ func _ready() -> void:
 	item_catalog = read_data("items/items.json")
 	prototype_rules = read_data("prototype/combat.json")
 	prototype_rules.cyberware = read_data("prototype/cyberware.json")
+	reward_rules = read_data("prototype/rewards.json")
 	map_config = read_data("map.json")
 	load_meta()
 
 func initial_state() -> Dictionary:
-	return {"schemaVersion":2, "currentWeek":1, "currentDay":1, "currentHp":100, "maxHp":100, "combat":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "faction":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "battleId":"", "result":"", "battleHistory":[], "deck":[], "portraits":{"left":"noren", "right":"bartender"}}
+	return {"schemaVersion":2, "currentWeek":1, "currentDay":1, "currentHp":100, "maxHp":100, "combat":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "faction":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "battleId":"", "result":"", "battleHistory":[], "deck":[], "battleReward":{}, "portraits":{"left":"noren", "right":"bartender"}}
 
 func new_game() -> void:
 	if transition_locked or battle_busy: return
@@ -198,6 +200,7 @@ func start_event(id: String) -> bool:
 	state.currentPlaceId = e.placeId
 	state.battleId = ""
 	state.result = ""
+	state.battleReward = {}
 	state.combat = {}
 	state.portraits = {"left":"noren", "right":""}
 	enter_node(e.startNodeId)
@@ -271,6 +274,7 @@ func enter_node(id: String) -> void:
 				notice.emit("事件配置错误，状态未提交。")
 				return
 			state.currentScene = "result"
+			prepare_battle_reward()
 		"battle":
 			state.battleId = n.battleId
 			state.currentScene = "battle"
@@ -319,7 +323,38 @@ func claim_rewards(expected_revision: int) -> bool:
 	var actions: Array = []
 	for id in event_data().get("rewardIds", []): actions.append({"op":"grantReward", "id":id})
 	if not apply_actions(actions): return false
+	if has_battle_reward() and state.battleReward.status == "pending":
+		state.battleReward.status = "skipped"
 	go_map()
+	return true
+
+func prepare_battle_reward() -> void:
+	# Finish-node entry occurs only after all authored post-battle dialogue.
+	if training_mode or state.result != "win": return
+	var battle: Dictionary = battles.get(state.battleId, {})
+	if battle.get("eventId", "") != state.activeEventId: return
+	if not {"battleId":state.battleId, "result":"win"} in state.battleHistory: return
+	var claim_id: String = state.activeEventId + ":" + state.battleId + ":victory"
+	if claim_id in state.claimedRewardIds: return
+	state.credits += int(reward_rules.credits)
+	state.claimedRewardIds.append(claim_id)
+	state.battleReward = {"claimId":claim_id, "eventId":state.activeEventId,
+		"battleId":state.battleId, "credits":int(reward_rules.credits),
+		"options":reward_rules.cards.keys(), "selectedCardId":"", "status":"pending"}
+
+func has_battle_reward() -> bool:
+	var reward: Dictionary = state.get("battleReward", {})
+	return not training_mode and state.get("currentScene", "") == "result" and not reward.is_empty() and reward.get("eventId", "") == state.activeEventId and reward.get("battleId", "") == state.battleId
+
+func choose_reward_card(id: String, expected_revision: int) -> bool:
+	if transition_locked or battle_busy or expected_revision != revision or not has_battle_reward(): return false
+	var reward: Dictionary = state.battleReward
+	if reward.status != "pending" or not id in reward.options or not reward_rules.cards.has(id): return false
+	# One checkpoint contains both ownership and the consumed choice.
+	state.deck.append(id)
+	reward.selectedCardId = id
+	reward.status = "claimed"
+	checkpoint()
 	return true
 
 func save_game() -> bool:
@@ -354,6 +389,10 @@ func valid_save(s) -> bool:
 	if not s.combat.is_empty() and not valid_combat(s.combat): return false
 	if not s.completedEventIds is Array or not s.flags is Dictionary or not s.choiceHistory is Dictionary or not s.portraits is Dictionary: return false
 	if not s.claimedRewardIds is Array or not s.battleHistory is Array: return false
+	if not s.deck is Array or not s.battleReward is Dictionary: return false
+	for id in s.deck:
+		if not id is String or not (reward_rules.cards.has(id) or card_catalog.has(id) or prototype_rules.cards.has(id)): return false
+	if not valid_battle_reward(s): return false
 	if not (s.credits is float or s.credits is int) or s.credits < 0: return false
 	if not s.currentScene in ["map", "place", "dialogue", "battle", "result"]: return false
 	if not s.targetId in ["", "richard", "lumina"] or not s.faction in ["", "company", "resistance"]: return false
@@ -404,7 +443,11 @@ func initialize_combat() -> void:
 	var definitions: Array = []
 	for id in battle.enemyIds: definitions.append(enemy_catalog[id])
 	var model := CombatModel.new()
-	model.initialize(state.battleId, int(state.currentHp), int(state.maxHp), prototype_rules, definitions, card_catalog)
+	var rules := prototype_rules.duplicate(true)
+	if not training_mode:
+		rules.deck.append_array(state.deck)
+		rules.cards.merge(reward_rules.cards, false)
+	model.initialize(state.battleId, int(state.currentHp), int(state.maxHp), rules, definitions, card_catalog)
 	state.combat = model.snapshot()
 
 func commit_combat(model: CombatModel) -> void:
@@ -454,6 +497,26 @@ func open_cyberware() -> void:
 	page = "cyberware"
 	changed.emit()
 
+func open_card_library() -> void:
+	if transition_locked or battle_busy or page != "menu": return
+	# Like the archive, this is a menu page, never an adventure checkpoint.
+	page = "card_library"
+	changed.emit()
+
+func library_cards() -> Array:
+	# Enumerate definitions, not owned copies or a battle's frozen snapshot.
+	# Match combat's precedence: formal definitions win over prototype IDs.
+	var catalog := card_catalog.duplicate(true)
+	catalog.merge(prototype_rules.get("cards", {}), false)
+	catalog.merge(reward_rules.get("cards", {}), false)
+	var definitions: Array = catalog.values()
+	definitions.sort_custom(func(a: Dictionary, b: Dictionary):
+		var a_order := int(a.get("sortOrder", 2147483647))
+		var b_order := int(b.get("sortOrder", 2147483647))
+		if a_order != b_order: return a_order < b_order
+		return str(a.id).naturalnocasecmp_to(str(b.id)) < 0)
+	return definitions.duplicate(true)
+
 func load_meta() -> bool:
 	if not FileAccess.file_exists(meta_path): return false
 	var json := JSON.new()
@@ -472,6 +535,7 @@ func save_meta() -> bool:
 func migrate_save(data):
 	if not data is Dictionary: return data
 	data = data.duplicate(true)
+	if not data.has("battleReward"): data.battleReward = {}
 	if data.get("schemaVersion",0) == 1:
 		data = data.duplicate(true)
 		data.schemaVersion = 2
@@ -487,6 +551,24 @@ func migrate_save(data):
 		if combat.get("profile") is Dictionary and not combat.profile.has("cyberware"):
 			combat.profile.cyberware = prototype_rules.cyberware.duplicate(true)
 	return data
+
+func valid_battle_reward(s: Dictionary) -> bool:
+	var r: Dictionary = s.battleReward
+	if r.is_empty(): return true
+	for key in ["claimId", "eventId", "battleId", "selectedCardId", "status"]:
+		if not r.get(key) is String: return false
+	if r.eventId != s.activeEventId or r.battleId != s.battleId: return false
+	if not battles.has(r.battleId) or battles[r.battleId].eventId != r.eventId: return false
+	if r.claimId != r.eventId + ":" + r.battleId + ":victory" or not r.claimId in s.claimedRewardIds: return false
+	if not (r.get("credits") is int or r.get("credits") is float) or r.credits != int(reward_rules.credits): return false
+	if not r.get("options") is Array or r.options.size() != 3: return false
+	var seen := []
+	for id in r.options:
+		if not id is String or not reward_rules.cards.has(id) or id in seen: return false
+		seen.append(id)
+	if not r.status in ["pending", "claimed", "skipped"]: return false
+	if r.status == "claimed": return r.selectedCardId in r.options and r.selectedCardId in s.deck
+	return r.selectedCardId.is_empty()
 
 func valid_combat(c: Dictionary) -> bool:
 	for key in ["battleId","turn","playerHp","maxHp","drawPile","hand","discardPile","instances","enemies","outcome","log","profile","cardCatalog"]:

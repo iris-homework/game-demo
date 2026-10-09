@@ -6,7 +6,8 @@ const VIEWS = {
 	"dialogue": preload("res://scenes/dialogue.tscn"),
 	"battle": preload("res://scenes/battle.tscn"),
 	"result": preload("res://scenes/result.tscn"),
-	"cyberware": preload("res://scenes/cyberware.tscn")
+	"cyberware": preload("res://scenes/cyberware.tscn"),
+	"card_library": preload("res://scenes/card_library.tscn")
 }
 var view: Control
 var debug_panel: Control
@@ -90,7 +91,7 @@ func _input(event: InputEvent) -> void:
 		if is_instance_valid(debug_panel):
 			debug_panel.queue_free()
 			debug_panel = null
-		elif Game.page in ["map", "menu"] and view.has_method("handle_escape") and view.handle_escape():
+		elif Game.page in ["map", "menu", "result"] and view.has_method("handle_escape") and view.handle_escape():
 			pass
 		elif Game.page == "menu" and not Game.state.is_empty(): Game.resume()
 		else: Game.menu()
