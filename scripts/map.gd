@@ -1,9 +1,9 @@
 extends DemoUI
-## 城市总览地图：大幅等比底图 + 地点／任务标记 + 悬停预览与固定详情。
+## 城市总览地图：大幅等比底图 + 地点／任务标记 + 悬停提亮与点击详情。
 ## 只读取 Game 的状态查询并调用既有流程接口，不在这里复制解锁规则。
 ##
 ## 供输入测试使用的可观察接口：
-##   selected_id:String、preview:Control、detail:Control、markers:Dictionary、
+##   selected_id:String、detail:Control、markers:Dictionary、
 ##   map_rect:Rect2、get_marker_center(id)->Vector2、select_place(id)、
 ##   close_detail()、handle_escape()->bool；详情按钮命名为
 ##   enter_place／heal_place／event_<事件ID>，可用 find_child 查找。
@@ -11,7 +11,6 @@ extends DemoUI
 const CANVAS := Vector2(1440.0, 900.0)
 const HUD_HEIGHT := 76.0
 const MARKER_HEIGHT := 72.0
-const HOVER_DELAY := 0.2
 const EDGE := 12.0
 const MIN_GAP := 3.0
 const MAX_NUDGE := 150.0
@@ -23,22 +22,18 @@ const GOLD := Color("ffdb72")
 static var pending_selection_id := ""
 
 var selected_id := ""
-var preview: Control = null
 var detail: Control = null
 var markers := {}
 var map_rect := Rect2()
 
 var _hud_hp_fill: ColorRect
 var _hud_hp_text: Label
-var _hover_timer: Timer
-var _hover_pending_id := ""
 var _hovered_id := ""
 var _week_dialog: AcceptDialog
 var _leader_layer: Control
 var _blank_hit: Control
 var _pointer_seen := false
 var _pointer_canvas := Vector2.ZERO
-var _hover_started_us := 0
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -51,11 +46,6 @@ func _ready() -> void:
 	_refresh_hud()
 	if not Game.status_changed.is_connected(_refresh_hud):
 		Game.status_changed.connect(_refresh_hud)
-	_hover_timer = Timer.new()
-	_hover_timer.one_shot = true
-	_hover_timer.wait_time = HOVER_DELAY
-	_hover_timer.timeout.connect(_on_hover_timeout)
-	add_child(_hover_timer)
 	_consume_pending_selection()
 
 func _consume_pending_selection() -> void:
@@ -349,10 +339,6 @@ func select_place(id: String) -> void:
 	if Game.place_data(id).is_empty():
 		return
 	selected_id = id
-	_hover_pending_id = ""
-	if is_instance_valid(_hover_timer):
-		_hover_timer.stop()
-	_hide_preview()
 	_apply_selection_visuals()
 	_build_detail(id)
 
@@ -481,7 +467,7 @@ func _on_card_action(kind: String, id: String) -> bool:
 
 func _on_marker_hover(id: String, hovered: bool) -> void:
 	# 每帧指针轮询给出权威结果；进入／离开信号只做即时提示，并先用实际指针位置复核，
-	# 避免合成输入与系统事件交错时反复清除悬停、反复重置延迟。
+	# 避免合成输入与系统事件交错时反复清除悬停、打断动画。
 	if hovered:
 		if _pointer_seen and not _pointer_over_marker(id):
 			return
@@ -502,55 +488,9 @@ func _set_hovered_marker(id: String) -> void:
 		var old = markers.get(previous)
 		if is_instance_valid(old):
 			old.set_hovered(false)
-	if id.is_empty():
-		_hover_pending_id = ""
-		if is_instance_valid(_hover_timer):
-			_hover_timer.stop()
-		_hide_preview()
-		return
-	if is_instance_valid(preview) and str(preview.get_meta("place_id", "")) != id:
-		_hide_preview()
 	var marker = markers.get(id)
 	if is_instance_valid(marker):
 		marker.set_hovered(true)
-	_hover_pending_id = id
-	_hover_started_us = Time.get_ticks_usec()
-	if is_instance_valid(_hover_timer):
-		_hover_timer.start(HOVER_DELAY)
-
-func _on_hover_timeout() -> void:
-	var id := _hover_pending_id
-	var elapsed := float(Time.get_ticks_usec() - _hover_started_us) / 1000000.0
-	if elapsed < HOVER_DELAY:
-		# Timer 的首帧 delta 可能包含启动前的时间；以单调时钟保证实际悬停满 0.2 秒。
-		_hover_timer.start(HOVER_DELAY - elapsed)
-		return
-	_hover_pending_id = ""
-	if id.is_empty():
-		return
-	if is_instance_valid(detail):
-		return
-	if Game.transition_locked or Game.battle_busy:
-		return
-	_show_preview(id)
-
-func _show_preview(id: String) -> void:
-	_hide_preview()
-	var card := MidnightMapCard.new()
-	card.name = "preview_card"
-	card.z_index = 18
-	preview = card
-	add_child(card)
-	card.setup_preview(_card_content(id), base_font, CARD_BOUNDS)
-	card.set_meta("place_id", id)
-	card.set_meta("hover_delay_seconds", float(Time.get_ticks_usec() - _hover_started_us) / 1000000.0)
-	_place_card(card, id)
-
-func _hide_preview() -> void:
-	if is_instance_valid(preview):
-		remove_child(preview)
-		preview.queue_free()
-	preview = null
 
 # ------------------------------------------------------------------- 输入
 
@@ -577,8 +517,6 @@ func _on_blank_hit_input(event: InputEvent) -> void:
 		_blank_hit.accept_event()
 	if is_instance_valid(detail):
 		close_detail()
-	elif is_instance_valid(preview):
-		_hide_preview()
 
 func handle_escape() -> bool:
 	if is_instance_valid(_week_dialog):
@@ -586,9 +524,6 @@ func handle_escape() -> bool:
 		return true
 	if is_instance_valid(detail):
 		close_detail()
-		return true
-	if is_instance_valid(preview):
-		_hide_preview()
 		return true
 	return false
 
@@ -658,8 +593,6 @@ func _update_hover_from_pointer() -> void:
 	var point := _pointer_point()
 	if is_instance_valid(detail) and detail.get_global_rect().has_point(point):
 		return
-	if is_instance_valid(preview) and preview.get_global_rect().has_point(point):
-		return
 	_set_hovered_marker(_marker_at(point))
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -677,9 +610,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 	if is_instance_valid(detail):
 		close_detail()
-		get_viewport().set_input_as_handled()
-	elif is_instance_valid(preview):
-		_hide_preview()
 		get_viewport().set_input_as_handled()
 
 func show_weeks() -> void:

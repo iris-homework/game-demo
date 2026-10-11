@@ -14,6 +14,8 @@ const NAME_WIDTH := 190.0
 const NAME_HEIGHT := 22.0
 const NAME_FONT_SIZE := 17
 const NAME_GAP := 3.0
+const HOVER_SCALE := 1.06
+const HOVER_DURATION := 0.16
 
 var place_id := ""
 var marker_height := 72.0
@@ -30,8 +32,8 @@ var name_offset := Vector2.ZERO
 var has_avatar := false
 
 var _frame_tex: TextureRect
-var _underlay: TextureRect
-var _hover_ring: TextureRect
+var _hover_tween: Tween
+var _hover_amount := 0.0
 var _select_ring: TextureRect
 var _symbol: TextureRect
 var _name_label: Label
@@ -59,7 +61,7 @@ func prepare(spec: Dictionary) -> void:
 	size = Vector2(left_pad + frame_size.x + right_pad, TOP_PAD + frame_size.y)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	# 简介由地图自定义悬停卡展示，关闭系统 tooltip，避免延时叠出第二份简介。
+	# 悬停只做轻微提亮与放大；地点简介通过点击详情查看。
 	tooltip_text = ""
 	_build(side, spec)
 	if not mouse_entered.is_connected(_on_mouse_entered):
@@ -72,9 +74,6 @@ func _build(side: String, spec: Dictionary) -> void:
 	var frames := MidnightMapAssets.frames()
 	_select_ring = _frame_view(frames.get("selected"), origin, 1.20, Color(0.95, 0.92, 0.86, 0.72))
 	_select_ring.visible = false
-	_hover_ring = _frame_view(frames.get("hover"), origin, 1.10, Color(0.70, 1.0, 1.0, 0.82))
-	_hover_ring.visible = false
-	_underlay = _frame_view(frames.get("normal"), origin, 1.12, Color(accent, 0.30))
 	_frame_tex = _frame_view(frames.get("normal"), origin, 1.0, frame_tint)
 	_symbol = TextureRect.new()
 	_symbol.texture = MidnightMapAssets.symbol(place_id)
@@ -111,8 +110,6 @@ func _frame_view(texture: Texture2D, origin: Vector2, view_scale: float, tint: C
 	var edge_color := accent
 	if view_scale == 1.20:
 		edge_color = Color("fff4dc")
-	elif view_scale == 1.10:
-		edge_color = Color("9af8ff")
 	material.set_shader_parameter("edge_color", Color(edge_color, tint.a))
 	node.material = material
 	node.modulate = Color.WHITE
@@ -202,7 +199,25 @@ func set_hovered(value: bool) -> void:
 	if _hovered == value:
 		return
 	_hovered = value
+	if _hover_tween != null:
+		_hover_tween.kill()
+	_hover_tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_hover_tween.tween_method(_apply_hover, _hover_amount, 1.0 if value else 0.0, HOVER_DURATION)
 	_update_visuals()
+
+func _apply_hover(amount: float) -> void:
+	_hover_amount = amount
+	# 图案和角标围绕同一尖端缩放，命中区域保持稳定，避免边缘反复触发进出。
+	var anchor := Vector2(left_pad, TOP_PAD) + tip_local
+	var visual_scale := Vector2.ONE * lerpf(1.0, HOVER_SCALE, amount)
+	for node in [_frame_tex, _select_ring, _symbol]:
+		if is_instance_valid(node):
+			node.pivot_offset = anchor - node.position
+			node.scale = visual_scale
+			(node.material as ShaderMaterial).set_shader_parameter("hover_amount", amount)
+	for badge in _badges:
+		badge.pivot_offset = anchor - badge.position
+		badge.scale = visual_scale
 
 func set_selected(value: bool) -> void:
 	if _selected == value:
@@ -214,8 +229,6 @@ func is_hovered() -> bool:
 	return _hovered
 
 func _update_visuals() -> void:
-	if is_instance_valid(_hover_ring):
-		_hover_ring.visible = _hovered
 	if is_instance_valid(_select_ring):
 		_select_ring.visible = _selected
 	if is_instance_valid(_name_label):
