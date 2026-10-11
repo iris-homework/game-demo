@@ -6,6 +6,10 @@ var failures := 0
 var output_dir := ""
 var capture_only := false
 var input_records: Array = []
+var _test_buttons := 0
+var _last_test_point := Vector2.ZERO
+var _recent_inputs: Array = []
+var _input_window_ready := false
 
 func check(ok: bool, message: String) -> void:
 	checks += 1
@@ -14,6 +18,16 @@ func check(ok: bool, message: String) -> void:
 	if not ok:
 		failures += 1
 		push_error("MAP VISUAL: " + message)
+		var diagnostic := {"check":message, "inputs":_recent_inputs.duplicate(true),
+			"gui":str(get_viewport().gui_get_hovered_control()), "mouse":str(get_viewport().get_mouse_position())}
+		if is_instance_valid(app) and Game.page == "map":
+			diagnostic.merge({"pointer":str(app.view._pointer_point()), "hovered":app.view._hovered_id,
+				"selected":app.view.selected_id, "zoom":app.view.zoom_level,
+				"windowActive":app.view._window_active, "pointerSeen":app.view._pointer_seen,
+				"windowHasFocus":get_window().has_focus()})
+		if not output_dir.is_empty():
+			var log_file := FileAccess.open(output_dir.path_join("failure-%d.json" % failures), FileAccess.WRITE)
+			if log_file != null: log_file.store_string(JSON.stringify(diagnostic,"\t"))
 
 func settle(seconds: float = 0.22) -> void:
 	await get_tree().create_timer(seconds).timeout
@@ -26,6 +40,15 @@ func wait_unlocked() -> void:
 	check(not Game.transition_locked and not Game.battle_busy, "scene transition and battle animations release input")
 
 func stage() -> void:
+	if not _input_window_ready:
+		# 首次建窗的系统焦点/指针事件可能晚于 _ready；先等窗口获得焦点，
+		# 再让首次激活事件完成，避免把启动时的系统指针当成测试移动。
+		var deadline := Time.get_ticks_msec() + 5000
+		while not get_window().has_focus() and Time.get_ticks_msec() < deadline:
+			await get_tree().process_frame
+		assert(get_window().has_focus(), "map input test requires a focused rendered window")
+		await settle(0.5)
+		_input_window_ready = true
 	Game.transition_locked = false
 	Game.battle_busy = false
 	Game.state = Game.initial_state()
@@ -37,28 +60,48 @@ func stage() -> void:
 	Game.changed.emit()
 	await settle()
 
+# 一次只走目标视口的标准输入/GUI 分发，不混合系统 warp 与全局输入队列。
+# point 是游戏逻辑画布坐标；运行在真实渲染窗口中，但这不是物理鼠标证据。
+func dispatch_input(event: InputEvent) -> void:
+	var info := {"type":event.get_class(), "frame":Engine.get_process_frames()}
+	if event is InputEventMouse or event is InputEventGesture:
+		info["point"] = str(event.position)
+	if event is InputEventMouseButton:
+		info["pressed"] = event.pressed
+		info["button"] = event.button_index
+	_recent_inputs.append(info)
+	if _recent_inputs.size() > 24: _recent_inputs.pop_front()
+	get_viewport().push_input(event, true)
+
 func motion(point: Vector2) -> void:
 	var event := InputEventMouseMotion.new()
-	event.position = get_viewport().get_final_transform() * point
+	event.position = get_viewport().get_canvas_transform() * point
 	event.global_position = event.position
-	Input.warp_mouse(event.position)
-	# macOS 的原生 warp 事件异步送达；先处理它，再提交精确的窗口坐标。
+	event.relative = point - _last_test_point
+	event.button_mask = _test_buttons
+	_last_test_point = point
+	dispatch_input(event)
 	await get_tree().process_frame
 	await get_tree().process_frame
-	Input.parse_input_event(event)
-	await get_tree().process_frame
+
+func mouse_button(point: Vector2, index: int, pressed: bool) -> void:
+	if index in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT, MOUSE_BUTTON_MIDDLE]:
+		var mask := 1 << (index - 1)
+		if pressed: _test_buttons |= mask
+		else: _test_buttons &= ~mask
+	var event := InputEventMouseButton.new()
+	event.position = get_viewport().get_canvas_transform() * point
+	event.global_position = event.position
+	event.button_index = index
+	event.button_mask = _test_buttons
+	event.pressed = pressed
+	dispatch_input(event)
 	await get_tree().process_frame
 
 func click(point: Vector2) -> void:
 	await motion(point)
-	for down in [true, false]:
-		var event := InputEventMouseButton.new()
-		event.position = get_viewport().get_final_transform() * point
-		event.global_position = event.position
-		event.button_index = MOUSE_BUTTON_LEFT
-		event.pressed = down
-		Input.parse_input_event(event)
-		await get_tree().process_frame
+	await mouse_button(point, MOUSE_BUTTON_LEFT, true)
+	await mouse_button(point, MOUSE_BUTTON_LEFT, false)
 	await settle(0.08)
 
 func press_escape() -> void:
@@ -66,7 +109,7 @@ func press_escape() -> void:
 		var event := InputEventKey.new()
 		event.keycode = KEY_ESCAPE
 		event.pressed = down
-		Input.parse_input_event(event)
+		dispatch_input(event)
 		await get_tree().process_frame
 	await settle(0.08)
 
@@ -318,25 +361,15 @@ func _ready() -> void:
 	if scroll != null:
 		await motion(scroll.get_global_rect().get_center())
 		for i in range(12):
-			var wheel := InputEventMouseButton.new()
-			wheel.position = get_viewport().get_final_transform() * scroll.get_global_rect().get_center()
-			wheel.global_position = wheel.position
-			wheel.button_index = MOUSE_BUTTON_WHEEL_DOWN
-			wheel.pressed = true
-			Input.parse_input_event(wheel)
-			await get_tree().process_frame
+			await mouse_button(scroll.get_global_rect().get_center(), MOUSE_BUTTON_WHEEL_DOWN, true)
+			await mouse_button(scroll.get_global_rect().get_center(), MOUSE_BUTTON_WHEEL_DOWN, false)
 		await settle()
 		check(scroll.scroll_vertical > 0, "real wheel scrolls long content")
 		check(Game.state.currentPlaceId == "hive" and Game.page == "map", "wheel stays in detail and does not enter event")
 		await shot("11-long-list-scrolled")
 		for i in range(65):
-			var wheel := InputEventMouseButton.new()
-			wheel.position = get_viewport().get_final_transform() * scroll.get_global_rect().get_center()
-			wheel.global_position = wheel.position
-			wheel.button_index = MOUSE_BUTTON_WHEEL_DOWN
-			wheel.pressed = true
-			Input.parse_input_event(wheel)
-			await get_tree().process_frame
+			await mouse_button(scroll.get_global_rect().get_center(), MOUSE_BUTTON_WHEEL_DOWN, true)
+			await mouse_button(scroll.get_global_rect().get_center(), MOUSE_BUTTON_WHEEL_DOWN, false)
 		await settle()
 		var last_action := map_button("event_MAP_LIST_07")
 		check(last_action != null and scroll.get_global_rect().has_point(button_center(last_action)), "last event action is reachable after scrolling")

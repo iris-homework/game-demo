@@ -1,0 +1,116 @@
+extends "res://tests/map_visual.gd"
+
+func wheel(point: Vector2, index: int) -> void:
+	await motion(point)
+	await mouse_button(point, index, true)
+	await mouse_button(point, index, false)
+	await settle(0.05)
+
+func drag(from: Vector2, to: Vector2) -> void:
+	await motion(from)
+	await mouse_button(from, MOUSE_BUTTON_LEFT, true)
+	await motion(to)
+	await mouse_button(to, MOUSE_BUTTON_LEFT, false)
+	await settle(0.08)
+
+func _ready() -> void:
+	var args := OS.get_cmdline_user_args()
+	for i in args.size():
+		if args[i] == "--output-dir" and i + 1 < args.size(): output_dir = args[i + 1]
+	if output_dir.is_empty(): output_dir = OS.get_temp_dir().path_join("midnight_map_zoom")
+	DirAccess.make_dir_recursive_absolute(output_dir)
+	Game.save_enabled = false
+	Game.save_path = output_dir.path_join("test-checkpoint.json")
+	Game.meta_path = output_dir.path_join("test-meta.json")
+	app = load("res://scenes/main.tscn").instantiate()
+	add_child(app)
+	await stage()
+	var view = app.view
+	var state_before := JSON.stringify(Game.state)
+	var original_tip: Vector2 = view.markers.church.global_position
+	var original_size: Vector2 = view.markers.church.size
+	check(is_equal_approx(view.zoom_level, 1.0), "initial overview is 100 percent")
+	await drag(Vector2(700, 800), Vector2(900, 700))
+	check(view._pan.is_zero_approx(), "minimum zoom cannot pan")
+	await wheel(Vector2(700, 700), MOUSE_BUTTON_WHEEL_DOWN)
+	check(is_equal_approx(view.zoom_level, 1.0), "wheel cannot zoom below minimum")
+	await shot("01-overview")
+	await wheel(Vector2(700, 700), MOUSE_BUTTON_WHEEL_UP)
+	check(is_equal_approx(view.zoom_level, 1.1), "wheel increases zoom")
+	var anchor := Vector2(650, 450)
+	var local_before: Vector2 = (anchor - view.map_rect.position - view._pan) / view.zoom_level
+	await wheel(anchor, MOUSE_BUTTON_WHEEL_UP)
+	var local_after: Vector2 = (anchor - view.map_rect.position - view._pan) / view.zoom_level
+	check(local_before.distance_to(local_after) < 0.01, "wheel keeps cursor map point anchored")
+	await click(view._zoom_in.get_global_rect().get_center())
+	check(is_equal_approx(view.zoom_level, 1.3), "plus button increases zoom")
+	await click(view._zoom_out.get_global_rect().get_center())
+	check(is_equal_approx(view.zoom_level, 1.2), "minus button decreases zoom")
+	for i in range(12): await wheel(anchor, MOUSE_BUTTON_WHEEL_UP)
+	check(is_equal_approx(view.zoom_level, 2.0) and view._zoom_in.disabled, "maximum clamps to 200 percent and disables plus")
+	check(view.markers.church.size == original_size, "marker hit size remains readable and unchanged")
+	var tip: Vector2 = view.markers.church.position + view.markers.church.tip_local + Vector2(view.markers.church.left_pad, view.markers.church.TOP_PAD)
+	var expected: Vector2 = view._base_tips.church * view.zoom_level + view._map_art.position
+	check(tip.distance_to(expected) < 0.01, "marker tip follows map transform")
+	var before: Vector2 = view._pan
+	await drag(Vector2(700, 700), Vector2(850, 760))
+	check(view._pan.x > before.x and view._pan.y > before.y, "drag moves right and down")
+	before = view._pan
+	await drag(Vector2(850, 760), Vector2(550, 500))
+	check(view._pan.x < before.x and view._pan.y < before.y, "drag moves left and up")
+	for i in range(4): await drag(Vector2(200, 200), Vector2(1400, 800))
+	check(view._pan.is_zero_approx(), "upper-left map edge clamps positive panning")
+	for i in range(4): await drag(Vector2(1400, 800), Vector2(100, 100))
+	check(view._pan.distance_to(-view.map_rect.size) < 0.01, "lower-right map edge clamps negative panning")
+	await click(view._zoom_reset.get_global_rect().get_center())
+	check(is_equal_approx(view.zoom_level, 1.0) and view._pan.is_zero_approx(), "percentage button resets overview and pan")
+	check(view.markers.church.global_position.distance_to(original_tip) < 0.01, "reset restores exact marker position")
+	for place in Game.places:
+		view.close_detail()
+		view.set_map_zoom(1.0)
+		view.set_map_zoom(1.5, view.get_marker_center(place.id))
+		await click(view.get_marker_center(place.id))
+		check(view.selected_id == place.id, "zoomed hit area selects " + place.id)
+	view.close_detail()
+	view.set_map_zoom(1.0)
+	view.set_map_zoom(1.5)
+	await settle()
+	var center: Vector2 = view.get_marker_center("church")
+	await click(center)
+	check(view.selected_id == "church" and is_instance_valid(view.detail), "zoomed marker opens correct detail")
+	check(card_inside(view.detail), "zoomed detail stays within screen bounds")
+	var zoom_before: float = view.zoom_level
+	await wheel(view.detail.get_global_rect().get_center(), MOUSE_BUTTON_WHEEL_UP)
+	check(is_equal_approx(view.zoom_level, zoom_before), "detail consumes wheel without map zoom")
+	await shot("02-zoomed-detail")
+	await press_escape()
+	center = view.get_marker_center("church")
+	await drag(center, center + Vector2(100, 100))
+	check(view.selected_id.is_empty() and not is_instance_valid(view.detail), "drag starting on marker does not open detail")
+	await shot("03-panned")
+	await wheel(Vector2(720, 30), MOUSE_BUTTON_WHEEL_UP)
+	check(is_equal_approx(view.zoom_level, zoom_before), "HUD does not zoom map")
+	view.show_weeks()
+	await wheel(Vector2(100, 700), MOUSE_BUTTON_WHEEL_UP)
+	check(is_equal_approx(view.zoom_level, zoom_before), "week modal blocks map navigation")
+	view._close_weeks()
+	await settle()
+	Game.transition_locked = true
+	await wheel(Vector2(700, 700), MOUSE_BUTTON_WHEEL_UP)
+	check(is_equal_approx(view.zoom_level, zoom_before), "transition blocks map navigation")
+	Game.transition_locked = false
+	await motion(Vector2(500, 700))
+	await mouse_button(Vector2(500, 700), MOUSE_BUTTON_LEFT, true)
+	view._notification(NOTIFICATION_APPLICATION_FOCUS_OUT)
+	check(not view._drag_pending, "focus loss cancels drag capture")
+	view._notification(NOTIFICATION_APPLICATION_FOCUS_IN)
+	await mouse_button(Vector2(500, 700), MOUSE_BUTTON_LEFT, false)
+	await click(view._zoom_reset.get_global_rect().get_center())
+	check(JSON.stringify(Game.state) == state_before, "map browsing does not change game state")
+	await click(view.get_marker_center("church"))
+	check(view.selected_id == "church", "minimum zoom retains original click behavior")
+	await shot("04-reset-detail")
+	var log_file := FileAccess.open(output_dir.path_join("checks.json"), FileAccess.WRITE)
+	log_file.store_string(JSON.stringify(input_records, "\t"))
+	print("MAP ZOOM: %d checks, %d failures" % [checks, failures])
+	get_tree().quit(0 if failures == 0 else 1)

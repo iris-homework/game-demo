@@ -16,6 +16,12 @@ const MIN_GAP := 3.0
 const MAX_NUDGE := 150.0
 const MAP_FALLBACK_SIZE := Vector2(1671.0, 941.0)
 const CARD_BOUNDS := Rect2(12.0, 82.0, 1416.0, 794.0)
+const MIN_ZOOM := 1.0
+const MAX_ZOOM := 2.0
+const ZOOM_STEP := 0.1
+const DRAG_THRESHOLD := 6.0
+const MAP_VIEW := Rect2(0.0, HUD_HEIGHT, 1440.0, 824.0)
+const ZOOM_BAR := Rect2(1120.0, 846.0, 304.0, 44.0)
 const GOLD := Color("ffdb72")
 
 ## 治疗会触发 checkpoint 让整页重建；只在治疗前设置，新视图消费或失败时清空。
@@ -26,12 +32,27 @@ var detail: Control = null
 var markers := {}
 var map_rect := Rect2()
 
+var zoom_level := MIN_ZOOM
+var _pan := Vector2.ZERO
+var _map_layer: Control
+var _map_art: Control
+var _base_tips := {}
+var _zoom_out: Button
+var _zoom_in: Button
+var _zoom_reset: Button
+var _drag_pending := false
+var _dragging := false
+var _drag_start := Vector2.ZERO
+var _drag_pan := Vector2.ZERO
+var _drag_marker := ""
+
 var _hud_hp_fill: ColorRect
 var _hud_hp_text: Label
 var _hovered_id := ""
 var _week_dialog: AcceptDialog
 var _leader_layer: Control
 var _blank_hit: Control
+var _window_active := true
 var _pointer_seen := false
 var _pointer_canvas := Vector2.ZERO
 
@@ -41,8 +62,10 @@ func _ready() -> void:
 	set_process(true)
 	_build_blank_hit()
 	_build_map()
-	_build_hud()
 	_build_markers()
+	_build_hud()
+	_build_zoom_controls()
+	_apply_map_transform()
 	_refresh_hud()
 	if not Game.status_changed.is_connected(_refresh_hud):
 		Game.status_changed.connect(_refresh_hud)
@@ -60,7 +83,22 @@ func _consume_pending_selection() -> void:
 # ---------------------------------------------------------------- 底图与 HUD
 
 func _build_map() -> void:
-	var texture: Texture2D = Game.texture("city_map")
+	var clip := Control.new()
+	clip.name = "map_viewport"
+	clip.position = MAP_VIEW.position
+	clip.size = MAP_VIEW.size
+	clip.clip_contents = true
+	clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(clip)
+	_map_layer = Control.new()
+	_map_layer.position = -MAP_VIEW.position
+	_map_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	clip.add_child(_map_layer)
+	_map_art = Control.new()
+	_map_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_map_layer.add_child(_map_art)
+	var asset_id := str(Game.map_config.get("cityMapAssetId", "city_map"))
+	var texture: Texture2D = Game.texture(asset_id)
 	if texture == null:
 		texture = MidnightMapAssets.map_texture()
 	var source := MAP_FALLBACK_SIZE
@@ -79,16 +117,16 @@ func _build_map() -> void:
 		view.position = map_rect.position
 		view.size = map_rect.size
 		view.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(view)
+		_map_art.add_child(view)
 	else:
-		panel(self, map_rect.position, map_rect.size, Color("0e1928"), Color("264256"))
-		label(self, "城市地图插画待补", map_rect.position + Vector2(30.0, 30.0), Vector2(640.0, 44.0), 26, MUTED)
-	rect(self, map_rect.position, map_rect.size, Color(0.02, 0.03, 0.05, 0.12))
+		panel(_map_art, map_rect.position, map_rect.size, Color("0e1928"), Color("264256"))
+		label(_map_art, "城市地图插画待补", map_rect.position + Vector2(30.0, 30.0), Vector2(640.0, 44.0), 26, MUTED)
+	rect(_map_art, map_rect.position, map_rect.size, Color(0.02, 0.03, 0.05, 0.12))
 	var edge := Color(0.24, 0.62, 0.72, 0.55)
-	rect(self, map_rect.position, Vector2(map_rect.size.x, 1.0), edge)
-	rect(self, map_rect.position + Vector2(0.0, map_rect.size.y - 1.0), Vector2(map_rect.size.x, 1.0), edge)
-	rect(self, map_rect.position, Vector2(1.0, map_rect.size.y), edge)
-	rect(self, map_rect.position + Vector2(map_rect.size.x - 1.0, 0.0), Vector2(1.0, map_rect.size.y), edge)
+	rect(_map_art, map_rect.position, Vector2(map_rect.size.x, 1.0), edge)
+	rect(_map_art, map_rect.position + Vector2(0.0, map_rect.size.y - 1.0), Vector2(map_rect.size.x, 1.0), edge)
+	rect(_map_art, map_rect.position, Vector2(1.0, map_rect.size.y), edge)
+	rect(_map_art, map_rect.position + Vector2(map_rect.size.x - 1.0, 0.0), Vector2(1.0, map_rect.size.y), edge)
 	var gradient := Gradient.new()
 	gradient.offsets = PackedFloat32Array([0.0, 1.0])
 	gradient.colors = PackedColorArray([Color(0.02, 0.03, 0.05, 0.92), Color(0.02, 0.03, 0.05, 0.0)])
@@ -102,6 +140,128 @@ func _build_map() -> void:
 	shade.size = Vector2(CANVAS.x, HUD_HEIGHT + 42.0)
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(shade)
+
+# 只变换地图插画与锚点；标记保持可读尺寸，HUD 和详情留在固定画布上。
+func _build_zoom_controls() -> void:
+	var bar := Control.new()
+	bar.name = "map_zoom_controls"
+	bar.position = ZOOM_BAR.position
+	bar.size = ZOOM_BAR.size
+	bar.mouse_filter = Control.MOUSE_FILTER_STOP
+	bar.z_index = 10
+	add_child(bar)
+	_zoom_out = button(bar, "−", Vector2.ZERO, Vector2(48, 44), func(): set_map_zoom(zoom_level - ZOOM_STEP))
+	_zoom_reset = button(bar, "100%", Vector2(56, 0), Vector2(112, 44), func(): set_map_zoom(MIN_ZOOM))
+	_zoom_in = button(bar, "＋", Vector2(176, 0), Vector2(48, 44), func(): set_map_zoom(zoom_level + ZOOM_STEP))
+	label(bar, "缩放", Vector2(238, 8), Vector2(62, 28), 16, MUTED)
+	_zoom_reset.tooltip_text = "点击恢复全图；滚轮缩放，放大后按住左键拖动"
+	_zoom_out.tooltip_text = "缩小地图"
+	_zoom_in.tooltip_text = "放大地图"
+	for control in [_zoom_out, _zoom_reset, _zoom_in]:
+		control.focus_mode = Control.FOCUS_NONE
+
+func set_map_zoom(value: float, anchor: Vector2 = MAP_VIEW.get_center()) -> void:
+	if Game.transition_locked or Game.battle_busy or is_instance_valid(_week_dialog):
+		return
+	var next := clampf(value, MIN_ZOOM, MAX_ZOOM)
+	if is_equal_approx(next, zoom_level):
+		return
+	var origin := map_rect.position
+	var local_point := (anchor - origin - _pan) / zoom_level
+	_pan = anchor - origin - local_point * next
+	zoom_level = next
+	_cancel_drag()
+	_apply_map_transform()
+
+func _apply_map_transform() -> void:
+	# 每轴只允许在放大产生的额外范围内移动，最小时自动归零。
+	var extra := map_rect.size * (zoom_level - MIN_ZOOM)
+	_pan = _pan.clamp(-extra, Vector2.ZERO)
+	var offset := map_rect.position * (1.0 - zoom_level) + _pan
+	_map_art.position = offset
+	_map_art.scale = Vector2.ONE * zoom_level
+	_leader_layer.position = offset
+	_leader_layer.scale = Vector2.ONE * zoom_level
+	for id in markers:
+		markers[id].set_tip(_base_tips[id] * zoom_level + offset)
+	_zoom_out.disabled = zoom_level <= MIN_ZOOM
+	_zoom_in.disabled = zoom_level >= MAX_ZOOM
+	_zoom_reset.text = "%d%%" % roundi(zoom_level * 100.0)
+	_blank_hit.mouse_default_cursor_shape = Control.CURSOR_DRAG if zoom_level > MIN_ZOOM else Control.CURSOR_ARROW
+	if is_instance_valid(detail):
+		_place_card(detail, selected_id)
+	_update_hover_from_pointer()
+
+func _cancel_drag() -> void:
+	_drag_pending = false
+	_dragging = false
+	_drag_marker = ""
+
+func _map_navigation_allowed(point: Vector2) -> bool:
+	return (_window_active and not Game.transition_locked and not Game.battle_busy
+		and not is_instance_valid(_week_dialog) and _pointer_over_map_layer()
+		and MAP_VIEW.has_point(point) and not ZOOM_BAR.has_point(point)
+		and not (is_instance_valid(detail) and detail.get_global_rect().has_point(point)))
+
+func _navigate_map(event: InputEvent) -> void:
+	var point := _pointer_point()
+	if not _window_active or Game.transition_locked or Game.battle_busy or is_instance_valid(_week_dialog) or not _pointer_over_map_layer():
+		_cancel_drag()
+		return
+	if _drag_pending and event is InputEventMouseMotion:
+		var delta := point - _drag_start
+		if not _dragging and delta.length() >= DRAG_THRESHOLD:
+			_dragging = true
+			close_detail()
+			_set_hovered_marker("")
+		if _dragging:
+			_pan = _drag_pan + delta
+			_apply_map_transform()
+		get_viewport().set_input_as_handled()
+		return
+	if event is InputEventMouseButton:
+		var mouse := event as InputEventMouseButton
+		if _drag_pending and mouse.button_index == MOUSE_BUTTON_LEFT and not mouse.pressed:
+			var clicked := not _dragging and _map_navigation_allowed(point)
+			var id := _drag_marker
+			_cancel_drag()
+			get_viewport().set_input_as_handled()
+			if clicked:
+				if not id.is_empty() and _marker_at(point) == id:
+					select_place(id)
+				elif id.is_empty():
+					close_detail()
+			return
+		if not mouse.pressed or not _map_navigation_allowed(point):
+			return
+		if mouse.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+			var direction := 1.0 if mouse.button_index == MOUSE_BUTTON_WHEEL_UP else -1.0
+			set_map_zoom(zoom_level + direction * ZOOM_STEP * maxf(mouse.factor, 0.1), point)
+			get_viewport().set_input_as_handled()
+		elif mouse.button_index == MOUSE_BUTTON_LEFT and zoom_level > MIN_ZOOM:
+			_drag_pending = true
+			_drag_start = point
+			_drag_pan = _pan
+			_drag_marker = _marker_at(point)
+			get_viewport().set_input_as_handled()
+	elif event is InputEventMagnifyGesture and _map_navigation_allowed(point):
+		set_map_zoom(zoom_level * event.factor, point)
+		get_viewport().set_input_as_handled()
+	elif event is InputEventPanGesture and _map_navigation_allowed(point) and zoom_level > MIN_ZOOM:
+		_pan -= event.delta * 24.0
+		_apply_map_transform()
+		get_viewport().set_input_as_handled()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		_window_active = false
+		_pointer_seen = false
+		_cancel_drag()
+		_set_hovered_marker("")
+	elif what == NOTIFICATION_APPLICATION_FOCUS_IN:
+		_window_active = true
+		# 弹窗或切换应用期间根视口未必收到鼠标移动，不能继续使用旧坐标。
+		_pointer_seen = false
 
 func _build_hud() -> void:
 	rect(self, Vector2.ZERO, Vector2(CANVAS.x, HUD_HEIGHT), Color("070e19ee"))
@@ -173,14 +333,15 @@ func _build_markers() -> void:
 	_leader_layer = Control.new()
 	_leader_layer.name = "leader_layer"
 	_leader_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_leader_layer)
+	_map_layer.add_child(_leader_layer)
 	for id in order:
 		_draw_leader(placements[id], by_id[id].accent)
 	var add_order := order.duplicate()
 	add_order.reverse()
 	for id in add_order:
 		var marker = built[id]
-		add_child(marker)
+		_map_layer.add_child(marker)
+		_base_tips[id] = placements[id].tip
 		marker.set_tip(placements[id].tip)
 		marker.fit_name(CARD_BOUNDS)
 		markers[id] = marker
@@ -466,6 +627,9 @@ func _on_card_action(kind: String, id: String) -> bool:
 # ------------------------------------------------------------------- 悬停
 
 func _on_marker_hover(id: String, hovered: bool) -> void:
+	if _hover_input_blocked():
+		_set_hovered_marker("")
+		return
 	# 每帧指针轮询给出权威结果；进入／离开信号只做即时提示，并先用实际指针位置复核，
 	# 避免合成输入与系统事件交错时反复清除悬停、打断动画。
 	if hovered:
@@ -530,6 +694,9 @@ func handle_escape() -> bool:
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouse:
 		_track_pointer((event as InputEventMouse).position)
+	if event is InputEventGesture:
+		_track_pointer(event.position)
+	_navigate_map(event)
 	if event is InputEventMouseMotion:
 		_update_hover_from_pointer()
 
@@ -550,6 +717,8 @@ func _pointer_point() -> Vector2:
 	return get_global_mouse_position()
 
 func _marker_at(point: Vector2) -> String:
+	if not MAP_VIEW.has_point(point) or ZOOM_BAR.has_point(point):
+		return ""
 	for id in markers:
 		var marker = markers[id]
 		if is_instance_valid(marker) and marker.get_hit_rect().has_point(point):
@@ -557,6 +726,8 @@ func _marker_at(point: Vector2) -> String:
 	return ""
 
 func _pointer_over_marker(id: String) -> bool:
+	if not MAP_VIEW.has_point(_pointer_point()) or ZOOM_BAR.has_point(_pointer_point()):
+		return false
 	var marker = markers.get(id)
 	if not is_instance_valid(marker):
 		return false
@@ -583,15 +754,18 @@ func _pointer_over_map_layer() -> bool:
 			return false
 	return true
 
+func _hover_input_blocked() -> bool:
+	return (not _window_active or _dragging or Game.transition_locked or Game.battle_busy
+		or is_instance_valid(_week_dialog) or not _pointer_over_map_layer())
+
 func _update_hover_from_pointer() -> void:
-	if Game.transition_locked or Game.battle_busy:
-		return
-	if is_instance_valid(_week_dialog):
-		return
-	if not _pointer_over_map_layer():
+	# 暂停悬停更新前同时清除视觉，避免弹层关闭或失焦后保留旧地点的高亮。
+	if _hover_input_blocked():
+		_set_hovered_marker("")
 		return
 	var point := _pointer_point()
 	if is_instance_valid(detail) and detail.get_global_rect().has_point(point):
+		_set_hovered_marker("")
 		return
 	_set_hovered_marker(_marker_at(point))
 
@@ -630,6 +804,7 @@ func show_weeks() -> void:
 	dialog.popup_centered(Vector2i(590, 300))
 
 func _close_weeks() -> void:
+	_pointer_seen = false
 	if is_instance_valid(_week_dialog):
 		_week_dialog.queue_free()
 	_week_dialog = null
