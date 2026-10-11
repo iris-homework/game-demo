@@ -140,7 +140,7 @@
     "description": "城市最高的建筑，沃斯集团总部。高处的办公空间彰显集团的权势。",
     "mapAnchor": [
       0.503,
-      0.351
+      0.22
     ],
     "hitArea": {
       "type": "rect",
@@ -399,7 +399,40 @@
     "description": "旧环线终点站旁的候车楼改建而成。招牌彻夜亮着，夜班工人与过路人来去频繁。",
     "mapAnchor": [
       0.455,
-      0.808
+      0.69
+    ],
+    "hitArea": {
+      "type": "rect",
+      "size": [
+        0.034,
+        0.07
+      ]
+    },
+    "services": [],
+    "mapDisplay": {
+      "offset": [
+        0,
+        0
+      ],
+      "labelOffset": [
+        0,
+        0
+      ],
+      "avatarSide": "left"
+    }
+  },
+  {
+    "id": "church",
+    "name": "义体教会",
+    "backgroundAssetId": "church",
+    "unlockCondition": {
+      "completed": "E01"
+    },
+    "lockHint": "先在地下酒馆接下委托",
+    "description": "金属骨架、冷色灯带与全息圣像构成庄严的礼拜空间，祭坛陈列着精密义体。信众将机械替换与身体改造视为接近理想生命的信仰实践，电子祷词与义体运转声在穹顶下回荡。",
+    "mapAnchor": [
+      0.51,
+      0.445
     ],
     "hitArea": {
       "type": "rect",
@@ -432,7 +465,7 @@
     "description": "沃斯集团拥有的城市最大商场。商品与补给功能待设计。",
     "mapAnchor": [
       0.449,
-      0.398
+      0.3
     ],
     "hitArea": {
       "type": "rect",

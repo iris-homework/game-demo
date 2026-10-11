@@ -42,6 +42,9 @@ func motion(point: Vector2) -> void:
 	event.position = get_viewport().get_final_transform() * point
 	event.global_position = event.position
 	Input.warp_mouse(event.position)
+	# macOS 的原生 warp 事件异步送达；先处理它，再提交精确的窗口坐标。
+	await get_tree().process_frame
+	await get_tree().process_frame
 	Input.parse_input_event(event)
 	await get_tree().process_frame
 	await get_tree().process_frame
@@ -168,7 +171,23 @@ func _ready() -> void:
 		if failures == 0: print("MAP CAPTURE OK: %d checks; %s" % [checks, output_dir])
 		get_tree().quit(0 if failures == 0 else 1)
 		return
-	check(app.view.markers.size() == 16, "16 actual marker controls")
+	check(app.view.markers.size() == 17, "17 actual marker controls including church")
+	await motion(app.view.get_marker_center("church"))
+	await settle(0.35)
+	check(is_instance_valid(app.view.preview), "church hover opens preview")
+	await click(app.view.get_marker_center("church"))
+	check(app.view.selected_id == "church" and card_inside(app.view.detail), "church marker opens in-bounds detail")
+	check(map_button("enter_place") != null and map_button("heal_place") == null, "church exposes visit without invented services")
+	await shot("church-detail")
+	await click(button_center(map_button("enter_place")))
+	check(Game.page == "place" and Game.state.currentPlaceId == "church", "church enters through actual button input")
+	await settle(0.4)
+	await shot("church-place")
+	await click(button_center(text_button("返回城市地图")))
+	check(Game.page == "map" and Game.map_place_state("church").current, "church return button updates map avatar")
+	await motion(Vector2(18,88))
+	await shot("church-return")
+	await stage()
 	check(not is_instance_valid(app.view.detail), "overview starts without fixed card")
 	var avatar: Control = app.view.markers.bar.get("_avatar_root")
 	await click(button_center(avatar))

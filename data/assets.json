@@ -138,5 +138,9 @@
   "alley_battle": {
     "path": "res://assets/backgrounds/alley_battle.png",
     "kind": "battle_background"
+  },
+  "church": {
+    "path": "",
+    "kind": "pending"
   }
 }

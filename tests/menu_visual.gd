@@ -210,7 +210,7 @@ func input_suite() -> void:
 	var adventure: Dictionary = Game.state.duplicate(true)
 	Game.menu()
 	await settle(0.5)
-	check("医院" in app.view.progress_summary.text and "革命军" in app.view.progress_summary.text,"summary uses real location and faction")
+	check("医院" in app.view.progress_summary.text and "归零运动" in app.view.progress_summary.text,"summary uses real location and faction")
 	check(not button("continue_commission").disabled,"memory progress enables continue")
 	var revision_before := Game.revision
 	await settle(0.4)

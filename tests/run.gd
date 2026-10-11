@@ -37,7 +37,7 @@ func _ready() -> void:
 	Game.save_enabled = false
 	Game.save_path = "user://automated_test_checkpoint.json"
 	# Validate authored references, completion nodes and all three return paths.
-	check(Game.places.size() == 16, "16 places")
+	check(Game.places.size() == 17, "17 places including church")
 	check(Game.events.size() == 13, "12 events with split E05")
 	for e in Game.events.values():
 		check(not Game.place_data(e.placeId).is_empty(), e.id + " place exists")

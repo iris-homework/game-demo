@@ -182,7 +182,7 @@ func chrome(section: String, show_days: bool = true) -> void:
 			label(self,"第 %d 天" % day,Vector2(x+9,26),Vector2(60,28),15,INK if current else MUTED)
 			if current: rect(self,Vector2(x,66),Vector2(65,3),PINK)
 		label(self,"W E E K  0 1    /    午夜开场",Vector2(583,72),Vector2(420,20),11,MUTED)
-	var faction: String = {"":"自由佣兵","company":"公司特遣部","resistance":"归零运动"}.get(Game.state.get("faction",""),"自由佣兵")
+	var faction := faction_label()
 	label(self,faction,Vector2(1026,13),Vector2(214,31),17,CYAN)
 	label(self,"%d CR" % int(Game.state.get("credits",0)),Vector2(1026,49),Vector2(210,30),17)
 	button(self,"退出演练" if Game.training_mode else "菜单",Vector2(1263,23),Vector2(145,49),Game.menu)
@@ -245,3 +245,7 @@ func cut_panel(parent: Node, pos: Vector2, dimensions: Vector2, fill: Color, edg
 	polygon(holder,[Vector2(cut,0),Vector2(w,0),Vector2(w,h-cut),Vector2(w-cut,h),Vector2(0,h),Vector2(0,cut)],edge)
 	polygon(holder,[Vector2(cut+1,2),Vector2(w-2,2),Vector2(w-2,h-cut-1),Vector2(w-cut-1,h-2),Vector2(2,h-2),Vector2(2,cut+1)],fill)
 	return holder
+
+## 地图、菜单与通用 HUD 共用同一阵营显示名，存档仍保存原 ID。
+func faction_label() -> String:
+	return {"": "自由佣兵", "company": "公司特遣部", "resistance": "归零运动"}.get(Game.state.get("faction", ""), "自由佣兵")

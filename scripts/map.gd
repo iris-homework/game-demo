@@ -122,7 +122,7 @@ func _build_hud() -> void:
 	_hud_hp_text = label(self, "", Vector2(202.0, 34.0), Vector2(126.0, 28.0), 16, CREAM)
 	label(self, "%d CR" % int(Game.state.get("credits", 0)), Vector2(340.0, 12.0), Vector2(116.0, 30.0), 20, CREAM)
 	label(self, "信用点", Vector2(340.0, 44.0), Vector2(116.0, 20.0), 12, MUTED)
-	var faction: String = {"": "自由佣兵", "company": "公司特遣部", "resistance": "革命军"}.get(Game.state.get("faction", ""), "自由佣兵")
+	var faction := faction_label()
 	label(self, faction, Vector2(470.0, 12.0), Vector2(116.0, 30.0), 19, CYAN)
 	label(self, "当前阵营", Vector2(470.0, 44.0), Vector2(116.0, 20.0), 12, MUTED)
 	# Keep the date centered on the canvas, independent of the fields to its left.

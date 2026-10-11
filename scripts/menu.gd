@@ -4,7 +4,6 @@ extends DemoUI
 ## 原生背景与诺伦局部动画由菜单环境组件提供，本脚本不绘制角色、背景或帧素材。
 
 const MENU_ENVIRONMENT := preload("res://scripts/menu/menu_environment.gd")
-const FACTION_LABELS := {"": "自由佣兵", "company": "公司特遣部", "resistance": "革命军"}
 const COLUMN_X := 980.0
 const COLUMN_WIDTH := 350.0
 const MASK_LEFT := 920.0
@@ -123,7 +122,7 @@ func _menu_button(node_name: String, text: String, pos: Vector2, dimensions: Vec
 func _summary_text() -> String:
 	if not Game.state.is_empty():
 		var place_name := str(Game.place_data(Game.state.get("currentPlaceId", "")).get("name", ""))
-		var faction := str(FACTION_LABELS.get(Game.state.get("faction", ""), "自由佣兵"))
+		var faction := faction_label()
 		if place_name.is_empty():
 			return faction
 		return "%s  ·  %s" % [place_name, faction]

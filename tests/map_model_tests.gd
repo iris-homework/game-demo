@@ -46,7 +46,7 @@ func _ready() -> void:
 	Game.save_path = evidence_dir.path_join("test-checkpoint.json")
 	Game.meta_path = evidence_dir.path_join("test-meta.json")
 	reset_map()
-	check(Game.places.size() == 16, "all 16 existing places retained")
+	check(Game.places.size() == 17, "16 existing places plus church")
 	var catalog: Dictionary = Game.read_data("../assets/icons/map/locations.json")
 	var seen: Array = []
 	for p in Game.places:
@@ -56,6 +56,23 @@ func _ready() -> void:
 		var matching: Array = catalog.locations.filter(func(e): return e.id == p.id)
 		check(matching.size() == 1 and ResourceLoader.exists("res://assets/icons/map/" + str(matching[0].icon)), "existing symbol " + p.id)
 	check(Game.texture(Game.map_config.cityMapAssetId) != null, "city texture is configured")
+	Game.state = Game.initial_state()
+	check(not Game.map_place_state("church").open, "church opens after accepting the tavern contract")
+	Game.visit("church")
+	check(Game.state.currentPlaceId == "bar", "locked church visit is rejected")
+	reset_map()
+	check(Game.map_place_state("church").open and Game.available_events("church").is_empty(), "church is visitable without invented events")
+	var church_before: Dictionary = Game.state.duplicate(true)
+	Game.visit("church")
+	check(Game.page == "place" and Game.state.currentPlaceId == "church", "church enters existing place route")
+	for key in ["currentHp", "currentDay", "credits", "completedEventIds", "flags", "deck"]:
+		check(Game.state[key] == church_before[key], "church visit preserves " + key)
+	check(Game.save_game(), "church checkpoint saved to test path")
+	Game.state = {}
+	check(Game.load_game() and Game.state.currentPlaceId == "church" and Game.page == "place", "church checkpoint restores location")
+	Game.go_map()
+	check(Game.map_place_state("church").current and not Game.map_place_state("church").target, "church return updates avatar without changing objective")
+	reset_map()
 	check(target_ids() == ["E03"], "initial target is hive")
 	check(Game.map_place_state("bar").current, "current avatar at bar")
 	check(Game.map_place_state("bar").completed, "bar completed and no new event")
