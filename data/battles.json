@@ -4,7 +4,7 @@
     "eventId": "E02",
     "name": "骚动的垃圾场",
     "participants": [
-      "noren",
+      "@player",
       "robot"
     ],
     "returnNodeByResult": {
@@ -25,7 +25,7 @@
     "eventId": "E03",
     "name": "蜂巢城寨的艾克",
     "participants": [
-      "noren",
+      "@player",
       "ike"
     ],
     "returnNodeByResult": {
@@ -46,7 +46,7 @@
     "eventId": "E04",
     "name": "后巷深处",
     "participants": [
-      "noren",
+      "@player",
       "gang"
     ],
     "returnNodeByResult": {
@@ -67,7 +67,7 @@
     "eventId": "E05A",
     "name": "港口追击 · 理查德",
     "participants": [
-      "noren",
+      "@player",
       "richard"
     ],
     "returnNodeByResult": {
@@ -88,7 +88,7 @@
     "eventId": "E05B",
     "name": "港口追击 · 卢米娜",
     "participants": [
-      "noren",
+      "@player",
       "lumina"
     ],
     "returnNodeByResult": {
@@ -109,7 +109,7 @@
     "eventId": "E08",
     "name": "赛博精神病",
     "participants": [
-      "noren",
+      "@player",
       "psycho"
     ],
     "returnNodeByResult": {
@@ -130,7 +130,7 @@
     "eventId": "E09",
     "name": "危险的野狼",
     "participants": [
-      "noren",
+      "@player",
       "wolves"
     ],
     "returnNodeByResult": {
@@ -151,7 +151,7 @@
     "eventId": "E10",
     "name": "进攻发电厂",
     "participants": [
-      "noren",
+      "@player",
       "wolves",
       "company_robot"
     ],
@@ -173,7 +173,7 @@
     "eventId": "E11",
     "name": "变异的鱼",
     "participants": [
-      "noren",
+      "@player",
       "fish"
     ],
     "returnNodeByResult": {
@@ -194,7 +194,7 @@
     "eventId": "E12",
     "name": "机甲复仇",
     "participants": [
-      "noren",
+      "@player",
       "gang"
     ],
     "returnNodeByResult": {

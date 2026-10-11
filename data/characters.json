@@ -2,7 +2,8 @@
   "noren": {
     "displayName": "诺伦",
     "portraitAssetId": "noren",
-    "battlePortraitAssetId": "noren_battle"
+    "battlePortraitAssetId": "noren_battle",
+    "mapAvatarCrop": [0.27, 0.005, 0.42, 0.28]
   },
   "bartender": {
     "displayName": "老板娘",

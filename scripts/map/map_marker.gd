@@ -148,7 +148,7 @@ func _build_avatar(side: String, spec: Dictionary) -> void:
 	_avatar_pic.stretch_mode = TextureRect.STRETCH_SCALE
 	_avatar_pic.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	_avatar_pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_avatar_pic.texture = MidnightMapAssets.avatar_texture(spec.get("avatar_texture", null))
+	_avatar_pic.texture = MidnightMapAssets.avatar_texture(spec.get("avatar_texture", null), spec.get("avatar_crop", [0.0, 0.0, 1.0, 1.0]))
 	var material := ShaderMaterial.new()
 	material.shader = preload("res://scripts/map/round_avatar.gdshader")
 	_avatar_pic.material = material

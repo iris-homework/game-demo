@@ -69,9 +69,8 @@ func enter(params: Dictionary) -> void:
 	cut_panel(self,Vector2(550,24),Vector2(340,48),INK,Color("3d9eff"),12)
 	turn_label = label(self,"回合 %02d  /  你的回合" % model.turn,Vector2(566,29),Vector2(308,37),19,Color("8fcaff"))
 	turn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var n_asset: String = Game.characters.noren.get("battlePortraitAssetId", "")
-	player_portrait = battle_portrait(n_asset,Vector2(90,215)+ACTOR_OFFSET,Vector2(630,335))
-	label(self,Game.display_name("noren"),Vector2(305,552)+ACTOR_OFFSET,Vector2(280,33),23)
+	player_portrait = battle_portrait(Game.player_asset_id("battlePortraitAssetId"),Vector2(90,215)+ACTOR_OFFSET,Vector2(630,335))
+	label(self,Game.display_name(Game.PLAYER_REFERENCE),Vector2(305,552)+ACTOR_OFFSET,Vector2(280,33),23)
 	label(self,"NEURAL LINK / ONLINE",Vector2(268,590)+ACTOR_OFFSET,Vector2(340,27),12,CYAN)
 	for i in model.enemies.size():
 		var pos := enemy_position(i)

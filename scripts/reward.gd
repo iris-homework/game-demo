@@ -66,6 +66,7 @@ func open_picker() -> void:
 	suspended_buttons.clear()
 	for node in find_children("*","Button",true,false):
 		if not node.disabled:
+			if node.has_focus(): node.release_focus()
 			node.disabled = true
 			suspended_buttons.append(node)
 	picker = Control.new()
@@ -111,7 +112,23 @@ func open_picker() -> void:
 	for i in focus_buttons.size():
 		focus_buttons[i].focus_next = focus_buttons[i].get_path_to(focus_buttons[(i+1)%focus_buttons.size()])
 		focus_buttons[i].focus_previous = focus_buttons[i].get_path_to(focus_buttons[(i+focus_buttons.size()-1)%focus_buttons.size()])
-	option_buttons[0].grab_focus()
+	# Start neutral; Tab can enter the focus loop when using the keyboard.
+
+func _input(event: InputEvent) -> void:
+	if not is_instance_valid(picker): return
+	var focused := get_viewport().gui_get_focus_owner()
+	if event is InputEventMouseMotion:
+		# Mouse hover takes over without leaving a keyboard highlight behind.
+		if is_instance_valid(focused) and picker.is_ancestor_of(focused):
+			focused.release_focus()
+	elif not is_instance_valid(focused):
+		# Enter the modal's focus loop explicitly when it starts without focus.
+		if event.is_action_pressed("ui_focus_next"):
+			option_buttons[0].grab_focus()
+			get_viewport().set_input_as_handled()
+		elif event.is_action_pressed("ui_focus_prev"):
+			option_buttons[0].get_node(option_buttons[0].focus_previous).grab_focus()
+			get_viewport().set_input_as_handled()
 
 func close_picker() -> void:
 	if not is_instance_valid(picker): return

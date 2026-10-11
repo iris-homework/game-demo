@@ -116,7 +116,7 @@ func _build_map() -> void:
 func _build_hud() -> void:
 	rect(self, Vector2.ZERO, Vector2(CANVAS.x, HUD_HEIGHT), Color("070e19ee"))
 	rect(self, Vector2(0.0, HUD_HEIGHT - 1.0), Vector2(CANVAS.x, 1.0), Color("2f6178"))
-	label(self, Game.display_name("noren") + " / 城市总览", Vector2(24.0, 8.0), Vector2(320.0, 26.0), 19, CREAM)
+	label(self, Game.display_name(Game.PLAYER_REFERENCE) + " / 城市总览", Vector2(24.0, 8.0), Vector2(320.0, 26.0), 19, CREAM)
 	panel(self, Vector2(24.0, 46.0), Vector2(170.0, 12.0), Color("382333"), Color("805071"))
 	_hud_hp_fill = rect(self, Vector2(26.0, 48.0), Vector2(166.0, 8.0), PINK)
 	_hud_hp_text = label(self, "", Vector2(202.0, 34.0), Vector2(126.0, 28.0), 16, CREAM)
@@ -150,9 +150,7 @@ func _refresh_hud() -> void:
 # ------------------------------------------------------------------- 标记
 
 func _build_markers() -> void:
-	var avatar_texture: Texture2D = Game.texture("noren")
-	if avatar_texture == null:
-		avatar_texture = MidnightMapAssets.portrait_texture()
+	var avatar_texture: Texture2D = Game.texture(Game.player_asset_id())
 	var specs: Array = []
 	for place in Game.places:
 		specs.append(_make_spec(place, avatar_texture))
@@ -175,6 +173,7 @@ func _build_markers() -> void:
 			"persistent_name": spec.persistent_name, "name": spec.name,
 			"name_offset": spec.label_offset, "avatar": spec.avatar,
 			"avatar_side": spec.avatar_side, "avatar_texture": spec.avatar_texture,
+			"avatar_crop": spec.avatar_crop,
 			"badges": spec.badges, "font": base_font, "tooltip": spec.tooltip,
 		})
 		marker.chosen.connect(_on_marker_chosen)
@@ -255,7 +254,8 @@ func _make_spec(place: Dictionary, avatar_texture: Texture2D) -> Dictionary:
 		"label_offset": label_offset, "avatar_side": side, "avatar": current,
 		"current": current, "target": target, "persistent_name": current or target,
 		"accent": accent, "frame_tint": frame_tint, "symbol_tint": symbol_tint,
-		"badges": badges, "avatar_texture": avatar_texture, "tooltip": tooltip,
+		"badges": badges, "avatar_texture": avatar_texture,
+		"avatar_crop": Game.player_character().get("mapAvatarCrop", [0.0, 0.0, 1.0, 1.0]), "tooltip": tooltip,
 	}
 
 func _resolve_placements(order: Array, by_id: Dictionary, built: Dictionary) -> Dictionary:

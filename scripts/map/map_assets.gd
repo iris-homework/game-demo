@@ -11,7 +11,6 @@ extends RefCounted
 const ICON_DIR := "res://assets/icons/map/"
 const CATALOG_PATH := "res://assets/icons/map/locations.json"
 const MAP_PATHS := ["res://assets/map/map.jpg", "res://assets/map/map.png"]
-const PORTRAIT_PATHS := ["res://assets/characters/noren.png"]
 const FRAME_PATHS := {
 	"normal": "res://assets/icons/map/marker_frame.svg",
 	"hover": "res://assets/icons/map/marker_frame_hover.svg",
@@ -29,26 +28,30 @@ static var _icons := {}
 static var _catalog_loaded := false
 static var _map_texture: Texture2D = null
 static var _map_attempted := false
-static var _portrait_texture: Texture2D = null
-static var _portrait_attempted := false
-static var _avatar_texture: Texture2D = null
+static var _avatar_textures := {}
 
-static func avatar_texture(source: Texture2D = null) -> Texture2D:
-	if _avatar_texture != null:
-		return _avatar_texture
-	if source == null:
-		source = portrait_texture()
+static func avatar_texture(source: Texture2D = null, crop: Array = [0.0, 0.0, 1.0, 1.0]) -> Texture2D:
+	if source == null: source = portrait_texture()
+	if source == null: return null
+	# Resource instances may be recreated when the old view releases its texture.
+	var source_key := source.resource_path if not source.resource_path.is_empty() else str(source.get_instance_id())
+	var key := source_key + ":" + str(crop)
+	if _avatar_textures.has(key): return _avatar_textures[key]
 	var image := _rgba_image_of(source)
-	if image == null:
-		return null
+	if image == null: return null
 	var dimensions := image.get_size()
-	var crop := Rect2i(Vector2i(Vector2(dimensions) * Vector2(0.27, 0.005)),
-		Vector2i(Vector2(dimensions) * Vector2(0.42, 0.28)))
-	var head := image.get_region(crop)
+	var region := Rect2i(Vector2i.ZERO, dimensions)
+	if crop.size() == 4:
+		var position := Vector2(float(crop[0]), float(crop[1])).clamp(Vector2.ZERO, Vector2.ONE)
+		var size := Vector2(float(crop[2]), float(crop[3])).clamp(Vector2.ZERO, Vector2.ONE - position)
+		var proposed := Rect2i(Vector2i(Vector2(dimensions) * position), Vector2i(Vector2(dimensions) * size))
+		if proposed.size.x > 0 and proposed.size.y > 0: region = proposed
+	var head := image.get_region(region)
 	head.resize(128, 128, Image.INTERPOLATE_LANCZOS)
 	head.generate_mipmaps()
-	_avatar_texture = ImageTexture.create_from_image(head)
-	return _avatar_texture
+	var avatar := ImageTexture.create_from_image(head)
+	_avatar_textures[key] = avatar
+	return avatar
 
 static func frame(state_name: String) -> Texture2D:
 	var key := state_name if FRAME_PATHS.has(state_name) else "normal"
@@ -81,16 +84,7 @@ static func map_texture() -> Texture2D:
 	return _map_texture
 
 static func portrait_texture() -> Texture2D:
-	if _portrait_attempted:
-		return _portrait_texture
-	_portrait_attempted = true
-	for path in PORTRAIT_PATHS:
-		if ResourceLoader.exists(path):
-			var res = load(path)
-			if res is Texture2D:
-				_portrait_texture = res
-				break
-	return _portrait_texture
+	return Game.texture(Game.player_asset_id())
 
 static func icon_file(place_id: String) -> String:
 	_ensure_catalog()

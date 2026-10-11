@@ -168,7 +168,7 @@ func chrome(section: String, show_days: bool = true) -> void:
 	polygon(self,[Vector2.ZERO,Vector2(457,0),Vector2(432,95),Vector2(0,95)],Color("202331"))
 	rect(self,Vector2(0,94),Vector2(1440,1),Color("4a505e"))
 	rect(self,Vector2(0,94),Vector2(314,3),PINK)
-	label(self,Game.display_name("noren") + "  /  " + section,Vector2(36,8),Vector2(395,36),20,CREAM)
+	label(self,Game.display_name(Game.PLAYER_REFERENCE) + "  /  " + section,Vector2(36,8),Vector2(395,36),20,CREAM)
 	panel(self,Vector2(37,51),Vector2(277,17),Color("382333"),Color("805071"))
 	hp_fill = rect(self,Vector2(40,54),Vector2(271,11),PINK)
 	hp_label = label(self,"",Vector2(327,44),Vector2(140,33),18)
@@ -204,7 +204,7 @@ func tag(text: String, pos: Vector2, color: Color = CYAN, width: float = 180) ->
 func portrait(id: String, side: String, active: bool = true, top: float = 150, height: float = 590) -> void:
 	if id.is_empty(): return
 	var x := 120.0 if side == "left" else 900.0
-	var aid: String = Game.characters.get(id, {}).get("portraitAssetId", "")
+	var aid: String = Game.characters.get(Game.resolve_character_id(id), {}).get("portraitAssetId", "")
 	var pic := image_asset(self, aid, Vector2(x,top), Vector2(390,height), false)
 	if pic:
 		# Original RGB art is preserved; white paper is keyed only at render time.
@@ -220,7 +220,7 @@ func portrait(id: String, side: String, active: bool = true, top: float = 150, h
 		label(box, "◇", Vector2(126,45), Vector2(100,110), 76, Color("6d4b75"))
 		label(box, Game.display_name(id), Vector2(22,195), Vector2(290,65), 32, CREAM if active else MUTED)
 		label(box, "角色立绘待补", Vector2(22,265), Vector2(290,40), 17, MUTED)
-		label(box, "CHARACTER / " + id.to_upper(), Vector2(22,320), Vector2(290,30), 12, Color("806988"))
+		label(box, "CHARACTER / " + Game.resolve_character_id(id).to_upper(), Vector2(22,320), Vector2(290,30), 12, Color("806988"))
 
 func fade_in() -> void:
 	modulate.a = 0

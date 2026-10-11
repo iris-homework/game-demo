@@ -6,6 +6,9 @@ signal changed
 signal notice(message: String)
 var assets: Dictionary
 var characters: Dictionary
+var player_characters: Dictionary
+const LEGACY_PLAYER_CHARACTER_ID := "noren"
+const PLAYER_REFERENCE := "@player"
 var places: Array
 var events: Dictionary
 var battles: Dictionary
@@ -48,17 +51,99 @@ func _ready() -> void:
 	prototype_rules = read_data("prototype/combat.json")
 	prototype_rules.cyberware = read_data("prototype/cyberware.json")
 	reward_rules = read_data("prototype/rewards.json")
+	player_characters = read_data("player_characters.json")
 	map_config = read_data("map.json")
 	load_meta()
 
-func initial_state() -> Dictionary:
-	return {"schemaVersion":2, "currentWeek":1, "currentDay":1, "currentHp":100, "maxHp":100, "combat":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "faction":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "battleId":"", "result":"", "battleHistory":[], "deck":[], "battleReward":{}, "portraits":{"left":"noren", "right":"bartender"}}
+func player_character_id() -> String:
+	return state.get("playerCharacterId", config.defaultPlayerCharacterId)
 
-func new_game() -> void:
+func player_definition() -> Dictionary:
+	return player_characters.get(player_character_id(), {})
+
+func player_character() -> Dictionary:
+	return characters.get(player_character_id(), {})
+
+func player_asset_id(field: String = "portraitAssetId") -> String:
+	return player_character().get(field, "")
+
+func resolve_character_id(id: String) -> String:
+	return player_character_id() if id == PLAYER_REFERENCE else id
+
+func cyberware_definition(id: String) -> Dictionary:
+	var found: Dictionary = {}
+	for definition in prototype_rules.cyberware.cards:
+		if not definition is Dictionary or definition.get("id") != id: continue
+		if not found.is_empty(): return {} # Duplicate catalog IDs are ambiguous.
+		found = definition
+	return found
+
+func player_cyberware(player_id: String = "") -> Dictionary:
+	if player_id.is_empty(): player_id = player_character_id()
+	if not valid_player_character(player_id): return {}
+	var rules: Dictionary = prototype_rules.cyberware.duplicate(true)
+	rules.cards = []
+	for id in player_characters[player_id].get("cyberwareIds", []):
+		rules.cards.append(cyberware_definition(id).duplicate(true))
+	return rules
+
+func valid_player_character(id) -> bool:
+	if not id is String or not player_characters.has(id) or not characters.has(id): return false
+	var character = characters[id]
+	if not character is Dictionary or not character.get("displayName") is String: return false
+	if character.displayName.is_empty(): return false
+	for field in ["portraitAssetId", "battlePortraitAssetId"]:
+		if not character.get(field) is String: return false
+	if character.has("mapAvatarCrop"):
+		var crop = character.mapAvatarCrop
+		if not crop is Array or crop.size() != 4: return false
+		for value in crop:
+			if not (value is int or value is float) or not is_finite(float(value)): return false
+		if crop[0] < 0 or crop[1] < 0 or crop[2] <= 0 or crop[3] <= 0 or crop[0] + crop[2] > 1 or crop[1] + crop[3] > 1: return false
+	var definition = player_characters[id]
+	if not definition is Dictionary or not definition.get("attributes") is Dictionary: return false
+	var hp = definition.attributes.get("maxHp")
+	if not (hp is int or hp is float) or not is_finite(float(hp)) or hp < 1 or hp != floor(float(hp)): return false
+	if not definition.get("startingDeck") is Array or definition.startingDeck.is_empty(): return false
+	for card_id in definition.startingDeck:
+		if not card_id is String or not (card_catalog.has(card_id) or prototype_rules.cards.has(card_id) or reward_rules.cards.has(card_id)): return false
+	var cyberware_ids = definition.get("cyberwareIds", [])
+	if not cyberware_ids is Array or cyberware_ids.size() > CombatModel.CYBERWARE_LIMIT: return false
+	var seen_cyberware := []
+	for cyberware_id in cyberware_ids:
+		if not cyberware_id is String or cyberware_id in seen_cyberware: return false
+		var cyberware := cyberware_definition(cyberware_id)
+		if cyberware.is_empty(): return false
+		if not cyberware.get("name") is String or not cyberware.get("description") is String: return false
+		var amount = cyberware.get("nextAttackBonus")
+		if not (amount is int or amount is float) or not is_finite(float(amount)) or amount < 1 or amount != floor(float(amount)): return false
+		seen_cyberware.append(cyberware_id)
+	# Skills are authored metadata until a specific effect contract is implemented.
+	if not definition.get("skills") is Array: return false
+	var seen := []
+	for skill in definition.skills:
+		if not skill is Dictionary: return false
+		for field in ["id", "name", "description"]:
+			if not skill.get(field) is String: return false
+		if skill.id.is_empty() or skill.id in seen: return false
+		seen.append(skill.id)
+	return true
+
+func initial_state(player_id: String = "") -> Dictionary:
+	if player_id.is_empty(): player_id = config.defaultPlayerCharacterId
+	if not valid_player_character(player_id): return {}
+	var hp := int(player_characters[player_id].attributes.maxHp)
+	return {"schemaVersion":2, "playerCharacterId":player_id, "currentWeek":1, "currentDay":int(config.initialDay), "currentHp":hp, "maxHp":hp, "combat":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "faction":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "battleId":"", "result":"", "battleHistory":[], "deck":[], "battleReward":{}, "portraits":{"left":PLAYER_REFERENCE, "right":"bartender"}}
+
+func new_game(player_id: String = "") -> void:
 	if transition_locked or battle_busy: return
+	var fresh := initial_state(player_id)
+	if fresh.is_empty():
+		notice.emit("主角配置无效，无法开始委托。")
+		return
 	if training_mode: restore_training()
 	if save_enabled: save_meta()
-	state = initial_state()
+	state = fresh
 	enter_node("intro_01")
 
 func meets(condition: Dictionary, subject: Dictionary = {}) -> bool:
@@ -152,9 +237,10 @@ func node_data() -> Dictionary:
 	return event_data().get("nodes", {}).get(state.get("activeNodeId", ""), {})
 
 func display_name(id: String) -> String:
-	return characters.get(id, {}).get("displayName", "旁白")
+	return characters.get(resolve_character_id(id), {}).get("displayName", "旁白")
 
 func render_text(value: String) -> String:
+	value = value.replace("{主角姓名}", display_name(PLAYER_REFERENCE))
 	var target: String = state.get("targetId", "")
 	if "{目标姓名}" in value:
 		if not characters.has(target):
@@ -202,7 +288,7 @@ func start_event(id: String) -> bool:
 	state.result = ""
 	state.battleReward = {}
 	state.combat = {}
-	state.portraits = {"left":"noren", "right":""}
+	state.portraits = {"left":PLAYER_REFERENCE, "right":""}
 	enter_node(e.startNodeId)
 	return true
 
@@ -285,7 +371,7 @@ func enter_node(id: String) -> void:
 			if side in ["left", "right"] and not n.get("speakerId", "").is_empty():
 				var speaker: String = n.speakerId
 				var other := "right" if side == "left" else "left"
-				if state.portraits[other] == speaker: state.portraits[other] = ""
+				if resolve_character_id(state.portraits[other]) == resolve_character_id(speaker): state.portraits[other] = ""
 				state.portraits[side] = speaker
 	checkpoint()
 
@@ -378,7 +464,8 @@ func save_game() -> bool:
 
 func valid_save(s) -> bool:
 	if not s is Dictionary or s.get("schemaVersion", 0) != 2: return false
-	for k in initial_state():
+	if not valid_player_character(s.get("playerCharacterId")): return false
+	for k in initial_state(s.playerCharacterId):
 		if not s.has(k): return false
 	for key in ["currentScene", "currentPlaceId", "activeEventId", "activeNodeId", "targetId", "faction", "battleId", "result"]:
 		if not s[key] is String: return false
@@ -387,6 +474,7 @@ func valid_save(s) -> bool:
 	if s.maxHp <= 0 or s.currentHp < 0 or s.currentHp > s.maxHp or s.currentDay < 1 or s.currentDay > 7: return false
 	if not s.combat is Dictionary or not s.inventory is Dictionary: return false
 	if not s.combat.is_empty() and not valid_combat(s.combat): return false
+	if not s.combat.is_empty() and s.combat.profile.get("playerCharacterId", s.playerCharacterId) != s.playerCharacterId: return false
 	if not s.completedEventIds is Array or not s.flags is Dictionary or not s.choiceHistory is Dictionary or not s.portraits is Dictionary: return false
 	if not s.claimedRewardIds is Array or not s.battleHistory is Array: return false
 	if not s.deck is Array or not s.battleReward is Dictionary: return false
@@ -397,6 +485,10 @@ func valid_save(s) -> bool:
 	if not s.currentScene in ["map", "place", "dialogue", "battle", "result"]: return false
 	if not s.targetId in ["", "richard", "lumina"] or not s.faction in ["", "company", "resistance"]: return false
 	if not s.portraits.has("left") or not s.portraits.has("right"): return false
+	for side in ["left", "right"]:
+		var portrait_id = s.portraits[side]
+		if not portrait_id is String: return false
+		if not portrait_id in ["", PLAYER_REFERENCE] and not characters.has(portrait_id): return false
 	if place_data(s.currentPlaceId).is_empty(): return false
 	if not events.has(s.activeEventId) or not events[s.activeEventId].nodes.has(s.activeNodeId): return false
 	if s.currentScene == "battle":
@@ -444,9 +536,16 @@ func initialize_combat() -> void:
 	for id in battle.enemyIds: definitions.append(enemy_catalog[id])
 	var model := CombatModel.new()
 	var rules := prototype_rules.duplicate(true)
+	var player := player_definition()
+	rules.playerCharacterId = player_character_id()
+	rules.playerAttributes = player.attributes.duplicate(true)
+	rules.playerSkills = player.skills.duplicate(true)
+	rules.playerCyberwareIds = player.get("cyberwareIds", []).duplicate()
+	rules.cyberware = player_cyberware()
+	rules.deck = player.startingDeck.duplicate()
+	rules.cards.merge(reward_rules.cards, false)
 	if not training_mode:
 		rules.deck.append_array(state.deck)
-		rules.cards.merge(reward_rules.cards, false)
 	model.initialize(state.battleId, int(state.currentHp), int(state.maxHp), rules, definitions, card_catalog)
 	state.combat = model.snapshot()
 
@@ -472,9 +571,11 @@ func heal_at(place_id: String) -> bool:
 
 func start_training(battle_id: String = "B12") -> void:
 	if transition_locked or battle_busy or training_mode or not battles.has(battle_id): return
+	var fresh := initial_state(player_character_id())
+	if fresh.is_empty(): return
 	training_backup = state.duplicate(true)
 	training_mode = true
-	state = initial_state()
+	state = fresh
 	state.targetId = "richard"
 	state.activeEventId = battles[battle_id].eventId
 	state.currentPlaceId = battles[battle_id].placeId
@@ -535,6 +636,13 @@ func save_meta() -> bool:
 func migrate_save(data):
 	if not data is Dictionary: return data
 	data = data.duplicate(true)
+	# Legacy checkpoints always belonged to Noren, even if the default changes.
+	if not data.has("playerCharacterId"):
+		data.playerCharacterId = LEGACY_PLAYER_CHARACTER_ID
+		if data.get("portraits") is Dictionary:
+			for side in ["left", "right"]:
+				if data.portraits.get(side) == LEGACY_PLAYER_CHARACTER_ID:
+					data.portraits[side] = PLAYER_REFERENCE
 	if not data.has("battleReward"): data.battleReward = {}
 	if data.get("schemaVersion",0) == 1:
 		data = data.duplicate(true)
@@ -549,7 +657,8 @@ func migrate_save(data):
 	var combat = data.get("combat", {})
 	if combat is Dictionary and not combat.is_empty():
 		if combat.get("profile") is Dictionary and not combat.profile.has("cyberware"):
-			combat.profile.cyberware = prototype_rules.cyberware.duplicate(true)
+			if valid_player_character(data.get("playerCharacterId")):
+				combat.profile.cyberware = player_cyberware(data.playerCharacterId)
 	return data
 
 func valid_battle_reward(s: Dictionary) -> bool:
@@ -618,6 +727,11 @@ func valid_cyberware_state(c: Dictionary) -> bool:
 		if not (amount is int or amount is float): return false
 		if not is_finite(float(amount)) or amount <= 0 or amount != floor(float(amount)): return false
 		catalog[definition.id] = int(amount)
+	# New battles freeze the character's list beside its definitions. Older
+	# snapshots have no marker and retain their historical (possibly eight) cards.
+	if c.profile.has("playerCyberwareIds"):
+		var ids = c.profile.playerCyberwareIds
+		if not ids is Array or ids.size() > CombatModel.CYBERWARE_LIMIT or ids != catalog.keys(): return false
 	var seen := []
 	var maximum := 0
 	# Unspent buffs can carry over from earlier turns, while cooldown IDs only

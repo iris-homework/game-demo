@@ -2,7 +2,7 @@ extends Node
 var app: Control
 var checks := 0
 var failures := 0
-var output := "res://artifacts/qa/reward-2026-10-09/"
+var output := "res://artifacts/qa/reward-focus-2026-10-11/"
 
 func check(ok: bool, message: String) -> void:
 	checks += 1
@@ -23,7 +23,7 @@ func idle() -> void:
 			return
 	await settle()
 
-func click(pos: Vector2) -> void:
+func move_mouse(pos: Vector2) -> void:
 	var point := get_viewport().get_final_transform() * pos
 	Input.warp_mouse(point)
 	var motion := InputEventMouseMotion.new()
@@ -31,6 +31,10 @@ func click(pos: Vector2) -> void:
 	motion.global_position = point
 	Input.parse_input_event(motion)
 	await get_tree().process_frame
+
+func click(pos: Vector2) -> void:
+	await move_mouse(pos)
+	var point := get_viewport().get_final_transform() * pos
 	for down in [true,false]:
 		var event := InputEventMouseButton.new()
 		event.position = point
@@ -45,6 +49,7 @@ func key(code: Key) -> void:
 	for down in [true,false]:
 		var event := InputEventKey.new()
 		event.keycode = code
+		event.physical_keycode = code
 		event.pressed = down
 		Input.parse_input_event(event)
 		await get_tree().process_frame
@@ -52,6 +57,7 @@ func key(code: Key) -> void:
 
 func shot(id: String) -> void:
 	await settle()
+	print("REWARD SCREENSHOT: " + id)
 	await RenderingServer.frame_post_draw
 	var pixels := get_viewport().get_texture().get_image()
 	check(pixels.save_png(output+id+".png") == OK,"Save screenshot " + id)
@@ -64,9 +70,12 @@ func configure_battle(id: String) -> void:
 	Game.enter_node("battle")
 
 func _ready() -> void:
+	get_window().title = "Reward focus regression"
+	get_window().always_on_top = true
 	Game.save_enabled = false
-	Game.save_path = "res://artifacts/qa/reward-2026-10-09/visual_checkpoint.json"
-	Game.meta_path = "res://artifacts/qa/reward-2026-10-09/visual_meta.json"
+	DirAccess.make_dir_recursive_absolute(output)
+	Game.save_path = output + "visual_checkpoint.json"
+	Game.meta_path = output + "visual_meta.json"
 	output += "%dx%d-" % [get_window().size.x,get_window().size.y]
 	app = load("res://scenes/main.tscn").instantiate()
 	add_child(app)
@@ -96,12 +105,41 @@ func _ready() -> void:
 	await click(Vector2(540,591))
 	check(is_instance_valid(reward.picker) and reward.option_buttons.size() == 3,"Click reward entry opens three cards")
 	check(reward.exit_button.disabled,"Modal blocks underlying exit")
+	check(get_viewport().gui_get_focus_owner() == null,"Opening picker does not highlight the first card by default")
 	await shot("choice")
+	for i in range(3):
+		await move_mouse(reward.option_buttons[i].get_global_rect().get_center())
+		await settle(0.06)
+		for j in range(3):
+			check(reward.option_buttons[j].is_hovered() == (i == j) and not reward.option_buttons[j].has_focus(),"Only hovered card %d is highlighted; inspect card %d" % [i+1,j+1])
+		await shot("hover-%d" % (i+1))
+	await move_mouse(Vector2(194,233))
+	await settle(0.06)
+	for b in reward.option_buttons:
+		check(not b.is_hovered() and not b.has_focus(),"Moving off cards clears highlights")
+	await shot("no-hover")
+	await key(KEY_TAB)
+	check(reward.option_buttons[0].has_focus(),"Tab starts keyboard navigation at first card")
+	await key(KEY_TAB)
+	check(reward.option_buttons[1].has_focus(),"Tab moves focus to second card")
+	await key(KEY_TAB)
+	check(reward.option_buttons[2].has_focus(),"Tab moves focus to third card")
+	await key(KEY_TAB)
+	var focused := get_viewport().gui_get_focus_owner()
+	check(is_instance_valid(focused) and reward.picker.is_ancestor_of(focused),"Tab stays in picker on back button")
+	await key(KEY_TAB)
+	check(reward.option_buttons[0].has_focus(),"Tab wraps inside picker")
+	await shot("keyboard-focus")
+	await move_mouse(reward.option_buttons[1].get_global_rect().get_center())
+	await settle(0.06)
+	check(get_viewport().gui_get_focus_owner() == null and reward.option_buttons[1].is_hovered(),"Mouse resumes on second card without stale keyboard highlight")
+	await shot("mouse-after-keyboard")
 	await click(Vector2(1246,813))
 	check(Game.page == "result" and is_instance_valid(reward.picker),"Outside click cannot leave reward through modal")
 	await key(KEY_ESCAPE)
 	check(Game.page == "result" and not is_instance_valid(reward.picker) and Game.state.deck.is_empty(),"Escape closes picker without claiming or exiting")
 	await click(Vector2(1080,599))
+	check(get_viewport().gui_get_focus_owner() == null,"Reopening picker does not restore stale card focus")
 	await click(Vector2(712,483))
 	await settle()
 	check(Game.state.deck == ["test_reward_02"] and Game.state.battleReward.status == "claimed","Mouse picks only second card")

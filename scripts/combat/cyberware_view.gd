@@ -22,6 +22,8 @@ func _ready() -> void:
 	label(self,"%02d / CYBERWARE" % model.cyberware_cards().size(),Vector2(420,80),Vector2(420,38),20,PURPLE)
 	label(self,"临时名称与效果 · 冷却 1 回合（含当回合）· 下回合恢复可用",Vector2(124,129),Vector2(1000,31),17,MUTED)
 	close_button = button(self,"关闭  ×",Vector2(1190,78),Vector2(146,46),func(): closed.emit())
+	if model.cyberware_cards().is_empty():
+		label(self,"当前角色没有可激活义体",Vector2(310,360),Vector2(820,60),30,MUTED)
 	for i in model.cyberware_cards().size():
 		var definition: Dictionary = model.cyberware_cards()[i]
 		var pos := Vector2(255+(i%3)*330,197+(i/3)*275)

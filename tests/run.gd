@@ -42,7 +42,7 @@ func _ready() -> void:
 	for e in Game.events.values():
 		check(not Game.place_data(e.placeId).is_empty(), e.id + " place exists")
 		for n in e.nodes.values():
-			if n.has("speakerId") and n.speakerId != "": check(Game.characters.has(n.speakerId), "Known character " + n.speakerId)
+			if n.has("speakerId") and n.speakerId != "": check(Game.characters.has(Game.resolve_character_id(n.speakerId)), "Known character " + n.speakerId)
 			if n.has("next"): check(e.nodes.has(n.next), e.id + " next exists")
 			for c in n.get("choices", []): check(c.next == "@map" or e.nodes.has(c.next), "Choice target exists")
 		for id in e.rewardIds: check(Game.rewards.has(id), "Reward exists")
