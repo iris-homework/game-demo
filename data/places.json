@@ -165,7 +165,7 @@
   {
     "id": "port",
     "name": "港口",
-    "backgroundAssetId": "city",
+    "backgroundAssetId": "port",
     "unlockCondition": {
       "flag": "portClue"
     },

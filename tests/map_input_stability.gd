@@ -53,13 +53,17 @@ func _ready() -> void:
 				check(view.selected_id == place.id, "click %s zoom %.1f cycle %d" % [place.id, zoom, cycle])
 	view.close_detail()
 	view.set_map_zoom(1.0)
-	view.set_map_zoom(1.5)
+	view.set_map_zoom(1.1)
 	var magnify := InputEventMagnifyGesture.new()
 	magnify.position = Vector2(700,700)
 	magnify.factor = 1.2
 	dispatch_input(magnify)
 	await get_tree().process_frame
-	check(is_equal_approx(view.zoom_level, 1.8), "one magnify gesture applies exactly once")
+	check(is_equal_approx(view.zoom_level, 1.32), "one magnify gesture applies exactly once")
+	magnify.factor = 2.0
+	dispatch_input(magnify)
+	await get_tree().process_frame
+	check(is_equal_approx(view.zoom_level, 1.5), "magnify clamps to 150 percent")
 	var before: Vector2 = view._pan
 	var pan := InputEventPanGesture.new()
 	pan.position = Vector2(700,700)

@@ -1,0 +1,115 @@
+{
+  "importedOn": "2026-10-12",
+  "assets": [
+    {
+      "assetId": "junkyard",
+      "source": "卡牌游戏美术资源/场景/垃圾场背景.png",
+      "path": "res://assets/backgrounds/junkyard.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "adae7cc9942db00473ba169669cb280e102802fc0de07413b240a338f13d7045"
+    },
+    {
+      "assetId": "hive",
+      "source": "卡牌游戏美术资源/场景/蜂巢城寨背景.png",
+      "path": "res://assets/backgrounds/hive.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "fd44fcfb4097ec6c1bc0693bcb6b6d10fd5561e1610be3edc75922695f3140f2"
+    },
+    {
+      "assetId": "block5",
+      "source": "卡牌游戏美术资源/场景/五号街区背景.png",
+      "path": "res://assets/backgrounds/block5.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "038c5128b46fec323f3b96f107bde8dea987a44db55bb8261643f5ff49d5f322"
+    },
+    {
+      "assetId": "pump",
+      "source": "卡牌游戏美术资源/场景/黑潮泵站背景.png",
+      "path": "res://assets/backgrounds/pump.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "4c2e1d5468356d4300e2169b2d9c5c6f13c8cc49b344d7d1dc387ad9d2bc07f2"
+    },
+    {
+      "assetId": "garden",
+      "source": "卡牌游戏美术资源/场景/白昼庭院背景.png",
+      "path": "res://assets/backgrounds/garden.png",
+      "size": [
+        1619,
+        971
+      ],
+      "sha256": "63e65617a3bef991b4eae99c1a7027b9a5c1e573feaf58e6bf012efc7822d0f9"
+    },
+    {
+      "assetId": "hotel",
+      "source": "卡牌游戏美术资源/场景/末班车旅馆背景.png",
+      "path": "res://assets/backgrounds/hotel.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "6ed577932f8fe4a07525f535a516af945e4dbcb3018ef71c08c95b96a52bc59c"
+    },
+    {
+      "assetId": "church",
+      "source": "卡牌游戏美术资源/场景/义体教会背景.png",
+      "path": "res://assets/backgrounds/church.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "02388e87b15ea509545a8e25161acd4a33d22951ed4e67a7795d7c30eaf577a2"
+    },
+    {
+      "assetId": "port",
+      "source": "卡牌游戏美术资源/场景/港口背景.png",
+      "path": "res://assets/backgrounds/port.png",
+      "size": [
+        1671,
+        941
+      ],
+      "sha256": "05a045c2c25788ff66a42d4a9fbce8a51e66149f6cb39c5a5ceb7ed86268bf9e"
+    },
+    {
+      "assetId": "alley_battle",
+      "source": "卡牌游戏美术资源/场景/后巷战斗场景.png",
+      "path": "res://assets/backgrounds/alley_battle.png",
+      "size": [
+        1586,
+        992
+      ],
+      "sha256": "8e6ec1f2cf9792e82ccf75044833203a76447fe4bced8290af3bd72d5396b13e"
+    },
+    {
+      "assetId": "hive_battle",
+      "source": "卡牌游戏美术资源/场景/蜂巢城寨战斗场景.png",
+      "path": "res://assets/backgrounds/hive_battle.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "e3727989d12c4a115f1bf073c44655c3a9c7481ef533c380a829c5b131844286"
+    },
+    {
+      "assetId": "pump_battle",
+      "source": "卡牌游戏美术资源/场景/黑潮泵站战斗场景.png",
+      "path": "res://assets/backgrounds/pump_battle.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "ec1fa40851c12bf25db968c87d28a06044cd7d9998912a813d694c2001cbab42"
+    }
+  ]
+}

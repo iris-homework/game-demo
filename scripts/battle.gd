@@ -24,6 +24,9 @@ var cyberware_status: Label
 var pile_overlay: Control
 var initialized := false
 const ACTOR_OFFSET := Vector2(0,24)
+const ACTOR_SCALE := 0.85
+# Additional placement belongs to the selected stage; fallback scenes retain the base.
+var actor_offset := ACTOR_OFFSET
 const HAND_SCALE := 0.75
 const PILE_SIZE := Vector2(58,72)
 const DRAW_POS := Vector2(30,800)
@@ -69,12 +72,12 @@ func enter(params: Dictionary) -> void:
 	cut_panel(self,Vector2(550,24),Vector2(340,48),INK,Color("3d9eff"),12)
 	turn_label = label(self,"回合 %02d  /  你的回合" % model.turn,Vector2(566,29),Vector2(308,37),19,Color("8fcaff"))
 	turn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	player_portrait = battle_portrait(Game.player_asset_id("battlePortraitAssetId"),Vector2(90,215)+ACTOR_OFFSET,Vector2(630,335))
-	label(self,Game.display_name(Game.PLAYER_REFERENCE),Vector2(305,552)+ACTOR_OFFSET,Vector2(280,33),23)
-	label(self,"NEURAL LINK / ONLINE",Vector2(268,590)+ACTOR_OFFSET,Vector2(340,27),12,CYAN)
+	player_portrait = battle_portrait(Game.player_asset_id("battlePortraitAssetId"),Vector2(90,215)+actor_offset,Vector2(630,335),Vector2(315,318))
+	label(self,Game.display_name(Game.PLAYER_REFERENCE),Vector2(305,552)+actor_offset,Vector2(280,33),23)
+	label(self,"NEURAL LINK / ONLINE",Vector2(268,590)+actor_offset,Vector2(340,27),12,CYAN)
 	for i in model.enemies.size():
 		var pos := enemy_position(i)
-		var portrait_node := battle_portrait(model.enemies[i].battlePortraitAssetId,pos,Vector2(460,317))
+		var portrait_node := battle_portrait(model.enemies[i].battlePortraitAssetId,pos,Vector2(460,317),Vector2(230,307))
 		enemy_portraits.append(portrait_node)
 		if portrait_node: arena.contact_points.append(pos+Vector2(230,307))
 	refresh_enemy_hud()
@@ -110,18 +113,25 @@ func enter(params: Dictionary) -> void:
 	start_hand.call_deferred()
 
 func battle_background() -> bool:
+	actor_offset = ACTOR_OFFSET
 	var place_asset: String = Game.place_data(battle.placeId).backgroundAssetId
 	var stage_asset: String = Game.assets.get(place_asset,{}).get("battleAssetId","")
 	if stage_asset.is_empty() or Game.texture(stage_asset) == null:
 		background(place_asset,0.15)
 		return false
+	var stage_offset: Array = Game.assets[stage_asset].get("actorOffset", [0,0])
+	actor_offset += Vector2(stage_offset[0],stage_offset[1])
 	rect(self,Vector2.ZERO,Vector2(1440,900),INK)
 	image_asset(self,stage_asset,Vector2.ZERO,Vector2(1440,900),true)
 	rect(self,Vector2.ZERO,Vector2(1440,900),Color(0.025,0.015,0.045,0.16))
 	return true
 
-func battle_portrait(asset_id: String, pos: Vector2, dimensions: Vector2) -> TextureRect:
+func battle_portrait(asset_id: String, pos: Vector2, dimensions: Vector2, foot_anchor: Vector2) -> TextureRect:
 	var node := image_asset(self,asset_id,pos,dimensions,false)
+	if node:
+		# Scale around the soles so stage placement stays grounded.
+		node.pivot_offset = foot_anchor
+		node.scale = Vector2.ONE * ACTOR_SCALE
 	if node and Game.assets.get(asset_id,{}).get("whiteKey",false):
 		var material := ShaderMaterial.new()
 		material.shader = preload("res://shaders/white_key.gdshader")
@@ -132,7 +142,7 @@ func battle_portrait(asset_id: String, pos: Vector2, dimensions: Vector2) -> Tex
 	return node
 
 func enemy_position(index: int) -> Vector2:
-	return Vector2(791 + index*180 - (model.enemies.size()-1)*100,229)+ACTOR_OFFSET
+	return Vector2(791 + index*180 - (model.enemies.size()-1)*100,229)+actor_offset
 
 func refresh_enemy_hud() -> void:
 	if is_instance_valid(enemy_hud):
@@ -140,7 +150,7 @@ func refresh_enemy_hud() -> void:
 		enemy_hud.queue_free()
 	targets.clear()
 	enemy_hud = Control.new()
-	enemy_hud.position = ACTOR_OFFSET
+	enemy_hud.position = Vector2(0,actor_offset.y)
 	enemy_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(enemy_hud)
 	for i in model.enemies.size():
@@ -398,7 +408,7 @@ func end_turn_pressed() -> void:
 		return
 	commit()
 	for attack in result.attacks:
-		await impact(Vector2(418,421)+ACTOR_OFFSET,"−%d HP" % attack.damage,PINK)
+		await impact(Vector2(418,421)+actor_offset,"−%d HP" % attack.damage,PINK)
 	if not model.outcome.is_empty():
 		set_busy(false)
 		finish(model.outcome)

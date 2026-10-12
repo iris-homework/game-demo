@@ -33,36 +33,38 @@
     "kind": "portrait"
   },
   "junkyard": {
-    "path": "",
-    "kind": "pending"
+    "path": "res://assets/backgrounds/junkyard.png",
+    "kind": "background"
   },
   "hive": {
-    "path": "",
-    "kind": "pending"
+    "path": "res://assets/backgrounds/hive.png",
+    "kind": "background",
+    "battleAssetId": "hive_battle"
   },
   "camp": {
     "path": "",
     "kind": "pending"
   },
   "block5": {
-    "path": "",
-    "kind": "pending"
+    "path": "res://assets/backgrounds/block5.png",
+    "kind": "background"
   },
   "power": {
     "path": "",
     "kind": "pending"
   },
   "pump": {
-    "path": "",
-    "kind": "pending"
+    "path": "res://assets/backgrounds/pump.png",
+    "kind": "background",
+    "battleAssetId": "pump_battle"
   },
   "garden": {
-    "path": "",
-    "kind": "pending"
+    "path": "res://assets/backgrounds/garden.png",
+    "kind": "background"
   },
   "hotel": {
-    "path": "",
-    "kind": "pending"
+    "path": "res://assets/backgrounds/hotel.png",
+    "kind": "background"
   },
   "mall": {
     "path": "",
@@ -137,10 +139,34 @@
   },
   "alley_battle": {
     "path": "res://assets/backgrounds/alley_battle.png",
-    "kind": "battle_background"
+    "kind": "battle_background",
+    "actorOffset": [
+      0,
+      20
+    ]
   },
   "church": {
-    "path": "",
-    "kind": "pending"
+    "path": "res://assets/backgrounds/church.png",
+    "kind": "background"
+  },
+  "port": {
+    "path": "res://assets/backgrounds/port.png",
+    "kind": "background"
+  },
+  "hive_battle": {
+    "path": "res://assets/backgrounds/hive_battle.png",
+    "kind": "battle_background",
+    "actorOffset": [
+      0,
+      40
+    ]
+  },
+  "pump_battle": {
+    "path": "res://assets/backgrounds/pump_battle.png",
+    "kind": "battle_background",
+    "actorOffset": [
+      0,
+      80
+    ]
   }
 }

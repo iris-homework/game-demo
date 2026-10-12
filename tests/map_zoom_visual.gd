@@ -47,7 +47,7 @@ func _ready() -> void:
 	await click(view._zoom_out.get_global_rect().get_center())
 	check(is_equal_approx(view.zoom_level, 1.2), "minus button decreases zoom")
 	for i in range(12): await wheel(anchor, MOUSE_BUTTON_WHEEL_UP)
-	check(is_equal_approx(view.zoom_level, 2.0) and view._zoom_in.disabled, "maximum clamps to 200 percent and disables plus")
+	check(is_equal_approx(view.zoom_level, 1.5) and view._zoom_in.disabled, "maximum clamps to 150 percent and disables plus")
 	check(view.markers.church.size == original_size, "marker hit size remains readable and unchanged")
 	var tip: Vector2 = view.markers.church.position + view.markers.church.tip_local + Vector2(view.markers.church.left_pad, view.markers.church.TOP_PAD)
 	var expected: Vector2 = view._base_tips.church * view.zoom_level + view._map_art.position
@@ -61,7 +61,7 @@ func _ready() -> void:
 	for i in range(4): await drag(Vector2(200, 200), Vector2(1400, 800))
 	check(view._pan.is_zero_approx(), "upper-left map edge clamps positive panning")
 	for i in range(4): await drag(Vector2(1400, 800), Vector2(100, 100))
-	check(view._pan.distance_to(-view.map_rect.size) < 0.01, "lower-right map edge clamps negative panning")
+	check(view._pan.distance_to(-view.map_rect.size * 0.5) < 0.01, "lower-right map edge clamps negative panning")
 	await click(view._zoom_reset.get_global_rect().get_center())
 	check(is_equal_approx(view.zoom_level, 1.0) and view._pan.is_zero_approx(), "percentage button resets overview and pan")
 	check(view.markers.church.global_position.distance_to(original_tip) < 0.01, "reset restores exact marker position")
@@ -73,7 +73,8 @@ func _ready() -> void:
 		check(view.selected_id == place.id, "zoomed hit area selects " + place.id)
 	view.close_detail()
 	view.set_map_zoom(1.0)
-	view.set_map_zoom(1.5)
+	# Keep headroom so blocked wheel-up assertions cannot pass only due to the cap.
+	view.set_map_zoom(1.3)
 	await settle()
 	var center: Vector2 = view.get_marker_center("church")
 	await click(center)
@@ -110,6 +111,16 @@ func _ready() -> void:
 	await click(view.get_marker_center("church"))
 	check(view.selected_id == "church", "minimum zoom retains original click behavior")
 	await shot("04-reset-detail")
+	view.close_detail()
+	view.set_map_zoom(1.5)
+	var map_image: TextureRect = view.find_child("map_texture", true, false)
+	var clarity_material := map_image.material
+	map_image.material = null
+	await settle()
+	await shot("05-linear-150")
+	map_image.material = clarity_material
+	await settle()
+	await shot("06-clarity-150")
 	var log_file := FileAccess.open(output_dir.path_join("checks.json"), FileAccess.WRITE)
 	log_file.store_string(JSON.stringify(input_records, "\t"))
 	print("MAP ZOOM: %d checks, %d failures" % [checks, failures])
