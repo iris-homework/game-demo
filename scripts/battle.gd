@@ -149,21 +149,33 @@ func refresh_enemy_hud() -> void:
 	for i in model.enemies.size():
 		var enemy: Dictionary = shown_enemies[i]
 		var center := enemy_position(i) + Vector2(230,0)
+		if model.enemies.size() > 1: center.x = 640+i*245
 		var intent_text := "攻击 %d" % int(enemy.intent.get("amount",0))
 		if int(enemy.intent.get("hits",1)) > 1: intent_text += " ×%d" % int(enemy.intent.hits)
 		cut_panel(enemy_hud,Vector2(center.x-98,181),Vector2(196,65),INK,PINK,13)
 		label(enemy_hud,"↗",Vector2(center.x-83,184),Vector2(55,50),38,PINK)
 		label(enemy_hud,intent_text,Vector2(center.x-28,185),Vector2(135,35),24)
-		label(enemy_hud,"下回合意图",Vector2(center.x-28,218),Vector2(140,22),12,MUTED)
-		label(enemy_hud,enemy.displayName,Vector2(center.x-126,553),Vector2(300,34),22)
-		panel(enemy_hud,Vector2(center.x-125,585),Vector2(250,13),Color("331d33"),Color("594858"))
-		rect(enemy_hud,Vector2(center.x-123,587),Vector2(246*float(enemy.hp)/enemy.maxHp,9),PINK)
-		label(enemy_hud,"%d / %d" % [enemy.hp,enemy.maxHp],Vector2(center.x+92,551),Vector2(104,32),19,PINK)
+		label(enemy_hud,("%02d · 下回合意图" % (i+1)) if model.enemies.size() > 1 else "下回合意图",Vector2(center.x-28,218),Vector2(140,22),12,MUTED)
+		if model.enemies.size() == 1:
+			label(enemy_hud,enemy.displayName,Vector2(center.x-126,553),Vector2(300,34),22)
+			panel(enemy_hud,Vector2(center.x-125,585),Vector2(250,13),Color("331d33"),Color("594858"))
+			rect(enemy_hud,Vector2(center.x-123,587),Vector2(246*float(enemy.hp)/enemy.maxHp,9),PINK)
+			label(enemy_hud,"%d / %d" % [enemy.hp,enemy.maxHp],Vector2(center.x+92,551),Vector2(104,32),19,PINK)
+		else:
+			# Fixed compact status row; the numbered feet identify the moving actors.
+			var left := center.x-102
+			label(enemy_hud,"%02d  %s" % [i+1,enemy.displayName],Vector2(left,615),Vector2(150,27),16)
+			label(enemy_hud,"%d/%d" % [enemy.hp,enemy.maxHp],Vector2(left+155,615),Vector2(58,27),15,PINK)
+			panel(enemy_hud,Vector2(left,645),Vector2(205,7),Color("331d33"),Color("594858"))
+			rect(enemy_hud,Vector2(left+1,646),Vector2(203*float(enemy.hp)/enemy.maxHp,5),PINK)
 		var target := Button.new()
 		target.position = Vector2(center.x-151,259)
 		target.size = Vector2(302,287)
 		target.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-		target.pressed.connect(func(): play_selected(i))
+		target.pressed.connect(func():
+			var front := target_at_pointer()
+			if front >= 0: play_selected(front)
+		)
 		enemy_hud.add_child(target)
 		targets.append(target)
 		var clear := StyleBoxFlat.new()
@@ -316,10 +328,18 @@ func begin_card_aim(uid: String) -> void:
 	_process(0.0)
 
 func target_at_pointer() -> int:
+	return target_at_point(get_global_mouse_position())
+
+func target_at_point(point: Vector2) -> int:
+	var result := -1
+	var front_y := -INF
 	for i in targets.size():
-		if not targets[i].disabled and targets[i].get_global_rect().has_point(get_global_mouse_position()):
-			return i
-	return -1
+		if not targets[i].disabled and targets[i].get_global_rect().has_point(point):
+			var foot_y: float = stage.enemies[i].position.y
+			if foot_y >= front_y:
+				front_y = foot_y
+				result = i
+	return result
 
 func play_selected(target: int) -> void:
 	if selected_uid.is_empty() or Game.transition_locked or Game.battle_busy or is_instance_valid(pile_overlay): return

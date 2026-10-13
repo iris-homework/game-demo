@@ -4,11 +4,15 @@ signal phase_changed(phase: String)
 const Actor = preload("res://scripts/combat/pose_actor.gd")
 const NeonSlash = preload("res://scripts/combat/prismatic_slash_fx.gd")
 var world := Node2D.new()
+var actors_root := Node2D.new()
 var player: Node2D
 var enemies: Array[Node2D] = []
 var floor_y := 307.0
 var zoom := 1.0
 var focus_x := 720.0
+var focus_y := 272.0
+var active_attacker: Node2D
+var active_defender: Node2D
 var shake := Vector2.ZERO
 var phase := "idle"
 var shake_time := 0.0
@@ -28,28 +32,49 @@ func setup(count: int, feet_y: float) -> void:
 	clip_contents = true
 	floor_y = feet_y-position.y
 	add_child(world)
-	var ground := Polygon2D.new()
-	ground.polygon = PackedVector2Array([Vector2(-2500,floor_y-20),Vector2(4000,floor_y-20),Vector2(4000,1500),Vector2(-2500,1500)])
-	ground.color = Color("13141a")
+	focus_y = floor_y-35
+	var ground := preload("res://scripts/combat/depth_floor.gd").new()
+	ground.baseline = floor_y
 	world.add_child(ground)
-	var horizon := Line2D.new()
-	horizon.points = PackedVector2Array([Vector2(-2500,floor_y-20),Vector2(4000,floor_y-20)])
-	horizon.width = 1
-	horizon.default_color = Color("22232b")
-	world.add_child(horizon)
+	actors_root.y_sort_enabled = true
+	world.add_child(actors_root)
 	player = Actor.new()
-	world.add_child(player)
-	player.setup("noren",Vector2(405,floor_y),1.0)
+	actors_root.add_child(player)
+	player.setup("noren",Vector2(405,floor_y-30),1.0)
 	for i in count:
 		var actor := Actor.new()
-		world.add_child(actor)
-		actor.setup("finn",Vector2(1021+i*180-(count-1)*100,floor_y),-1.0)
+		actors_root.add_child(actor)
+		actor.setup("finn",enemy_home(i,count),-1.0)
 		enemies.append(actor)
+		if count > 1:
+			var marker := Label.new()
+			marker.text = "%02d" % (i+1)
+			marker.position = Vector2(20,3)
+			marker.add_theme_font_size_override("font_size",13)
+			marker.modulate = Color("8babb8")
+			actor.add_child(marker)
+	update_depth()
 	add_child(sound)
 	sound.volume_db = -16
 	_update_camera()
 
+func enemy_home(index: int, count: int) -> Vector2:
+	if count == 1: return Vector2(1021,floor_y-75)
+	if count == 2: return Vector2(1000+index*105,floor_y-105+index*135)
+	# Three clear depth lanes; additional columns remain within the stage.
+	var lanes := [Vector2(980,-110),Vector2(1140,-30),Vector2(930,45)]
+	var slot: Vector2 = lanes[index%3]
+	return Vector2(slot.x+float(index/3)*130,floor_y+slot.y)
+
+func depth_scale(point: Vector2) -> float:
+	return clampf(1.0+(point.y-(floor_y-30))*0.00065,0.91,1.08)
+
+func update_depth() -> void:
+	for actor in actors_root.get_children():
+		actor.scale = Vector2.ONE*depth_scale(actor.position)
+
 func _process(delta: float) -> void:
+	update_depth()
 	if shake_time < shake_duration:
 		shake_time = minf(shake_duration,shake_time+delta)
 		var t := shake_time/shake_duration
@@ -73,16 +98,17 @@ func kick_camera(direction: float, strength: float) -> void:
 func _update_camera() -> void:
 	var effective_zoom := zoom*impact_zoom
 	world.scale = Vector2.ONE*effective_zoom
-	world.position = Vector2(720-focus_x*effective_zoom,floor_y*(1-effective_zoom))+shake
+	world.position = Vector2(720-focus_x*effective_zoom,floor_y-35-focus_y*effective_zoom)+shake
 
 func set_phase(value: String) -> void:
 	phase = value
 	phase_changed.emit(value)
 
-func camera_to(target_x: float, magnification: float, duration: float) -> Tween:
+func camera_to(target_x: float, magnification: float, duration: float, target_y: float = NAN) -> Tween:
 	if camera_tween and camera_tween.is_running(): camera_tween.kill()
 	camera_tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 	camera_tween.tween_property(self,"focus_x",target_x,duration)
+	camera_tween.tween_property(self,"focus_y",floor_y-35 if is_nan(target_y) else target_y,duration)
 	camera_tween.tween_property(self,"zoom",magnification,duration)
 	return camera_tween
 
@@ -93,34 +119,102 @@ func wide() -> void:
 	_update_camera()
 
 func contact(actor: Node2D) -> Vector2:
-	return actor.global_position+Vector2(0,-62*zoom*impact_zoom)
+	return actor.to_global(Vector2(0,-62))
 
 func target_rect(index: int) -> Rect2:
 	var actor := enemies[index]
-	return Rect2(actor.global_position+Vector2(-65,-130)*zoom*impact_zoom,Vector2(130,145)*zoom*impact_zoom).intersection(get_global_rect())
+	return Rect2(actor.to_global(Vector2(-58,-130)),Vector2(116,145)*actor.global_scale).intersection(get_global_rect())
 
 func move_actor(actor: Node2D, destination: Vector2, duration: float) -> void:
 	var tween := create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tween.tween_property(actor,"position",destination,duration)
 	await tween.finished
 
+func attack_destination(attacker: Node2D, defender: Node2D, reach: float) -> Vector2:
+	var direction := 1.0 if defender.position.x >= attacker.position.x else -1.0
+	var preferred: Vector2 = defender.position-Vector2(direction*reach*depth_scale(defender.position),0)
+	for offset in [Vector2.ZERO,Vector2(0,-42),Vector2(0,42),Vector2(-direction*35,0),Vector2(direction*reach*2,0)]:
+		var candidate: Vector2 = preferred+offset
+		var clear := true
+		for other in actors_root.get_children():
+			if other == attacker or other == defender or not other.alive: continue
+			if ((candidate-other.position)/Vector2(70,45)).length() < 1.0:
+				clear = false
+				break
+		if clear: return candidate
+	return preferred
+
+func path_clear(points: Array[Vector2], attacker: Node2D, defender: Node2D) -> bool:
+	for other in actors_root.get_children():
+		if other == attacker or other == defender or not other.alive: continue
+		for i in points.size()-1:
+			var foot: Vector2 = other.position/Vector2(70,45)
+			var nearest := Geometry2D.get_closest_point_to_segment(foot,points[i]/Vector2(70,45),points[i+1]/Vector2(70,45))
+			if foot.distance_to(nearest) < 1.0: return false
+	return true
+
+func approach_path(attacker: Node2D, defender: Node2D, destination: Vector2) -> Array[Vector2]:
+	var direct: Array[Vector2] = [attacker.position,destination]
+	if path_clear(direct,attacker,defender): return direct
+	var best := direct
+	var best_length := INF
+	# Short detours on the ground plane, not a navigation or collision simulation.
+	for lane in [floor_y-165,floor_y-65,floor_y+100]:
+		var candidate: Array[Vector2] = [attacker.position,Vector2(attacker.position.x,lane),Vector2(destination.x,lane),destination]
+		if not path_clear(candidate,attacker,defender): continue
+		var distance := 0.0
+		for i in candidate.size()-1: distance += candidate[i].distance_to(candidate[i+1])
+		if distance < best_length:
+			best_length = distance
+			best = candidate
+	return best
+
+func approach(attacker: Node2D, defender: Node2D, destination: Vector2) -> void:
+	var points := approach_path(attacker,defender,destination)
+	var total := 0.0
+	for i in points.size()-1: total += points[i].distance_to(points[i+1])
+	var duration := clampf(total/2300.0,0.15,0.34)
+	for i in points.size()-1:
+		await move_actor(attacker,points[i+1],maxf(0.01,duration*points[i].distance_to(points[i+1])/maxf(total,1)))
+
+func frame_attack(attacker: Node2D, defender: Node2D, destination: Vector2) -> void:
+	var magnification := 1.65
+	var target_y := (destination.y+defender.position.y)*0.5
+	if enemies.size() > 1:
+		# Keep all living opponents available for the next card while closing in.
+		var top := INF
+		var bottom := -INF
+		for actor in actors_root.get_children():
+			if not actor.alive: continue
+			var foot: Vector2 = destination if actor == attacker else actor.position
+			top = minf(top,foot.y-135*depth_scale(foot))
+			bottom = maxf(bottom,foot.y+20)
+		magnification = minf(magnification,(size.y-48)/(bottom-top))
+		target_y = (top+bottom)*0.5+(floor_y-35-size.y*0.5)/magnification
+	camera_to((destination.x+defender.position.x)*0.5,magnification,0.25,target_y)
+
 func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_hit: Callable) -> void:
 	if not attacker.alive or not defender.alive: return
+	active_attacker = attacker
+	active_defender = defender
 	var direction := 1.0 if defender.position.x > attacker.position.x else -1.0
 	var enemy_attack := attacker != player
 	attacker.face_toward(defender.position)
 	defender.face_toward(attacker.position)
 	var reach := 105.0 if style == "pierce" else 86.0
-	var destination := defender.position-Vector2(direction*reach,0)
+	var destination := attack_destination(attacker,defender,reach)
+	direction = 1.0 if defender.position.x >= destination.x else -1.0
 	set_phase("prepare")
-	camera_to((destination.x+defender.position.x)*0.5,1.65,0.25)
+	frame_attack(attacker,defender,destination)
 	await move_actor(attacker,attacker.position-Vector2(direction*7,0),0.08)
 	if attacker.position.distance_to(destination) > 26:
 		set_phase("approach")
 		attacker.set_pose("move")
-		await move_actor(attacker,destination,0.15)
+		await approach(attacker,defender,destination)
 	else:
 		await move_actor(attacker,destination,0.08)
+	attacker.face_toward(defender.position)
+	defender.face_toward(attacker.position)
 	if camera_tween.is_running(): await camera_tween.finished
 	for i in hits.size():
 		var hit: Dictionary = hits[i]
@@ -135,7 +229,7 @@ func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_h
 		await get_tree().create_timer(0.045 if enemy_attack else 0.025).timeout
 		attacker.set_pose(style)
 		await move_actor(attacker,destination+Vector2(direction*10,0),0.035)
-		var contact_point: Vector2 = defender.position+Vector2(-direction*13,-62)
+		var contact_point: Vector2 = defender.position+Vector2(-direction*13,-62)*depth_scale(defender.position)
 		show_strike(contact_point,direction,style,blocked)
 		play_hit_sound(blocked)
 		if not blocked and damage > 0: defender.set_pose("damaged")
@@ -167,6 +261,7 @@ func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_h
 func neon_fx(point: Vector2, kind: String, direction: float = 1.0) -> Node2D:
 	var fx := NeonSlash.new()
 	fx.position = point
+	fx.z_index = 1
 	fx.mode = kind
 	fx.direction = direction
 	world.add_child(fx)
@@ -216,6 +311,7 @@ func return_home() -> void:
 		var trails: Array[Node2D] = []
 		for actor in returning:
 			var trail := NeonSlash.new()
+			trail.z_index = 1
 			trail.mode = "return"
 			trail.manual = true
 			trail.start = actor.position-Vector2(0,48)

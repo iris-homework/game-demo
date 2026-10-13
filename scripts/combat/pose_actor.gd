@@ -49,5 +49,5 @@ func _draw() -> void:
 	var points := PackedVector2Array()
 	for i in 40:
 		var angle := i*TAU/40.0
-		points.append(Vector2(cos(angle)*32,sin(angle)*4+2))
+		points.append(Vector2(cos(angle)*32,sin(angle)*9+2))
 	draw_colored_polygon(points,Color(0,0,0,0.7))
