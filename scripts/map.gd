@@ -46,8 +46,6 @@ var _drag_start := Vector2.ZERO
 var _drag_pan := Vector2.ZERO
 var _drag_marker := ""
 
-var _hud_hp_fill: ColorRect
-var _hud_hp_text: Label
 var _hovered_id := ""
 var _week_dialog: AcceptDialog
 var _leader_layer: Control
@@ -66,9 +64,6 @@ func _ready() -> void:
 	_build_hud()
 	_build_zoom_controls()
 	_apply_map_transform()
-	_refresh_hud()
-	if not Game.status_changed.is_connected(_refresh_hud):
-		Game.status_changed.connect(_refresh_hud)
 	_consume_pending_selection()
 
 func _consume_pending_selection() -> void:
@@ -267,38 +262,7 @@ func _notification(what: int) -> void:
 		_pointer_seen = false
 
 func _build_hud() -> void:
-	rect(self, Vector2.ZERO, Vector2(CANVAS.x, HUD_HEIGHT), Color("070e19ee"))
-	rect(self, Vector2(0.0, HUD_HEIGHT - 1.0), Vector2(CANVAS.x, 1.0), Color("2f6178"))
-	label(self, Game.display_name(Game.PLAYER_REFERENCE) + " / 城市总览", Vector2(24.0, 8.0), Vector2(320.0, 26.0), 19, CREAM)
-	panel(self, Vector2(24.0, 46.0), Vector2(170.0, 12.0), Color("382333"), Color("805071"))
-	_hud_hp_fill = rect(self, Vector2(26.0, 48.0), Vector2(166.0, 8.0), PINK)
-	_hud_hp_text = label(self, "", Vector2(202.0, 34.0), Vector2(126.0, 28.0), 16, CREAM)
-	label(self, "%d CR" % int(Game.state.get("credits", 0)), Vector2(340.0, 12.0), Vector2(116.0, 30.0), 20, CREAM)
-	label(self, "信用点", Vector2(340.0, 44.0), Vector2(116.0, 20.0), 12, MUTED)
-	var faction := faction_label()
-	label(self, faction, Vector2(470.0, 12.0), Vector2(116.0, 30.0), 19, CYAN)
-	label(self, "当前阵营", Vector2(470.0, 44.0), Vector2(116.0, 20.0), 12, MUTED)
-	# Keep the date centered on the canvas, independent of the fields to its left.
-	var day := clampi(int(Game.state.get("currentDay", 1)), 1, 7)
-	var date_width := 238.0
-	var date_x := (CANVAS.x - date_width) * 0.5
-	var date_label := label(self, "第 %d 天" % day, Vector2(date_x, 8.0), Vector2(date_width, 26.0), 19, CYAN)
-	date_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	rect(self, Vector2(date_x, 39.0), Vector2(date_width, 22.0), Color("456576"))
-	rect(self, Vector2(date_x + 1.0, 40.0), Vector2(date_width - 2.0, 20.0), Color("0b1520"))
-	for index in range(7):
-		var x := date_x + 6.0 + float(index) * 33.0
-		rect(self, Vector2(x, 45.0), Vector2(28.0, 10.0), CYAN if index < day else Color("253544"))
-	button(self, "周次", Vector2(1096.0, 16.0), Vector2(140.0, 44.0), show_weeks).add_theme_font_size_override("font_size", 17)
-	button(self, "菜单", Vector2(1248.0, 16.0), Vector2(140.0, 44.0), Game.menu)
-
-func _refresh_hud() -> void:
-	if not is_instance_valid(_hud_hp_fill) or not is_instance_valid(_hud_hp_text):
-		return
-	var maximum := maxi(int(Game.state.get("maxHp", 100)), 1)
-	var hp := int(Game.state.get("currentHp", maximum))
-	_hud_hp_fill.size.x = 166.0 * float(hp) / float(maximum)
-	_hud_hp_text.text = "%d / %d" % [hp, maximum]
+	map_chrome("城市总览", show_weeks)
 
 # ------------------------------------------------------------------- 标记
 

@@ -10,6 +10,7 @@ var base_font: Font
 var button_font: FontVariation
 var hp_fill: ColorRect
 var hp_label: Label
+var hp_bar_width := 166.0
 
 func _init() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -163,29 +164,44 @@ func background(id: String, darkness: float = 0.3) -> void:
 	if Game.texture(id) == null:
 		label(self, "场景美术待补 / " + Game.place_data(Game.state.get("currentPlaceId", "")).get("name", ""), Vector2(64,828), Vector2(650,27), 15, MUTED)
 
-func chrome(section: String, show_days: bool = true) -> void:
-	rect(self,Vector2.ZERO,Vector2(1440,95),Color("090b12f5"))
-	polygon(self,[Vector2.ZERO,Vector2(457,0),Vector2(432,95),Vector2(0,95)],Color("202331"))
-	rect(self,Vector2(0,94),Vector2(1440,1),Color("4a505e"))
-	rect(self,Vector2(0,94),Vector2(314,3),PINK)
-	label(self,Game.display_name(Game.PLAYER_REFERENCE) + "  /  " + section,Vector2(36,8),Vector2(395,36),20,CREAM)
-	panel(self,Vector2(37,51),Vector2(277,17),Color("382333"),Color("805071"))
-	hp_fill = rect(self,Vector2(40,54),Vector2(271,11),PINK)
-	hp_label = label(self,"",Vector2(327,44),Vector2(140,33),18)
-	refresh_hp()
-	if not Game.status_changed.is_connected(refresh_hp): Game.status_changed.connect(refresh_hp)
-	if show_days:
-		for day in range(1,8):
-			var current: bool = day == int(Game.state.get("currentDay",1))
-			var x := 477+(day-1)*70
-			panel(self,Vector2(x,17),Vector2(65,47),CREAM if current else Color("141922"),CREAM if current else Color("35404b"))
-			label(self,"第 %d 天" % day,Vector2(x+9,26),Vector2(60,28),15,INK if current else MUTED)
-			if current: rect(self,Vector2(x,66),Vector2(65,3),PINK)
-		label(self,"W E E K  0 1    /    午夜开场",Vector2(583,72),Vector2(420,20),11,MUTED)
+## 冒险页面共用紧凑状态栏；战斗隐藏日期，将中央留给回合信息。
+func status_bar(section: String, show_days: bool = true, weeks_action: Callable = Callable()) -> void:
+	rect(self, Vector2.ZERO, Vector2(1440.0, 76.0), Color("070e19ee"))
+	rect(self, Vector2(0.0, 75.0), Vector2(1440.0, 1.0), Color("2f6178"))
+	label(self, Game.display_name(Game.PLAYER_REFERENCE) + " / " + section, Vector2(24.0, 8.0), Vector2(320.0, 26.0), 19, CREAM)
+	panel(self, Vector2(24.0, 46.0), Vector2(170.0, 12.0), Color("382333"), Color("805071"))
+	hp_fill = rect(self, Vector2(26.0, 48.0), Vector2(166.0, 8.0), PINK)
+	hp_label = label(self, "", Vector2(202.0, 34.0), Vector2(126.0, 28.0), 16, CREAM)
+	label(self, "%d CR" % int(Game.state.get("credits", 0)), Vector2(340.0, 12.0), Vector2(116.0, 30.0), 20, CREAM)
+	label(self, "信用点", Vector2(340.0, 44.0), Vector2(116.0, 20.0), 12, MUTED)
 	var faction := faction_label()
-	label(self,faction,Vector2(1026,13),Vector2(214,31),17,CYAN)
-	label(self,"%d CR" % int(Game.state.get("credits",0)),Vector2(1026,49),Vector2(210,30),17)
-	button(self,"退出演练" if Game.training_mode else "菜单",Vector2(1263,23),Vector2(145,49),Game.menu)
+	label(self, faction, Vector2(470.0, 12.0), Vector2(116.0, 30.0), 19, CYAN)
+	label(self, "当前阵营", Vector2(470.0, 44.0), Vector2(116.0, 20.0), 12, MUTED)
+	if show_days:
+		# Keep the date centered on the canvas, independent of the fields to its left.
+		var day := clampi(int(Game.state.get("currentDay", 1)), 1, 7)
+		var date_width := 238.0
+		var date_x := (1440.0 - date_width) * 0.5
+		var date_label := label(self, "第 %d 天" % day, Vector2(date_x, 8.0), Vector2(date_width, 26.0), 19, CYAN)
+		date_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		rect(self, Vector2(date_x, 39.0), Vector2(date_width, 22.0), Color("456576"))
+		rect(self, Vector2(date_x + 1.0, 40.0), Vector2(date_width - 2.0, 20.0), Color("0b1520"))
+		for index in range(7):
+			var x := date_x + 6.0 + float(index) * 33.0
+			rect(self, Vector2(x, 45.0), Vector2(28.0, 10.0), CYAN if index < day else Color("253544"))
+	if weeks_action.is_valid():
+		button(self, "周次", Vector2(1096.0, 16.0), Vector2(140.0, 44.0), weeks_action).add_theme_font_size_override("font_size", 17)
+	button(self, "退出演练" if Game.training_mode else "菜单", Vector2(1248.0, 16.0), Vector2(140.0, 44.0), Game.menu)
+	hp_bar_width = 166.0
+	refresh_hp()
+	if not Game.status_changed.is_connected(refresh_hp):
+		Game.status_changed.connect(refresh_hp)
+
+func map_chrome(section: String, weeks_action: Callable = Callable()) -> void:
+	status_bar(section, true, weeks_action)
+
+func chrome(section: String, show_days: bool = true) -> void:
+	status_bar(section, show_days)
 	if section != "战斗":
 		label(self,"MIDNIGHT / W01",Vector2(36,864),Vector2(600,24),12,MUTED)
 		label(self,"● 自动保存    /    F1 开发面板",Vector2(1100,859),Vector2(310,27),12,MUTED)
@@ -194,7 +210,7 @@ func refresh_hp() -> void:
 	if not is_instance_valid(hp_fill): return
 	var maximum := int(Game.state.get("maxHp",100))
 	var hp := int(Game.state.get("currentHp",100))
-	hp_fill.size.x = 271.0*hp/maxi(maximum,1)
+	hp_fill.size.x = hp_bar_width*hp/maxi(maximum,1)
 	hp_label.text = "%d / %d" % [hp,maximum]
 
 func tag(text: String, pos: Vector2, color: Color = CYAN, width: float = 180) -> void:

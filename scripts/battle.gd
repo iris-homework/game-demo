@@ -69,8 +69,8 @@ func enter(params: Dictionary) -> void:
 	tag("演练模式 · 不影响冒险" if Game.training_mode else "临时规则 / 攻击 1 · 敌方 HP 3",Vector2(1030,117),CYAN,360)
 	if Game.texture(Game.place_data(battle.placeId).backgroundAssetId) == null:
 		label(self,"场景美术待补",Vector2(43,203),Vector2(330,26),13,MUTED)
-	cut_panel(self,Vector2(550,24),Vector2(340,48),INK,Color("3d9eff"),12)
-	turn_label = label(self,"回合 %02d  /  你的回合" % model.turn,Vector2(566,29),Vector2(308,37),19,Color("8fcaff"))
+	cut_panel(self,Vector2(596,14),Vector2(248,48),INK,Color("3d9eff"),12)
+	turn_label = label(self,"回合 %02d  /  你的回合" % model.turn,Vector2(604,20),Vector2(232,36),18,Color("8fcaff"))
 	turn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	player_portrait = battle_portrait(Game.player_asset_id("battlePortraitAssetId"),Vector2(90,215)+actor_offset,Vector2(630,335),Vector2(315,318))
 	label(self,Game.display_name(Game.PLAYER_REFERENCE),Vector2(305,552)+actor_offset,Vector2(280,33),23)

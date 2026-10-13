@@ -4,12 +4,14 @@ extends DemoUI
 ## 原生背景与诺伦局部动画由菜单环境组件提供，本脚本不绘制角色、背景或帧素材。
 
 const MENU_ENVIRONMENT := preload("res://scripts/menu/menu_environment.gd")
+const MENU_LOGO := preload("res://scripts/menu/menu_logo.gd")
 const COLUMN_X := 980.0
 const COLUMN_WIDTH := 350.0
 const MASK_LEFT := 920.0
 const MASK_RIGHT := 1350.0
 
 var environment: Node
+var logo: Control
 var ui_layer: Control
 var continue_button: Button
 var new_button: Button
@@ -73,15 +75,12 @@ func _add_readability_mask() -> void:
 	ui_layer.add_child(mask)
 
 func _build_right_column() -> void:
-	rect(ui_layer, Vector2(COLUMN_X, 88), Vector2(56, 4), PINK)
-	label(ui_layer, "MIDNIGHT COMMISSION", Vector2(COLUMN_X, 100), Vector2(380, 24), 15, CYAN)
-	var title := label(ui_layer, "午夜委托", Vector2(COLUMN_X - 4, 132), Vector2(390, 112), 66)
+	var title := MENU_LOGO.new()
 	title.name = "menu_title"
-	# 文字后已有局部渐暗；再给标题一层轻阴影，压暗不足时仍保持清楚。
-	title.add_theme_color_override("font_shadow_color", Color(0.02, 0.015, 0.05, 0.85))
-	title.add_theme_constant_override("shadow_offset_x", 3)
-	title.add_theme_constant_override("shadow_offset_y", 4)
-	label(ui_layer, "霓虹之下，每条线索都有价码。", Vector2(COLUMN_X + 2, 252), Vector2(350, 30), 19, MUTED)
+	title.position = Vector2(COLUMN_X - 20, 120)
+	title.size = Vector2(410, 170)
+	ui_layer.add_child(title)
+	logo = title
 
 	continue_button = _menu_button("continue_commission", "继续委托", Vector2(COLUMN_X, 330), Vector2(COLUMN_WIDTH, 66), Game.resume, true)
 	# 无内存进度且无存档时禁用；禁用按钮会被 Godot 焦点环自动跳过。
@@ -191,10 +190,12 @@ func _motion_enabled() -> bool:
 	return true
 
 func _toggle_motion() -> void:
-	# 开关只改环境静态状态，当前会话保持；不动文字与按钮位置。
+	# 背景与字标共用动态开关，当前会话保持；不动文字与按钮位置。
 	var value := not _motion_enabled()
 	if is_instance_valid(environment) and environment.has_method("set_motion_enabled"):
 		environment.set_motion_enabled(value)
+	if is_instance_valid(logo):
+		logo.set_motion_enabled(value)
 	if is_instance_valid(motion_button):
 		motion_button.text = _motion_label()
 

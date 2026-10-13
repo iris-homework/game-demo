@@ -14,7 +14,9 @@ func _ready() -> void:
 	var side: String = node.get("speakerSide", "")
 	portrait(Game.state.portraits.left, "left", side == "left", 123, 642)
 	portrait(Game.state.portraits.right, "right", side == "right", 123, 642)
-	chrome(e.title)
+	map_chrome(e.title)
+	label(self,"MIDNIGHT / W01",Vector2(36,864),Vector2(600,24),12,MUTED)
+	label(self,"● 自动保存    /    F1 开发面板",Vector2(1100,859),Vector2(310,27),12,MUTED)
 	tag(e.id + " / " + Game.place_data(e.placeId).name, Vector2(54,104), CYAN, 280)
 	if not node.get("choices", []).is_empty():
 		for i in node.choices.size():
