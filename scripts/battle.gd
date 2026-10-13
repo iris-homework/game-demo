@@ -8,6 +8,10 @@ var held_card_uid := ""
 var cards: Dictionary = {}
 var enemy_hud: Control
 var targets: Array[Button] = []
+var enemy_plates: Array[Control] = []
+var enemy_intents: Array[Control] = []
+const ENEMY_PLATE_SIZE := Vector2(194,48)
+const ENEMY_INTENT_SIZE := Vector2(126,28)
 var aim: Node2D
 var hovered_target := -1
 var player_portrait: Node2D
@@ -74,6 +78,7 @@ func enter(params: Dictionary) -> void:
 		actor.visible = actor.alive
 		enemy_portraits.append(actor)
 	refresh_enemy_hud()
+	RenderingServer.frame_pre_draw.connect(update_target_rects)
 	pile_button(DRAW_POS,"抽牌堆",func(): show_pile("抽牌堆",model.draw_pile))
 	pile_button(DISCARD_POS,"弃牌堆",func(): show_pile("弃牌堆",model.discard_pile))
 	draw_count = label(self,"",DRAW_POS+Vector2(0,3),Vector2(PILE_SIZE.x,33),23,CYAN)
@@ -142,35 +147,40 @@ func refresh_enemy_hud() -> void:
 		remove_child(enemy_hud)
 		enemy_hud.queue_free()
 	targets.clear()
+	enemy_plates.clear()
+	enemy_intents.clear()
 	enemy_hud = Control.new()
 	enemy_hud.position = Vector2(0,actor_offset.y)
 	enemy_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(enemy_hud)
 	for i in model.enemies.size():
 		var enemy: Dictionary = shown_enemies[i]
-		var center := enemy_position(i) + Vector2(230,0)
-		if model.enemies.size() > 1: center.x = 640+i*245
 		var intent_text := "攻击 %d" % int(enemy.intent.get("amount",0))
 		if int(enemy.intent.get("hits",1)) > 1: intent_text += " ×%d" % int(enemy.intent.hits)
-		cut_panel(enemy_hud,Vector2(center.x-98,181),Vector2(196,65),INK,PINK,13)
-		label(enemy_hud,"↗",Vector2(center.x-83,184),Vector2(55,50),38,PINK)
-		label(enemy_hud,intent_text,Vector2(center.x-28,185),Vector2(135,35),24)
-		label(enemy_hud,("%02d · 下回合意图" % (i+1)) if model.enemies.size() > 1 else "下回合意图",Vector2(center.x-28,218),Vector2(140,22),12,MUTED)
-		if model.enemies.size() == 1:
-			label(enemy_hud,enemy.displayName,Vector2(center.x-126,553),Vector2(300,34),22)
-			panel(enemy_hud,Vector2(center.x-125,585),Vector2(250,13),Color("331d33"),Color("594858"))
-			rect(enemy_hud,Vector2(center.x-123,587),Vector2(246*float(enemy.hp)/enemy.maxHp,9),PINK)
-			label(enemy_hud,"%d / %d" % [enemy.hp,enemy.maxHp],Vector2(center.x+92,551),Vector2(104,32),19,PINK)
-		else:
-			# Fixed compact status row; the numbered feet identify the moving actors.
-			var left := center.x-102
-			label(enemy_hud,"%02d  %s" % [i+1,enemy.displayName],Vector2(left,615),Vector2(150,27),16)
-			label(enemy_hud,"%d/%d" % [enemy.hp,enemy.maxHp],Vector2(left+155,615),Vector2(58,27),15,PINK)
-			panel(enemy_hud,Vector2(left,645),Vector2(205,7),Color("331d33"),Color("594858"))
-			rect(enemy_hud,Vector2(left+1,646),Vector2(203*float(enemy.hp)/enemy.maxHp,5),PINK)
+		var plate := Control.new()
+		plate.size = ENEMY_PLATE_SIZE
+		plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		enemy_hud.add_child(plate)
+		enemy_plates.append(plate)
+		panel(plate,Vector2.ZERO,ENEMY_PLATE_SIZE,Color(0.025,0.035,0.055,0.92),Color("57404f"))
+		var name_label := label(plate,"%02d  %s" % [i+1,enemy.displayName],Vector2(8,3),Vector2(121,24),16)
+		name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+		name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		name_label.tooltip_text = enemy.displayName
+		var hp_text := label(plate,"%d/%d" % [enemy.hp,enemy.maxHp],Vector2(132,4),Vector2(54,23),14,PINK)
+		hp_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		panel(plate,Vector2(8,33),Vector2(178,7),Color("331d33"),Color("594858"))
+		rect(plate,Vector2(9,34),Vector2(176*float(enemy.hp)/enemy.maxHp,5),PINK)
+		var intent := Control.new()
+		intent.size = ENEMY_INTENT_SIZE
+		intent.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		enemy_hud.add_child(intent)
+		enemy_intents.append(intent)
+		panel(intent,Vector2.ZERO,ENEMY_INTENT_SIZE,Color(0.025,0.035,0.055,0.94),Color("734457"))
+		var intent_label := label(intent,"%02d  ↗ %s" % [i+1,intent_text],Vector2(5,2),Vector2(116,24),14,Color("ff9bbd"))
+		intent_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		intent_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 		var target := Button.new()
-		target.position = Vector2(center.x-151,259)
-		target.size = Vector2(302,287)
 		target.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		target.pressed.connect(func():
 			var front := target_at_pointer()
@@ -611,6 +621,20 @@ func update_target_rects() -> void:
 		var area: Rect2 = stage.target_rect(i)
 		targets[i].position = area.position-enemy_hud.global_position
 		targets[i].size = area.size
+	update_enemy_plates()
+
+func update_enemy_plates() -> void:
+	# Names and HP stay below the existing top-right controls; only intent follows actors.
+	for i in enemy_plates.size():
+		var actor: Node2D = stage.enemies[i]
+		var plate := enemy_plates[i]
+		plate.global_position = Vector2(1216,280+i*58)
+		plate.modulate.a = 1.0 if int(shown_enemies[i].hp) > 0 else 0.4
+		var intent := enemy_intents[i]
+		intent.visible = actor.visible and actor.alive and actor.modulate.a > 0.01
+		intent.modulate.a = actor.modulate.a
+		var head := actor.to_global(Vector2(0,-130))
+		intent.global_position = Vector2(clampf(head.x-ENEMY_INTENT_SIZE.x*0.5,16,1424-ENEMY_INTENT_SIZE.x),clampf(head.y-ENEMY_INTENT_SIZE.y-8,206,674))
 
 func refresh_hp() -> void:
 	if shown_player_hp < 0:

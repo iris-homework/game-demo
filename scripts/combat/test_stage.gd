@@ -2,6 +2,7 @@ extends Control
 ## Clipped presentation world. No model, saves, card data or HUD are mutated here.
 signal phase_changed(phase: String)
 const Actor = preload("res://scripts/combat/pose_actor.gd")
+const ReturnGhost = preload("res://scripts/combat/return_ghost_fx.gd")
 const NeonSlash = preload("res://scripts/combat/prismatic_slash_fx.gd")
 var world := Node2D.new()
 var actors_root := Node2D.new()
@@ -321,13 +322,26 @@ func return_home() -> void:
 			flight.tween_method(trail.set_progress,0.0,1.0,0.18)
 		await flight.finished
 		for trail in trails: trail.queue_free()
+		var ghosts: Array[Node2D] = []
 		var reveal := create_tween().set_parallel(true)
 		for actor in returning:
 			actor.position = actor.home
-			neon_fx(actor.home-Vector2(0,30),"arrive")
 			actor.facing = 1.0 if actor == player else -1.0
 			actor.set_pose("idle")
-			reveal.tween_property(actor,"modulate",Color.WHITE,0.10)
+			var ghost := ReturnGhost.new()
+			ghost.position = actor.home
+			ghost.scale = Vector2.ONE*depth_scale(actor.home)
+			ghost.z_index = 1
+			world.add_child(ghost)
+			ghost.setup(actor.sprite)
+			ghosts.append(ghost)
+			reveal.tween_method(ghost.set_progress,0.0,1.0,0.50)
+			reveal.tween_property(actor,"modulate",Color.WHITE,0.28).set_delay(0.22).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		set_phase("home_glitch")
+		await get_tree().create_timer(0.22).timeout
+		set_phase("home_reveal")
 		await reveal.finished
+		for ghost in ghosts: ghost.queue_free()
+
 	if camera_tween.is_running(): await camera_tween.finished
 	set_phase("idle")
