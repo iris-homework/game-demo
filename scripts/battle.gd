@@ -10,7 +10,7 @@ var enemy_hud: Control
 var targets: Array[Button] = []
 var aim: Node2D
 var hovered_target := -1
-var player_portrait: TextureRect
+var player_portrait: Node2D
 var enemy_portraits: Array = []
 var turn_label: Label
 var turn_banner: Control
@@ -23,6 +23,10 @@ var cyberware_button: Button
 var cyberware_status: Label
 var pile_overlay: Control
 var initialized := false
+var stage: Control
+var shown_enemies: Array = []
+var shown_player_hp := -1
+var preview_attack_style := ""
 const ACTOR_OFFSET := Vector2(0,24)
 const ACTOR_SCALE := 0.85
 # Additional placement belongs to the selected stage; fallback scenes retain the base.
@@ -41,28 +45,17 @@ func enter(params: Dictionary) -> void:
 	model = CombatModel.new()
 	model.restore(Game.state.combat)
 	expected_revision = Game.revision
-	var integrated_ground := battle_background()
-	var arena := Node2D.new()
-	arena.set_script(preload("res://scripts/combat/arena_fx.gd"))
-	arena.paint_ground = not integrated_ground
-	add_child(arena)
-	if integrated_ground:
-		# Let the illustrated road continue behind the hand, with a soft readability fade.
-		var gradient := Gradient.new()
-		gradient.colors = PackedColorArray([Color("090b1200"),Color("090b12bd")])
-		var texture := GradientTexture2D.new()
-		texture.gradient = gradient
-		texture.fill_from = Vector2.ZERO
-		texture.fill_to = Vector2(0,1)
-		var shade := TextureRect.new()
-		shade.texture = texture
-		shade.position = Vector2(0,650)
-		shade.size = Vector2(1440,250)
-		shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(shade)
-	else:
-		polygon(self,[Vector2(0,704),Vector2(1440,681),Vector2(1440,900),Vector2(0,900)],Color("090b12e5"))
-		polygon(self,[Vector2(0,697),Vector2(238,692),Vector2(235,698),Vector2(0,704)],PINK)
+	shown_enemies = model.enemies.duplicate(true)
+	shown_player_hp = model.player_hp
+	# Retain existing HUD offsets; only the world imagery is replaced.
+	var place_asset: String = Game.place_data(battle.placeId).backgroundAssetId
+	var stage_asset: String = Game.assets.get(place_asset,{}).get("battleAssetId","")
+	var old_offset: Array = Game.assets.get(stage_asset,{}).get("actorOffset",[0,0])
+	actor_offset = ACTOR_OFFSET+Vector2(old_offset[0],old_offset[1])
+	rect(self,Vector2.ZERO,Vector2(1440,900),Color("07080c"))
+	stage = preload("res://scripts/combat/test_stage.gd").new()
+	add_child(stage)
+	stage.setup(model.enemies.size(),533+actor_offset.y)
 	chrome("战斗",false)
 	label(self,battle.name,Vector2(41,112),Vector2(700,55),33)
 	label(self,"COMBAT // " + Game.place_data(battle.placeId).name,Vector2(43,166),Vector2(670,29),14,CYAN)
@@ -72,14 +65,14 @@ func enter(params: Dictionary) -> void:
 	cut_panel(self,Vector2(596,14),Vector2(248,48),INK,Color("3d9eff"),12)
 	turn_label = label(self,"回合 %02d  /  你的回合" % model.turn,Vector2(604,20),Vector2(232,36),18,Color("8fcaff"))
 	turn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	player_portrait = battle_portrait(Game.player_asset_id("battlePortraitAssetId"),Vector2(90,215)+actor_offset,Vector2(630,335),Vector2(315,318))
+	player_portrait = stage.player
 	label(self,Game.display_name(Game.PLAYER_REFERENCE),Vector2(305,552)+actor_offset,Vector2(280,33),23)
 	label(self,"NEURAL LINK / ONLINE",Vector2(268,590)+actor_offset,Vector2(340,27),12,CYAN)
 	for i in model.enemies.size():
-		var pos := enemy_position(i)
-		var portrait_node := battle_portrait(model.enemies[i].battlePortraitAssetId,pos,Vector2(460,317),Vector2(230,307))
-		enemy_portraits.append(portrait_node)
-		if portrait_node: arena.contact_points.append(pos+Vector2(230,307))
+		var actor: Node2D = stage.enemies[i]
+		actor.alive = model.enemies[i].hp > 0
+		actor.visible = actor.alive
+		enemy_portraits.append(actor)
 	refresh_enemy_hud()
 	pile_button(DRAW_POS,"抽牌堆",func(): show_pile("抽牌堆",model.draw_pile))
 	pile_button(DISCARD_POS,"弃牌堆",func(): show_pile("弃牌堆",model.discard_pile))
@@ -154,7 +147,7 @@ func refresh_enemy_hud() -> void:
 	enemy_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(enemy_hud)
 	for i in model.enemies.size():
-		var enemy: Dictionary = model.enemies[i]
+		var enemy: Dictionary = shown_enemies[i]
 		var center := enemy_position(i) + Vector2(230,0)
 		var intent_text := "攻击 %d" % int(enemy.intent.get("amount",0))
 		if int(enemy.intent.get("hits",1)) > 1: intent_text += " ×%d" % int(enemy.intent.hits)
@@ -187,8 +180,7 @@ func refresh_enemy_hud() -> void:
 		target.add_theme_stylebox_override("disabled",StyleBoxEmpty.new())
 		target.disabled = enemy.hp <= 0
 		target.tooltip_text = "攻击目标：" + enemy.displayName + "\n下次行动：" + intent_text
-		if not selected_uid.is_empty():
-			label(enemy_hud,"⌖  点击攻击",Vector2(center.x-87,455),Vector2(245,50),23,CYAN)
+	update_target_rects()
 
 func pile_button(pos: Vector2, title: String, action: Callable) -> void:
 	panel(self,pos+Vector2(8,-8),PILE_SIZE,Color("0d1728"),Color("335671"))
@@ -288,6 +280,7 @@ func deal_hand(animate: bool) -> void:
 
 func _process(_delta: float) -> void:
 	update_hand_hover()
+	update_target_rects()
 	if not is_instance_valid(aim): return
 	aim.visible = not selected_uid.is_empty() and not Game.battle_busy and not Game.transition_locked and not is_instance_valid(pile_overlay)
 	if not aim.visible or not cards.has(selected_uid): return
@@ -297,7 +290,7 @@ func _process(_delta: float) -> void:
 	hovered_target = target_at_pointer()
 	aim.set("locked", hovered_target >= 0)
 	if hovered_target >= 0:
-		aim.set("target_center", enemy_position(hovered_target) + Vector2(230,150))
+		aim.set("target_center", stage.contact(stage.enemies[hovered_target]))
 
 func cancel_selection() -> void:
 	held_card_uid = ""
@@ -346,27 +339,27 @@ func play_selected(target: int) -> void:
 	card_view.z_index = 40
 	# Remove this card from the live hand immediately; the visual can finish later.
 	arrange_hand()
-	var hit_pos := enemy_position(target)+Vector2(230,150)
+	# Keep the existing card/discard art while the actor performs the attack.
 	var launch := create_tween().set_parallel(true)
-	launch.tween_property(card_view,"position",hit_pos-Vector2(90,115),0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	launch.tween_property(card_view,"position",Vector2(630,655),0.16)
 	launch.tween_property(card_view,"scale",Vector2(0.48,0.48),0.16)
 	launch.tween_property(card_view,"rotation_degrees",12.0,0.16)
-	await launch.finished
-	refresh_enemy_hud()
-	impact(hit_pos,"−%d" % result.damage,PINK)
-	var burst := Node2D.new()
-	burst.set_script(preload("res://scripts/combat/hit_fx.gd"))
-	burst.position = hit_pos
-	burst.z_index = 45
-	add_child(burst)
-	animate_discard(card_view)
-	if not model.outcome.is_empty():
-		await get_tree().create_timer(0.52).timeout
-		set_busy(false)
-		finish(model.outcome)
-	else:
-		# Impact numbers and discard travel never hold up the next selection.
-		set_busy(false)
+	var discarded := [false]
+	var style: String = model.card(uid).get("animation","slash")
+	if Game.training_mode and not preview_attack_style.is_empty(): style = preview_attack_style
+	await stage.attack(stage.player,stage.enemies[target],style,result.hits,func(hit: Dictionary, _index: int):
+		shown_enemies[target].hp = hit.hpAfter
+		refresh_enemy_hud()
+		impact(stage.contact(stage.enemies[target]),"−%d" % hit.damage,PINK)
+		if not discarded[0]:
+			discarded[0] = true
+			animate_discard(card_view)
+	)
+	if not discarded[0]: animate_discard(card_view)
+	# The visual tail of the discard must land before the next deal resets counts.
+	while is_instance_valid(card_view) and card_view.visible: await get_tree().process_frame
+	set_busy(false)
+	if not model.outcome.is_empty(): finish(model.outcome)
 
 func arrange_hand() -> void:
 	for i in model.hand.size():
@@ -399,6 +392,7 @@ func end_turn_pressed() -> void:
 	var discard_wait: SceneTreeTimer
 	if not discarded_views.is_empty():
 		discard_wait = get_tree().create_timer(0.33+(discarded_views.size()-1)*0.045)
+	await stage.wide()
 	await announce_turn("敌方回合",true)
 	if discard_wait != null and discard_wait.time_left > 0.0:
 		await discard_wait.timeout
@@ -408,11 +402,22 @@ func end_turn_pressed() -> void:
 		return
 	commit()
 	for attack in result.attacks:
-		await impact(Vector2(418,421)+actor_offset,"−%d HP" % attack.damage,PINK)
+		var attacker_index := -1
+		for i in model.enemies.size():
+			if model.enemies[i].id == attack.id: attacker_index = i
+		if attacker_index < 0: continue
+		var style: String = shown_enemies[attacker_index].intent.get("animation","pierce")
+		await stage.attack(stage.enemies[attacker_index],stage.player,style,attack.hits,func(hit: Dictionary, _index: int):
+			shown_player_hp = int(hit.hpAfter)
+			refresh_hp()
+			impact(stage.contact(stage.player),"−%d HP" % hit.damage,PINK)
+		)
 	if not model.outcome.is_empty():
 		set_busy(false)
 		finish(model.outcome)
 		return
+	await stage.return_home()
+	shown_enemies = model.enemies.duplicate(true)
 	refresh_enemy_hud()
 	turn_label.text = "回合 %02d  /  你的回合" % model.turn
 	await announce_turn("第%d回合" % model.turn)
@@ -543,12 +548,23 @@ func show_debug_results() -> void:
 	popup.popup_centered(Vector2i(610,185))
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_F5,KEY_F6,KEY_F7]:
+		if Game.training_mode and Game.config.developmentMode:
+			if event.keycode == KEY_F5:
+				if not Game.battle_busy and not Game.transition_locked and not is_instance_valid(pile_overlay):
+					preview_attack_style = "pierce" if preview_attack_style != "pierce" else "slash"
+					Game.notice.emit("演练攻击动作："+("突刺" if preview_attack_style == "pierce" else "挥砍"))
+			else:
+				preview_defense(event.keycode == KEY_F7)
+			get_viewport().set_input_as_handled()
+			return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		if initialized and not Game.battle_busy and not Game.transition_locked and not is_instance_valid(pile_overlay):
 			var uid := hand_at_pointer()
 			if not uid.is_empty():
 				get_viewport().set_input_as_handled()
 				begin_card_aim(uid)
+				if selected_uid == uid: held_card_uid = uid
 				return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
 		var released_uid := held_card_uid
@@ -568,3 +584,34 @@ func _input(event: InputEvent) -> void:
 
 func timing(key: String, fallback: float) -> float:
 	return maxf(0.01,float(model.profile.get("visuals",{}).get(key,fallback)))
+
+func update_target_rects() -> void:
+	if not is_instance_valid(stage) or not is_instance_valid(enemy_hud): return
+	for i in targets.size():
+		var area: Rect2 = stage.target_rect(i)
+		targets[i].position = area.position-enemy_hud.global_position
+		targets[i].size = area.size
+
+func refresh_hp() -> void:
+	if shown_player_hp < 0:
+		super.refresh_hp()
+		return
+	if not is_instance_valid(hp_fill): return
+	hp_fill.size.x = hp_bar_width*shown_player_hp/maxi(model.max_hp,1)
+	hp_label.text = "%d / %d" % [shown_player_hp,model.max_hp]
+
+func preview_defense(partial: bool) -> void:
+	if not initialized or Game.battle_busy or Game.transition_locked or is_instance_valid(pile_overlay): return
+	if not Game.training_mode or not Game.config.developmentMode: return
+	var index := -1
+	for i in stage.enemies.size():
+		if stage.enemies[i].alive:
+			index = i
+			break
+	if index < 0: return
+	cancel_selection()
+	set_busy(true)
+	Game.notice.emit("动作预览：部分格挡后受击（不结算）" if partial else "动作预览：完全格挡（不结算）")
+	await stage.attack(stage.enemies[index],stage.player,"slash",[{"damage":1 if partial else 0,"blocked":1}],func(_hit, _i): pass)
+	await stage.return_home()
+	set_busy(false)

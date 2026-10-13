@@ -95,12 +95,14 @@ func play_card(uid: String, target_index: int) -> Dictionary:
 		if effect.get("type", "") != "damage" or not effect.get("amount") is float and not effect.get("amount") is int: return {}
 		if effect.amount < 0: return {}
 	var damage := 0
+	var hits: Array = []
 	# Apply once to the first damage effect of a valid attack, never per hit.
 	var bonus := next_attack_bonus if definition.get("type", "") == "attack" else 0
 	for effect in effects:
 		var amount := mini(int(effect.amount) + bonus, int(enemies[target_index].hp))
 		enemies[target_index].hp -= amount
 		damage += amount
+		hits.append({"damage":amount,"blocked":0,"hpAfter":enemies[target_index].hp,"killed":enemies[target_index].hp == 0})
 		if bonus > 0:
 			next_attack_bonus = 0
 			bonus = 0
@@ -111,7 +113,7 @@ func play_card(uid: String, target_index: int) -> Dictionary:
 	for enemy in enemies:
 		if enemy.hp > 0: alive = true
 	if not alive: outcome = "win"
-	return {"uid":uid, "target":target_index, "damage":damage, "outcome":outcome}
+	return {"uid":uid, "target":target_index, "damage":damage, "hits":hits, "outcome":outcome}
 
 func end_turn() -> Dictionary:
 	if not outcome.is_empty(): return {}
@@ -125,8 +127,13 @@ func end_turn() -> Dictionary:
 		var intent: Dictionary = enemy.intent
 		if intent.get("type", "") == "attack":
 			var damage := int(intent.get("amount", 0)) * int(intent.get("hits", 1))
-			player_hp = maxi(0, player_hp - damage)
-			attacks.append({"id":enemy.id, "damage":damage})
+			var hits: Array = []
+			for hit_index in int(intent.get("hits",1)):
+				var loss := mini(player_hp,int(intent.get("amount",0)))
+				player_hp = maxi(0,player_hp-loss)
+				hits.append({"damage":loss,"blocked":0,"hpAfter":player_hp,"killed":player_hp == 0})
+				if player_hp == 0: break
+			attacks.append({"id":enemy.id, "damage":damage, "hits":hits})
 			log_lines.append("%s 执行意图：攻击 %d。" % [enemy.displayName, damage])
 		if player_hp == 0:
 			outcome = "lose"
