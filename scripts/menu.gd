@@ -1,6 +1,6 @@
 extends DemoUI
 ## 主菜单：右侧 350px 列放标题、委托入口与只读摘要，左侧交给环境组件的诺伦坐姿。
-## 继续、新游戏、牌库、义体档案、演练都通过 Game 调用流程。
+## 继续、新游戏、牌库、科技档案、演练都通过 Game 调用流程。
 ## 原生背景与诺伦局部动画由菜单环境组件提供，本脚本不绘制角色、背景或帧素材。
 
 const MENU_ENVIRONMENT := preload("res://scripts/menu/menu_environment.gd")
@@ -92,7 +92,7 @@ func _build_right_column() -> void:
 	new_button = _menu_button("new_commission", "新的委托", Vector2(COLUMN_X, 446), Vector2(COLUMN_WIDTH, 66), request_new)
 
 	library_button = _menu_button("card_library", "牌库", Vector2(COLUMN_X, 536), Vector2(COLUMN_WIDTH, 48), Game.open_card_library)
-	cyberware_button = _menu_button("cyberware_archive", "义体档案", Vector2(COLUMN_X, 606), Vector2(165, 48), Game.open_cyberware, false, 17)
+	cyberware_button = _menu_button("cyberware_archive", "科技档案", Vector2(COLUMN_X, 606), Vector2(165, 48), Game.open_cyberware, false, 17)
 	training_toggle = _menu_button("training_toggle", "演练  展开", Vector2(COLUMN_X + 185, 606), Vector2(165, 48), _toggle_training, false, 17)
 
 	training_container = Control.new()

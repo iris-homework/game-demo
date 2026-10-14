@@ -25,12 +25,12 @@ func _ready() -> void:
 	subset.cyberwareIds = ["test_cyberware_05", "test_cyberware_02"]
 	Game.player_characters.qa_subset = subset
 	Game.characters.qa_subset = Game.characters.noren.duplicate(true)
-	Game.characters.qa_subset.name = "义体子集测试角色"
+	Game.characters.qa_subset.name = "科技子集测试角色"
 	var empty: Dictionary = subset.duplicate(true)
 	empty.cyberwareIds = []
 	Game.player_characters.qa_empty = empty
 	Game.characters.qa_empty = Game.characters.noren.duplicate(true)
-	Game.characters.qa_empty.name = "无义体测试角色"
+	Game.characters.qa_empty.name = "无科技测试角色"
 	await open_battle("qa_subset")
 	var view = app.view
 	verify(view.cyberware_button.text.contains("2/2"), "HUD uses role's two cyberware cards")
@@ -58,7 +58,7 @@ func _ready() -> void:
 	verify(is_instance_valid(overlay) and overlay.card_buttons.is_empty(), "Empty role still opens informative overlay")
 	var found_empty_text := false
 	for child in overlay.get_children():
-		if child is Label and child.text == "当前角色没有可激活义体":
+		if child is Label and child.text == "当前角色没有可激活科技":
 			found_empty_text = true
 	verify(found_empty_text, "Empty overlay explains missing loadout")
 	await key(KEY_1)

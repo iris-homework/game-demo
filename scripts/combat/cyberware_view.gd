@@ -18,14 +18,17 @@ func _ready() -> void:
 	rect(self,Vector2.ZERO,Vector2(1440,900),Color("06030fee"))
 	cut_panel(self,Vector2(64,34),Vector2(1312,828),INK,PURPLE,28)
 	rect(self,Vector2(102,70),Vector2(5,67),PURPLE)
-	label(self,"激活义体",Vector2(122,68),Vector2(350,56),36)
-	label(self,"%02d / CYBERWARE" % model.cyberware_cards().size(),Vector2(420,80),Vector2(420,38),20,PURPLE)
+	label(self,"激活科技",Vector2(122,68),Vector2(350,56),36)
+	label(self,"%02d / TECHNOLOGY" % model.cyberware_cards().size(),Vector2(420,80),Vector2(420,38),20,PURPLE)
 	label(self,"临时名称与效果 · 冷却 1 回合（含当回合）· 下回合恢复可用",Vector2(124,129),Vector2(1000,31),17,MUTED)
 	close_button = button(self,"关闭  ×",Vector2(1190,78),Vector2(146,46),func(): closed.emit())
 	if model.cyberware_cards().is_empty():
-		label(self,"当前角色没有可激活义体",Vector2(310,360),Vector2(820,60),30,MUTED)
+		label(self,"当前角色没有可激活科技",Vector2(310,360),Vector2(820,60),30,MUTED)
 	for i in model.cyberware_cards().size():
 		var definition: Dictionary = model.cyberware_cards()[i]
+		# Normalize legacy snapshot text for display without changing saved rules.
+		var display_name := str(definition.name).replace("义体", "科技")
+		var description := str(definition.description).replace("义体", "科技")
 		var pos := Vector2(255+(i%3)*330,197+(i/3)*275)
 		var b := button(self,"",pos,Vector2(270,246),func(): activation_requested.emit(definition.id))
 		for state_name in ["normal","hover","pressed","disabled","focus"]:
@@ -35,9 +38,9 @@ func _ready() -> void:
 			elif state_name == "disabled": fill = Color("25272d")
 			elif state_name == "focus": fill = Color.TRANSPARENT
 			b.add_theme_stylebox_override(state_name,style(fill,PURPLE if state_name != "disabled" else Color("606570"),2))
-		b.tooltip_text = definition.name + "（暂定）\n" + definition.description + "\n使用后冷却 1 回合（含当回合），下回合恢复。"
-		label(b,"CYBER / %02d" % (i+1),Vector2(20,13),Vector2(228,25),12,PURPLE)
-		label(b,definition.name,Vector2(20,46),Vector2(230,38),25)
+		b.tooltip_text = display_name + "（暂定）\n" + description + "\n使用后冷却 1 回合（含当回合），下回合恢复。"
+		label(b,"TECH / %02d" % (i+1),Vector2(20,13),Vector2(228,25),12,PURPLE)
+		label(b,display_name,Vector2(20,46),Vector2(230,38),25)
 		rect(b,Vector2(20,92),Vector2(230,1),Color("74528f"))
 		label(b,"+%d" % int(definition.nextAttackBonus),Vector2(19,101),Vector2(110,72),52,PURPLE)
 		label(b,"下次攻击\n伤害增加",Vector2(132,112),Vector2(119,64),18,CREAM)

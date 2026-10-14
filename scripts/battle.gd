@@ -88,7 +88,7 @@ func enter(params: Dictionary) -> void:
 	end_button = button(self,"结束回合  →",Vector2(1240,719),Vector2(170,40),end_turn_pressed,true)
 	end_button.add_theme_font_size_override("font_size",16)
 	end_button.tooltip_text = "敌方执行头顶意图；未使用手牌弃置，再抽取新手牌。临时规则不限制出牌次数。"
-	cyberware_button = button(self,"激活义体",Vector2(30,719),Vector2(170,40),show_cyberware)
+	cyberware_button = button(self,"激活科技",Vector2(30,719),Vector2(170,40),show_cyberware)
 	cyberware_button.add_theme_font_size_override("font_size",15)
 	for state_name in ["normal","hover","pressed","focus"]:
 		var purple_style := button_style(state_name,false)
@@ -519,8 +519,8 @@ func commit() -> void:
 
 func refresh_cyberware() -> void:
 	if not is_instance_valid(cyberware_status): return
-	cyberware_button.text = "激活义体 · %d/%d" % [model.available_cyberware_count(),model.cyberware_cards().size()]
-	cyberware_status.text = "下次攻击伤害 +%d" % model.next_attack_bonus if model.next_attack_bonus > 0 else "临时义体 / 点击查看"
+	cyberware_button.text = "激活科技 · %d/%d" % [model.available_cyberware_count(),model.cyberware_cards().size()]
+	cyberware_status.text = "下次攻击伤害 +%d" % model.next_attack_bonus if model.next_attack_bonus > 0 else "临时科技 / 点击查看"
 
 func show_cyberware() -> void:
 	if not initialized or Game.battle_busy or Game.transition_locked or is_instance_valid(pile_overlay): return

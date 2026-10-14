@@ -1040,7 +1040,7 @@
     },
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
-    "description": "一名装载过量义体的男子在街区失控。",
+    "description": "一名装载过量科技的男子在街区失控。",
     "optional": true,
     "demoNote": "演示条件：完成阵营入门后开放，正式条件待确认。",
     "rewardIds": [],

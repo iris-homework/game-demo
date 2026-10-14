@@ -48,7 +48,7 @@ func _ready() -> void:
 	check(normal.available_cyberware_count() == 6 and normal.activate_cyberware(FIRST), "Next player turn releases cooldown")
 	# Only in-memory fixture actors have alternative lists.
 	Game.characters["qa_subset"] = Game.characters.noren.duplicate(true)
-	Game.characters["qa_subset"].displayName = "义体配置测试角色"
+	Game.characters["qa_subset"].displayName = "科技配置测试角色"
 	Game.player_characters["qa_subset"] = original.duplicate(true)
 	Game.player_characters["qa_subset"].cyberwareIds = [FIFTH, SECOND]
 	Game.characters["qa_empty"] = Game.characters.noren.duplicate(true)
