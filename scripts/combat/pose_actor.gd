@@ -9,7 +9,7 @@ var alive := true
 var tint := Color("ff4c9b")
 var poses: Dictionary = {}
 const NOREN := {
-	"idle": [Vector2(710,1232),0.099], "move": [Vector2(920,1048),0.103],
+	"idle": [Vector2(710,1240),0.099], "move": [Vector2(920,1048),0.103],
 	"slash": [Vector2(725,1110),0.103], "pierce": [Vector2(1000,941),0.132],
 	"block": [Vector2(550,1140),0.103], "damaged": [Vector2(700,1230),0.099]
 }

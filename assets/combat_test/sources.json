@@ -28,8 +28,9 @@
     },
     {
       "file": "noren_idle.png",
-      "source": "../动作参考_2026-10-13/诺伦/01_待机_idle.png",
-      "sha256": "eefade0be25218d91938e15fd72ce462497aee17a31f1add54d589934706f5f6"
+      "source": "../../../卡牌游戏美术资源/动作参考_2026-10-13/诺伦/01_待机_idle.png",
+      "sha256": "01e0012f008b4b609f00dd5806737d412538cee8d2a8f5c85a3393bbfc0c5d75",
+      "note": "2026-10-14 user-updated upright idle; identical to 01_待机_idle_站直版_v2.png. Original RGBA bytes copied without editing."
     },
     {
       "file": "noren_block.png",
