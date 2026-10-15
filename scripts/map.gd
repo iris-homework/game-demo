@@ -362,8 +362,6 @@ func _make_spec(place: Dictionary, avatar_texture: Texture2D) -> Dictionary:
 			badges.append({"kind": "main", "count": main_events.size(), "color": accent})
 		if not optional_events.is_empty():
 			badges.append({"kind": "optional", "count": optional_events.size(), "color": accent})
-		if badges.is_empty() and completed:
-			badges.append({"kind": "check", "count": 0, "color": Color("9fd3dc")})
 	var tooltip := str(place.get("description", ""))
 	if not open:
 		tooltip = str(place.get("lockHint", "尚未开放"))

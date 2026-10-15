@@ -100,7 +100,6 @@ func enter(params: Dictionary) -> void:
 	refresh_cyberware()
 	if Game.config.developmentMode:
 		button(self,"调试结果",Vector2(1230,163),Vector2(160,36),show_debug_results).add_theme_font_size_override("font_size",15)
-	button(self,"投降",Vector2(1230,211),Vector2(160,36),func(): finish("surrender")).add_theme_font_size_override("font_size",15)
 	aim = Node2D.new()
 	aim.set_script(preload("res://scripts/combat/targeting_line.gd"))
 	aim.z_index = 35

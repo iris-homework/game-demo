@@ -34,9 +34,9 @@ func _ready() -> void:
 	var turn: int = view.model.turn
 	view.end_turn_pressed()
 	view.show_pile("抽牌堆",view.model.draw_pile)
-	view.finish("surrender")
+	view.finish("lose")
 	await key(KEY_F1)
-	verify(view.model.turn == turn and Game.page == "battle" and view.pile_overlay == overlay and not is_instance_valid(app.debug_panel),"Modal blocks turn, pile, surrender and debug shortcuts")
+	verify(view.model.turn == turn and Game.page == "battle" and view.pile_overlay == overlay and not is_instance_valid(app.debug_panel),"Modal blocks turn, pile, result submission and debug shortcuts")
 	await click(overlay.card_buttons[0].get_global_rect().get_center())
 	verify(view.model.next_attack_bonus == 1 and overlay.card_buttons[0].disabled,"Click activates and marks card used")
 	await click(overlay.card_buttons[0].get_global_rect().get_center())

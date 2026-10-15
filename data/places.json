@@ -3,8 +3,6 @@
     "id": "bar",
     "name": "地下酒馆",
     "backgroundAssetId": "bar",
-    "unlockCondition": {},
-    "lockHint": "",
     "description": "藏在后巷的午夜酒馆。酒杯与闲谈掩护着消息交换和委托交易。",
     "mapAnchor": [
       0.106,
@@ -34,10 +32,6 @@
     "id": "junkyard",
     "name": "垃圾场",
     "backgroundAssetId": "junkyard",
-    "unlockCondition": {
-      "completed": "E01"
-    },
-    "lockHint": "先在地下酒馆接下委托",
     "description": "城市边缘的废弃物层层堆叠，可回收零件与故障设备散落其间。",
     "mapAnchor": [
       0.23,
@@ -67,10 +61,6 @@
     "id": "alley",
     "name": "后巷",
     "backgroundAssetId": "alley",
-    "unlockCondition": {
-      "flag": "alleyClue"
-    },
-    "lockHint": "从蜂巢城寨取得线索",
     "description": "巷道交错，出口难辨。外来者很容易误入别人的地盘。",
     "mapAnchor": [
       0.173,
@@ -100,17 +90,6 @@
     "id": "camp",
     "name": "归零运动营地",
     "backgroundAssetId": "camp",
-    "unlockCondition": {
-      "any": [
-        {
-          "completed": "E05A"
-        },
-        {
-          "completed": "E05B"
-        }
-      ]
-    },
-    "lockHint": "完成任一港口追踪委托",
     "description": "归零运动的根据地。居住、集会与备战空间紧邻，像一座自给自足的村落。",
     "mapAnchor": [
       0.075,
@@ -140,17 +119,6 @@
     "id": "tower",
     "name": "沃斯大楼",
     "backgroundAssetId": "tower",
-    "unlockCondition": {
-      "any": [
-        {
-          "completed": "E05A"
-        },
-        {
-          "completed": "E05B"
-        }
-      ]
-    },
-    "lockHint": "完成任一港口追踪委托",
     "description": "城市最高的建筑，沃斯集团总部。高处的办公空间彰显集团的权势。",
     "mapAnchor": [
       0.503,
@@ -180,10 +148,6 @@
     "id": "port",
     "name": "港口",
     "backgroundAssetId": "port",
-    "unlockCondition": {
-      "flag": "portClue"
-    },
-    "lockHint": "在后巷取得港口线索",
     "description": "货轮与人潮不断往来。码头和仓库为追踪与逃跑提供复杂地形。",
     "mapAnchor": [
       0.85,
@@ -213,21 +177,10 @@
     "id": "block5",
     "name": "五号街区",
     "backgroundAssetId": "block5",
-    "unlockCondition": {
-      "any": [
-        {
-          "completed": "E05A"
-        },
-        {
-          "completed": "E05B"
-        }
-      ]
-    },
-    "lockHint": "完成任一港口追踪委托",
     "description": "密集的中产居民区。稳定的生活节奏让突发暴力事件更加显眼。",
     "mapAnchor": [
-      0.742,
-      0.56
+      0.7,
+      0.57
     ],
     "hitArea": {
       "type": "rect",
@@ -253,17 +206,6 @@
     "id": "power",
     "name": "发电厂",
     "backgroundAssetId": "power",
-    "unlockCondition": {
-      "any": [
-        {
-          "completed": "E05A"
-        },
-        {
-          "completed": "E05B"
-        }
-      ]
-    },
-    "lockHint": "完成任一港口追踪委托",
     "description": "城市的能源心脏。输电管线穿过厂区，为各街区维持昼夜不息的供电。",
     "mapAnchor": [
       0.919,
@@ -293,10 +235,6 @@
     "id": "hive",
     "name": "蜂巢城寨",
     "backgroundAssetId": "hive",
-    "unlockCondition": {
-      "completed": "E01"
-    },
-    "lockHint": "先在地下酒馆接下委托",
     "description": "微型住房像蜂巢般堆叠。城市最底层的人在拥挤与混乱中维持着生活秩序。",
     "mapAnchor": [
       0.244,
@@ -326,17 +264,6 @@
     "id": "pump",
     "name": "黑潮泵站",
     "backgroundAssetId": "pump",
-    "unlockCondition": {
-      "any": [
-        {
-          "completed": "E05A"
-        },
-        {
-          "completed": "E05B"
-        }
-      ]
-    },
-    "lockHint": "完成任一港口追踪委托",
     "description": "污水与工业废水在此汇合，经主排污口流向港口外海。",
     "mapAnchor": [
       0.877,
@@ -366,17 +293,6 @@
     "id": "garden",
     "name": "白昼庭院",
     "backgroundAssetId": "garden",
-    "unlockCondition": {
-      "any": [
-        {
-          "completed": "E05A"
-        },
-        {
-          "completed": "E05B"
-        }
-      ]
-    },
-    "lockHint": "完成任一港口追踪委托",
     "description": "富人居住区。与五号街区仅隔一条街，却有独立门禁与专人维护的庭院。",
     "mapAnchor": [
       0.699,
@@ -406,10 +322,6 @@
     "id": "hotel",
     "name": "末班车旅馆",
     "backgroundAssetId": "hotel",
-    "unlockCondition": {
-      "completed": "E01"
-    },
-    "lockHint": "先在地下酒馆接下委托",
     "description": "旧环线终点站旁的候车楼改建而成。招牌彻夜亮着，夜班工人与过路人来去频繁。",
     "mapAnchor": [
       0.455,
@@ -439,10 +351,6 @@
     "id": "church",
     "name": "科技教会",
     "backgroundAssetId": "church",
-    "unlockCondition": {
-      "completed": "E01"
-    },
-    "lockHint": "先在地下酒馆接下委托",
     "description": "金属骨架、冷色灯带与全息圣像构成庄严的礼拜空间，祭坛陈列着精密科技。信众将机械替换与身体改造视为接近理想生命的信仰实践，电子祷词与科技运转声在穹顶下回荡。",
     "mapAnchor": [
       0.51,
@@ -472,10 +380,6 @@
     "id": "mall",
     "name": "沃斯商场",
     "backgroundAssetId": "mall",
-    "unlockCondition": {
-      "completed": "E01"
-    },
-    "lockHint": "先在地下酒馆接下委托",
     "description": "沃斯集团拥有的城市最大商场。商品与补给功能待设计。",
     "mapAnchor": [
       0.449,
@@ -505,10 +409,6 @@
     "id": "market",
     "name": "黑市",
     "backgroundAssetId": "market",
-    "unlockCondition": {
-      "completed": "E01"
-    },
-    "lockHint": "先在地下酒馆接下委托",
     "description": "隐藏在城寨里的交易场所。商品、卡牌和交易规则待设计。",
     "mapAnchor": [
       0.182,
@@ -538,10 +438,6 @@
     "id": "hospital",
     "name": "医院",
     "backgroundAssetId": "hospital",
-    "unlockCondition": {
-      "completed": "E01"
-    },
-    "lockHint": "先在地下酒馆接下委托",
     "description": "城市最大的正规医疗机构，承担急救与诊疗。原型治疗每次回复 30% 最大生命。",
     "mapAnchor": [
       0.631,
@@ -577,10 +473,6 @@
     "id": "clinic",
     "name": "地下诊所",
     "backgroundAssetId": "clinic",
-    "unlockCondition": {
-      "completed": "E01"
-    },
-    "lockHint": "先在地下酒馆接下委托",
     "description": "蜂巢城寨内不起眼的小诊所。原型治疗每次回复 30% 最大生命；正式费用与限制待设计。",
     "mapAnchor": [
       0.329,

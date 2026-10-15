@@ -64,7 +64,7 @@ func _ready() -> void:
 	check(Game.load_game() and same_checkpoint(Game.state, saved), "Load preserves existing HP, piles and snapshot despite config edits")
 	Game.start_training("B12")
 	check(Game.player_character_id() == "qa_actor" and Game.state.maxHp == 200 and Game.state.combat.instances.size() == 1, "Training uses current character and own base deck")
-	Game.finish_training("surrender")
+	Game.finish_training("lose")
 	check(same_checkpoint(Game.state, saved), "Training restores full adventure identity and progress")
 	var before := Game.state.duplicate(true)
 	Game.new_game("bartender")

@@ -60,7 +60,7 @@ func _ready() -> void:
 	await settle(0.1)
 	verify(view.enemy_plates[2].visible and is_equal_approx(view.enemy_plates[2].modulate.a,0.4) and not view.enemy_intents[2].visible,"Dead enemy retains a dimmed HP slot but loses its intent")
 	await shot("05-dead-hidden")
-	Game.finish_training("surrender")
+	Game.finish_training("lose")
 	await idle()
 	Game.start_training("B04")
 	await idle()

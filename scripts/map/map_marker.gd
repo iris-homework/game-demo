@@ -34,7 +34,6 @@ var has_avatar := false
 var _frame_tex: TextureRect
 var _hover_tween: Tween
 var _hover_amount := 0.0
-var _select_ring: TextureRect
 var _symbol: TextureRect
 var _name_label: Label
 var _avatar_root: Control
@@ -72,8 +71,6 @@ func prepare(spec: Dictionary) -> void:
 func _build(side: String, spec: Dictionary) -> void:
 	var origin := Vector2(left_pad, TOP_PAD)
 	var frames := MidnightMapAssets.frames()
-	_select_ring = _frame_view(frames.get("selected"), origin, 1.20, Color(0.95, 0.92, 0.86, 0.72))
-	_select_ring.visible = false
 	_frame_tex = _frame_view(frames.get("normal"), origin, 1.0, frame_tint)
 	_symbol = TextureRect.new()
 	_symbol.texture = MidnightMapAssets.symbol(place_id)
@@ -108,8 +105,6 @@ func _frame_view(texture: Texture2D, origin: Vector2, view_scale: float, tint: C
 	var material := ShaderMaterial.new()
 	material.shader = preload("res://scripts/map/frame_state.gdshader")
 	var edge_color := accent
-	if view_scale == 1.20:
-		edge_color = Color("fff4dc")
 	material.set_shader_parameter("edge_color", Color(edge_color, tint.a))
 	node.material = material
 	node.modulate = Color.WHITE
@@ -210,7 +205,7 @@ func _apply_hover(amount: float) -> void:
 	# 图案和角标围绕同一尖端缩放，命中区域保持稳定，避免边缘反复触发进出。
 	var anchor := Vector2(left_pad, TOP_PAD) + tip_local
 	var visual_scale := Vector2.ONE * lerpf(1.0, HOVER_SCALE, amount)
-	for node in [_frame_tex, _select_ring, _symbol]:
+	for node in [_frame_tex, _symbol]:
 		if is_instance_valid(node):
 			node.pivot_offset = anchor - node.position
 			node.scale = visual_scale
@@ -229,8 +224,6 @@ func is_hovered() -> bool:
 	return _hovered
 
 func _update_visuals() -> void:
-	if is_instance_valid(_select_ring):
-		_select_ring.visible = _selected
 	if is_instance_valid(_name_label):
 		_name_label.visible = persistent_name or _hovered or _selected
 	if _selected:

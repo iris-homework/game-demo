@@ -1,6 +1,6 @@
 class_name MidnightMapBadge
 extends Control
-## 用户提供的任务／锁定符号，置于固定直径圆框中；完成勾保持既有样式。
+## 用户提供的任务／锁定符号，置于固定直径圆框中。
 
 const DIAMETER := 28.0
 const STATUS_ICONS := {
@@ -41,16 +41,12 @@ func _measure() -> Vector2:
 			return Vector2(width, DIAMETER)
 		"lock":
 			return Vector2(DIAMETER, DIAMETER)
-		"check":
-			return Vector2(22.0, 22.0)
 	return Vector2(0.0, 0.0)
 
 func _draw() -> void:
 	match kind:
 		"main", "optional", "lock":
 			_draw_icon_frame()
-		"check":
-			_draw_check()
 
 func _build_icon() -> void:
 	if is_instance_valid(_icon):
@@ -90,16 +86,3 @@ func _draw_icon_frame() -> void:
 		draw_string_outline(font, Vector2(DIAMETER + 4.0, baseline), str(count), HORIZONTAL_ALIGNMENT_LEFT, -1.0, 17, 4, Color(0.03, 0.05, 0.09, 0.94))
 		draw_string(font, Vector2(DIAMETER + 4.0, baseline), str(count), HORIZONTAL_ALIGNMENT_LEFT, -1.0, 17, accent)
 
-func _draw_check() -> void:
-	var back := Rect2(0.5, 0.5, _size.x - 1.0, _size.y - 1.0)
-	draw_style_box(_round(back, Color(0.04, 0.06, 0.10, 0.88), Color(accent, 0.70), 3), back)
-	draw_line(Vector2(_size.x * 0.24, _size.y * 0.54), Vector2(_size.x * 0.44, _size.y * 0.74), accent, 2.4, true)
-	draw_line(Vector2(_size.x * 0.44, _size.y * 0.74), Vector2(_size.x * 0.78, _size.y * 0.28), accent, 2.4, true)
-
-func _round(rect: Rect2, fill: Color, border: Color, radius: int) -> StyleBoxFlat:
-	var s := StyleBoxFlat.new()
-	s.bg_color = fill
-	s.border_color = border
-	s.set_border_width_all(1)
-	s.set_corner_radius_all(radius)
-	return s

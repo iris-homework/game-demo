@@ -77,7 +77,7 @@ func _ready() -> void:
 		verify(view.model.player_hp == 99 and view.model.turn == 2 and view.cards.size() == 5, id + " turn control remains usable")
 		await motion(Vector2(720,100))
 		await shot(id + "_turn2")
-		view.finish("surrender")
+		view.finish("lose")
 		await idle()
 		verify(Game.page == "menu", id + " exit restores training state")
 		await settle(4.1) # Let the exit toast expire before the next scene capture.

@@ -53,7 +53,7 @@ func show_character(id: String, prefix: String) -> Texture2D:
 	check(has_label(Game.display_name("@player")), prefix + " battle label follows ID")
 	check(app.view.model.max_hp == int(Game.player_definition().attributes.maxHp), prefix + " battle HP follows config")
 	await shot(prefix + "-battle")
-	Game.finish_training("surrender")
+	Game.finish_training("lose")
 	await idle()
 	return avatar
 

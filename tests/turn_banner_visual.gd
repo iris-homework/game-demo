@@ -56,7 +56,7 @@ func _ready() -> void:
 	await click(Vector2(1280,647))
 	view.show_cyberware()
 	view.show_pile("抽牌堆",view.model.draw_pile)
-	view.finish("surrender")
+	view.finish("lose")
 	Game.menu()
 	verify(view.model.turn == 1 and view.model.hand.is_empty() and Game.page == "battle" and not is_instance_valid(view.pile_overlay),"Opening overlay blocks turn, modal and navigation actions")
 	while view.turn_banner.reveal < 0.5: await get_tree().process_frame

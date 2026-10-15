@@ -55,7 +55,7 @@ func _ready() -> void:
 		check(Game.claim_rewards(Game.revision) and Game.page == "map","Exit reward to map")
 		check(not Game.choose_reward_card(options[0],Game.revision),"No claiming from map")
 	# Nonvictories return through their original story nodes, with no reward.
-	for outcome in ["lose","surrender"]:
+	for outcome in ["lose"]:
 		start_battle("B08")
 		Game.battle_exit(outcome,Game.revision)
 		finish_dialogue()

@@ -192,7 +192,7 @@ func map_target_events() -> Array:
 	var targets: Array = []
 	for e in available_events():
 		var p := place_data(e.placeId)
-		if not e.optional and not p.is_empty() and meets(p.unlockCondition):
+		if not e.optional and not p.is_empty():
 			targets.append(e)
 	targets.sort_custom(func(a, b): return str(a.id) < str(b.id))
 	return targets
@@ -200,8 +200,7 @@ func map_target_events() -> Array:
 func map_place_state(id: String) -> Dictionary:
 	var p := place_data(id)
 	if p.is_empty(): return {}
-	var open := meets(p.unlockCondition)
-	var available: Array = available_events(id) if open else []
+	var available: Array = available_events(id)
 	available.sort_custom(func(a, b):
 		if bool(a.optional) != bool(b.optional): return not bool(a.optional)
 		return str(a.id) < str(b.id))
@@ -215,7 +214,7 @@ func map_place_state(id: String) -> Dictionary:
 		if e.placeId == id and e.id in state.get("completedEventIds", []):
 			completed = true
 			break
-	return {"place":p, "open":open, "available":available,
+	return {"place":p, "open":true, "available":available,
 		"main_events":main_events, "optional_events":optional_events,
 		"current":state.get("currentPlaceId", "") == id,
 		"target":not main_events.is_empty() and not state.get("flags", {}).get("week1Complete", false),
@@ -269,7 +268,7 @@ func go_map() -> void:
 func visit(id: String) -> void:
 	if transition_locked or battle_busy: return
 	var p := place_data(id)
-	if p.is_empty() or not meets(p.unlockCondition): return
+	if p.is_empty(): return
 	state.currentPlaceId = id
 	state.currentScene = "place"
 	checkpoint()
@@ -279,7 +278,7 @@ func start_event(id: String) -> bool:
 	if not events.has(id): return false
 	var e: Dictionary = events[id]
 	if id in state.completedEventIds or not meets(e.unlockCondition): return false
-	if not meets(place_data(e.placeId).unlockCondition): return false
+	if place_data(e.placeId).is_empty(): return false
 	state.activeEventId = id
 	state.currentPlaceId = e.placeId
 	state.battleId = ""
@@ -404,6 +403,7 @@ func choose(index: int, expected_revision: int) -> bool:
 	return true
 
 func battle_exit(result: String, expected_revision: int) -> bool:
+	if result not in ["win", "lose"]: return false
 	if transition_locked or battle_busy or expected_revision != revision or state.currentScene != "battle": return false
 	var b: Dictionary = battles.get(state.battleId, {})
 	if not b.get("returnNodeByResult", {}).has(result): return false
@@ -573,7 +573,7 @@ func commit_combat(model: CombatModel) -> void:
 func heal_at(place_id: String) -> bool:
 	if transition_locked or battle_busy or not state.currentScene in ["map", "place"]: return false
 	var p := place_data(place_id)
-	if p.is_empty() or not meets(p.unlockCondition): return false
+	if p.is_empty(): return false
 	for service in p.get("services", []):
 		if service.type == "healHpPercent":
 			var previous := int(state.currentHp)
@@ -601,11 +601,12 @@ func restore_training() -> void:
 	training_mode = false
 
 func finish_training(result: String) -> void:
+	if not training_mode or result not in ["win", "lose"]: return
 	restore_training()
 	page = "menu"
 	revision += 1
 	changed.emit()
-	notice.emit("演练结束：%s。冒险进度和血量未改变。" % {"win":"胜利","lose":"失败","surrender":"投降"}.get(result,result))
+	notice.emit("演练结束：%s。冒险进度和血量未改变。" % {"win":"胜利","lose":"失败"}.get(result,result))
 
 func open_cyberware() -> void:
 	if transition_locked or battle_busy: return

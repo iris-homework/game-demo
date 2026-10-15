@@ -34,7 +34,7 @@ func _ready() -> void:
 	Game.meta_path = OUTPUT + "migration-meta.json"
 	check(not Game.initial_state().has("faction"), "New game has no allegiance")
 	check(Game.read_data("weeks/week1/week.json").eventIds == Game.events.keys(), "Week index matches active events")
-	for p in Game.places: check_condition(p.unlockCondition)
+	for p in Game.places: check(not p.has("unlockCondition"), "Places have no unlock conditions")
 	for e in Game.events.values():
 		check_condition(e.unlockCondition)
 		check(not e.nodes.has("join"), "No recruitment choice")

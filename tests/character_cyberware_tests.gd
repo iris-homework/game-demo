@@ -73,7 +73,7 @@ func _ready() -> void:
 	check(restored.play_card(restored.hand[0], 0).damage == 2, "Restored pending bonus resolves exactly once")
 	Game.start_training("B12")
 	check(Game.state.combat.profile.playerCharacterId == "qa_subset" and Game.state.combat.profile.cyberware.cards.is_empty(), "Training uses current actor's new list")
-	Game.finish_training("surrender")
+	Game.finish_training("lose")
 	check(same_save(Game.state, saved), "Training restores previous adventure and its frozen list")
 	subset = battle_for("qa_subset")
 	check(subset.cyberware_cards().is_empty(), "Next new battle takes updated actor configuration")

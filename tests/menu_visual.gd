@@ -245,7 +245,7 @@ func input_suite() -> void:
 		await wait_unlocked()
 		check(Game.page == "battle" and Game.training_mode and Game.state.battleId == battle_id,"real training entrance " + battle_id)
 		# Existing outcome API ends the exercise; this is not a full combat playthrough.
-		Game.finish_training("surrender")
+		Game.finish_training("lose")
 		await wait_unlocked()
 		await settle(0.5)
 		check(Game.page == "menu" and Game.state == adventure and not Game.training_mode,"training restores adventure " + battle_id)

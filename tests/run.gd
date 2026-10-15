@@ -36,7 +36,7 @@ func start_contract(index: int) -> void:
 func _ready() -> void:
 	Game.save_enabled = false
 	Game.save_path = "user://automated_test_checkpoint.json"
-	# Validate authored references, completion nodes and all three return paths.
+	# Validate authored references, including legacy saved result nodes.
 	check(Game.places.size() == 17, "17 places including church")
 	check(Game.events.size() == 9, "9 independent commission events")
 	for e in Game.events.values():
@@ -82,7 +82,7 @@ func _ready() -> void:
 		check(not Game.start_event("E12"), "No repeating Boss")
 	# Every battle must resume the exact corresponding node after disk roundtrip.
 	for b in Game.battles.values():
-		for result in ["win", "lose", "surrender"]:
+		for result in ["win", "lose"]:
 			Game.state = Game.initial_state()
 			Game.state.targetId = "richard"
 			Game.state.activeEventId = b.eventId
@@ -91,7 +91,10 @@ func _ready() -> void:
 			check(Game.save_game(), "Save battle")
 			Game.state = {}
 			check(Game.load_game(), "Restore battle")
+			var before_rejected := Game.state.duplicate(true)
 			var battle_rev := Game.revision
+			check(not Game.battle_exit("surrender", battle_rev), "Surrender rejected " + b.id)
+			check(Game.state == before_rejected and Game.revision == battle_rev and Game.page == "battle", "Rejected surrender preserves battle")
 			check(Game.battle_exit(result,battle_rev), b.id + " " + result)
 			check(not Game.battle_exit(result,battle_rev), "Duplicate battle result rejected")
 			check(Game.state.activeNodeId == b.returnNodeByResult[result], "Exact return node")
@@ -100,6 +103,24 @@ func _ready() -> void:
 				check(Game.state.flags.is_empty(), "Failure grants no clues")
 				check(Game.node_data().has("choices"), "Failure has an exit")
 			check(Game.save_game() and Game.load_game(), "Restore result node")
+	# Legacy result checkpoints still return to the map; new training cannot surrender.
+	Game.state = Game.initial_state()
+	Game.state.targetId = "richard"
+	Game.state.activeEventId = "E02"
+	Game.state.currentPlaceId = "junkyard"
+	Game.state.result = "surrender"
+	Game.enter_node("surrender")
+	check(Game.save_game() and Game.load_game(), "Legacy surrender dialogue still loads")
+	check(Game.choose(0, Game.revision) and Game.page == "map", "Legacy surrender can return to map")
+	var adventure := Game.state.duplicate(true)
+	Game.start_training("B12")
+	var training := Game.state.duplicate(true)
+	var training_revision := Game.revision
+	check(not Game.battle_exit("surrender", Game.revision), "Training battle exit rejects surrender")
+	Game.finish_training("surrender")
+	check(Game.training_mode and Game.state == training and Game.revision == training_revision and Game.page == "battle", "Direct training surrender leaves battle intact")
+	Game.finish_training("lose")
+	check(not Game.training_mode and Game.page == "menu" and Game.state == adventure, "Training defeat restores adventure")
 	# Configured rewards are claimed atomically and idempotently; production pool is empty.
 	check(Game.rewards.is_empty(), "No invented production reward")
 	Game.rewards["test"] = {"type":"credits","amount":20,"name":"test"}

@@ -132,8 +132,8 @@ func play_dialogue(choice: int = 0) -> void:
 		app.view.text_label.visible_characters = -1
 		if not app.view.choice_buttons.is_empty():
 			await click(button_center(app.view.choice_buttons[choice]))
-		elif is_instance_valid(app.view.advance_button):
-			await click(button_center(app.view.advance_button))
+		elif Game.node_data().has("next"):
+			await click(Vector2(720, 760))
 		else:
 			break
 	check(guard < 50, "actual dialogue input terminates")
@@ -291,9 +291,14 @@ func _ready() -> void:
 	await settle()
 	start_place = Game.state.currentPlaceId
 	await click(app.view.get_marker_center("tower"))
-	check(map_button("enter_place") == null, "locked location has no enter action")
-	check(Game.page == "map" and Game.state.currentPlaceId == start_place, "locked click preserves state")
-	await shot("07-locked-detail")
+	check(map_button("enter_place") != null, "tower has enter action before port contract")
+	check(Game.page == "map" and Game.state.currentPlaceId == start_place, "opening detail preserves state")
+	await shot("07-open-tower-detail")
+	await click(button_center(map_button("enter_place")))
+	check(Game.page == "place" and Game.state.currentPlaceId == "tower", "tower enter works before port contract")
+	Game.go_map()
+	await settle()
+	start_place = Game.state.currentPlaceId
 	app.view.close_detail()
 	await click(app.view.get_marker_center("hospital"))
 	check(map_button("enter_place") != null and map_button("heal_place") != null, "open no-event hospital retains enter and service")
@@ -389,7 +394,7 @@ func _ready() -> void:
 	Game.changed.emit()
 	await settle()
 	await click(app.view.get_marker_center("tower"))
-	check(not Game.map_place_state("tower").target and map_button("event_MAP_LOCKED_INPUT") == null and map_button("enter_place") == null, "available event cannot expose locked place action")
+	check(map_button("event_MAP_LOCKED_INPUT") != null and map_button("enter_place") != null, "open tower exposes eligible event and enter actions")
 	Game.events.erase(locked_fixture.id)
 	await stage()
 	await click(app.view.get_marker_center("hive"))
@@ -403,7 +408,7 @@ func _ready() -> void:
 	check(Game.save_game() and Game.load_game(), "advanced target round-trips through isolated checkpoint")
 	await settle()
 	check(Game.page == "map" and Game.map_place_state("alley").target, "checkpoint restores advanced target")
-	for outcome in ["lose", "surrender"]:
+	for outcome in ["lose"]:
 		await stage()
 		await click(app.view.get_marker_center("hive"))
 		await click(button_center(map_button("event_E03")))

@@ -57,9 +57,16 @@ func _ready() -> void:
 		check(matching.size() == 1 and ResourceLoader.exists("res://assets/icons/map/" + str(matching[0].icon)), "existing symbol " + p.id)
 	check(Game.texture(Game.map_config.cityMapAssetId) != null, "city texture is configured")
 	Game.state = Game.initial_state()
-	check(not Game.map_place_state("church").open, "church opens after accepting the tavern contract")
-	Game.visit("church")
-	check(Game.state.currentPlaceId == "bar", "locked church visit is rejected")
+	for p in Game.places:
+		check(Game.map_place_state(p.id).open, "place open before any event " + p.id)
+		Game.visit(p.id)
+		check(Game.page == "place" and Game.state.currentPlaceId == p.id, "initial visit succeeds " + p.id)
+	check(not Game.start_event("E12"), "open places do not bypass story prerequisites")
+	Game.state.currentHp = 50
+	check(Game.heal_at("clinic") and Game.state.currentHp == 80, "clinic service available before E01")
+	var last_place: String = Game.state.currentPlaceId
+	Game.visit("unknown")
+	check(Game.state.currentPlaceId == last_place, "unknown location still rejected")
 	reset_map()
 	check(Game.map_place_state("church").open and Game.available_events("church").is_empty(), "church is visitable without invented events")
 	var church_before: Dictionary = Game.state.duplicate(true)
@@ -90,17 +97,20 @@ func _ready() -> void:
 	check(target_ids() == ["E03"], "completed stale active event not used as target")
 	# Synthetic map combinations stay in memory and leave authored data unchanged.
 	var tower: Dictionary = Game.place_data("tower")
-	var old_condition: Dictionary = tower.unlockCondition.duplicate(true)
+	tower.unlockCondition = {"flag":"obsoletePlaceLock"}
 	var fake_event := {"id":"MAP_LOCKED_TEST", "placeId":"tower", "optional":false, "unlockCondition":{}, "title":"Locked fixture"}
 	Game.events[fake_event.id] = fake_event
 	check(Game.available_events("tower").size() > 0, "fixture event-level condition passes")
-	check(not Game.map_place_state("tower").open and not Game.map_place_state("tower").target and Game.map_place_state("tower").available.is_empty(), "locked place excludes available events and targets")
+	check(Game.map_place_state("tower").open and Game.map_place_state("tower").target and Game.map_place_state("tower").available.size() == 1, "obsolete place condition cannot hide available events or targets")
+	check("MAP_LOCKED_TEST" in target_ids(), "target query ignores obsolete place condition")
+	Game.visit("tower")
+	check(Game.state.currentPlaceId == "tower", "visit ignores obsolete place condition")
 	Game.events.erase(fake_event.id)
 	Game.events["MAP_PARALLEL_TEST"] = {"id":"MAP_PARALLEL_TEST", "placeId":"bar", "optional":false, "unlockCondition":{}, "title":"Parallel fixture"}
 	check(target_ids() == ["E03", "MAP_PARALLEL_TEST"], "all simultaneous main candidates in stable order")
 	check(Game.objective() == "2 个可推进的主线目标", "multiple candidates not arbitrarily reduced")
 	Game.events.erase("MAP_PARALLEL_TEST")
-	check(tower.unlockCondition == old_condition, "authored unlock conditions retained")
+	tower.erase("unlockCondition")
 	# Actual first-week routes, including both independent contracts.
 	for contract in ["richard", "lumina"]:
 		reset_map()
@@ -116,7 +126,7 @@ func _ready() -> void:
 		check(target_ids().is_empty(), "no false next-week target " + contract)
 		check(Game.map_place_state("pump").optional_events.size() == 1, "optional remains after week completion " + contract)
 	reset_map()
-	for outcome in ["lose", "surrender"]:
+	for outcome in ["lose"]:
 		Game.start_event("E03")
 		var guard := 0
 		while Game.state.currentScene == "dialogue" and guard < 40:
@@ -141,5 +151,7 @@ func _ready() -> void:
 	check(Game.load_game(), "test-path checkpoint restored")
 	check(Game.state.get("currentPlaceId", "") == expected.currentPlaceId and target_ids() == ["E03"], "restored place and target derived correctly")
 	check(Game.state.get("schemaVersion", 0) == 2, "save schema retained")
+	for p in Game.places:
+		check(Game.map_place_state(p.id).open, "restored save keeps place open " + p.id)
 	print("MAP MODEL: %d checks, %d failures" % [checks, failures])
 	get_tree().quit(0 if failures == 0 else 1)
