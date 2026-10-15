@@ -89,11 +89,20 @@ func _build_dialogue_panel() -> void:
 	speaker_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	speaker_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	speaker_label.rotation = -0.20
-	var title := label(self, "午夜委托", Vector2(22,798), Vector2(220,30), 21, Color.BLACK)
+	# Center both lines on the red plaque's local axis, using the original fonts.
+	var brand_center := Vector2(130,791.5)
+	var brand_angle := Vector2(260,-62).angle() # Match the plaque edge exactly.
+	var title := label(self, "午夜委托", brand_center + Vector2(-110,-30).rotated(brand_angle), Vector2(220,30), 21, Color.BLACK)
 	title.add_theme_font_override("font", name_font)
-	title.rotation = -0.20
-	var subtitle := label(self, "MIDNIGHT / W01", Vector2(26,829), Vector2(218,18), 11, Color.BLACK)
-	subtitle.rotation = -0.20
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	title.autowrap_mode = TextServer.AUTOWRAP_OFF
+	title.rotation = brand_angle
+	var subtitle := label(self, "MIDNIGHT COMMISSION", brand_center + Vector2(-110,3).rotated(brand_angle), Vector2(220,22), 13, Color.BLACK)
+	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	subtitle.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	subtitle.autowrap_mode = TextServer.AUTOWRAP_OFF
+	subtitle.rotation = brand_angle
 
 func _story_button(text: String, pos: Vector2, dimensions: Vector2, action: Callable) -> Button:
 	# Native button states keep keyboard focus visible without the shared cyan corner marks.
