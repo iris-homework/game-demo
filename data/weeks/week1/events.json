@@ -15,14 +15,14 @@
         "id": "intro_01",
         "speakerId": "bartender",
         "speakerSide": "right",
-        "text": "欢迎来到午夜酒馆，小姑娘。最近城里不太平，归零运动又在找公司的麻烦。你这时候来，是想喝酒，还是想找活干？",
+        "text": "欢迎来到午夜酒馆，小姑娘。最近城里不太平，找人的委托倒是多了不少。你这时候来，是想喝酒，还是想找活干？",
         "next": "intro_02"
       },
       "intro_02": {
         "id": "intro_02",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "找活干。听说你这里门路不少。",
+        "text": "找活干。我是自由佣兵，按委托办事。听说你这里门路不少。",
         "next": "intro_03"
       },
       "intro_03": {
@@ -54,7 +54,7 @@
         "choices": [
           {
             "id": "richard",
-            "label": "理查德  /  追捕拖欠公司债务的欠债人",
+            "label": "理查德  /  追踪失联的欠债人",
             "next": "chosen_01",
             "effects": [
               {
@@ -66,7 +66,7 @@
           },
           {
             "id": "lumina",
-            "label": "卢米娜  /  追捕袭击公司设施的归零运动成员",
+            "label": "卢米娜  /  寻找失联的货运联络人",
             "next": "chosen_01",
             "effects": [
               {
@@ -494,7 +494,7 @@
     },
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
-    "description": "在港口追上欠债人理查德。",
+    "description": "在港口找到理查德，完成追踪委托并交接。",
     "optional": false,
     "demoNote": "",
     "rewardIds": [],
@@ -538,116 +538,8 @@
         "id": "win_02",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "结束了，别再反抗。等等，这些人是谁？",
+        "text": "结束了，别再反抗。欠款的事，你自己和委托人谈。",
         "next": "win_03"
-      },
-      "win_03": {
-        "id": "win_03",
-        "speakerId": "fitz",
-        "speakerSide": "right",
-        "text": "多谢你替公司抓到他，小姑娘。理查德欠了我们两千万；按公司的规矩，恐怕得在强制劳动所待很久。警卫，带走。",
-        "next": "win_04"
-      },
-      "win_04": {
-        "id": "win_04",
-        "speakerId": "richard",
-        "speakerSide": "right",
-        "text": "菲茨杰拉德先生，等等！求您——",
-        "next": "win_05"
-      },
-      "win_05": {
-        "id": "win_05",
-        "speakerId": "",
-        "speakerSide": "right",
-        "text": "警卫将理查德带离。",
-        "next": "win_06",
-        "type": "stage"
-      },
-      "win_06": {
-        "id": "win_06",
-        "speakerId": "fitz",
-        "speakerSide": "right",
-        "text": "你身手不错。有没有兴趣加入公司特遣部？待遇优厚。",
-        "next": "join"
-      },
-      "join": {
-        "id": "join",
-        "speakerId": "",
-        "speakerSide": "",
-        "text": "回应菲茨杰拉德的邀请",
-        "choices": [
-          {
-            "id": "accept",
-            "label": "接受",
-            "next": "accept_01",
-            "effects": [],
-            "condition": {}
-          },
-          {
-            "id": "refuse",
-            "label": "拒绝",
-            "next": "refuse_01",
-            "effects": [],
-            "condition": {}
-          }
-        ]
-      },
-      "accept_01": {
-        "id": "accept_01",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "我接受。",
-        "next": "accept_02"
-      },
-      "accept_02": {
-        "id": "accept_02",
-        "speakerId": "fitz",
-        "speakerSide": "right",
-        "text": "很好。以后你归我管，薪水照发。跟我去总部办入职手续。",
-        "next": "accept_03"
-      },
-      "accept_03": {
-        "id": "accept_03",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "总算有份正经工作了……大概吧。（心想）",
-        "next": "finish"
-      },
-      "refuse_01": {
-        "id": "refuse_01",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "我拒绝。",
-        "next": "refuse_02"
-      },
-      "refuse_02": {
-        "id": "refuse_02",
-        "speakerId": "fitz",
-        "speakerSide": "right",
-        "text": "可惜，这恐怕不是你能拒绝的事。",
-        "next": "refuse_03"
-      },
-      "refuse_03": {
-        "id": "refuse_03",
-        "speakerId": "",
-        "speakerSide": "right",
-        "text": "菲茨杰拉德向警卫使了个眼色。",
-        "next": "refuse_04",
-        "type": "stage"
-      },
-      "refuse_04": {
-        "id": "refuse_04",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "……行，我加入。",
-        "next": "refuse_05"
-      },
-      "refuse_05": {
-        "id": "refuse_05",
-        "speakerId": "fitz",
-        "speakerSide": "right",
-        "text": "明智的选择。跟我去总部办入职手续。",
-        "next": "finish"
       },
       "battle": {
         "id": "battle",
@@ -687,12 +579,22 @@
       "finish": {
         "id": "finish",
         "type": "finish",
-        "effects": [
-          {
-            "op": "setFaction",
-            "value": "company"
-          }
-        ]
+        "effects": []
+      },
+      "win_03": {
+        "id": "win_03",
+        "speakerId": "",
+        "speakerSide": "right",
+        "type": "stage",
+        "text": "确认理查德的身份后，{主角姓名}通过终端联系委托中间人，完成交接。",
+        "next": "win_04"
+      },
+      "win_04": {
+        "id": "win_04",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "这份委托到此为止。领完报酬，去看看还有什么活。",
+        "next": "finish"
       }
     }
   },
@@ -712,7 +614,7 @@
     },
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
-    "description": "在港口追上被悬赏的归零运动成员卢米娜。",
+    "description": "在港口找到卢米娜，完成追踪委托并交接。",
     "optional": false,
     "demoNote": "",
     "rewardIds": [],
@@ -735,14 +637,14 @@
         "id": "intro_03",
         "speakerId": "lumina",
         "speakerSide": "right",
-        "text": "公司派来的？",
+        "text": "是货运站的人让你来的？",
         "next": "intro_04"
       },
       "intro_04": {
         "id": "intro_04",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "我不是公司的人。",
+        "text": "我是自由佣兵。委托人要确认你的下落。",
         "next": "intro_05"
       },
       "intro_05": {
@@ -763,114 +665,8 @@
         "id": "win_02",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "你已经输了。跟我走。",
+        "text": "别再动手了。跟中间人把事情说清楚，这份委托就结束。",
         "next": "win_03"
-      },
-      "win_03": {
-        "id": "win_03",
-        "speakerId": "rift",
-        "speakerSide": "right",
-        "text": "等一下。",
-        "next": "win_04"
-      },
-      "win_04": {
-        "id": "win_04",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "你又是谁？",
-        "next": "win_05"
-      },
-      "win_05": {
-        "id": "win_05",
-        "speakerId": "rift",
-        "speakerSide": "right",
-        "text": "归零运动干部，里夫特。先别动她。你是公司的人？",
-        "next": "win_06"
-      },
-      "win_06": {
-        "id": "win_06",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "误会。我只是接了委托。",
-        "next": "win_07"
-      },
-      "win_07": {
-        "id": "win_07",
-        "speakerId": "rift",
-        "speakerSide": "right",
-        "text": "看着不像公司的走狗，身手倒是不错。愿不愿意加入归零运动？",
-        "next": "join"
-      },
-      "join": {
-        "id": "join",
-        "speakerId": "",
-        "speakerSide": "",
-        "text": "回应里夫特的邀请",
-        "choices": [
-          {
-            "id": "accept",
-            "label": "接受",
-            "next": "accept_01",
-            "effects": [],
-            "condition": {}
-          },
-          {
-            "id": "refuse",
-            "label": "拒绝",
-            "next": "refuse_01",
-            "effects": [],
-            "condition": {}
-          }
-        ]
-      },
-      "accept_01": {
-        "id": "accept_01",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "我加入。",
-        "next": "accept_02"
-      },
-      "accept_02": {
-        "id": "accept_02",
-        "speakerId": "rift",
-        "speakerSide": "left",
-        "text": "好。从现在起，我们就是同志。",
-        "next": "accept_03"
-      },
-      "accept_03": {
-        "id": "accept_03",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "这事可比委托麻烦多了。（心想）",
-        "next": "finish"
-      },
-      "refuse_01": {
-        "id": "refuse_01",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "没兴趣。",
-        "next": "refuse_02"
-      },
-      "refuse_02": {
-        "id": "refuse_02",
-        "speakerId": "rift",
-        "speakerSide": "right",
-        "text": "那你今天就别想离开港口。",
-        "next": "refuse_03"
-      },
-      "refuse_03": {
-        "id": "refuse_03",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "……等等。我加入。",
-        "next": "refuse_04"
-      },
-      "refuse_04": {
-        "id": "refuse_04",
-        "speakerId": "rift",
-        "speakerSide": "left",
-        "text": "这才对。从现在起，我们就是同志。",
-        "next": "finish"
       },
       "battle": {
         "id": "battle",
@@ -910,117 +706,22 @@
       "finish": {
         "id": "finish",
         "type": "finish",
-        "effects": [
-          {
-            "op": "setFaction",
-            "value": "resistance"
-          }
-        ]
-      }
-    }
-  },
-  "E06": {
-    "id": "E06",
-    "title": "入职公司",
-    "placeId": "tower",
-    "unlockCondition": {
-      "completed": "E05A"
-    },
-    "repeatPolicy": "once",
-    "startNodeId": "intro_01",
-    "description": "前往沃斯大楼，办理公司特遣部入职手续。",
-    "optional": false,
-    "demoNote": "",
-    "rewardIds": [],
-    "nodes": {
-      "intro_01": {
-        "id": "intro_01",
-        "speakerId": "reception",
-        "speakerSide": "right",
-        "text": "你是新来的吧？这是员工证，还有配发的装备。",
-        "next": "intro_02"
-      },
-      "intro_02": {
-        "id": "intro_02",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "谢谢。",
-        "next": "intro_03"
-      },
-      "intro_03": {
-        "id": "intro_03",
-        "speakerId": "reception",
-        "speakerSide": "right",
-        "text": "今天还是第一次有人跟我说谢谢。加油，新人。",
-        "next": "intro_04"
-      },
-      "intro_04": {
-        "id": "intro_04",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "我会的。",
-        "next": "finish"
-      },
-      "finish": {
-        "id": "finish",
-        "type": "finish",
         "effects": []
-      }
-    }
-  },
-  "E07": {
-    "id": "E07",
-    "title": "加入归零运动",
-    "placeId": "camp",
-    "unlockCondition": {
-      "completed": "E05B"
-    },
-    "repeatPolicy": "once",
-    "startNodeId": "intro_01",
-    "description": "随里夫特前往营地，与维克多会面。",
-    "optional": false,
-    "demoNote": "",
-    "rewardIds": [],
-    "nodes": {
-      "intro_01": {
-        "id": "intro_01",
+      },
+      "win_03": {
+        "id": "win_03",
+        "speakerId": "",
+        "speakerSide": "right",
+        "type": "stage",
+        "text": "确认卢米娜的身份后，{主角姓名}通过终端联系委托中间人，完成交接。",
+        "next": "win_04"
+      },
+      "win_04": {
+        "id": "win_04",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "我们这是去哪儿？",
-        "next": "intro_02"
-      },
-      "intro_02": {
-        "id": "intro_02",
-        "speakerId": "rift",
-        "speakerSide": "left",
-        "text": "带你见老大。到了。",
-        "next": "intro_03"
-      },
-      "intro_03": {
-        "id": "intro_03",
-        "speakerId": "victor",
-        "speakerSide": "right",
-        "text": "你好，新人。里夫特说你很能打。",
-        "next": "intro_04"
-      },
-      "intro_04": {
-        "id": "intro_04",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "他夸大了。",
-        "next": "intro_05"
-      },
-      "intro_05": {
-        "id": "intro_05",
-        "speakerId": "victor",
-        "speakerSide": "right",
-        "text": "不用谦虚。能从港口走到这里，就有资格留下。",
+        "text": "这份委托到此为止。领完报酬，去看看还有什么活。",
         "next": "finish"
-      },
-      "finish": {
-        "id": "finish",
-        "type": "finish",
-        "effects": []
       }
     }
   },
@@ -1031,10 +732,10 @@
     "unlockCondition": {
       "any": [
         {
-          "completed": "E06"
+          "completed": "E05A"
         },
         {
-          "completed": "E07"
+          "completed": "E05B"
         }
       ]
     },
@@ -1042,7 +743,7 @@
     "startNodeId": "intro_01",
     "description": "一名装载过量科技的男子在街区失控。",
     "optional": true,
-    "demoNote": "演示条件：完成阵营入门后开放，正式条件待确认。",
+    "demoNote": "完成任一港口追踪委托后开放。",
     "rewardIds": [],
     "nodes": {
       "intro_01": {
@@ -1115,204 +816,6 @@
       }
     }
   },
-  "E09": {
-    "id": "E09",
-    "title": "危险的野狼",
-    "placeId": "power",
-    "unlockCondition": {
-      "all": [
-        {
-          "completed": "E06"
-        },
-        {
-          "faction": "company"
-        }
-      ]
-    },
-    "repeatPolicy": "once",
-    "startNodeId": "intro_01",
-    "description": "公司命你清剿在发电厂活动的野狼部队。",
-    "optional": false,
-    "demoNote": "",
-    "rewardIds": [],
-    "nodes": {
-      "intro_01": {
-        "id": "intro_01",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "就是你们？",
-        "next": "intro_02"
-      },
-      "intro_02": {
-        "id": "intro_02",
-        "speakerId": "",
-        "speakerSide": "right",
-        "text": "野狼部队沉默地摆开阵势。",
-        "next": "intro_03",
-        "type": "stage"
-      },
-      "intro_03": {
-        "id": "intro_03",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "不打算谈？那就来吧。",
-        "next": "battle"
-      },
-      "win_01": {
-        "id": "win_01",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "真难缠……好在公司配的装备够用。",
-        "next": "win_02"
-      },
-      "win_02": {
-        "id": "win_02",
-        "speakerId": "ally_robot",
-        "speakerSide": "left",
-        "text": "胜利。胜利。",
-        "next": "finish"
-      },
-      "battle": {
-        "id": "battle",
-        "type": "battle",
-        "battleId": "B09"
-      },
-      "lose": {
-        "id": "lose",
-        "speakerId": "",
-        "speakerSide": "",
-        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
-        "choices": [
-          {
-            "id": "return",
-            "label": "返回城市地图（保留结果）",
-            "next": "@map",
-            "effects": [],
-            "condition": {}
-          }
-        ]
-      },
-      "surrender": {
-        "id": "surrender",
-        "speakerId": "",
-        "speakerSide": "",
-        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
-        "choices": [
-          {
-            "id": "return",
-            "label": "返回城市地图（保留结果）",
-            "next": "@map",
-            "effects": [],
-            "condition": {}
-          }
-        ]
-      },
-      "finish": {
-        "id": "finish",
-        "type": "finish",
-        "effects": []
-      }
-    }
-  },
-  "E10": {
-    "id": "E10",
-    "title": "进攻发电厂",
-    "placeId": "power",
-    "unlockCondition": {
-      "all": [
-        {
-          "completed": "E07"
-        },
-        {
-          "faction": "resistance"
-        }
-      ]
-    },
-    "repeatPolicy": "once",
-    "startNodeId": "intro_01",
-    "description": "与野狼部队一起切断公司的能源供应。",
-    "optional": false,
-    "demoNote": "",
-    "rewardIds": [],
-    "nodes": {
-      "intro_01": {
-        "id": "intro_01",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "这些是公司的新型号？看着不太好对付。",
-        "next": "intro_02"
-      },
-      "intro_02": {
-        "id": "intro_02",
-        "speakerId": "",
-        "speakerSide": "right",
-        "text": "野狼部队沉默地向前推进。",
-        "next": "intro_03",
-        "type": "stage"
-      },
-      "intro_03": {
-        "id": "intro_03",
-        "speakerId": "company_robot",
-        "speakerSide": "right",
-        "text": "发现入侵者。执行歼灭。",
-        "next": "battle"
-      },
-      "win_01": {
-        "id": "win_01",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "还好有野狼部队在，不然真要栽在这儿。",
-        "next": "win_02"
-      },
-      "win_02": {
-        "id": "win_02",
-        "speakerId": "company_robot",
-        "speakerSide": "right",
-        "text": "机体……损坏……",
-        "next": "finish"
-      },
-      "battle": {
-        "id": "battle",
-        "type": "battle",
-        "battleId": "B10"
-      },
-      "lose": {
-        "id": "lose",
-        "speakerId": "",
-        "speakerSide": "",
-        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
-        "choices": [
-          {
-            "id": "return",
-            "label": "返回城市地图（保留结果）",
-            "next": "@map",
-            "effects": [],
-            "condition": {}
-          }
-        ]
-      },
-      "surrender": {
-        "id": "surrender",
-        "speakerId": "",
-        "speakerSide": "",
-        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
-        "choices": [
-          {
-            "id": "return",
-            "label": "返回城市地图（保留结果）",
-            "next": "@map",
-            "effects": [],
-            "condition": {}
-          }
-        ]
-      },
-      "finish": {
-        "id": "finish",
-        "type": "finish",
-        "effects": []
-      }
-    }
-  },
   "E11": {
     "id": "E11",
     "title": "变异的鱼",
@@ -1320,10 +823,10 @@
     "unlockCondition": {
       "any": [
         {
-          "completed": "E06"
+          "completed": "E05A"
         },
         {
-          "completed": "E07"
+          "completed": "E05B"
         }
       ]
     },
@@ -1331,7 +834,7 @@
     "startNodeId": "intro_01",
     "description": "处理受污染水域中异变的鱼群。",
     "optional": true,
-    "demoNote": "演示条件：阵营入门后开放；暂挂黑潮泵站外海入口。",
+    "demoNote": "完成任一港口追踪委托后开放。",
     "rewardIds": [],
     "nodes": {
       "intro_01": {
@@ -1405,18 +908,18 @@
     "unlockCondition": {
       "any": [
         {
-          "completed": "E09"
+          "completed": "E05A"
         },
         {
-          "completed": "E10"
+          "completed": "E05B"
         }
       ]
     },
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
-    "description": "黑帮头目驾驶公司机甲，回到蜂巢城寨复仇。",
+    "description": "黑帮头目驾驶机甲，回到蜂巢城寨复仇。",
     "optional": false,
-    "demoNote": "演示前置：完成本阵营发电厂任务，正式前置待确认。",
+    "demoNote": "完成任一港口追踪委托后开放。",
     "rewardIds": [],
     "nodes": {
       "intro_01": {

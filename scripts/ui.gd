@@ -174,9 +174,6 @@ func status_bar(section: String, show_days: bool = true, weeks_action: Callable 
 	hp_label = label(self, "", Vector2(202.0, 34.0), Vector2(126.0, 28.0), 16, CREAM)
 	label(self, "%d CR" % int(Game.state.get("credits", 0)), Vector2(340.0, 12.0), Vector2(116.0, 30.0), 20, CREAM)
 	label(self, "信用点", Vector2(340.0, 44.0), Vector2(116.0, 20.0), 12, MUTED)
-	var faction := faction_label()
-	label(self, faction, Vector2(470.0, 12.0), Vector2(116.0, 30.0), 19, CYAN)
-	label(self, "当前阵营", Vector2(470.0, 44.0), Vector2(116.0, 20.0), 12, MUTED)
 	if show_days:
 		# Keep the date centered on the canvas, independent of the fields to its left.
 		var day := clampi(int(Game.state.get("currentDay", 1)), 1, 7)
@@ -262,6 +259,3 @@ func cut_panel(parent: Node, pos: Vector2, dimensions: Vector2, fill: Color, edg
 	polygon(holder,[Vector2(cut+1,2),Vector2(w-2,2),Vector2(w-2,h-cut-1),Vector2(w-cut-1,h-2),Vector2(2,h-2),Vector2(2,cut+1)],fill)
 	return holder
 
-## 地图、菜单与通用 HUD 共用同一阵营显示名，存档仍保存原 ID。
-func faction_label() -> String:
-	return {"": "自由佣兵", "company": "公司特遣部", "resistance": "归零运动"}.get(Game.state.get("faction", ""), "自由佣兵")

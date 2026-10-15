@@ -98,13 +98,20 @@
   },
   {
     "id": "camp",
-    "name": "归零运动营地",
+    "name": "临时营地",
     "backgroundAssetId": "camp",
     "unlockCondition": {
-      "faction": "resistance"
+      "any": [
+        {
+          "completed": "E05A"
+        },
+        {
+          "completed": "E05B"
+        }
+      ]
     },
-    "lockHint": "沿卢米娜委托加入归零运动",
-    "description": "归零运动的根据地。居住、集会与备战空间紧邻，像一座自给自足的村落。",
+    "lockHint": "完成任一港口追踪委托",
+    "description": "过路人与自由佣兵暂歇的落脚处。临时住处、补给堆场与集会空地相邻。",
     "mapAnchor": [
       0.075,
       0.15
@@ -134,9 +141,16 @@
     "name": "沃斯大楼",
     "backgroundAssetId": "tower",
     "unlockCondition": {
-      "faction": "company"
+      "any": [
+        {
+          "completed": "E05A"
+        },
+        {
+          "completed": "E05B"
+        }
+      ]
     },
-    "lockHint": "沿理查德委托加入公司",
+    "lockHint": "完成任一港口追踪委托",
     "description": "城市最高的建筑，沃斯集团总部。高处的办公空间彰显集团的权势。",
     "mapAnchor": [
       0.503,
@@ -202,14 +216,14 @@
     "unlockCondition": {
       "any": [
         {
-          "completed": "E06"
+          "completed": "E05A"
         },
         {
-          "completed": "E07"
+          "completed": "E05B"
         }
       ]
     },
-    "lockHint": "完成阵营入门事件",
+    "lockHint": "完成任一港口追踪委托",
     "description": "密集的中产居民区。稳定的生活节奏让突发暴力事件更加显眼。",
     "mapAnchor": [
       0.742,
@@ -242,15 +256,15 @@
     "unlockCondition": {
       "any": [
         {
-          "completed": "E06"
+          "completed": "E05A"
         },
         {
-          "completed": "E07"
+          "completed": "E05B"
         }
       ]
     },
-    "lockHint": "完成阵营入门事件",
-    "description": "城市的能源心脏，也是公司与归零运动争夺控制权的关键设施。",
+    "lockHint": "完成任一港口追踪委托",
+    "description": "城市的能源心脏。输电管线穿过厂区，为各街区维持昼夜不息的供电。",
     "mapAnchor": [
       0.919,
       0.408
@@ -315,14 +329,14 @@
     "unlockCondition": {
       "any": [
         {
-          "completed": "E06"
+          "completed": "E05A"
         },
         {
-          "completed": "E07"
+          "completed": "E05B"
         }
       ]
     },
-    "lockHint": "完成阵营入门事件",
+    "lockHint": "完成任一港口追踪委托",
     "description": "污水与工业废水在此汇合，经主排污口流向港口外海。",
     "mapAnchor": [
       0.877,
@@ -355,14 +369,14 @@
     "unlockCondition": {
       "any": [
         {
-          "completed": "E06"
+          "completed": "E05A"
         },
         {
-          "completed": "E07"
+          "completed": "E05B"
         }
       ]
     },
-    "lockHint": "完成阵营入门事件",
+    "lockHint": "完成任一港口追踪委托",
     "description": "富人居住区。与五号街区仅隔一条街，却有独立门禁与专人维护的庭院。",
     "mapAnchor": [
       0.699,

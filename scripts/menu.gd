@@ -121,10 +121,7 @@ func _menu_button(node_name: String, text: String, pos: Vector2, dimensions: Vec
 func _summary_text() -> String:
 	if not Game.state.is_empty():
 		var place_name := str(Game.place_data(Game.state.get("currentPlaceId", "")).get("name", ""))
-		var faction := faction_label()
-		if place_name.is_empty():
-			return faction
-		return "%s  ·  %s" % [place_name, faction]
+		return place_name if not place_name.is_empty() else "进行中的委托"
 	if Game.has_save():
 		# 仅磁盘存档时只提示存在检查点，不触发读取、恢复或保存。
 		return "已有检查点"

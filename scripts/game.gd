@@ -133,7 +133,7 @@ func initial_state(player_id: String = "") -> Dictionary:
 	if player_id.is_empty(): player_id = config.defaultPlayerCharacterId
 	if not valid_player_character(player_id): return {}
 	var hp := int(player_characters[player_id].attributes.maxHp)
-	return {"schemaVersion":2, "playerCharacterId":player_id, "currentWeek":1, "currentDay":int(config.initialDay), "currentHp":hp, "maxHp":hp, "combat":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "faction":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "battleId":"", "result":"", "battleHistory":[], "deck":[], "battleReward":{}, "portraits":{"left":PLAYER_REFERENCE, "right":"bartender"}}
+	return {"schemaVersion":2, "playerCharacterId":player_id, "currentWeek":1, "currentDay":int(config.initialDay), "currentHp":hp, "maxHp":hp, "combat":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "battleId":"", "result":"", "battleHistory":[], "deck":[], "battleReward":{}, "portraits":{"left":PLAYER_REFERENCE, "right":"bartender"}}
 
 func new_game(player_id: String = "") -> void:
 	if transition_locked or battle_busy: return
@@ -164,8 +164,6 @@ func meets(condition: Dictionary, subject: Dictionary = {}) -> bool:
 				if not value in s.completedEventIds: return false
 			"flag":
 				if not s.flags.get(value, false): return false
-			"faction":
-				if s.faction != value: return false
 			"target":
 				if s.targetId != value: return false
 			"creditsAtLeast":
@@ -311,9 +309,6 @@ func apply_actions(actions: Array) -> bool:
 			"setTarget":
 				if not a.get("value", "") in ["richard", "lumina"]: return false
 				draft.targetId = a.value
-			"setFaction":
-				if not a.get("value", "") in ["company", "resistance", ""]: return false
-				draft.faction = a.value
 			"completeEvent":
 				if not events.has(a.get("id", "")): return false
 				if not a.id in draft.completedEventIds: draft.completedEventIds.append(a.id)
@@ -464,10 +459,11 @@ func save_game() -> bool:
 
 func valid_save(s) -> bool:
 	if not s is Dictionary or s.get("schemaVersion", 0) != 2: return false
+	if s.has("faction"): return false # Legacy fields must pass through migration first.
 	if not valid_player_character(s.get("playerCharacterId")): return false
 	for k in initial_state(s.playerCharacterId):
 		if not s.has(k): return false
-	for key in ["currentScene", "currentPlaceId", "activeEventId", "activeNodeId", "targetId", "faction", "battleId", "result"]:
+	for key in ["currentScene", "currentPlaceId", "activeEventId", "activeNodeId", "targetId", "battleId", "result"]:
 		if not s[key] is String: return false
 	for key in ["maxHp", "currentHp", "currentDay", "credits"]:
 		if not (s[key] is int or s[key] is float): return false
@@ -483,7 +479,7 @@ func valid_save(s) -> bool:
 	if not valid_battle_reward(s): return false
 	if not (s.credits is float or s.credits is int) or s.credits < 0: return false
 	if not s.currentScene in ["map", "place", "dialogue", "battle", "result"]: return false
-	if not s.targetId in ["", "richard", "lumina"] or not s.faction in ["", "company", "resistance"]: return false
+	if not s.targetId in ["", "richard", "lumina"]: return false
 	if not s.portraits.has("left") or not s.portraits.has("right"): return false
 	for side in ["left", "right"]:
 		var portrait_id = s.portraits[side]
@@ -512,6 +508,8 @@ func load_game() -> bool:
 		revision += 1
 		changed.emit()
 		if path.ends_with(".bak"): notice.emit("已从备用检查点恢复进度。")
+		if parser.data.get("activeEventId", "") in ["E06", "E07", "E09", "E10"]:
+			notice.emit("旧阵营事件已移除，已返回港口。已有信用点和卡牌保留，该事件未选的奖励卡不再领取。")
 		return true
 	last_error = "存档格式不兼容或已损坏，无法继续；可以开始新游戏。"
 	notice.emit(last_error)
@@ -652,6 +650,7 @@ func migrate_save(data):
 		data.currentDay = 1
 		data.combat = {}
 		data.inventory = {}
+	migrate_mercenary_story(data)
 	# Additive schema-2 upgrade: old battles gain the temporary catalog, with
 	# no used cards or pending buff. Existing snapshots retain their own rules.
 	var combat = data.get("combat", {})
@@ -660,6 +659,52 @@ func migrate_save(data):
 			if valid_player_character(data.get("playerCharacterId")):
 				combat.profile.cyberware = player_cyberware(data.playerCharacterId)
 	return data
+
+func migrate_mercenary_story(data: Dictionary) -> void:
+	# Removed story content is handled here only; no live allegiance remains.
+	data.erase("faction")
+	var retired_events := ["E06", "E07", "E09", "E10"]
+	var retired_battles := ["B09", "B10"]
+	var retired_characters := ["reception", "rift", "victor", "fitz", "company_robot", "ally_robot", "wolves"]
+	var active = data.get("activeEventId", "")
+	if active in retired_events:
+		var port_event := "E05A" if active in ["E06", "E09"] else "E05B"
+		if data.get("completedEventIds") is Array:
+			if not port_event in data.completedEventIds: data.completedEventIds.append(port_event)
+		if data.get("targetId", "") == "":
+			data.targetId = "richard" if port_event == "E05A" else "lumina"
+		data.activeEventId = port_event
+		data.activeNodeId = "finish"
+		data.currentPlaceId = "port"
+		data.currentScene = "map"
+		data.battleId = ""
+		data.result = ""
+		data.combat = {}
+		# Already paid credits and selected cards stay in their original fields.
+		# An unselected reward belonging to a removed encounter is retired with it.
+		data.battleReward = {}
+		data.portraits = {"left":PLAYER_REFERENCE, "right":""}
+	elif active in ["E05A", "E05B"]:
+		var node = data.get("activeNodeId", "")
+		var removed_node: bool = node == "join" or (node is String and (node.begins_with("accept_") or node.begins_with("refuse_") or node in ["win_05", "win_06", "win_07"]))
+		if removed_node:
+			data.activeNodeId = "win_03"
+			data.portraits = {"left":PLAYER_REFERENCE, "right":""}
+	if data.get("completedEventIds") is Array:
+		data.completedEventIds = data.completedEventIds.filter(func(id): return not id in retired_events)
+	if data.get("choiceHistory") is Dictionary:
+		for key in data.choiceHistory.keys():
+			if not key is String: continue
+			if key.get_slice(":", 0) in retired_events or key in ["E05A:join", "E05B:join"]:
+				data.choiceHistory.erase(key)
+	if data.get("battleId", "") in retired_battles:
+		data.battleId = ""
+		data.result = ""
+		data.combat = {}
+		data.battleReward = {}
+	if data.get("portraits") is Dictionary:
+		for side in ["left", "right"]:
+			if data.portraits.get(side, "") in retired_characters: data.portraits[side] = ""
 
 func valid_battle_reward(s: Dictionary) -> bool:
 	var r: Dictionary = s.battleReward

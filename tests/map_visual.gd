@@ -194,18 +194,16 @@ func _ready() -> void:
 		Game.changed.emit()
 		await settle()
 		await shot("03-current-target")
-		Game.state.faction = "company"
-		Game.state.completedEventIds = ["E01", "E03", "E04", "E05A", "E06"]
+		Game.state.completedEventIds = ["E01", "E03", "E04", "E05A"]
 		Game.state.flags = {"alleyClue":true, "portClue":true}
 		Game.changed.emit()
 		await settle()
-		await shot("04-company")
-		Game.state.faction = "resistance"
+		await shot("04-richard-contract")
 		Game.state.targetId = "lumina"
-		Game.state.completedEventIds = ["E01", "E03", "E04", "E05B", "E07"]
+		Game.state.completedEventIds = ["E01", "E03", "E04", "E05B"]
 		Game.changed.emit()
 		await settle()
-		await shot("05-resistance")
+		await shot("05-lumina-contract")
 		if failures == 0: print("MAP CAPTURE OK: %d checks; %s" % [checks, output_dir])
 		get_tree().quit(0 if failures == 0 else 1)
 		return
@@ -423,8 +421,7 @@ func _ready() -> void:
 		await shot("14-return-" + outcome)
 	await stage()
 	Game.state.flags.week1Complete = true
-	Game.state.completedEventIds = ["E01", "E03", "E04", "E05A", "E06", "E09", "E12"]
-	Game.state.faction = "company"
+	Game.state.completedEventIds = ["E01", "E03", "E04", "E05A", "E12"]
 	Game.changed.emit()
 	await settle()
 	check(Game.map_target_events().is_empty(), "completed week has no false target")

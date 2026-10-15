@@ -3,7 +3,12 @@
     "displayName": "诺伦",
     "portraitAssetId": "noren",
     "battlePortraitAssetId": "noren_battle",
-    "mapAvatarCrop": [0.27, 0.005, 0.42, 0.28]
+    "mapAvatarCrop": [
+      0.27,
+      0.005,
+      0.42,
+      0.28
+    ]
   },
   "bartender": {
     "displayName": "老板娘",
@@ -13,11 +18,6 @@
   "gang": {
     "displayName": "黑帮头目",
     "portraitAssetId": "gang",
-    "battlePortraitAssetId": ""
-  },
-  "reception": {
-    "displayName": "前台小姐",
-    "portraitAssetId": "reception",
     "battlePortraitAssetId": ""
   },
   "ike": {
@@ -35,44 +35,14 @@
     "portraitAssetId": "lumina",
     "battlePortraitAssetId": ""
   },
-  "rift": {
-    "displayName": "里夫特",
-    "portraitAssetId": "rift",
-    "battlePortraitAssetId": ""
-  },
-  "victor": {
-    "displayName": "维克多",
-    "portraitAssetId": "victor",
-    "battlePortraitAssetId": ""
-  },
-  "fitz": {
-    "displayName": "菲茨杰拉德",
-    "portraitAssetId": "fitz",
-    "battlePortraitAssetId": ""
-  },
   "robot": {
     "displayName": "故障机器人",
-    "portraitAssetId": "robot",
-    "battlePortraitAssetId": ""
-  },
-  "company_robot": {
-    "displayName": "公司机器人",
-    "portraitAssetId": "robot",
-    "battlePortraitAssetId": ""
-  },
-  "ally_robot": {
-    "displayName": "机器人",
     "portraitAssetId": "robot",
     "battlePortraitAssetId": ""
   },
   "psycho": {
     "displayName": "赛博精神病",
     "portraitAssetId": "psycho",
-    "battlePortraitAssetId": ""
-  },
-  "wolves": {
-    "displayName": "野狼部队",
-    "portraitAssetId": "wolves",
     "battlePortraitAssetId": ""
   },
   "fish": {

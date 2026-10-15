@@ -125,49 +125,6 @@
       "psycho"
     ]
   },
-  "B09": {
-    "id": "B09",
-    "eventId": "E09",
-    "name": "危险的野狼",
-    "participants": [
-      "@player",
-      "wolves"
-    ],
-    "returnNodeByResult": {
-      "win": "win_01",
-      "lose": "lose",
-      "surrender": "surrender"
-    },
-    "rules": null,
-    "enemyStats": null,
-    "placeId": "power",
-    "prototypeProfileId": "attack_flow_v1",
-    "enemyIds": [
-      "wolves"
-    ]
-  },
-  "B10": {
-    "id": "B10",
-    "eventId": "E10",
-    "name": "进攻发电厂",
-    "participants": [
-      "@player",
-      "wolves",
-      "company_robot"
-    ],
-    "returnNodeByResult": {
-      "win": "win_01",
-      "lose": "lose",
-      "surrender": "surrender"
-    },
-    "rules": null,
-    "enemyStats": null,
-    "placeId": "power",
-    "prototypeProfileId": "attack_flow_v1",
-    "enemyIds": [
-      "company_robot"
-    ]
-  },
   "B11": {
     "id": "B11",
     "eventId": "E11",

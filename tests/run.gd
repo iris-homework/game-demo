@@ -38,7 +38,7 @@ func _ready() -> void:
 	Game.save_path = "user://automated_test_checkpoint.json"
 	# Validate authored references, completion nodes and all three return paths.
 	check(Game.places.size() == 17, "17 places including church")
-	check(Game.events.size() == 13, "12 events with split E05")
+	check(Game.events.size() == 9, "9 independent commission events")
 	for e in Game.events.values():
 		check(not Game.place_data(e.placeId).is_empty(), e.id + " place exists")
 		for n in e.nodes.values():
@@ -63,25 +63,23 @@ func _ready() -> void:
 	check(Game.state.credits == 0 and Game.state.flags.alleyClue, "Payment applied once")
 	step_to_stop()
 	check("E03" in Game.state.completedEventIds, "Payment finishes E03")
-	# Complete both factions, both responses to recruitment, then their Boss paths.
+	# Both contracts converge on the independent mercenary finale.
 	for target in [0,1]:
-		for join_choice in [0,1]:
-			start_contract(target)
-			Game.start_event("E03"); step_to_stop(); Game.choose(1,Game.revision); step_to_stop()
-			Game.battle_exit("win",Game.revision); step_to_stop(); Game.claim_rewards(Game.revision)
-			complete_event("E02")
-			complete_event("E04")
-			complete_event("E05A" if target == 0 else "E05B", "win", join_choice)
-			check(Game.state.faction == ("company" if target == 0 else "resistance"), "Faction set for both recruitment responses")
-			complete_event("E06" if target == 0 else "E07")
-			check(not Game.start_event("E10" if target == 0 else "E09"), "Opposite faction event blocked")
-			complete_event("E08")
-			complete_event("E11")
-			complete_event("E09" if target == 0 else "E10")
-			complete_event("E12")
-			check(Game.state.flags.get("week1Complete",false), "Week one completed")
-			check(Game.state.currentWeek == 1, "No empty future week")
-			check(not Game.start_event("E12"), "No repeating Boss")
+		start_contract(target)
+		Game.start_event("E03"); step_to_stop(); Game.choose(1,Game.revision); step_to_stop()
+		Game.battle_exit("win",Game.revision); step_to_stop(); Game.claim_rewards(Game.revision)
+		complete_event("E02")
+		complete_event("E04")
+		complete_event("E05A" if target == 0 else "E05B")
+		check(not Game.state.has("faction"), "No allegiance after contract completion")
+		for removed in ["E06", "E07", "E09", "E10"]:
+			check(not Game.start_event(removed), "Removed event cannot start " + removed)
+		complete_event("E08")
+		complete_event("E11")
+		complete_event("E12")
+		check(Game.state.flags.get("week1Complete",false), "Week one completed")
+		check(Game.state.currentWeek == 1, "No empty future week")
+		check(not Game.start_event("E12"), "No repeating Boss")
 	# Every battle must resume the exact corresponding node after disk roundtrip.
 	for b in Game.battles.values():
 		for result in ["win", "lose", "surrender"]:

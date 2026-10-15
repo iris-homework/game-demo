@@ -101,7 +101,7 @@ func _ready() -> void:
 	check(Game.objective() == "2 个可推进的主线目标", "multiple candidates not arbitrarily reduced")
 	Game.events.erase("MAP_PARALLEL_TEST")
 	check(tower.unlockCondition == old_condition, "authored unlock conditions retained")
-	# Actual first-week routes, including both faction branches.
+	# Actual first-week routes, including both independent contracts.
 	for contract in ["richard", "lumina"]:
 		reset_map()
 		Game.state.targetId = contract
@@ -110,10 +110,7 @@ func _ready() -> void:
 		finish_event("E04")
 		check(target_ids() == ["E05A" if contract == "richard" else "E05B"], "correct port branch " + contract)
 		finish_event("E05A" if contract == "richard" else "E05B")
-		check(target_ids() == ["E06" if contract == "richard" else "E07"], "correct faction entry " + contract)
-		finish_event("E06" if contract == "richard" else "E07")
-		check(target_ids() == ["E09" if contract == "richard" else "E10"], "correct power branch " + contract)
-		finish_event("E09" if contract == "richard" else "E10")
+		check(Game.map_place_state("camp").open and Game.map_place_state("tower").open, "both locations open without allegiance " + contract)
 		check(target_ids() == ["E12"], "hive finale " + contract)
 		finish_event("E12")
 		check(target_ids().is_empty(), "no false next-week target " + contract)

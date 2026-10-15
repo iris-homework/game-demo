@@ -53,24 +53,6 @@
     "intentSequence": [],
     "prototype": true
   },
-  "wolves": {
-    "id": "wolves",
-    "characterId": "wolves",
-    "displayName": "野狼部队",
-    "battlePortraitAssetId": "",
-    "maxHp": null,
-    "intentSequence": [],
-    "prototype": true
-  },
-  "company_robot": {
-    "id": "company_robot",
-    "characterId": "company_robot",
-    "displayName": "公司机器人",
-    "battlePortraitAssetId": "",
-    "maxHp": null,
-    "intentSequence": [],
-    "prototype": true
-  },
   "fish": {
     "id": "fish",
     "characterId": "fish",

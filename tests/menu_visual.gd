@@ -155,7 +155,6 @@ func _ready() -> void:
 		var state := Game.initial_state()
 		state.currentScene = "map"
 		state.completedEventIds = ["E01"]
-		state.faction = "company"
 		await stage(state)
 		await shot("02-menu-progress")
 		app.view._set_training_open(true)
@@ -205,12 +204,11 @@ func input_suite() -> void:
 	check(old_frame.get_ref() == null,"leaving menu releases the native artwork texture")
 	Game.go_map()
 	await settle()
-	Game.state.faction = "resistance"
 	Game.state.currentPlaceId = "hospital"
 	var adventure: Dictionary = Game.state.duplicate(true)
 	Game.menu()
 	await settle(0.5)
-	check("医院" in app.view.progress_summary.text and "归零运动" in app.view.progress_summary.text,"summary uses real location and faction")
+	check(app.view.progress_summary.text == "医院","summary shows only the real location")
 	check(not button("continue_commission").disabled,"memory progress enables continue")
 	var revision_before := Game.revision
 	await settle(0.4)
