@@ -8,7 +8,7 @@ func _ready() -> void:
 		return
 	var e := Game.event_data()
 	var complete: bool = Game.state.flags.get("week1Complete", false) and e.id == "E12"
-	background("city", 0.53)
+	background(Game.place_data(e.placeId).backgroundAssetId, 0.53)
 	chrome("事件结算")
 	polygon(self,[Vector2(222,166),Vector2(1218,131),Vector2(1232,778),Vector2(238,813)],PINK)
 	cut_panel(self, Vector2(231,147), Vector2(978,644), INK, CREAM,32)
