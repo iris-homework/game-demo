@@ -4,6 +4,8 @@ signal phase_changed(phase: String)
 const Actor = preload("res://scripts/combat/pose_actor.gd")
 const ReturnGhost = preload("res://scripts/combat/return_ghost_fx.gd")
 const NeonSlash = preload("res://scripts/combat/prismatic_slash_fx.gd")
+const ACTOR_SCALE := 1.2544
+const GROUND_CLEARANCE := Vector2(70,45)*ACTOR_SCALE
 var world := Node2D.new()
 var actors_root := Node2D.new()
 var player: Node2D
@@ -68,7 +70,8 @@ func enemy_home(index: int, count: int) -> Vector2:
 	return Vector2(slot.x+float(index/3)*130,floor_y+slot.y)
 
 func depth_scale(point: Vector2) -> float:
-	return clampf(1.0+(point.y-(floor_y-30))*0.00065,0.91,1.08)
+	# One foot-anchored scale for poses, targeting, contact, framing and return ghosts.
+	return ACTOR_SCALE*clampf(1.0+(point.y-(floor_y-30))*0.00065,0.91,1.08)
 
 func update_depth() -> void:
 	for actor in actors_root.get_children():
@@ -139,7 +142,7 @@ func attack_destination(attacker: Node2D, defender: Node2D, reach: float) -> Vec
 		var clear := true
 		for other in actors_root.get_children():
 			if other == attacker or other == defender or not other.alive: continue
-			if ((candidate-other.position)/Vector2(70,45)).length() < 1.0:
+			if ((candidate-other.position)/GROUND_CLEARANCE).length() < 1.0:
 				clear = false
 				break
 		if clear: return candidate
@@ -149,8 +152,8 @@ func path_clear(points: Array[Vector2], attacker: Node2D, defender: Node2D) -> b
 	for other in actors_root.get_children():
 		if other == attacker or other == defender or not other.alive: continue
 		for i in points.size()-1:
-			var foot: Vector2 = other.position/Vector2(70,45)
-			var nearest := Geometry2D.get_closest_point_to_segment(foot,points[i]/Vector2(70,45),points[i+1]/Vector2(70,45))
+			var foot: Vector2 = other.position/GROUND_CLEARANCE
+			var nearest := Geometry2D.get_closest_point_to_segment(foot,points[i]/GROUND_CLEARANCE,points[i+1]/GROUND_CLEARANCE)
 			if foot.distance_to(nearest) < 1.0: return false
 	return true
 
@@ -189,7 +192,7 @@ func frame_attack(attacker: Node2D, defender: Node2D, destination: Vector2) -> v
 			if not actor.alive: continue
 			var foot: Vector2 = destination if actor == attacker else actor.position
 			top = minf(top,foot.y-135*depth_scale(foot))
-			bottom = maxf(bottom,foot.y+20)
+			bottom = maxf(bottom,foot.y+20*depth_scale(foot))
 		magnification = minf(magnification,(size.y-48)/(bottom-top))
 		target_y = (top+bottom)*0.5+(floor_y-35-size.y*0.5)/magnification
 	camera_to((destination.x+defender.position.x)*0.5,magnification,0.25,target_y)
@@ -300,7 +303,7 @@ func return_home() -> void:
 	for actor in actors:
 		if not actor.alive or actor.position.distance_to(actor.home) < 1: continue
 		returning.append(actor)
-		neon_fx(actor.position-Vector2(0,30),"vanish")
+		neon_fx(actor.position-Vector2(0,30)*depth_scale(actor.position),"vanish")
 		actor.modulate = Color(2,1.4,1.8,1)
 		fade.tween_property(actor,"modulate:a",0.0,0.06)
 	if returning.is_empty():
@@ -315,8 +318,8 @@ func return_home() -> void:
 			trail.z_index = 1
 			trail.mode = "return"
 			trail.manual = true
-			trail.start = actor.position-Vector2(0,48)
-			trail.end = actor.home-Vector2(0,48)
+			trail.start = actor.position-Vector2(0,48)*depth_scale(actor.position)
+			trail.end = actor.home-Vector2(0,48)*depth_scale(actor.home)
 			world.add_child(trail)
 			trails.append(trail)
 			flight.tween_method(trail.set_progress,0.0,1.0,0.18)
