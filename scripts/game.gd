@@ -133,7 +133,7 @@ func initial_state(player_id: String = "") -> Dictionary:
 	if player_id.is_empty(): player_id = config.defaultPlayerCharacterId
 	if not valid_player_character(player_id): return {}
 	var hp := int(player_characters[player_id].attributes.maxHp)
-	return {"schemaVersion":2, "playerCharacterId":player_id, "currentWeek":1, "currentDay":int(config.initialDay), "currentHp":hp, "maxHp":hp, "combat":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "battleId":"", "result":"", "battleHistory":[], "deck":[], "battleReward":{}, "portraits":{"left":PLAYER_REFERENCE, "right":"bartender"}}
+	return {"schemaVersion":2, "playerCharacterId":player_id, "currentWeek":1, "currentDay":int(config.initialDay), "currentHp":hp, "maxHp":hp, "combat":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "dialogueHistory":[], "battleId":"", "result":"", "battleHistory":[], "deck":[], "battleReward":{}, "portraits":{"left":PLAYER_REFERENCE, "right":"bartender"}}
 
 func new_game(player_id: String = "") -> void:
 	if transition_locked or battle_busy: return
@@ -361,6 +361,7 @@ func enter_node(id: String) -> void:
 			initialize_combat()
 		_:
 			state.currentScene = "dialogue"
+			record_dialogue()
 			var side: String = n.get("speakerSide", "")
 			if side in ["left", "right"] and not n.get("speakerId", "").is_empty():
 				var speaker: String = n.speakerId
@@ -368,6 +369,19 @@ func enter_node(id: String) -> void:
 				if resolve_character_id(state.portraits[other]) == resolve_character_id(speaker): state.portraits[other] = ""
 				state.portraits[side] = speaker
 	checkpoint()
+
+func record_dialogue(choice_text: String = "") -> void:
+	# Store rendered snapshots, never traverse unseen branches to reconstruct a log.
+	if not state.has("dialogueHistory"): state.dialogueHistory = []
+	var n := node_data()
+	var speaker: String = n.get("speakerId", "")
+	state.dialogueHistory.append({
+		"eventId": state.activeEventId,
+		"title": event_data().title,
+		"speaker": "你的选择" if not choice_text.is_empty() else (display_name(speaker) if not speaker.is_empty() else "场景"),
+		"text": render_text(choice_text if not choice_text.is_empty() else n.get("text", "")),
+		"kind": "choice" if not choice_text.is_empty() else "dialogue"
+	})
 
 func advance(expected_revision: int) -> void:
 	if transition_locked or battle_busy or expected_revision != revision or state.currentScene != "dialogue": return
@@ -399,6 +413,7 @@ func choose(index: int, expected_revision: int) -> bool:
 	if not event_data().nodes.has(c.next) and c.next != "@map": return false
 	if not apply_actions(c.get("effects", [])): return false
 	state.choiceHistory[state.activeEventId + ":" + state.activeNodeId] = c.id
+	record_dialogue(c.label)
 	enter_node(c.next)
 	return true
 
@@ -490,6 +505,12 @@ func valid_save(s) -> bool:
 	if not s.completedEventIds is Array or not s.flags is Dictionary or not s.choiceHistory is Dictionary or not s.portraits is Dictionary: return false
 	if not s.claimedRewardIds is Array or not s.battleHistory is Array: return false
 	if not s.deck is Array or not s.battleReward is Dictionary: return false
+	if not s.get("dialogueHistory", []) is Array: return false
+	for entry in s.get("dialogueHistory", []):
+		if not entry is Dictionary: return false
+		for key in ["eventId", "title", "speaker", "text", "kind"]:
+			if not entry.get(key) is String: return false
+		if entry.kind not in ["dialogue", "choice"]: return false
 	for id in s.deck:
 		if not id is String or not (reward_rules.cards.has(id) or card_catalog.has(id) or prototype_rules.cards.has(id)): return false
 	if not valid_battle_reward(s): return false
@@ -520,6 +541,7 @@ func load_game() -> bool:
 		if not valid_save(data): continue
 		state = data
 		state.credits = int(state.credits)
+		if state.dialogueHistory.is_empty() and state.currentScene == "dialogue": record_dialogue()
 		page = state.currentScene
 		revision += 1
 		changed.emit()
@@ -659,6 +681,7 @@ func migrate_save(data):
 				if data.portraits.get(side) == LEGACY_PLAYER_CHARACTER_ID:
 					data.portraits[side] = PLAYER_REFERENCE
 	if not data.has("battleReward"): data.battleReward = {}
+	if not data.has("dialogueHistory"): data.dialogueHistory = []
 	if data.get("schemaVersion",0) == 1:
 		data = data.duplicate(true)
 		data.schemaVersion = 2

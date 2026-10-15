@@ -8,6 +8,10 @@ var elapsed := 0.0
 var choice_buttons: Array[Button] = []
 var advance_area: Control
 var skip_button: Button
+var history_button: Button
+var history_overlay: Control
+var history_text: RichTextLabel
+var history_background_buttons: Dictionary = {}
 
 func _ready() -> void:
 	expected_revision = Game.revision
@@ -18,6 +22,9 @@ func _ready() -> void:
 	portrait(Game.state.portraits.left, "left", side == "left", 173, 642)
 	portrait(Game.state.portraits.right, "right", side == "right", 173, 642)
 	map_chrome(e.title)
+	history_button = button(self, "对话记录", Vector2(936,16), Vector2(140,44), open_history)
+	history_button.add_theme_font_size_override("font_size", 17)
+	history_button.tooltip_text = "回看本次冒险的对白与选择"
 	skip_button = button(self, "跳过剧情", Vector2(1096,16), Vector2(140,44), skip)
 	skip_button.add_theme_font_size_override("font_size", 17)
 	skip_button.disabled = not node.get("choices", []).is_empty() or not node.has("next")
@@ -154,12 +161,14 @@ func _dialogue_polygon(points: Array, color: Color) -> Polygon2D:
 	return shape
 
 func _process(delta: float) -> void:
+	if is_instance_valid(history_overlay): return
 	elapsed += delta
 	if is_instance_valid(text_label) and text_label.visible_characters >= 0:
 		text_label.visible_characters = int(elapsed * 40)
 		if text_label.visible_characters >= text_label.text.length(): text_label.visible_characters = -1
 
 func advance() -> void:
+	if is_instance_valid(history_overlay): return
 	if text_label.visible_characters >= 0:
 		text_label.visible_characters = -1
 		return
@@ -168,13 +177,94 @@ func advance() -> void:
 	Game.advance(expected_revision)
 
 func select(index: int) -> void:
+	if is_instance_valid(history_overlay): return
 	Game.choose(index, expected_revision)
 
 func skip() -> void:
+	if is_instance_valid(history_overlay): return
 	Game.skip_dialogue(expected_revision)
+
+func open_history() -> void:
+	if is_instance_valid(history_overlay): return
+	for b in find_children("*", "Button", true, false):
+		history_background_buttons[b] = b.disabled
+		b.release_focus()
+		b.disabled = true
+	history_overlay = Control.new()
+	history_overlay.name = "DialogueHistory"
+	history_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	history_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(history_overlay)
+	rect(history_overlay, Vector2.ZERO, Vector2(1440,900), Color(0,0,0,0.78))
+	panel(history_overlay, Vector2(180,118), Vector2(1080,674), Color("0d0d10"), STORY_RED)
+	rect(history_overlay, Vector2(180,118), Vector2(1080,5), STORY_RED)
+	label(history_overlay, "对话记录", Vector2(216,144), Vector2(600,48), 30, STORY_WHITE)
+	label(history_overlay, "本次冒险 · 已经过的对白与选择", Vector2(218,199), Vector2(740,30), 16, MUTED)
+	var close := button(history_overlay, "关闭 ×", Vector2(1090,148), Vector2(130,44), close_history)
+	close.focus_next = close.get_path()
+	close.focus_previous = close.get_path()
+	rect(history_overlay, Vector2(216,245), Vector2(1008,1), Color("533037"))
+	history_text = RichTextLabel.new()
+	history_text.position = Vector2(218,266)
+	history_text.size = Vector2(1000,458)
+	history_text.add_theme_font_override("normal_font", base_font)
+	history_text.add_theme_font_size_override("normal_font_size", 22)
+	history_text.add_theme_color_override("default_color", STORY_WHITE)
+	history_text.add_theme_constant_override("line_separation", 8)
+	history_text.bbcode_enabled = false
+	history_text.selection_enabled = true
+	history_text.focus_mode = Control.FOCUS_NONE
+	history_overlay.add_child(history_text)
+	var last_event := ""
+	for entry in Game.state.get("dialogueHistory", []):
+		if entry.eventId != last_event:
+			history_text.push_color(MUTED)
+			history_text.add_text("— %s —\n\n" % entry.title)
+			history_text.pop()
+			last_event = entry.eventId
+		history_text.push_color(STORY_RED if entry.kind == "choice" else Color("ff8588"))
+		history_text.add_text(entry.speaker + "\n")
+		history_text.pop()
+		history_text.add_text(entry.text + "\n\n")
+	if history_text.get_total_character_count() == 0:
+		history_text.add_text("暂无对话记录。之后经过的对白会保存在这里。")
+	label(history_overlay, "滚轮 / 触控板回看    ·    ↑ ↓ / PageUp / PageDown    ·    Esc 返回", Vector2(218,746), Vector2(1000,26), 15, MUTED)
+	close.grab_focus()
+	_history_scroll_to_latest.call_deferred()
+
+func _history_scroll_to_latest() -> void:
+	if is_instance_valid(history_overlay):
+		history_text.scroll_to_line(maxi(0, history_text.get_line_count() - 1))
+
+func close_history() -> void:
+	if not is_instance_valid(history_overlay): return
+	remove_child(history_overlay)
+	history_overlay.queue_free()
+	history_overlay = null
+	history_text = null
+	for b in history_background_buttons:
+		if is_instance_valid(b): b.disabled = history_background_buttons[b]
+	history_background_buttons.clear()
+	history_button.grab_focus()
+
+func handle_escape() -> bool:
+	if not is_instance_valid(history_overlay): return false
+	close_history()
+	return true
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event.is_pressed() or event.is_echo(): return
+	if is_instance_valid(history_overlay):
+		var scroll := history_text.get_v_scroll_bar()
+		match event.keycode:
+			KEY_UP: scroll.value -= 48
+			KEY_DOWN: scroll.value += 48
+			KEY_PAGEUP: scroll.value -= scroll.page
+			KEY_PAGEDOWN: scroll.value += scroll.page
+			KEY_HOME: scroll.value = 0
+			KEY_END: scroll.value = scroll.max_value
+		get_viewport().set_input_as_handled()
+		return
 	if event.keycode in [KEY_SPACE, KEY_ENTER]:
 		get_viewport().set_input_as_handled()
 		advance()

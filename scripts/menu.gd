@@ -163,13 +163,25 @@ func _on_new_confirmed() -> void:
 	Game.new_game()
 
 func _close_confirm() -> void:
+	get_viewport().gui_release_focus()
 	confirm_dialog.hide()
 	for node in modal_button_states:
 		if is_instance_valid(node):
 			node.disabled = modal_button_states[node].disabled
 			node.focus_mode = modal_button_states[node].focus
 	modal_button_states.clear()
-	new_button.grab_focus()
+	# 取消后不强制选中入口；仅保留真实悬停，Tab 仍可重新进入键盘导航。
+	new_button.refresh_feedback()
+
+func _input(event: InputEvent) -> void:
+	if get_viewport().gui_get_focus_owner() != null: return
+	if is_instance_valid(confirm_dialog) and confirm_dialog.visible: return
+	if event.is_action_pressed("ui_focus_next"):
+		new_button.grab_focus() if continue_button.disabled else continue_button.grab_focus()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("ui_focus_prev"):
+		motion_button.grab_focus()
+		get_viewport().set_input_as_handled()
 
 func _toggle_training() -> void:
 	_set_training_open(not training_open)

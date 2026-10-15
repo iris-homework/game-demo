@@ -48,7 +48,7 @@ func _ready() -> void:
 	add_child(app)
 	Game.new_game()
 	await capture("opening")
-	check(app.view.find_children("*", "Button", true, false).size() == 2, "Opening has only menu and skip buttons")
+	check(app.view.find_children("*", "Button", true, false).size() == 3, "Opening has menu, history and skip buttons")
 	var footer_absent := true
 	for item in app.view.find_children("*", "Label", true, false):
 		if item.position.y >= 850: footer_absent = false
