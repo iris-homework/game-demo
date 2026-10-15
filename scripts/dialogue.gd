@@ -5,6 +5,7 @@ var expected_revision: int
 var elapsed := 0.0
 var choice_buttons: Array[Button] = []
 var advance_button: Button
+var skip_button: Button
 
 func _ready() -> void:
 	expected_revision = Game.revision
@@ -15,6 +16,10 @@ func _ready() -> void:
 	portrait(Game.state.portraits.left, "left", side == "left", 123, 642)
 	portrait(Game.state.portraits.right, "right", side == "right", 123, 642)
 	map_chrome(e.title)
+	skip_button = button(self, "跳过剧情", Vector2(1096,16), Vector2(140,44), skip)
+	skip_button.add_theme_font_size_override("font_size", 17)
+	skip_button.disabled = not node.get("choices", []).is_empty() or not node.has("next")
+	skip_button.tooltip_text = "请先作出选择" if not node.get("choices", []).is_empty() else "跳至下一个选择点、战斗或剧情结束"
 	label(self,"MIDNIGHT / W01",Vector2(36,864),Vector2(600,24),12,MUTED)
 	label(self,"● 自动保存    /    F1 开发面板",Vector2(1100,859),Vector2(310,27),12,MUTED)
 	tag(e.id + " / " + Game.place_data(e.placeId).name, Vector2(54,104), CYAN, 280)
@@ -57,6 +62,9 @@ func advance() -> void:
 
 func select(index: int) -> void:
 	Game.choose(index, expected_revision)
+
+func skip() -> void:
+	Game.skip_dialogue(expected_revision)
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event.is_pressed() or event.is_echo(): return

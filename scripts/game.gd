@@ -375,6 +375,22 @@ func advance(expected_revision: int) -> void:
 	var n := node_data()
 	if n.has("next"): enter_node(n.next)
 
+func skip_dialogue(expected_revision: int) -> void:
+	if transition_locked or battle_busy or expected_revision != revision or page != "dialogue" or state.currentScene != "dialogue": return
+	# Follow the same route as Continue, preserving portraits, battle entry and rewards.
+	# Never choose on the player's behalf, even if a choice node also has a next field.
+	var visited: Dictionary = {}
+	while state.currentScene == "dialogue" and not transition_locked and not battle_busy:
+		var n := node_data()
+		if not n.get("choices", []).is_empty() or not n.has("next"): return
+		visited[state.activeNodeId] = true
+		if visited.has(n.next):
+			notice.emit("剧情路径存在循环，已停止跳过。")
+			return
+		var previous_revision := revision
+		advance(revision)
+		if revision == previous_revision: return
+
 func choose(index: int, expected_revision: int) -> bool:
 	if transition_locked or battle_busy or expected_revision != revision or state.currentScene != "dialogue": return false
 	var choices: Array = node_data().get("choices", [])
