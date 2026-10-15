@@ -5,6 +5,7 @@ const Actor = preload("res://scripts/combat/pose_actor.gd")
 const ReturnGhost = preload("res://scripts/combat/return_ghost_fx.gd")
 const NeonSlash = preload("res://scripts/combat/prismatic_slash_fx.gd")
 const ACTOR_SCALE := 1.2544
+const ATTACK_ZOOM_FACTOR := 0.9
 const GROUND_CLEARANCE := Vector2(70,45)*ACTOR_SCALE
 var world := Node2D.new()
 var actors_root := Node2D.new()
@@ -182,7 +183,7 @@ func approach(attacker: Node2D, defender: Node2D, destination: Vector2) -> void:
 		await move_actor(attacker,points[i+1],maxf(0.01,duration*points[i].distance_to(points[i+1])/maxf(total,1)))
 
 func frame_attack(attacker: Node2D, defender: Node2D, destination: Vector2) -> void:
-	var magnification := 1.65
+	var magnification := 1.65*ATTACK_ZOOM_FACTOR
 	var target_y := (destination.y+defender.position.y)*0.5
 	if enemies.size() > 1:
 		# Keep all living opponents available for the next card while closing in.
@@ -193,7 +194,7 @@ func frame_attack(attacker: Node2D, defender: Node2D, destination: Vector2) -> v
 			var foot: Vector2 = destination if actor == attacker else actor.position
 			top = minf(top,foot.y-135*depth_scale(foot))
 			bottom = maxf(bottom,foot.y+20*depth_scale(foot))
-		magnification = minf(magnification,(size.y-48)/(bottom-top))
+		magnification = maxf(1.0,minf(magnification,ATTACK_ZOOM_FACTOR*(size.y-48)/(bottom-top)))
 		target_y = (top+bottom)*0.5+(floor_y-35-size.y*0.5)/magnification
 	camera_to((destination.x+defender.position.x)*0.5,magnification,0.25,target_y)
 

@@ -78,7 +78,7 @@ func _ready() -> void:
 		verify(view.model.enemies[index].hp == 19,"Attack damages only the selected enemy once")
 		verify(absf(stage.player.position.y-previous_y) > 40,"Switching target traverses the Y axis")
 		verify(approach_samples.size() > 1,"Approach animates through ground positions")
-		verify(not is_equal_approx(stage.focus_y,stage.floor_y-35) and stage.zoom > 1.0 and stage.zoom <= 1.65,"Near camera tracks Y and adapts zoom to preserve depth targets")
+		verify(not is_equal_approx(stage.focus_y,stage.floor_y-35) and stage.zoom >= 1.0 and stage.zoom <= 1.485,"Near camera tracks Y and adapts zoom to preserve depth targets")
 		verify(view.target_at_point(stage.contact(stage.enemies[index])) == index,"Near view hit area matches projected enemy")
 		for enemy in stage.enemies:
 			verify(stage.get_global_rect().has_point(stage.contact(enemy)),"Every live depth target stays available in near view")

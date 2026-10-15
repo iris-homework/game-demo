@@ -94,7 +94,7 @@ func _ready() -> void:
 	await wait_phase("impact")
 	verify(view.shown_enemies[0].hp == 19 and view.stage.enemies[0].pose == "damaged","Damage pose and HP share the impact")
 	await idle()
-	verify(is_equal_approx(view.stage.zoom,1.65),"Player close view persists after action")
+	verify(is_equal_approx(view.stage.zoom,1.485),"Player close view persists after action")
 	verify(view.stage.player.position.distance_to(view.stage.player.home) > 100,"Attacker stays beside target")
 	verify(view.end_button.get_global_rect() == end_rect and view.cyberware_button.get_global_rect() == cyber_rect,"Camera leaves UI geometry unchanged")
 	verify(view.shown_discard_count == view.model.discard_pile.size(),"Discard display settles without double counting")
