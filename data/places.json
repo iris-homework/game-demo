@@ -98,7 +98,7 @@
   },
   {
     "id": "camp",
-    "name": "临时营地",
+    "name": "归零运动营地",
     "backgroundAssetId": "camp",
     "unlockCondition": {
       "any": [
@@ -111,7 +111,7 @@
       ]
     },
     "lockHint": "完成任一港口追踪委托",
-    "description": "过路人与自由佣兵暂歇的落脚处。临时住处、补给堆场与集会空地相邻。",
+    "description": "归零运动的根据地。居住、集会与备战空间紧邻，像一座自给自足的村落。",
     "mapAnchor": [
       0.075,
       0.15

@@ -22,7 +22,7 @@ func capture(name: String) -> void:
 	if Game.page == "dialogue": app.view.text_label.visible_characters = -1
 	var visible_text := texts(app.view)
 	check(not visible_text.split("\n").has("自由佣兵"), name + " has no identity value")
-	check(not "当前阵营" in visible_text and not "归零运动" in visible_text, name + " contains no allegiance UI")
+	check(not "当前阵营" in visible_text, name + " contains no allegiance UI")
 	check(not visible_text.split("\n").has("身份"), name + " has no identity heading")
 	await RenderingServer.frame_post_draw
 	var picture := get_viewport().get_texture().get_image()
@@ -47,7 +47,7 @@ func _ready() -> void:
 	await get_tree().process_frame
 	app.view.select_place("camp")
 	await capture("02-map-camp")
-	check("临时营地" in texts(app.view), "Neutral camp name appears")
+	check("归零运动营地" in texts(app.view), "Original camp name appears")
 	check(Game.map_target_events().map(func(e): return e.id) == ["E12"], "Map finale objective is reachable")
 	Game.visit("tower")
 	await capture("03-tower")
