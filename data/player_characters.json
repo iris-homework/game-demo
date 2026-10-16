@@ -4,11 +4,16 @@
       "maxHp": 100
     },
     "startingDeck": [
-      "test_attack",
-      "test_attack",
-      "test_attack",
-      "test_attack",
-      "test_attack"
+      "noren_01",
+      "noren_01",
+      "noren_01",
+      "noren_01",
+      "noren_02",
+      "noren_02",
+      "noren_02",
+      "noren_02",
+      "noren_03",
+      "noren_04"
     ],
     "skills": [],
     "cyberwareIds": [
@@ -18,6 +23,7 @@
       "test_cyberware_04",
       "test_cyberware_05",
       "test_cyberware_06"
-    ]
+    ],
+    "combatRules": "noren_v1"
   }
 }

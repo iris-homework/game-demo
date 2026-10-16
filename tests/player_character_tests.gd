@@ -35,8 +35,12 @@ func _ready() -> void:
 	Game.state.targetId = "richard"
 	check(Game.render_text("{主角姓名}追踪{目标姓名}") == "诺伦追踪理查德", "Player and target substitutions coexist")
 	var normal := start_battle()
-	check(normal.instances.size() == 5 and normal.draw_cards().size() == 5, "Noren keeps five starting attack cards")
-	check(normal.play_card(normal.hand[0], 0).damage == 1, "Noren damage remains one")
+	check(normal.instances.size() == 10 and normal.draw_cards().size() == 5, "Noren starts with ten cards and draws five")
+	var strike: String = normal.instances.find_key("noren_01")
+	normal.draw_pile.erase(strike)
+	if not strike in normal.hand: normal.hand.append(strike)
+	normal.enemies[0].hp = 30; normal.enemies[0].maxHp = 30
+	check(normal.play_card(strike, 0).damage == 6, "Noren initial strike deals six")
 	check(normal.profile.playerCharacterId == "noren" and normal.profile.playerSkills == [], "Combat snapshots include character metadata")
 	# A temporary actor proves the runtime follows configuration; never shipped as content.
 	Game.characters["qa_actor"] = {"displayName":"接入测试", "portraitAssetId":"bartender", "battlePortraitAssetId":"mech_battle"}
@@ -63,7 +67,7 @@ func _ready() -> void:
 	Game.state = {}
 	check(Game.load_game() and same_checkpoint(Game.state, saved), "Load preserves existing HP, piles and snapshot despite config edits")
 	Game.start_training("B12")
-	check(Game.player_character_id() == "qa_actor" and Game.state.maxHp == 200 and Game.state.combat.instances.size() == 1, "Training uses current character and own base deck")
+	check(Game.player_character_id() == "qa_actor" and Game.state.maxHp == 200 and Game.state.combat.instances.size() == 2, "Training uses current character base deck plus owned reward")
 	Game.finish_training("lose")
 	check(same_checkpoint(Game.state, saved), "Training restores full adventure identity and progress")
 	var before := Game.state.duplicate(true)

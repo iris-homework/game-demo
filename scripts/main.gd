@@ -12,6 +12,9 @@ const VIEWS = {
 var view: Control
 var debug_panel: Control
 var toast: Control
+var card_console: Control
+var console_buttons: Array = []
+var view_process_mode := Node.PROCESS_MODE_INHERIT
 var shown_page := ""
 var transition: ColorRect
 var transition_count := 0
@@ -28,6 +31,7 @@ func show_page() -> void:
 	else: swap_view()
 
 func swap_view() -> void:
+	if is_instance_valid(card_console): close_card_console()
 	if is_instance_valid(debug_panel):
 		debug_panel.queue_free()
 		debug_panel = null
@@ -76,6 +80,12 @@ func show_notice(message: String) -> void:
 		if is_instance_valid(notice_ui): notice_ui.queue_free())
 
 func _input(event: InputEvent) -> void:
+	if is_instance_valid(card_console): return
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F2:
+		get_viewport().set_input_as_handled()
+		if Game.config.developmentMode and not Game.battle_busy and not Game.transition_locked:
+			open_card_console()
+		return
 	if Game.transition_locked:
 		get_viewport().set_input_as_handled()
 		return
@@ -132,3 +142,32 @@ func debug_change(kind: String, value: int) -> void:
 				Game.state.combat.playerHp = Game.state.currentHp
 	Game.checkpoint()
 	show_notice("测试状态已更新。")
+
+func open_card_console() -> void:
+	if is_instance_valid(card_console) or is_instance_valid(debug_panel): return
+	if "pile_overlay" in view and is_instance_valid(view.pile_overlay): return
+	if view.has_method("cancel_selection"): view.cancel_selection()
+	view_process_mode = view.process_mode
+	view.process_mode = Node.PROCESS_MODE_DISABLED
+	console_buttons.clear()
+	for node in view.find_children("*", "BaseButton", true, false):
+		console_buttons.append([node, node.disabled, node.focus_mode])
+		node.release_focus()
+		node.disabled = true
+		node.focus_mode = Control.FOCUS_NONE
+	card_console = preload("res://scripts/card_console.gd").new()
+	card_console.closed.connect(close_card_console)
+	add_child(card_console)
+
+func close_card_console() -> void:
+	if not is_instance_valid(card_console): return
+	remove_child(card_console)
+	card_console.queue_free()
+	card_console = null
+	if is_instance_valid(view): view.process_mode = view_process_mode
+	for item in console_buttons:
+		if is_instance_valid(item[0]):
+			item[0].disabled = item[1]
+			item[0].focus_mode = item[2]
+	console_buttons.clear()
+	if is_instance_valid(view) and view.has_method("refresh_library"): view.refresh_library()

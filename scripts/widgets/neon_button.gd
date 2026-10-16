@@ -1,6 +1,7 @@
 extends Button
 ## Lightweight feedback keeps the hit area stationary while its light animates.
 var accent := false
+var corner_marks := true
 var hover_amount := 0.0
 var press_amount := 0.0
 var feedback: Tween
@@ -39,12 +40,13 @@ func _draw() -> void:
 	var length := 9.0 + hover_amount * 15.0
 	var frame := get_theme_stylebox("normal") as StyleBoxFlat
 	var frame_skew := frame.skew if frame else Vector2.ZERO
-	for p in [Vector2(inset, inset), size - Vector2(inset, inset)]:
-		var direction := 1.0 if p.x < size.x * 0.5 else -1.0
-		# Match the StyleBoxFlat shear so the corner marks stay inside its border.
-		var corner := frame_point(p, frame_skew)
-		draw_line(corner, frame_point(p + Vector2(length * direction, 0), frame_skew), ink, 1.5, true)
-		draw_line(corner, frame_point(p + Vector2(0, 5 * direction), frame_skew), ink, 1.5, true)
+	if corner_marks:
+		for p in [Vector2(inset, inset), size - Vector2(inset, inset)]:
+			var direction := 1.0 if p.x < size.x * 0.5 else -1.0
+			# Match the StyleBoxFlat shear so the corner marks stay inside its border.
+			var corner := frame_point(p, frame_skew)
+			draw_line(corner, frame_point(p + Vector2(length * direction, 0), frame_skew), ink, 1.5, true)
+			draw_line(corner, frame_point(p + Vector2(0, 5 * direction), frame_skew), ink, 1.5, true)
 	if hover_amount > 0.01:
 		var glow := ink
 		glow.a = hover_amount * 0.09

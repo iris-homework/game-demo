@@ -9,6 +9,7 @@ var characters: Dictionary
 var player_characters: Dictionary
 const LEGACY_PLAYER_CHARACTER_ID := "noren"
 const PLAYER_REFERENCE := "@player"
+const TRAINING_ENEMY_HP := 100
 var places: Array
 var events: Dictionary
 var battles: Dictionary
@@ -25,6 +26,7 @@ var enemy_catalog: Dictionary
 var item_catalog: Dictionary
 var prototype_rules: Dictionary
 var reward_rules: Dictionary
+var noren_rules: Dictionary
 var map_config: Dictionary
 var meta_profile := {"schemaVersion":1, "cyberwareState":{}}
 var meta_path := "user://meta_profile.json"
@@ -51,6 +53,8 @@ func _ready() -> void:
 	prototype_rules = read_data("prototype/combat.json")
 	prototype_rules.cyberware = read_data("prototype/cyberware.json")
 	reward_rules = read_data("prototype/rewards.json")
+	reward_rules.cards.merge(card_catalog, true)
+	noren_rules = read_data("combat/noren.json")
 	player_characters = read_data("player_characters.json")
 	map_config = read_data("map.json")
 	load_meta()
@@ -450,9 +454,13 @@ func prepare_battle_reward() -> void:
 	if claim_id in state.claimedRewardIds: return
 	state.credits += int(reward_rules.credits)
 	state.claimedRewardIds.append(claim_id)
+	var options: Array = card_catalog.keys().filter(func(id): return card_catalog[id].get("rarity", "C") != "C")
+	options.shuffle()
+	options = options.slice(0, 3)
+	if options.size() < 3: options = reward_rules.cards.keys().slice(0, 3)
 	state.battleReward = {"claimId":claim_id, "eventId":state.activeEventId,
 		"battleId":state.battleId, "credits":int(reward_rules.credits),
-		"options":reward_rules.cards.keys(), "selectedCardId":"", "status":"pending"}
+		"options":options, "selectedCardId":"", "status":"pending"}
 
 func has_battle_reward() -> bool:
 	var reward: Dictionary = state.get("battleReward", {})
@@ -569,10 +577,14 @@ func resume() -> void:
 func initialize_combat() -> void:
 	var battle: Dictionary = battles[state.battleId]
 	var definitions: Array = []
-	for id in battle.enemyIds: definitions.append(enemy_catalog[id])
+	for id in battle.enemyIds:
+		var definition: Dictionary = enemy_catalog[id].duplicate(true)
+		if training_mode: definition.maxHp = TRAINING_ENEMY_HP
+		definitions.append(definition)
 	var model := CombatModel.new()
 	var rules := prototype_rules.duplicate(true)
 	var player := player_definition()
+	if player.get("combatRules", "") == "noren_v1": rules.merge(noren_rules, true)
 	rules.playerCharacterId = player_character_id()
 	rules.playerAttributes = player.attributes.duplicate(true)
 	rules.playerSkills = player.skills.duplicate(true)
@@ -580,8 +592,7 @@ func initialize_combat() -> void:
 	rules.cyberware = player_cyberware()
 	rules.deck = player.startingDeck.duplicate()
 	rules.cards.merge(reward_rules.cards, false)
-	if not training_mode:
-		rules.deck.append_array(state.deck)
+	rules.deck.append_array(state.deck)
 	model.initialize(state.battleId, int(state.currentHp), int(state.maxHp), rules, definitions, card_catalog)
 	state.combat = model.snapshot()
 
@@ -609,6 +620,7 @@ func start_training(battle_id: String = "B12") -> void:
 	if transition_locked or battle_busy or training_mode or not battles.has(battle_id): return
 	var fresh := initial_state(player_character_id())
 	if fresh.is_empty(): return
+	fresh.deck = state.get("deck", []).duplicate()
 	training_backup = state.duplicate(true)
 	training_mode = true
 	state = fresh
@@ -645,8 +657,7 @@ func library_cards() -> Array:
 	# Enumerate definitions, not owned copies or a battle's frozen snapshot.
 	# Match combat's precedence: formal definitions win over prototype IDs.
 	var catalog := card_catalog.duplicate(true)
-	catalog.merge(prototype_rules.get("cards", {}), false)
-	catalog.merge(reward_rules.get("cards", {}), false)
+	# Retired test cards stay loadable, but are not in the new 40-card catalogue.
 	var definitions: Array = catalog.values()
 	definitions.sort_custom(func(a: Dictionary, b: Dictionary):
 		var a_order := int(a.get("sortOrder", 2147483647))
@@ -777,8 +788,10 @@ func valid_combat(c: Dictionary) -> bool:
 		if not c[key] is Dictionary: return false
 	if not c.outcome in ["", "win", "lose", "surrender"]: return false
 	if not valid_cyberware_state(c): return false
+	if c.profile.get("ruleset", "") == "noren_v1" and not valid_noren_state(c): return false
 	var seen: Array = []
-	for uid in c.drawPile + c.hand + c.discardPile:
+	var exhausted: Array = c.get("norenState", {}).get("exhaustPile", []) if c.profile.get("ruleset", "") == "noren_v1" else []
+	for uid in c.drawPile + c.hand + c.discardPile + exhausted:
 		if not uid is String or uid in seen or not c.instances.has(uid): return false
 		seen.append(uid)
 		if not c.cardCatalog.has(c.instances[uid]): return false
@@ -827,3 +840,79 @@ func valid_cyberware_state(c: Dictionary) -> bool:
 		seen.append(id)
 		maximum += catalog[id]
 	return bonus <= maximum
+
+func owned_card_counts() -> Dictionary:
+	var counts := {}
+	var ids: Array = player_definition().get("startingDeck", []).duplicate()
+	ids.append_array(state.get("deck", []))
+	for id in ids: counts[id] = int(counts.get(id, 0)) + 1
+	return counts
+
+func resolve_card_id(query: String) -> String:
+	if card_catalog.has(query): return query
+	for definition in card_catalog.values():
+		if definition.name == query or (query.is_valid_int() and int(definition.number) == int(query)):
+			return definition.id
+	return ""
+
+func console_command(command: String) -> String:
+	var args := command.strip_edges().split(" ", false)
+	if args.is_empty(): return "输入 help 查看指令。"
+	match args[0].to_lower():
+		"help": return "cards [关键词]：查询卡牌名称、编号和 ID\nowned：查看已拥有数量\naddcard <牌名/编号/ID> [数量]：添加卡牌（默认 1，最多 99）\n示例：addcard 短点连射 2　或　addcard 36 2\n新增卡牌保存至当前冒险，下场战斗生效；新委托重置。"
+		"cards":
+			var lines: PackedStringArray = []
+			var query := args[1] if args.size() > 1 else ""
+			for definition in library_cards():
+				if query.is_empty() or query in definition.name or query in definition.id or query == definition.number:
+					lines.append("%s  %s [%s]  %s" % [definition.number, definition.name, definition.rarity, definition.id])
+			return "\n".join(lines) if not lines.is_empty() else "没有匹配的卡牌。"
+		"owned":
+			if state.is_empty(): return "请先开始或继续委托。"
+			var counts := owned_card_counts()
+			var lines: PackedStringArray = []
+			for id in counts:
+				var definition: Dictionary = card_catalog.get(id, reward_rules.cards.get(id, prototype_rules.cards.get(id, {})))
+				lines.append("%s ×%d" % [definition.get("name", id), counts[id]])
+			return "\n".join(lines)
+		"addcard":
+			if not config.developmentMode: return "开发模式未开启。"
+			if state.is_empty(): return "请先开始或继续委托，再添加卡牌。"
+			if training_mode: return "演练不写入冒险；请退出演练后加牌。"
+			if transition_locked or battle_busy: return "请等当前动作结束后再加牌。"
+			if args.size() < 2 or args.size() > 3: return "用法：addcard <牌名/编号/ID> [数量]"
+			var id := resolve_card_id(args[1])
+			if id.is_empty(): return "未找到卡牌。输入 cards 查询。"
+			if args.size() == 3 and not args[2].is_valid_int(): return "数量必须为 1～99 的整数。"
+			var amount := int(args[2]) if args.size() == 3 else 1
+			if amount < 1 or amount > 99: return "数量必须为 1～99 的整数。"
+			var old_deck: Array = state.deck.duplicate()
+			for i in amount: state.deck.append(id)
+			if save_enabled and not save_game():
+				state.deck = old_deck
+				return "添加失败：存档无法写入，已撤回本次加牌。"
+			return "已添加 %s ×%d；当前拥有 %d 张。下场战斗生效。" % [card_catalog[id].name, amount, owned_card_counts()[id]]
+	return "未知指令。输入 help 查看指令。"
+
+func valid_noren_state(c: Dictionary) -> bool:
+	var n = c.get("norenState")
+	if not n is Dictionary or not c.get("openingDrawDone") is bool: return false
+	for key in ["energy", "block", "ammo", "parry", "turnDamageBonus", "turnDiscount"]:
+		var value = n.get(key)
+		if not (value is int or value is float) or not is_finite(float(value)) or value < 0 or value != floor(float(value)): return false
+	if n.energy > int(c.profile.get("energyPerTurn", 3)) or n.ammo > int(c.profile.get("ammoCap", 6)): return false
+	if n.get("stance") not in ["melee", "ranged"] or n.parry > 2: return false
+	for key in ["stanceDiscount", "pressureUsed", "dissectionUsed"]:
+		if not n.get(key) is bool: return false
+	if not n.get("exhaustPile") is Array or not n.get("powers") is Array: return false
+	var seen := []
+	for power in n.powers:
+		if not power in ["high_pressure", "dissection"] or power in seen: return false
+		seen.append(power)
+	for enemy in c.enemies:
+		if not enemy is Dictionary: return false
+		for key in ["block", "bleed", "weak"]:
+			var value = enemy.get(key)
+			if not (value is int or value is float) or not is_finite(float(value)) or value < 0 or value != floor(float(value)): return false
+		if enemy.weak > 5: return false
+	return true

@@ -67,7 +67,8 @@ func _ready() -> void:
 	start_battle("B08")
 	Game.battle_exit("win",Game.revision)
 	finish_dialogue()
-	Game.choose_reward_card("test_reward_01",Game.revision)
+	var earned: String = Game.state.battleReward.options[0]
+	Game.choose_reward_card(earned,Game.revision)
 	Game.claim_rewards(Game.revision)
 	Game.state.activeEventId = "E11"
 	Game.state.currentPlaceId = Game.battles.B11.placeId
@@ -75,16 +76,17 @@ func _ready() -> void:
 	Game.enter_node("battle")
 	var model := CombatModel.new()
 	model.restore(Game.state.combat)
-	check(model.instances.size() == 6 and model.instances.values().count("test_reward_01") == 1,"Next battle contains earned card plus base deck")
-	model.draw_cards()
-	var uid: String = model.hand[0]
-	check(model.card(uid).id == "test_reward_01" and model.play_card(uid,0).damage == 1,"Earned card is playable")
+	check(model.instances.size() == 11 and model.instances.values().count(earned) == 1,"Next battle contains earned card plus base deck")
+	model.draw_cards(11)
+	var uid: String = model.instances.find_key(earned)
+	var candidates := model.discard_candidates(uid)
+	check(model.card(uid).id == earned and not model.play_card(uid,0,candidates[0]).is_empty(),"Earned card is playable")
 	Game.commit_combat(model)
-	check(roundtrip() and Game.state.combat.instances.size() == 6,"Expanded battle snapshot restores")
+	check(roundtrip() and Game.state.combat.instances.size() == 11,"Expanded battle snapshot restores")
 	# Training never consumes the pending reward or changes adventure ownership.
 	var saved := Game.state.duplicate(true)
 	Game.start_training("B12")
-	check(Game.state.combat.instances.size() == 5,"Training uses only original test deck")
+	check(Game.state.combat.instances.size() == 11,"Training copies currently owned deck")
 	Game.battle_exit("win",Game.revision)
 	check(Game.page == "menu" and Game.state == saved,"Training victory restores adventure without rewards")
 	# Explicit exit skips just the unchosen card, retaining credits.

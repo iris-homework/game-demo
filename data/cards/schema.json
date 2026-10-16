@@ -1,14 +1,96 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Card configuration reserved for future design",
+  "title": "Noren card definition (reference; runtime validation is in GDScript)",
   "type": "object",
-  "required": ["id"],
+  "required": [
+    "id",
+    "number",
+    "name",
+    "type",
+    "rarity",
+    "cost",
+    "description",
+    "target",
+    "effects"
+  ],
   "properties": {
-    "id": {"type": "string"},
-    "name": {"type": ["string", "null"]},
-    "description": {"type": ["string", "null"]},
-    "cost": {"type": ["number", "null"]},
-    "artAssetId": {"type": ["string", "null"]},
-    "effects": {"type": ["array", "null"]}
+    "id": {
+      "type": "string",
+      "pattern": "^noren_[0-9]{2}$"
+    },
+    "number": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "enum": [
+        "attack",
+        "skill",
+        "power"
+      ]
+    },
+    "rarity": {
+      "enum": [
+        "C",
+        "B",
+        "A",
+        "S"
+      ]
+    },
+    "cost": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "description": {
+      "type": "string"
+    },
+    "cardText": {
+      "type": "string"
+    },
+    "target": {
+      "enum": [
+        "self",
+        "enemy",
+        "all",
+        "stance"
+      ]
+    },
+    "effects": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "damage",
+              "block",
+              "ammo",
+              "draw",
+              "stance",
+              "weak",
+              "bleed",
+              "parry",
+              "parry_fill",
+              "next_damage",
+              "next_discount",
+              "power",
+              "discard_attack"
+            ]
+          }
+        }
+      }
+    },
+    "exhaust": {
+      "type": "boolean"
+    },
+    "artAssetId": {
+      "type": "string"
+    }
   }
 }

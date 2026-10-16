@@ -48,7 +48,7 @@ func _ready() -> void:
 				open_picker())
 	else:
 		label(card_row,"✓  已领取" if reward.status == "claimed" else "已跳过",Vector2(818,61),Vector2(180,37),21,CYAN if reward.status == "claimed" else MUTED)
-	label(self,"三张卡牌暂用测试卡占位 · 均为攻击 1 / 无费用",Vector2(216,695),Vector2(980,32),15,MUTED)
+	label(self,"从诺伦非初始牌中随机提供三张 · 按灰 / 蓝 / 红 / 金识别品级",Vector2(216,695),Vector2(980,32),15,MUTED)
 	var complete: bool = Game.state.flags.get("week1Complete",false) and Game.state.activeEventId == "E12"
 	label(self,"第一周 · 落幕。可返回地图探索剩余支线。" if complete else "新的线索已更新到城市地图。",Vector2(216,754),Vector2(820,35),20,CYAN)
 	label(self,"离开将放弃本次未选择的卡牌。" if pending else "奖励已保存，可继续探索城市。",Vector2(216,803),Vector2(775,31),16,MUTED)
@@ -106,7 +106,7 @@ func open_picker() -> void:
 		var caption := label(picker,"选择这张  [%d]" % (i+1),pos+Vector2(0,357),Vector2(270,35),19,CYAN)
 		caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	var back := button(picker,"返回奖励  /  Esc",Vector2(1052,717),Vector2(212,44),close_picker)
-	label(picker,"临时测试卡 · 攻击 1 · 无费用",Vector2(192,726),Vector2(680,32),16,MUTED)
+	label(picker,"按品级颜色查看卡牌 · 领取后加入拥有牌组",Vector2(192,726),Vector2(680,32),16,MUTED)
 	var focus_buttons: Array[Button] = option_buttons.duplicate()
 	focus_buttons.append(back)
 	for i in focus_buttons.size():

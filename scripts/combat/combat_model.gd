@@ -18,6 +18,23 @@ var log_lines: Array = []
 # IDs on cooldown for this player turn; retained under the legacy save key.
 var used_cyberware: Array = []
 var next_attack_bonus := 0
+var energy := 0
+var block := 0
+var stance := "melee"
+var ammo := 0
+var parry := 0
+var exhaust_pile: Array = []
+var powers: Array = []
+var turn_damage_bonus := 0
+var turn_discount := 0
+var stance_discount := false
+var pressure_used := false
+var dissection_used := false
+var opening_draw_done := false
+
+func is_noren() -> bool:
+	return profile.get("ruleset", "") == "noren_v1"
+
 
 func cyberware_cards() -> Array:
 	# Older snapshots retain eight definitions for validating earned bonuses,
@@ -53,10 +70,19 @@ func initialize(id: String, hp: int, maximum: int, rules: Dictionary, enemy_defs
 		var uid := "card_%03d" % i
 		instances[uid] = profile.deck[i]
 		draw_pile.append(uid)
+	if is_noren():
+		energy = int(profile.get("energyPerTurn", 3))
+		stance = profile.get("initialStance", "melee")
+		ammo = int(profile.get("initialAmmo", 2))
+		if profile.get("shuffleInitialDeck", true): draw_pile.shuffle()
 	for definition in enemy_defs:
 		var enemy: Dictionary = definition.duplicate(true)
 		enemy.maxHp = int(profile.enemyMaxHp) if enemy.get("maxHp") == null else int(enemy.maxHp)
 		enemy.hp = enemy.maxHp
+		if is_noren():
+			enemy.block = int(enemy.get("block", 0))
+			enemy.bleed = 0
+			enemy.weak = 0
 		enemy.intentIndex = 0
 		enemy.intent = intent_for(enemy, 0)
 		enemies.append(enemy)
@@ -70,10 +96,12 @@ func intent_for(enemy: Dictionary, index: int) -> Dictionary:
 func card(uid: String) -> Dictionary:
 	return card_catalog.get(instances.get(uid, ""), {})
 
-func draw_cards() -> Array:
+func draw_cards(amount: int = -1) -> Array:
 	var drawn: Array = []
 	if not outcome.is_empty(): return drawn
-	while hand.size() < int(profile.get("handSize", 3)):
+	opening_draw_done = true
+	var desired := int(profile.get("handSize", 3)) if amount < 0 else hand.size() + amount
+	while hand.size() < desired:
 		if draw_pile.is_empty():
 			if discard_pile.is_empty() or not profile.get("recycleDiscardWhenEmpty", true): break
 			draw_pile = discard_pile.duplicate()
@@ -84,7 +112,11 @@ func draw_cards() -> Array:
 		drawn.append(uid)
 	return drawn
 
-func play_card(uid: String, target_index: int) -> Dictionary:
+func play_card(uid: String, target_index: int = -1, discard_uid: String = "", extra_ammo: int = 0) -> Dictionary:
+	if is_noren(): return play_noren_card(uid, target_index, discard_uid, extra_ammo)
+	return play_legacy_card(uid, target_index)
+
+func play_legacy_card(uid: String, target_index: int) -> Dictionary:
 	if not outcome.is_empty() or not uid in hand or target_index < 0 or target_index >= enemies.size(): return {}
 	if enemies[target_index].hp <= 0: return {}
 	var definition := card(uid)
@@ -116,6 +148,7 @@ func play_card(uid: String, target_index: int) -> Dictionary:
 	return {"uid":uid, "target":target_index, "damage":damage, "hits":hits, "outcome":outcome}
 
 func end_turn() -> Dictionary:
+	if is_noren(): return end_noren_turn()
 	if not outcome.is_empty(): return {}
 	var discarded := hand.duplicate()
 	if profile.get("discardHandAtTurnEnd", true):
@@ -151,7 +184,7 @@ func use_item(_item_id: String, _target_index: int, _inventory: Dictionary, _cat
 	return {"ok":false, "reason":"道具效果待设计；当前没有可使用道具。"}
 
 func snapshot() -> Dictionary:
-	return {"battleId":battle_id,"turn":turn,"playerHp":player_hp,"maxHp":max_hp,"drawPile":draw_pile.duplicate(),"hand":hand.duplicate(),"discardPile":discard_pile.duplicate(),"instances":instances.duplicate(true),"enemies":enemies.duplicate(true),"outcome":outcome,"log":log_lines.slice(-30),"profile":profile.duplicate(true),"cardCatalog":card_catalog.duplicate(true),"usedCyberware":used_cyberware.duplicate(),"nextAttackBonus":next_attack_bonus}
+	return {"battleId":battle_id,"turn":turn,"playerHp":player_hp,"maxHp":max_hp,"drawPile":draw_pile.duplicate(),"hand":hand.duplicate(),"discardPile":discard_pile.duplicate(),"instances":instances.duplicate(true),"enemies":enemies.duplicate(true),"outcome":outcome,"log":log_lines.slice(-30),"profile":profile.duplicate(true),"cardCatalog":card_catalog.duplicate(true),"usedCyberware":used_cyberware.duplicate(),"nextAttackBonus":next_attack_bonus,"norenState":{"energy":energy,"block":block,"stance":stance,"ammo":ammo,"parry":parry,"exhaustPile":exhaust_pile.duplicate(),"powers":powers.duplicate(),"turnDamageBonus":turn_damage_bonus,"turnDiscount":turn_discount,"stanceDiscount":stance_discount,"pressureUsed":pressure_used,"dissectionUsed":dissection_used},"openingDrawDone":opening_draw_done}
 
 func restore(data: Dictionary) -> void:
 	battle_id = data.battleId
@@ -169,3 +202,231 @@ func restore(data: Dictionary) -> void:
 	card_catalog = data.cardCatalog.duplicate(true)
 	used_cyberware = data.get("usedCyberware", []).duplicate()
 	next_attack_bonus = int(data.get("nextAttackBonus", 0))
+
+	var n: Dictionary = data.get("norenState", {})
+	energy = int(n.get("energy", 0))
+	block = int(n.get("block", 0))
+	stance = n.get("stance", "melee")
+	ammo = int(n.get("ammo", 0))
+	parry = int(n.get("parry", 0))
+	exhaust_pile = n.get("exhaustPile", []).duplicate()
+	powers = n.get("powers", []).duplicate()
+	turn_damage_bonus = int(n.get("turnDamageBonus", 0))
+	turn_discount = int(n.get("turnDiscount", 0))
+	stance_discount = n.get("stanceDiscount", false)
+	pressure_used = n.get("pressureUsed", false)
+	dissection_used = n.get("dissectionUsed", false)
+	opening_draw_done = data.get("openingDrawDone", not (hand.is_empty() and turn == 1 and discard_pile.is_empty()))
+
+func card_cost(uid: String) -> int:
+	var definition := card(uid)
+	var cost := int(definition.get("cost", 0)) if definition.get("cost") != null else 0
+	if is_noren() and definition.get("type") == "attack":
+		cost -= turn_discount + (1 if stance_discount else 0)
+	return maxi(0, cost)
+
+func card_target(uid: String) -> String:
+	var target: String = card(uid).get("target", "enemy")
+	return ("enemy" if stance == "ranged" else "self") if target == "stance" else target
+
+func discard_candidates(uid: String) -> Array:
+	return hand.filter(func(other): return other != uid and card(other).get("type") == "attack")
+
+func extra_ammo_limit(uid: String) -> int:
+	return mini(maxi(0, ammo - 1), int(card(uid).get("extraAmmoMax", 0))) if stance == "ranged" else 0
+
+func play_error(uid: String) -> String:
+	if not outcome.is_empty() or not uid in hand: return "卡牌不在可用手牌中。"
+	var definition := card(uid)
+	if definition.is_empty(): return "卡牌定义无效。"
+	if not is_noren(): return ""
+	if energy < card_cost(uid): return "能量不足。"
+	if definition.type == "attack" and stance == "ranged" and ammo < 1: return "弹药不足；先补弹或切回近战。"
+	for effect in definition.get("effects", []):
+		if effect.type == "discard_attack" and discard_candidates(uid).is_empty(): return "手中没有可弃置的攻击牌。"
+	return ""
+
+func change_stance(value: String) -> Array:
+	if value == "toggle": value = "ranged" if stance == "melee" else "melee"
+	if value == stance: return []
+	stance = value
+	if stance == "melee": return draw_cards(1)
+	stance_discount = true
+	return []
+
+func gain_ammo(amount: int) -> void:
+	ammo = mini(int(profile.get("ammoCap", 6)), ammo + amount)
+
+func enemy_damage(index: int, amount: int, bypass: bool = false) -> Dictionary:
+	var enemy: Dictionary = enemies[index]
+	var absorbed := 0 if bypass else mini(amount, int(enemy.get("block", 0)))
+	enemy.block = int(enemy.get("block", 0)) - absorbed
+	var loss := mini(maxi(0, amount - absorbed), int(enemy.hp))
+	enemy.hp -= loss
+	return {"target":index,"damage":loss,"blocked":absorbed,"hpAfter":enemy.hp,"blockAfter":enemy.block,"killed":enemy.hp == 0}
+
+func apply_bleed(index: int, amount: int, card_stance: String, single: bool) -> void:
+	if enemies[index].hp <= 0: return
+	if card_stance == "ranged": amount = roundi(amount * 0.5)
+	if amount > 0 and card_stance == "melee" and single and "dissection" in powers and not dissection_used:
+		amount += 1
+		dissection_used = true
+	enemies[index].bleed = int(enemies[index].get("bleed", 0)) + amount
+
+func resolve_outcome() -> void:
+	if player_hp <= 0: outcome = "lose"
+	elif enemies.all(func(enemy): return enemy.hp <= 0): outcome = "win"
+
+func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_ammo: int) -> Dictionary:
+	if not play_error(uid).is_empty(): return {}
+	var definition := card(uid)
+	var target_kind := card_target(uid)
+	if target_kind == "enemy" and (target_index < 0 or target_index >= enemies.size() or enemies[target_index].hp <= 0): return {}
+	if extra_ammo < 0 or extra_ammo > extra_ammo_limit(uid): return {}
+	var effects: Array = definition.get("effects", [])
+	# Validate the complete transaction before spending resources or moving any card.
+	var allowed := ["damage","block","ammo","draw","stance","weak","bleed","parry","parry_fill","next_damage","next_discount","power","discard_attack"]
+	for effect in effects:
+		if not effect is Dictionary or not effect.get("type", "") in allowed: return {}
+		if effect.has("amount") and (not (effect.amount is int or effect.amount is float) or effect.amount < 0): return {}
+		if effect.type == "discard_attack" and not discard_uid in discard_candidates(uid): return {}
+	var at_start := stance
+	var ammo_before := ammo
+	var before := enemies.duplicate(true)
+	var attack: bool = definition.type == "attack"
+	var targets_to_hit: Array = []
+	if target_kind == "all":
+		for i in enemies.size():
+			if enemies[i].hp > 0: targets_to_hit.append(i)
+	elif target_kind == "enemy": targets_to_hit.append(target_index)
+	var bonus := 0
+	energy -= card_cost(uid)
+	if attack:
+		bonus = next_attack_bonus + turn_damage_bonus
+		next_attack_bonus = 0
+		turn_damage_bonus = 0
+		turn_discount = 0
+		stance_discount = false
+		if at_start == "melee": gain_ammo(1)
+		else:
+			ammo -= 1 + extra_ammo
+			if "high_pressure" in powers and not pressure_used:
+				bonus += 3
+				pressure_used = true
+	hand.erase(uid)
+	# Hold the resolving card outside all draw piles until its effects finish.
+	var drawn: Array = []
+	var discarded: Array = []
+	var hits: Array = []
+	var damage := 0
+	for effect in effects:
+		if effect.get("when", at_start) != at_start: continue
+		if effect.has("requiresBleed") and (target_index < 0 or int(before[target_index].get("bleed", 0)) < int(effect.requiresBleed)): continue
+		var amount := int(effect.get("amount", 0))
+		match effect.type:
+			"damage":
+				for index in targets_to_hit:
+					var count := int(effect.get("hits", 1))
+					if at_start == "ranged" and effect.has("bleedExtraHit") and int(before[index].get("bleed", 0)) >= int(effect.bleedExtraHit): count += 1
+					for segment in count:
+						if enemies[index].hp <= 0: break
+						var base := amount + (bonus if segment == 0 else 0)
+						if at_start == "ranged":
+							base += extra_ammo * int(definition.get("extraAmmoBonus", 0))
+							if ammo_before == 1: base += int(effect.get("lastAmmoBonus", 0))
+							if int(before[index].hp) * 2 <= int(before[index].maxHp): base += int(effect.get("executeBonus", 0))
+						var hit := enemy_damage(index, roundi(base * (1.5 if at_start == "ranged" else 1.0)), at_start == "ranged" and effect.get("rangedIgnoreBlock", false))
+						hit.attackDamage = hit.damage
+						hit.bleedDamage = 0
+						if at_start == "ranged" and enemies[index].hp > 0 and int(enemies[index].get("bleed", 0)) > 0:
+							var bleeding := enemy_damage(index, int(enemies[index].bleed))
+							enemies[index].bleed -= 1
+							hit.bleedDamage = bleeding.damage
+							hit.damage += bleeding.damage
+							hit.blocked += bleeding.blocked
+							hit.hpAfter = bleeding.hpAfter
+							hit.blockAfter = bleeding.blockAfter
+							hit.killed = bleeding.killed
+						hit.bleedAfter = int(enemies[index].get("bleed", 0))
+						damage += hit.damage
+						hits.append(hit)
+				bonus = 0
+			"block": block += amount
+			"ammo": gain_ammo(amount)
+			"draw": drawn.append_array(draw_cards(amount))
+			"stance": drawn.append_array(change_stance(effect.value))
+			"weak":
+				for index in targets_to_hit:
+					if enemies[index].hp > 0: enemies[index].weak = mini(5, int(enemies[index].get("weak", 0)) + amount)
+			"bleed":
+				for index in targets_to_hit:
+					var stacks := amount
+					if at_start == "melee" and int(before[index].get("bleed", 0)) > 0: stacks = int(effect.get("woundedMeleeAmount", amount))
+					apply_bleed(index, stacks, at_start, target_kind == "enemy")
+			"parry":
+				if parry < int(effect.cap): parry += amount
+			"parry_fill": parry = maxi(parry, amount)
+			"next_damage": turn_damage_bonus += amount
+			"next_discount": turn_discount += amount
+			"power":
+				if not effect.value in powers: powers.append(effect.value)
+			"discard_attack":
+				hand.erase(discard_uid)
+				discard_pile.append(discard_uid)
+				discarded.append(discard_uid)
+	var exhausted: bool = definition.get("exhaust", false) or definition.type == "power"
+	if exhausted: exhaust_pile.append(uid)
+	else: discard_pile.append(uid)
+	resolve_outcome()
+	log_lines.append("%s · %s · 伤害 %d" % [definition.name, "近战" if at_start == "melee" else "远程", damage])
+	return {"uid":uid,"target":target_index,"damage":damage,"hits":hits,"drawn":drawn,"discarded":discarded,"exhausted":exhausted,"stance":at_start,"outcome":outcome}
+
+func end_noren_turn() -> Dictionary:
+	if not outcome.is_empty(): return {}
+	var discarded := hand.duplicate()
+	discard_pile.append_array(hand)
+	hand.clear()
+	turn_damage_bonus = 0
+	turn_discount = 0
+	var attacks: Array = []
+	for index in enemies.size():
+		var enemy: Dictionary = enemies[index]
+		if enemy.hp <= 0: continue
+		enemy.block = 0 # A combatant's block clears at the start of its own turn.
+		var intent: Dictionary = enemy.intent
+		if intent.get("type", "") != "attack": continue
+		var per_hit := roundi(int(intent.get("amount", 0)) * (1.0 - mini(5, int(enemy.get("weak", 0))) * 0.1))
+		var total := per_hit * int(intent.get("hits", 1))
+		var hits: Array = []
+		var counters: Array = []
+		var damage := 0
+		for segment in int(intent.get("hits", 1)):
+			var absorbed := mini(block, per_hit)
+			block -= absorbed
+			var loss := mini(player_hp, per_hit - absorbed)
+			player_hp -= loss
+			damage += loss
+			hits.append({"damage":loss,"blocked":absorbed,"hpAfter":player_hp,"killed":player_hp == 0})
+			if player_hp == 0: break
+		if parry > 0:
+			for layer in parry:
+				if enemy.hp <= 0: break
+				var counter := enemy_damage(index, roundi(total * 0.25))
+				if enemy.hp > 0: enemy.bleed = int(enemy.get("bleed", 0)) + 1
+				counter.bleedAfter = int(enemy.get("bleed", 0))
+				counters.append(counter)
+			parry -= 1
+		attacks.append({"id":enemy.id,"damage":damage,"hits":hits,"counters":counters})
+		resolve_outcome()
+		if not outcome.is_empty(): break
+	if outcome.is_empty():
+		turn += 1
+		block = 0
+		energy = int(profile.get("energyPerTurn", 3))
+		pressure_used = false
+		dissection_used = false
+		used_cyberware.clear()
+		for enemy in enemies:
+			enemy.intentIndex += 1
+			enemy.intent = intent_for(enemy, int(enemy.intentIndex))
+	return {"discarded":discarded,"attacks":attacks,"drawn":draw_cards(),"outcome":outcome}

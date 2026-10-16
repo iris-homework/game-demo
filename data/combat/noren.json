@@ -1,0 +1,11 @@
+{
+  "ruleset": "noren_v1",
+  "handSize": 5,
+  "energyPerTurn": 3,
+  "initialStance": "melee",
+  "initialAmmo": 2,
+  "ammoCap": 6,
+  "shuffleInitialDeck": true,
+  "discardHandAtTurnEnd": true,
+  "recycleDiscardWhenEmpty": true
+}

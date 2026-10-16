@@ -84,7 +84,7 @@ func _ready() -> void:
 	check(restored.hand.size() == 4 and restored.discard_pile.size() == 1 and restored.enemies[0].hp == 2,"No reset/exploit on resume")
 	check(restored.player_hp == 50 and Game.state.currentDay == 7,"HP/date persisted")
 	check(not restored.use_item("missing",0,{},Game.item_catalog).ok,"Empty items cannot create effect")
-	check(Game.read_data("cards/cards.json").is_empty() and Game.item_catalog.is_empty(),"Formal card/item pools stay empty")
+	check(Game.read_data("cards/cards.json").size() == 40 and Game.item_catalog.is_empty(),"Forty Noren cards and unchanged empty items")
 	var original := Game.state.duplicate(true)
 	Game.start_training("B12")
 	check(Game.training_mode and Game.state.currentHp == 100,"Practice isolated")

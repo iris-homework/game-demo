@@ -6,6 +6,7 @@ const ReturnGhost = preload("res://scripts/combat/return_ghost_fx.gd")
 const NeonSlash = preload("res://scripts/combat/prismatic_slash_fx.gd")
 const ACTOR_SCALE := 1.2544
 const ATTACK_ZOOM_FACTOR := 0.9
+const RANGED_RETREAT_DISTANCE := 280.0
 const GROUND_CLEARANCE := Vector2(70,45)*ACTOR_SCALE
 var world := Node2D.new()
 var actors_root := Node2D.new()
@@ -199,6 +200,9 @@ func frame_attack(attacker: Node2D, defender: Node2D, destination: Vector2) -> v
 	camera_to((destination.x+defender.position.x)*0.5,magnification,0.25,target_y)
 
 func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_hit: Callable) -> void:
+	if style == "shoot":
+		await ranged_attack(attacker, defender, hits, on_hit)
+		return
 	if not attacker.alive or not defender.alive: return
 	active_attacker = attacker
 	active_defender = defender
@@ -348,4 +352,46 @@ func return_home() -> void:
 		for ghost in ghosts: ghost.queue_free()
 
 	if camera_tween.is_running(): await camera_tween.finished
+	set_phase("idle")
+
+func ranged_attack(attacker: Node2D, defender: Node2D, hits: Array, on_hit: Callable) -> void:
+	if not attacker.alive or not defender.alive: return
+	active_attacker = attacker
+	active_defender = defender
+	var direction := 1.0 if defender.position.x >= attacker.position.x else -1.0
+	attacker.face_toward(defender.position)
+	await wide()
+	if attacker.position.distance_to(defender.position) < 300 * depth_scale(attacker.position):
+		set_phase("retreat")
+		attacker.set_pose("retreat")
+		var origin: Vector2 = attacker.position
+		var destination := origin - Vector2(direction * RANGED_RETREAT_DISTANCE, 0)
+		destination.x = clampf(destination.x, 100, 1310)
+		await move_actor(attacker, origin.lerp(destination, 0.5) - Vector2(0,30), 0.12)
+		await move_actor(attacker, destination, 0.14)
+	for i in hits.size():
+		var hit: Dictionary = hits[i]
+		set_phase("aim")
+		attacker.set_pose("idle")
+		await get_tree().create_timer(0.10).timeout
+		set_phase("shoot")
+		attacker.set_pose("shoot")
+		var tracer := Line2D.new()
+		tracer.width = 3
+		tracer.default_color = Color("ffe0a3")
+		tracer.points = PackedVector2Array([attacker.position+Vector2(direction*75,-65)*depth_scale(attacker.position),defender.position+Vector2(0,-62)*depth_scale(defender.position)])
+		world.add_child(tracer)
+		defender.set_pose("block" if hit.blocked > 0 else "damaged")
+		play_hit_sound(hit.blocked > 0)
+		kick_camera(direction,5.0)
+		on_hit.call(hit,i)
+		await get_tree().create_timer(0.075).timeout
+		tracer.queue_free()
+		await get_tree().create_timer(0.12).timeout
+		if hit.killed:
+			defender.alive = false
+			await create_tween().tween_property(defender,"modulate:a",0.0,0.16).finished
+			break
+		defender.set_pose("idle")
+	attacker.set_pose("idle")
 	set_phase("idle")

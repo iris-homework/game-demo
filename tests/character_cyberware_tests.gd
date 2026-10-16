@@ -21,6 +21,8 @@ func battle_for(id: String = "noren") -> CombatModel:
 	model.restore(Game.state.combat)
 	model.enemies[0].hp = 30
 	model.enemies[0].maxHp = 30
+	# Explicit attack order keeps this technology regression independent of starter shuffling.
+	model.draw_pile.sort_custom(func(a,b): return str(model.instances[a]) > str(model.instances[b]))
 	return model
 
 func same_save(a: Dictionary, b: Dictionary) -> bool:
@@ -42,8 +44,8 @@ func _ready() -> void:
 	check(normal.next_attack_bonus == 6 and normal.available_cyberware_count() == 0, "All six stack and enter cooldown")
 	check(not normal.activate_cyberware(FIRST), "Same-turn reuse remains rejected")
 	normal.draw_cards()
-	check(normal.play_card(normal.hand[0], 0).damage == 7 and normal.next_attack_bonus == 0, "Six bonuses apply once to next attack")
-	check(normal.play_card(normal.hand[0], 0).damage == 1, "Following attack keeps base damage")
+	check(normal.play_card(normal.hand[0], 0).damage == 12 and normal.next_attack_bonus == 0, "Six bonuses apply once to next attack")
+	check(normal.play_card(normal.hand[0], 0).damage == 6, "Following attack keeps base damage")
 	normal.end_turn()
 	check(normal.available_cyberware_count() == 6 and normal.activate_cyberware(FIRST), "Next player turn releases cooldown")
 	# Only in-memory fixture actors have alternative lists.
@@ -70,7 +72,7 @@ func _ready() -> void:
 	restored.restore(Game.state.combat)
 	check(restored.cyberware_cards().size() == 2 and restored.next_attack_bonus == 1, "Restored battle retains selected items and pending bonus")
 	check(not restored.activate_cyberware(FIFTH), "Restore cannot bypass cooldown")
-	check(restored.play_card(restored.hand[0], 0).damage == 2, "Restored pending bonus resolves exactly once")
+	check(restored.play_card(restored.hand[0], 0).damage == 7, "Restored pending bonus resolves exactly once")
 	Game.start_training("B12")
 	check(Game.state.combat.profile.playerCharacterId == "qa_subset" and Game.state.combat.profile.cyberware.cards.is_empty(), "Training uses current actor's new list")
 	Game.finish_training("lose")

@@ -18,8 +18,6 @@ func _ready() -> void:
 		var enemy := template.duplicate(true)
 		enemy.id = "depth_demo_%d" % i
 		enemy.displayName = "训练对手"
-		enemy.maxHp = 20
-		enemy.hp = 20
 		view.model.enemies.append(enemy)
 	view.commit()
 	app.swap_view()
