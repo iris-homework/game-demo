@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-16",
+  "method": "imagegen AI detail enhancement; not native 4K or lossless recovery",
+  "source": "noren-bar-seated-v1.png",
+  "output": "noren-bar-seated-v2-detail.png",
+  "dimensions": [
+    1672,
+    941
+  ],
+  "sha256": "25a7946e0c5b5a2da877b2229be35cf070b69070bae612c9572f41afbd14a485",
+  "originalPreserved": true,
+  "animationCoordinates": "original 1672x941 reference space"
+}

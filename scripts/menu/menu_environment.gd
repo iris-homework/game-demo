@@ -4,7 +4,7 @@ extends Control
 ## The clock pauses for static mode, focus loss and minimization.
 
 const CANVAS := Vector2(1440, 900)
-const SOURCE_ART := "res://assets/menu/noren-bar-seated-v1.png"
+const SOURCE_ART := "res://assets/menu/noren-bar-seated-v2-detail.png"
 const ART_SHADER := preload("res://shaders/menu_native_art.gdshader")
 # Same neon keyframes as tools/render_noren_neon_patch.mjs, before GIF quantization.
 const LEFT_SIGN_KEYS := [Vector2(0,1),Vector2(9,1),Vector2(10,.28),Vector2(11,.15),Vector2(12,.85),Vector2(13,1),Vector2(20,1),Vector2(21,.4),Vector2(22,.18),Vector2(23,.18),Vector2(24,.75),Vector2(25,1),Vector2(44,1),Vector2(45,.30),Vector2(46,1),Vector2(59,1)]

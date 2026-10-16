@@ -124,5 +124,11 @@ void fragment() {
         artwork.rgb *= mix(1.0,sign_gains.x,left_sign_weight(p));
         artwork.rgb *= mix(1.0,sign_gains.y,right_sign_weight(p));
     }
+    // Lift shadow and midtone detail with a softer, more neutral white light.
+    // Preserve black outlines and highlight headroom; static and animated frames share the grade.
+    vec3 lifted = pow(artwork.rgb, vec3(0.72));
+    float luminance = dot(lifted, vec3(0.2126, 0.7152, 0.0722));
+    lifted = mix(vec3(luminance), lifted, 0.82);
+    artwork.rgb = mix(lifted, vec3(0.96, 0.98, 1.0), 0.012);
     COLOR = artwork;
 }

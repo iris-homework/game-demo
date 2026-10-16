@@ -56,8 +56,8 @@ func _add_readability_mask() -> void:
 	var gradient := Gradient.new()
 	gradient.colors = PackedColorArray([
 		Color(0.031, 0.027, 0.058, 0.0),
-		Color(0.031, 0.027, 0.058, 0.55),
-		Color(0.031, 0.027, 0.058, 0.55),
+		Color(0.031, 0.027, 0.058, 0.32),
+		Color(0.031, 0.027, 0.058, 0.32),
 		Color(0.031, 0.027, 0.058, 0.0)])
 	gradient.offsets = PackedFloat32Array([0.0, 0.30, 0.78, 1.0])
 	var texture := GradientTexture2D.new()

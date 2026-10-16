@@ -125,7 +125,7 @@ func _ready() -> void:
 	check(app.view.progress_summary.text == "暂无委托记录","no save summary is honest")
 	var env: Control = app.view.environment
 	check(env.source_texture.get_size() == Vector2(1672,941),"native artwork retains full 1672x941 resolution")
-	check(env.source_texture.resource_path == "res://assets/menu/noren-bar-seated-v1.png","menu samples original full-color PNG")
+	check(env.source_texture.resource_path == "res://assets/menu/noren-bar-seated-v2-detail.png","menu samples enhanced full-color PNG")
 	check(env.background.material is ShaderMaterial and env.artwork_material == env.background.material,"local motion shader is connected")
 	check(not ResourceLoader.has_cached("res://assets/menu/noren_idle_frames/frame_000.png"),"low-resolution GIF frames are not loaded")
 	check(is_equal_approx(env.frame_duration,0.08) and is_equal_approx(env.loop_duration,4.8) and is_equal_approx(env.playback_speed,1.5),"original animation timing retains the requested 1.5x speed")
