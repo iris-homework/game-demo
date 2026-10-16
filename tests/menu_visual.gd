@@ -395,9 +395,66 @@ func region_brightness(samples: PackedColorArray) -> float:
 	for color in samples: total += color.get_luminance()
 	return total / float(samples.size())
 
+# Inspect the displacement actually calculated by the production GPU shader.
+# Replace only its final color output; geometry code and live phase parameters stay identical.
+func motion_geometry_suite(env: Control) -> void:
+	var probe := SubViewport.new()
+	probe.size = Vector2i(1672, 941)
+	probe.disable_3d = true
+	probe.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	add_child(probe)
+	var surface := TextureRect.new()
+	surface.size = Vector2(1672, 941)
+	surface.texture = env.source_texture
+	var material := ShaderMaterial.new()
+	var shader := Shader.new()
+	shader.code = env.artwork_material.shader.code.replace("COLOR = artwork;", "COLOR = vec4(vec2(0.5) + offset / 8.0, 0.0, 1.0);")
+	material.shader = shader
+	surface.material = material
+	probe.add_child(surface)
+	var results: Array = []
+	for index in [0, 15, 30, 45, 59]:
+		env._show_frame(index)
+		material.set_shader_parameter("motion_angles", env.artwork_material.get_shader_parameter("motion_angles"))
+		await RenderingServer.frame_post_draw
+		var pixels := probe.get_texture().get_image()
+		var maximum := 0.0
+		var neighbor_step := 0.0
+		var min_determinant := 10.0
+		for y in range(315, 885):
+			for x in range(285, 545):
+				var c := pixels.get_pixel(x, y)
+				var cx := pixels.get_pixel(x + 1, y)
+				var cy := pixels.get_pixel(x, y + 1)
+				var offset := (Vector2(c.r, c.g) - Vector2(0.5, 0.5)) * 8.0
+				var dx := Vector2(cx.r - c.r, cx.g - c.g) * 8.0
+				var dy := Vector2(cy.r - c.r, cy.g - c.g) * 8.0
+				maximum = maxf(maximum, offset.length())
+				neighbor_step = maxf(neighbor_step, maxf(dx.length(), dy.length()))
+				min_determinant = minf(min_determinant, (1.0 + dx.x) * (1.0 + dy.y) - dx.y * dy.x)
+		results.append({"frame":index,"maximumSourcePixelOffset":maximum,"maximumNeighborDelta":neighbor_step,"minimumMappingDeterminant":min_determinant})
+		check(maximum <= 1.55, "pose %d limits GPU displacement to 1.5px plus readback rounding" % index)
+		check(neighbor_step < 0.20 and min_determinant > 0.70, "pose %d has no sharp warp seam or folded sampling" % index)
+		if index == 0:
+			check(maximum < 0.03, "static pose has no character deformation")
+	env._show_frame(0, 0.01)
+	var first: Vector3 = env.artwork_material.get_shader_parameter("motion_angles")
+	env._show_frame(0, 0.02)
+	var second: Vector3 = env.artwork_material.get_shader_parameter("motion_angles")
+	check(first.distance_to(second) > 0.00001 and first.distance_to(second) < 0.001, "motion updates smoothly inside the same indexed frame")
+	env._show_frame(59, TAU - 0.001)
+	var end: Vector3 = env.artwork_material.get_shader_parameter("motion_angles")
+	env._show_frame(0, 0.0)
+	var start: Vector3 = env.artwork_material.get_shader_parameter("motion_angles")
+	check(end.distance_to(start) < 0.00002, "continuous cycle returns to rest without a jump")
+	write_json("motion-geometry.json", results)
+	probe.queue_free()
+	await get_tree().process_frame
+
 func native_art_suite() -> void:
 	var env: Control = app.view.environment
 	env.set_process(false)
+	await motion_geometry_suite(env)
 	var start := await native_art_image(env, 0)
 	var moved := await native_art_image(env, 15)
 	for region in [Rect2(395,350,55,90), Rect2(320,740,80,60), Rect2(450,780,60,70)]:

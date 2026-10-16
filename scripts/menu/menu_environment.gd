@@ -57,7 +57,7 @@ func _process(delta: float) -> void:
 	if motion_enabled and focused and source_texture != null:
 		animation_time += minf(delta, 0.1)
 		var cycle_time := fposmod(animation_time * playback_speed, loop_duration)
-		_show_frame(mini(frame_count - 1, int(floor(cycle_time / frame_duration))))
+		_show_frame(mini(frame_count - 1, int(floor(cycle_time / frame_duration))), TAU * cycle_time / loop_duration)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
@@ -65,16 +65,17 @@ func _notification(what: int) -> void:
 	elif what == NOTIFICATION_APPLICATION_FOCUS_IN:
 		focused = true
 
-func _show_frame(index: int) -> void:
-	if index == frame_index or source_texture == null or artwork_material == null:
+func _show_frame(index: int, continuous_phase: float = -1.0) -> void:
+	if source_texture == null or artwork_material == null:
 		return
 	frame_index = index
-	var phase := TAU * float(index) / float(frame_count)
-	# Same "motion" preset angles/pivots as render_noren_idle.mjs.
+	var phase := continuous_phase if continuous_phase >= 0.0 else TAU * float(index) / float(frame_count)
+	# Subtle idle motion on a flattened image; phase zero is the undeformed artwork.
+	# Use continuous time in playback, retaining indexed poses for QA and neon timing.
 	artwork_material.set_shader_parameter("motion_angles", Vector3(
-		deg_to_rad(1.65 * 3.0) * sin(phase),
-		deg_to_rad(1.65 * 2.6) * sin(phase + 0.2),
-		deg_to_rad(1.25 * 2.6) * sin(phase + 0.8)))
+		deg_to_rad(0.60) * sin(phase),
+		deg_to_rad(0.28) * sin(phase),
+		deg_to_rad(0.22) * sin(phase)))
 	artwork_material.set_shader_parameter("light_gains", Vector2(0.032 * sin(phase), 0.045 * sin(phase + 0.65)))
 	artwork_material.set_shader_parameter("sign_gains", Vector2(_sign_gain(index, LEFT_SIGN_KEYS), _sign_gain(index, RIGHT_SIGN_KEYS)))
 
@@ -87,6 +88,8 @@ func _sign_gain(index: int, keys: Array) -> float:
 	return 1.0
 
 func set_motion_enabled(value: bool) -> void:
+	if value != motion_enabled:
+		animation_time = 0.0
 	motion_enabled = value
 	get_tree().root.set_meta("menu_motion_enabled", value)
 	if not value:
