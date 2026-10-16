@@ -10,7 +10,11 @@ var enemy_hud: Control
 var targets: Array[Button] = []
 var enemy_plates: Array[Control] = []
 var enemy_intents: Array[Control] = []
-const ENEMY_PLATE_SIZE := Vector2(194,72)
+const ActorHUD = preload("res://scripts/combat/actor_hud.gd")
+var player_plate: Control
+var shown_player_block := 0
+var shown_player_parry := 0
+var presenting_enemy_turn := false
 const ENEMY_INTENT_SIZE := Vector2(126,28)
 var aim: Node2D
 var hovered_target := -1
@@ -60,6 +64,8 @@ func enter(params: Dictionary) -> void:
 	expected_revision = Game.revision
 	shown_enemies = model.enemies.duplicate(true)
 	shown_player_hp = model.player_hp
+	shown_player_block = model.block
+	shown_player_parry = model.parry
 	# Retain existing HUD offsets; only the world imagery is replaced.
 	var place_asset: String = Game.place_data(battle.placeId).backgroundAssetId
 	var stage_asset: String = Game.assets.get(place_asset,{}).get("battleAssetId","")
@@ -79,8 +85,10 @@ func enter(params: Dictionary) -> void:
 	turn_label = label(self,"回合 %02d  /  你的回合" % model.turn,Vector2(604,20),Vector2(232,36),18,Color("8fcaff"))
 	turn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	player_portrait = stage.player
-	label(self,Game.display_name(Game.PLAYER_REFERENCE),Vector2(305,552)+actor_offset,Vector2(280,33),23)
-	resources_label = label(self,"",Vector2(220,620)+actor_offset,Vector2(570,67),17,CYAN)
+	player_plate = ActorHUD.new()
+	add_child(player_plate)
+	resources_label = label(self,"",Vector2(220,620)+actor_offset,Vector2(220,25),14,CYAN)
+	resources_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	build_energy_hud()
 	exhaust_button = button(self,"消耗 0",Vector2(1240,770),Vector2(170,30),func(): show_pile("消耗 / 能力",model.exhaust_pile))
 	exhaust_button.add_theme_font_size_override("font_size",13)
@@ -172,21 +180,10 @@ func refresh_enemy_hud() -> void:
 		var effective := roundi(int(enemy.intent.get("amount",0)) * (1.0 - int(enemy.get("weak",0))*0.1))
 		var intent_text := "攻击 %d" % effective
 		if int(enemy.intent.get("hits",1)) > 1: intent_text += " ×%d" % int(enemy.intent.hits)
-		var plate := Control.new()
-		plate.size = ENEMY_PLATE_SIZE
-		plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var plate := ActorHUD.new()
 		enemy_hud.add_child(plate)
 		enemy_plates.append(plate)
-		panel(plate,Vector2.ZERO,ENEMY_PLATE_SIZE,Color(0.025,0.035,0.055,0.92),Color("57404f"))
-		var name_label := label(plate,"%02d  %s" % [i+1,enemy.displayName],Vector2(8,3),Vector2(121,24),16)
-		name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
-		name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		name_label.tooltip_text = enemy.displayName
-		var hp_text := label(plate,"%d/%d" % [enemy.hp,enemy.maxHp],Vector2(132,4),Vector2(54,23),14,PINK)
-		hp_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		panel(plate,Vector2(8,33),Vector2(178,7),Color("331d33"),Color("594858"))
-		rect(plate,Vector2(9,34),Vector2(176*float(enemy.hp)/enemy.maxHp,5),PINK)
-		label(plate,"格挡 %d  裂伤 %d  虚弱 %d" % [enemy.get("block",0),enemy.get("bleed",0),enemy.get("weak",0)],Vector2(8,45),Vector2(182,23),11,CYAN)
+		plate.update_values(int(enemy.hp),int(enemy.maxHp),int(enemy.get("block",0)),enemy_statuses(enemy))
 		var intent := Control.new()
 		intent.size = ENEMY_INTENT_SIZE
 		intent.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -218,6 +215,8 @@ func refresh_enemy_hud() -> void:
 		target.add_theme_stylebox_override("disabled",StyleBoxEmpty.new())
 		target.disabled = enemy.hp <= 0
 		target.tooltip_text = "攻击目标：" + enemy.displayName + "\n下次行动：" + intent_text
+	# Status icons receive hover before the transparent target buttons.
+	for plate in enemy_plates: enemy_hud.move_child(plate,-1)
 	update_target_rects()
 
 func pile_button(pos: Vector2, title: String, action: Callable) -> void:
@@ -541,8 +540,10 @@ func end_turn_pressed() -> void:
 	await announce_turn("敌方回合",true)
 	if discard_wait != null and discard_wait.time_left > 0.0:
 		await discard_wait.timeout
+	presenting_enemy_turn = true
 	var result := model.end_turn()
 	if result.is_empty():
+		presenting_enemy_turn = false
 		set_busy(false)
 		return
 	commit()
@@ -551,24 +552,34 @@ func end_turn_pressed() -> void:
 		for i in model.enemies.size():
 			if model.enemies[i].id == attack.id: attacker_index = i
 		if attacker_index < 0: continue
+		shown_enemies[attacker_index].block = 0
+		refresh_enemy_hud()
 		var style: String = shown_enemies[attacker_index].intent.get("animation","pierce")
 		await stage.attack(stage.enemies[attacker_index],stage.player,style,attack.hits,func(hit: Dictionary, _index: int):
 			shown_player_hp = int(hit.hpAfter)
+			shown_player_block = maxi(0,shown_player_block-int(hit.get("blocked",0)))
+			refresh_player_plate()
 			refresh_hp()
 			impact(stage.contact(stage.player),"−%d HP" % hit.damage if hit.damage > 0 else "格挡",PINK)
 		)
 		if not attack.get("counters",[]).is_empty() and stage.player.alive:
 			await stage.attack(stage.player,stage.enemies[attacker_index],"slash",attack.counters,func(hit: Dictionary, _index: int):
 				shown_enemies[attacker_index].hp = hit.hpAfter
+				shown_enemies[attacker_index].block = hit.get("blockAfter",0)
 				shown_enemies[attacker_index].bleed = hit.bleedAfter
 				refresh_enemy_hud()
 				impact(stage.contact(stage.enemies[attacker_index]),"弹反 −%d" % hit.damage,CYAN)
 			)
+		shown_player_parry = maxi(0,shown_player_parry-1)
+		refresh_player_plate()
 	if not model.outcome.is_empty():
+		presenting_enemy_turn = false
 		set_busy(false)
 		finish(model.outcome)
 		return
 	await stage.return_home()
+	presenting_enemy_turn = false
+	refresh_resources()
 	stage.player.set_combat_stance(model.stance if model.is_noren() else "melee")
 	shown_enemies = model.enemies.duplicate(true)
 	refresh_enemy_hud()
@@ -779,18 +790,62 @@ func update_target_rects() -> void:
 		targets[i].size = area.size
 	update_enemy_plates()
 
+func anchor_plate(plate: Control, actor: Node2D) -> void:
+	var foot := actor.to_global(Vector2.ZERO)
+	plate.global_position = Vector2(clampf(foot.x-ActorHUD.WIDTH/2,24,1416-ActorHUD.WIDTH),foot.y+12)
+	plate.visible = actor.visible and actor.modulate.a > 0.01 and stage.get_global_rect().has_point(foot)
+	plate.modulate.a = actor.modulate.a
+
 func update_enemy_plates() -> void:
-	# Names and HP stay below the existing top-right controls; only intent follows actors.
+	anchor_plate(player_plate,stage.player)
 	for i in enemy_plates.size():
 		var actor: Node2D = stage.enemies[i]
-		var plate := enemy_plates[i]
-		plate.global_position = Vector2(1216,265+i*82)
-		plate.modulate.a = 1.0 if int(shown_enemies[i].hp) > 0 else 0.4
+		anchor_plate(enemy_plates[i],actor)
 		var intent := enemy_intents[i]
 		intent.visible = actor.visible and actor.alive and actor.modulate.a > 0.01
 		intent.modulate.a = actor.modulate.a
 		var head := actor.to_global(Vector2(0,-130))
 		intent.global_position = Vector2(clampf(head.x-ENEMY_INTENT_SIZE.x*0.5,16,1424-ENEMY_INTENT_SIZE.x),clampf(head.y-ENEMY_INTENT_SIZE.y-8,206,674))
+	# At melee distance, separate intersecting strips while retaining their foot anchors.
+	var plates: Array = [player_plate]+enemy_plates
+	for pass_index in 3:
+		for a in plates.size():
+			for b in range(a+1,plates.size()):
+				var first: Control = plates[a]
+				var second: Control = plates[b]
+				if not first.visible or not second.visible: continue
+				if not first.get_global_rect().grow(6).intersects(second.get_global_rect()): continue
+				var left: Control = first if first.position.x < second.position.x else second
+				var right: Control = second if left == first else first
+				var overlap := left.global_position.x+ActorHUD.WIDTH+20-right.global_position.x
+				left.global_position.x = maxf(24,left.global_position.x-overlap/2)
+				right.global_position.x = minf(1416-ActorHUD.WIDTH,right.global_position.x+overlap/2)
+	resources_label.global_position = player_plate.global_position+Vector2(-12,player_plate.size.y+2)
+	resources_label.visible = player_plate.visible
+	resources_label.modulate.a = player_plate.modulate.a
+
+func effect_entry(id: String, count: int, color: String, description: String) -> Dictionary:
+	return {"id":id,"count":count,"color":color,"description":description}
+
+func enemy_statuses(enemy: Dictionary) -> Array:
+	var effects: Array = []
+	var bleed := int(enemy.get("bleed",0))
+	var weak := int(enemy.get("weak",0))
+	if bleed > 0: effects.append(effect_entry("bleed",bleed,"ed586b","裂伤 · %d 层\n远程攻击每段本体命中后，造成等于当前层数的额外伤害，再减少 1 层。额外伤害先扣格挡，不受远程倍率加成；跨回合保留。" % bleed))
+	if weak > 0: effects.append(effect_entry("weak",weak,"e5a06b","虚弱 · %d 层\n每层降低攻击伤害 10%%，最多 5 层；当前降低 %d%%。每段四舍五入，跨回合保留。" % [weak,mini(5,weak)*10]))
+	return effects
+
+func refresh_player_plate() -> void:
+	if not is_instance_valid(player_plate): return
+	var effects: Array = []
+	if shown_player_parry > 0: effects.append(effect_entry("parry",shown_player_parry,"7be5bd","弹反 · %d 层\n一次敌方攻击结束后，每层反击一次，每次造成该次攻击格挡前总伤害的 25%%（四舍五入），并施加 1 层裂伤。整次反击后消耗 1 层；跨回合保留。" % shown_player_parry))
+	if model.turn_damage_bonus > 0: effects.append(effect_entry("damage",model.turn_damage_bonus,"f17988","下次攻击增伤 · +%d\n本回合下一张攻击牌的第一段基础伤害增加该数值；使用后消耗，回合结束清除。" % model.turn_damage_bonus))
+	if model.next_attack_bonus > 0: effects.append(effect_entry("technology",model.next_attack_bonus,"c095ff","科技增伤 · +%d\n下一张攻击牌的第一段基础伤害增加该数值；使用后消耗，未使用时跨回合保留。" % model.next_attack_bonus))
+	if model.turn_discount > 0: effects.append(effect_entry("discount",model.turn_discount,"f0d47f","本回合攻击减费 · %d\n下一张攻击牌少消耗该数值的能量，费用最低为 0。使用后消耗，回合结束清除。" % model.turn_discount))
+	if model.stance_discount: effects.append(effect_entry("stance_discount",1,"79d9f7","形态攻击减费 · 1\n进入远程形态获得：下一张攻击牌费用 −1，最低为 0。不叠加；跨回合保留至使用。"))
+	if "high_pressure" in model.powers: effects.append(effect_entry("high_pressure",1,"f2b969","高压枪机 · 本场持续\n每回合首次远程攻击的第一段基础伤害 +3；同名能力不叠加。\n本回合："+("已触发" if model.pressure_used else "待触发")))
+	if "dissection" in model.powers: effects.append(effect_entry("dissection",1,"d2b3ee","剖解经验 · 本场持续\n每回合首次以近战形态用单体卡牌施加裂伤时，额外施加 1 层；同名能力不叠加。\n本回合："+("已触发" if model.dissection_used else "待触发")))
+	player_plate.update_values(shown_player_hp,model.max_hp,shown_player_block,effects)
 
 func refresh_hp() -> void:
 	if shown_player_hp < 0:
@@ -823,6 +878,10 @@ func build_energy_hud() -> void:
 	energy_value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 
 func refresh_resources() -> void:
+	if not presenting_enemy_turn:
+		shown_player_block = model.block
+		shown_player_parry = model.parry
+	refresh_player_plate()
 	if not is_instance_valid(resources_label): return
 	if is_instance_valid(energy_panel):
 		energy_panel.visible = model.is_noren()
@@ -831,6 +890,5 @@ func refresh_resources() -> void:
 	if not model.is_noren():
 		resources_label.text = "旧版战斗快照"
 		return
-	resources_label.text = "%s  ·  弹药 %d / 6\n格挡 %d  ·  弹反 %d%s" % ["近战" if model.stance == "melee" else "远程",model.ammo,model.block,model.parry,"  ·  下张攻击减费" if model.stance_discount else ""]
-	resources_label.tooltip_text = "近战攻击回弹 1；远程攻击耗弹 1、伤害 ×1.5。\n进入近战抽 1；进入远程下张攻击费用 −1。\n" + ("高压枪机已生效 " if "high_pressure" in model.powers else "") + ("剖解经验已生效" if "dissection" in model.powers else "")
+	resources_label.text = "%s  ·  弹药 %d / 6" % ["近战" if model.stance == "melee" else "远程",model.ammo]
 	if is_instance_valid(exhaust_button): exhaust_button.text = "消耗 / 能力 %d" % model.exhaust_pile.size()
