@@ -407,7 +407,7 @@ func show_gun_bursts(attacker: Node2D, defender: Node2D, direction: float, block
 	muzzle.hold_remaining = last_hit_stop
 	muzzle.variation = round_index
 	# Barrel opening in the authored shooting texture, through its calibrated mirror/scale.
-	muzzle.position = world.to_local(attacker.sprite.to_global(Vector2(270,325))) if attacker.kind=="noren" else attacker.position+Vector2(direction*75,-65)*depth_scale(attacker.position)
+	muzzle.position = world.to_local(attacker.sprite.to_global(Vector2(54,385))) if attacker.kind=="noren" else attacker.position+Vector2(direction*75,-65)*depth_scale(attacker.position)
 	muzzle.scale = Vector2(direction,1)*depth_scale(attacker.position)
 	world.add_child(muzzle)
 	var impact := GunBurst.new()

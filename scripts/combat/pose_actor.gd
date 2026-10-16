@@ -15,7 +15,7 @@ const NOREN := {
 	"idle": [Vector2(710,1240),0.099], "move": [Vector2(920,1048),0.103],
 	"slash": [Vector2(725,1110),0.103], "pierce": [Vector2(1000,941),0.132],
 	"block": [Vector2(550,1140),0.103], "damaged": [Vector2(700,1230),0.099],
-	"gun_idle": [Vector2(660,1230),0.099], "shoot": [Vector2(945,980),0.126], "retreat": [Vector2(560,1155),0.099],
+	"gun_idle": [Vector2(660,1230),0.099], "shoot": [Vector2(714,1210),0.099], "retreat": [Vector2(560,1155),0.099],
 	"gun_block": [Vector2(550,1140),0.103], "gun_damaged": [Vector2(700,1230),0.099]
 }
 const FINN := {
@@ -34,6 +34,9 @@ func setup(actor_kind: String, origin: Vector2, direction: float) -> void:
 	sprite.centered = false
 	for key in (NOREN if kind == "noren" else FINN):
 		poses[key] = load("res://assets/combat_test/%s_%s.%s" % [kind,key,"png" if kind == "noren" else "webp"])
+	if kind == "noren":
+		# Match gun idle's planted feet; retain the original lunge artwork as a source.
+		poses["shoot"] = preload("res://assets/combat_test/noren_shoot_planted.png")
 	set_pose("idle")
 
 func set_pose(value: String) -> void:
