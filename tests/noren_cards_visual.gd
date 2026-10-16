@@ -10,6 +10,13 @@ func check(ok: bool, title: String) -> void:
 		failures += 1
 		push_error(title)
 
+func release_overlay_absent(view: Control) -> bool:
+	for child in view.get_children():
+		if child is Panel and child.z_index==5: return false
+	for label in view.find_children("*","Label",true,false):
+		if label.text.begins_with("点击释放") or label.text.begins_with("松手释放") or label.text.begins_with("拖到这里"): return false
+	return true
+
 func idle() -> void:
 	var started := Time.get_ticks_msec()
 	while Game.battle_busy or Game.transition_locked:
@@ -108,7 +115,7 @@ func _ready() -> void:
 	var view=app.view
 	await pointer(view.cards["card_000"].home+Vector2(68,110),1)
 	await pointer(Vector2(720,420))
-	check(view.drop_zone.visible and not view.aim.visible,"Self skill exposes center drop zone without enemy aim")
+	check(release_overlay_absent(view) and not view.aim.visible,"Self skill has no release rectangle, instruction or enemy aim")
 	await pointer(Vector2(720,420),0)
 	await idle()
 	check(view.model.block==4 and view.model.stance=="ranged" and view.model.energy==2,"Self skill resolves from center drag release")

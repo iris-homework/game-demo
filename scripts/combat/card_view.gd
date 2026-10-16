@@ -7,6 +7,9 @@ var home := Vector2.ZERO
 var home_scale := 1.0
 var home_rotation := 0.0
 var home_z := 10
+var lifted_z := 30
+var selection_home := Vector2.ZERO
+var center_on_selection := false
 var managed_input := false
 var enabled := false
 var selected := false
@@ -66,7 +69,7 @@ func _ready() -> void:
 		card_button.focus_mode = Control.FOCUS_NONE
 	for state_name in ["normal","hover","pressed","disabled","focus"]:
 		card_button.add_theme_stylebox_override(state_name, StyleBoxEmpty.new())
-	card_button.tooltip_text = data.get("description", "") + "\n攻击／指定敌人的技能：拖向敌人或点选目标；自身技能／能力／群体牌：拖到屏幕中部松手释放；拖回手牌或按 Esc／右键取消。"
+	card_button.tooltip_text = data.get("description", "") + "\n攻击牌选中后居中置顶，非攻击牌选中后跟随鼠标。非攻击牌选中期间左键优先出牌，不触发其他按钮；自身技能／能力可在画面内任意位置使用，指定敌人的技能仍需点击敌人。Esc／右键取消。"
 	if preview_only: card_button.tooltip_text = data.get("description", "")
 	card_button.pressed.connect(func(): if enabled: chosen.emit(uid))
 	if managed_input:
@@ -122,7 +125,7 @@ func drag_to(point: Vector2) -> void:
 	rotation = 0.0
 	scale = Vector2.ONE
 	global_position = point - pivot_offset
-	z_index = 50
+	z_index = maxi(50,lifted_z+1)
 
 func stop_drag() -> void:
 	if not dragging: return
@@ -135,9 +138,10 @@ func refresh_pose(force: bool = false) -> void:
 	if hover_tween: hover_tween.kill()
 	hover_tween = create_tween().set_parallel(true)
 	var lifted := hovered or selected
-	z_index = (31 if selected else 30) if lifted else home_z
+	z_index = (maxi(50,lifted_z+1) if selected else lifted_z) if lifted else home_z
+	var anchor := selection_home if selected and center_on_selection else home
 	hover_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	hover_tween.tween_property(self,"position",home + Vector2(0,-150 if selected else (-140 if lifted else 0)),0.14)
+	hover_tween.tween_property(self,"position",anchor + Vector2(0,-150 if selected else (-140 if lifted else 0)),0.14)
 	hover_tween.tween_property(self,"scale",Vector2.ONE * (1.12 if lifted else home_scale),0.14)
 	hover_tween.tween_property(self,"rotation",0.0 if lifted else home_rotation,0.14)
 

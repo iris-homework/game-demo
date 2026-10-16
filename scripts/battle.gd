@@ -28,9 +28,9 @@ var cyberware_status: Label
 var resources_label: Label
 var energy_panel: Panel
 var energy_value: Label
-var drop_zone: Panel
-var drop_hint: Label
 var held_start := Vector2.ZERO
+var held_card_moved := false
+var held_confirmation := false
 var exhaust_button: Button
 var pile_overlay: Control
 var initialized := false
@@ -43,7 +43,7 @@ const ACTOR_SCALE := 0.85
 # Additional placement belongs to the selected stage; fallback scenes retain the base.
 var actor_offset := ACTOR_OFFSET
 const HAND_SCALE := 0.75
-const CENTER_DROP_RECT := Rect2(220,210,980,410)
+const CENTER_DROP_RECT := Rect2(210,90,1020,620)
 const CARD_DRAG_THRESHOLD := 12.0
 const PILE_SIZE := Vector2(46,58)
 const DRAW_POS := Vector2(30,814)
@@ -82,12 +82,6 @@ func enter(params: Dictionary) -> void:
 	label(self,Game.display_name(Game.PLAYER_REFERENCE),Vector2(305,552)+actor_offset,Vector2(280,33),23)
 	resources_label = label(self,"",Vector2(220,620)+actor_offset,Vector2(570,67),17,CYAN)
 	build_energy_hud()
-	drop_zone = panel(self,CENTER_DROP_RECT.position,CENTER_DROP_RECT.size,Color(0.05,0.14,0.17,0.16),Color(0.35,0.8,0.9,0.45))
-	drop_zone.z_index = 5
-	drop_zone.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	drop_hint = label(drop_zone,"拖到这里，松手释放",Vector2(0,365),Vector2(CENTER_DROP_RECT.size.x,34),19,CYAN)
-	drop_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	drop_zone.hide()
 	exhaust_button = button(self,"消耗 0",Vector2(1240,770),Vector2(170,30),func(): show_pile("消耗 / 能力",model.exhaust_pile))
 	exhaust_button.add_theme_font_size_override("font_size",13)
 	exhaust_button.visible = model.is_noren()
@@ -252,6 +246,10 @@ func hand_rotation(index: int, count: int) -> float:
 func hand_at_pointer() -> String:
 	var pointer := get_global_mouse_position()
 	var nearest := ""
+	# The centered attack is visually above the fan, so its visible face wins hits too.
+	if cards.has(selected_uid):
+		var selected: CombatCard = cards[selected_uid]
+		if selected.center_on_selection and Rect2(Vector2.ZERO,selected.size).has_point(selected.get_global_transform().affine_inverse()*pointer): return selected_uid
 	# Stable resting footprints prevent enlarged cards from stealing their neighbours.
 	for uid in model.hand:
 		if not cards.has(uid): continue
@@ -265,13 +263,14 @@ func hand_at_pointer() -> String:
 	for uid in model.hand:
 		if not cards.has(uid): continue
 		var card: CombatCard = cards[uid]
-		if (card.hovered or card.selected) and Rect2(Vector2.ZERO,card.size).has_point(card.get_global_transform().affine_inverse()*pointer): return uid
+		# A following card sits under the pointer and must not swallow target clicks.
+		if not card.dragging and (card.hovered or card.selected) and Rect2(Vector2.ZERO,card.size).has_point(card.get_global_transform().affine_inverse()*pointer): return uid
 	return ""
 
 func update_hand_hover() -> void:
 	var uid := ""
 	if initialized and not Game.battle_busy and not Game.transition_locked and not is_instance_valid(pile_overlay):
-		uid = held_card_uid if not held_card_uid.is_empty() else hand_at_pointer()
+		uid = selected_uid if non_attack_selected() else (held_card_uid if not held_card_uid.is_empty() else hand_at_pointer())
 	for card_uid in cards: cards[card_uid].hover(card_uid == uid)
 
 func create_card(uid: String, index: int, count: int, animate: bool) -> CombatCard:
@@ -280,6 +279,9 @@ func create_card(uid: String, index: int, count: int, animate: bool) -> CombatCa
 	view.home_scale = HAND_SCALE
 	view.home_rotation = hand_rotation(index,count)
 	view.home_z = 10+index
+	view.lifted_z = maxi(30,10+count)
+	view.selection_home = hand_position(0,1)+Vector2(0,36) # Enlarged attack ends about 10 pixels above the viewport bottom.
+	view.center_on_selection = model.card(uid).get("type","attack") == "attack"
 	view.setup(uid,model.card(uid))
 	view.home = hand_position(index,count)
 	add_child(view)
@@ -339,25 +341,33 @@ func _process(_delta: float) -> void:
 	if hovered_target >= 0:
 		aim.set("target_center", stage.contact(stage.enemies[hovered_target]))
 
-func clear_card_drag() -> void:
-	if cards.has(held_card_uid): cards[held_card_uid].stop_drag()
+func clear_card_hold() -> void:
 	held_card_uid = ""
-	if is_instance_valid(drop_zone): drop_zone.hide()
+	held_card_moved = false
+	held_confirmation = false
+
+func clear_card_drag() -> void:
+	clear_card_hold()
+	for view in cards.values(): view.stop_drag()
 
 func update_center_drag() -> void:
-	if held_card_uid.is_empty() or not cards.has(held_card_uid): return
+	if selected_uid.is_empty() or not cards.has(selected_uid): return
 	if Game.battle_busy or Game.transition_locked or is_instance_valid(pile_overlay):
 		clear_card_drag()
 		return
-	if not model.card_target(held_card_uid) in ["self","all"]: return
 	var pointer := get_global_mouse_position()
-	var view: CombatCard = cards[held_card_uid]
-	if not view.dragging and pointer.distance_to(held_start) < CARD_DRAG_THRESHOLD: return
-	view.drag_to(pointer)
-	drop_zone.show()
-	var ready := CENTER_DROP_RECT.has_point(pointer)
-	drop_hint.text = "松手释放「%s」" % model.card(held_card_uid).name if ready else "拖到这里，松手释放"
-	drop_hint.modulate.a = 1.0 if ready else 0.6
+	if not held_card_uid.is_empty() and pointer.distance_to(held_start) >= CARD_DRAG_THRESHOLD:
+		held_card_moved = true
+	var view: CombatCard = cards[selected_uid]
+	if not view.center_on_selection: view.drag_to(pointer)
+
+func non_attack_selected() -> bool:
+	return cards.has(selected_uid) and not cards[selected_uid].center_on_selection
+
+func release_area_contains(uid: String, point: Vector2) -> bool:
+	if cards.has(uid) and not cards[uid].center_on_selection:
+		return get_global_rect().has_point(point)
+	return CENTER_DROP_RECT.has_point(point)
 
 func cancel_selection() -> void:
 	clear_card_drag()
@@ -381,9 +391,9 @@ func select_card(uid: String, toggle: bool = true) -> void:
 	_process(0.0)
 
 func begin_card_aim(uid: String) -> void:
-	held_start = get_global_mouse_position()
 	# A cancelled skill choice can leave selection active; grabbing it again re-arms the drag.
 	select_card(uid, model.card_target(uid) == "enemy")
+	held_start = get_global_mouse_position()
 	if selected_uid == uid and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		held_card_uid = uid
 	_process(0.0)
@@ -426,7 +436,6 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 	if result.is_empty(): return
 	set_busy(true)
 	selected_uid = ""
-	drop_zone.hide()
 	aim.visible = false
 	commit()
 	var retired: Array = [uid]
@@ -475,7 +484,7 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 	if not model.outcome.is_empty(): finish(model.outcome)
 
 func show_card_choice(title: String, options: Array, callback: Callable) -> void:
-	held_card_uid = ""
+	clear_card_drag()
 	pile_overlay = preload("res://scripts/combat/choice_picker.gd").new()
 	pile_overlay.heading = title
 	pile_overlay.options = options
@@ -501,6 +510,7 @@ func arrange_hand() -> void:
 		var view: CombatCard = cards[model.hand[i]]
 		view.home_rotation = hand_rotation(i,model.hand.size())
 		view.home_z = 10+i
+		view.lifted_z = maxi(30,10+model.hand.size())
 		view.move_home(hand_position(i,model.hand.size()))
 
 func animate_discard(view: CombatCard, delay: float = 0.0, turn_cleanup: bool = false) -> void:
@@ -708,23 +718,43 @@ func _input(event: InputEvent) -> void:
 			return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		if initialized and not Game.battle_busy and not Game.transition_locked and not is_instance_valid(pile_overlay):
+			# A selected non-attack owns the next click, including clicks over buttons or cards.
+			if non_attack_selected():
+				held_card_uid = selected_uid
+				held_start = get_global_mouse_position()
+				held_card_moved = false
+				held_confirmation = true
+				get_viewport().set_input_as_handled()
+				return
 			var uid := hand_at_pointer()
 			if not uid.is_empty():
 				get_viewport().set_input_as_handled()
 				begin_card_aim(uid)
 				if selected_uid == uid: held_card_uid = uid
 				return
+			if not selected_uid.is_empty():
+				var target_type := model.card_target(selected_uid)
+				var valid_target := target_at_pointer() >= 0 if target_type == "enemy" else CENTER_DROP_RECT.has_point(get_global_mouse_position())
+				if valid_target:
+					held_card_uid = selected_uid
+					held_start = get_global_mouse_position()
+					held_card_moved = false
+					held_confirmation = true
+					get_viewport().set_input_as_handled()
+					return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
 		var released_uid := held_card_uid
 		# Resolve the final pointer position even if press, motion and release share a frame.
 		update_center_drag()
-		var dragged: bool = cards.has(released_uid) and cards[released_uid].dragging
-		clear_card_drag()
+		var should_release := held_card_moved or held_confirmation
+		clear_card_hold()
 		if not released_uid.is_empty() and selected_uid == released_uid and not Game.battle_busy and not Game.transition_locked and not is_instance_valid(pile_overlay):
+			if non_attack_selected(): get_viewport().set_input_as_handled()
 			if model.card_target(released_uid) in ["self","all"]:
 				get_viewport().set_input_as_handled()
-				if dragged and CENTER_DROP_RECT.has_point(get_global_mouse_position()): play_selected(-1)
-				else: cancel_selection()
+				if should_release:
+					if release_area_contains(released_uid,get_global_mouse_position()): play_selected(-1)
+					elif not non_attack_selected(): cancel_selection()
 			else:
 				var target := target_at_pointer()
 				if target >= 0:
