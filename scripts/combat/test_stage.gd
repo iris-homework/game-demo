@@ -4,9 +4,12 @@ signal phase_changed(phase: String)
 const Actor = preload("res://scripts/combat/pose_actor.gd")
 const ReturnGhost = preload("res://scripts/combat/return_ghost_fx.gd")
 const NeonSlash = preload("res://scripts/combat/prismatic_slash_fx.gd")
+const GunBurst = preload("res://scripts/combat/gun_burst_fx.gd")
 const ACTOR_SCALE := 1.2544
 const ATTACK_ZOOM_FACTOR := 0.9
 const RANGED_RETREAT_DISTANCE := 280.0
+const RANGED_HIT_STOP := 0.12
+const RANGED_BLOCK_STOP := 0.09
 const GROUND_CLEARANCE := Vector2(70,45)*ACTOR_SCALE
 var world := Node2D.new()
 var actors_root := Node2D.new()
@@ -360,6 +363,7 @@ func ranged_attack(attacker: Node2D, defender: Node2D, hits: Array, on_hit: Call
 	active_defender = defender
 	var direction := 1.0 if defender.position.x >= attacker.position.x else -1.0
 	attacker.face_toward(defender.position)
+	defender.face_toward(attacker.position)
 	await wide()
 	if attacker.position.distance_to(defender.position) < 300 * depth_scale(attacker.position):
 		set_phase("retreat")
@@ -374,20 +378,19 @@ func ranged_attack(attacker: Node2D, defender: Node2D, hits: Array, on_hit: Call
 		set_phase("aim")
 		attacker.set_pose("idle")
 		await get_tree().create_timer(0.10).timeout
-		set_phase("shoot")
 		attacker.set_pose("shoot")
-		var tracer := Line2D.new()
-		tracer.width = 3
-		tracer.default_color = Color("ffe0a3")
-		tracer.points = PackedVector2Array([attacker.position+Vector2(direction*75,-65)*depth_scale(attacker.position),defender.position+Vector2(0,-62)*depth_scale(defender.position)])
-		world.add_child(tracer)
+		last_hit_stop = RANGED_HIT_STOP if int(hit.damage)>0 else RANGED_BLOCK_STOP
+		show_gun_bursts(attacker,defender,direction,int(hit.blocked)>0,i)
 		defender.set_pose("block" if hit.blocked > 0 else "damaged")
+		defender.sprite.modulate = Color(1.55,1.8,2.1) if int(hit.damage)==0 else Color(2.1,0.38,0.55)
 		play_hit_sound(hit.blocked > 0)
-		kick_camera(direction,5.0)
+		kick_camera(direction,9.0 if int(hit.damage)>0 else 6.0)
 		on_hit.call(hit,i)
-		await get_tree().create_timer(0.075).timeout
-		tracer.queue_free()
-		await get_tree().create_timer(0.12).timeout
+		set_phase("shoot")
+		# Hold both contact poses and local flashes; the camera impulse keeps decaying.
+		await get_tree().create_timer(last_hit_stop).timeout
+		if int(hit.blocked)>0 and int(hit.damage)>0: defender.set_pose("damaged")
+		await create_tween().tween_property(defender.sprite,"modulate",Color.WHITE,0.12).finished
 		if hit.killed:
 			defender.alive = false
 			await create_tween().tween_property(defender,"modulate:a",0.0,0.16).finished
@@ -395,3 +398,22 @@ func ranged_attack(attacker: Node2D, defender: Node2D, hits: Array, on_hit: Call
 		defender.set_pose("idle")
 	attacker.set_pose("idle")
 	set_phase("idle")
+
+func show_gun_bursts(attacker: Node2D, defender: Node2D, direction: float, blocked: bool, round_index: int) -> void:
+	var muzzle := GunBurst.new()
+	muzzle.mode = "muzzle"
+	muzzle.duration = 0.19
+	muzzle.hold_remaining = last_hit_stop
+	muzzle.variation = round_index
+	# Barrel opening in the authored shooting texture, through its calibrated mirror/scale.
+	muzzle.position = world.to_local(attacker.sprite.to_global(Vector2(270,325))) if attacker.kind=="noren" else attacker.position+Vector2(direction*75,-65)*depth_scale(attacker.position)
+	muzzle.scale = Vector2(direction,1)*depth_scale(attacker.position)
+	world.add_child(muzzle)
+	var impact := GunBurst.new()
+	impact.mode = "impact"
+	impact.hold_remaining = last_hit_stop
+	impact.blocked = blocked
+	impact.variation = round_index
+	impact.position = defender.position+Vector2(-direction*8,-62)*depth_scale(defender.position)
+	impact.scale = Vector2(direction,1)*depth_scale(defender.position)
+	world.add_child(impact)

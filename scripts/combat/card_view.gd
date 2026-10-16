@@ -36,7 +36,10 @@ func setup(card_uid: String, definition: Dictionary, read_only: bool = false) ->
 
 func _ready() -> void:
 	if data.has("rarity"):
-		label(self, "%s · %s" % [data.rarity, data.get("archetype", "诺伦")], Vector2(14,10), Vector2(137,20), 10, INK)
+		var rank := label(self, str(data.rarity).to_upper(), Vector2(14,5), Vector2(30,30), 26, INK)
+		rank.add_theme_font_override("font", button_font)
+		rank.autowrap_mode = TextServer.AUTOWRAP_OFF
+		label(self, data.get("archetype", "诺伦"), Vector2(50,13), Vector2(112,20), 10, INK)
 		label(self, data.name, Vector2(14,34), Vector2(151,35), 22, INK)
 		var text: String = data.get("cardText", data.get("description", ""))
 		var font_size := 11 if text.length() > 90 else (12 if text.length() > 60 else 14)

@@ -13,11 +13,16 @@ func exercise_card(number: int, before: String, after: String, check_input_lock:
 	await install_hand([number,1,2],before)
 	var view = app.view
 	var actor = view.stage.player
+	var played_view = view.cards["card_000"]
 	check(actor.combat_stance==before and actor.sprite.material==null and not is_instance_valid(actor.weapon_shift),"Restored stance has no arrival effect: %02d"%number)
 	var target: Vector2 = view.stage.target_rect(0).get_center() if number in [9,10] else Vector2(720,420)
 	await pointer(view.cards["card_000"].home+Vector2(68,110),1)
 	await pointer(target)
 	await pointer(target,0)
+	if number in [9,10]:
+		check(not is_instance_valid(actor.weapon_shift) and actor.combat_stance==before,"Attack starts in old stance before transition: %02d"%number)
+	else:
+		check(is_instance_valid(actor.weapon_shift) and is_instance_valid(played_view) and played_view.visible,"Stance effect starts while played card is still flying: %02d"%number)
 	if not await wait_for_shift(actor): return
 	var effect = actor.weapon_shift
 	var committed: Dictionary = view.model.snapshot()
@@ -27,19 +32,22 @@ func exercise_card(number: int, before: String, after: String, check_input_lock:
 	var phases: Array = [effect.phase]
 	effect.phase_changed.connect(func(phase): phases.append(phase))
 	if check_input_lock:
-		await key(KEY_F2)
-		check(not is_instance_valid(app.card_console),"Existing busy lock blocks F2 during weapon transition")
+		await key(KEY_A,true,true)
+		check(not is_instance_valid(app.card_console),"Existing busy lock blocks Ctrl+Shift+A during weapon transition")
 		view.select_card("card_001");view.play_selected(0)
 		check(view.model.snapshot()==committed,"Busy lock blocks a second card during weapon transition")
 	var captured := ""
 	var unchanged := true
+	var stayed_busy := true
 	while is_instance_valid(actor.weapon_shift):
 		unchanged = unchanged and view.model.snapshot()==committed
+		stayed_busy = stayed_busy and Game.battle_busy
 		if effect.phase!=captured:
 			captured=effect.phase
 			await shot("card-%02d-%s-%s"%[number,before,captured])
 		await get_tree().process_frame
 	await idle()
+	check(stayed_busy and (not is_instance_valid(played_view) or not played_view.visible),"Input stays locked through shift and card landing")
 	check(unchanged and view.model.snapshot()==committed,"Effect never spends or applies card rewards again")
 	check("glitch" in phases and "reveal" in phases,"Glitch precedes weapon reveal")
 	check(actor.combat_stance==after and actor.pose==("gun_idle" if after=="ranged" else "idle"),"Final weapon matches final stance")

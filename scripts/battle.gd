@@ -470,11 +470,12 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 			if int(hit.get("bleedDamage",0)) > 0: text += " (裂伤 %d)" % hit.bleedDamage
 			impact(stage.contact(stage.enemies[index]),text,PINK)
 		)
-	for retired_view in retired_views:
-		while is_instance_valid(retired_view) and retired_view.visible: await get_tree().process_frame
 	shown_enemies = model.enemies.duplicate(true)
 	refresh_enemy_hud()
+	# Discard flight already runs in parallel; only attack playback precedes the shift.
 	await stage.player.transition_combat_stance(model.stance if model.is_noren() else "melee")
+	for retired_view in retired_views:
+		while is_instance_valid(retired_view) and retired_view.visible: await get_tree().process_frame
 	await deal_hand(true)
 	arrange_hand()
 	refresh_counts()

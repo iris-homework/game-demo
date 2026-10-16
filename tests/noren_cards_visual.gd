@@ -32,9 +32,11 @@ func shot(name: String) -> void:
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png(output+name+".png")
 
-func key(code: Key) -> void:
+func key(code: Key, ctrl: bool = false, shift: bool = false) -> void:
 	for down in [true,false]:
 		var event := InputEventKey.new()
+		event.ctrl_pressed = ctrl
+		event.shift_pressed = shift
 		event.keycode=code;event.pressed=down
 		get_viewport().push_input(event,true)
 		await get_tree().process_frame
@@ -101,8 +103,8 @@ func _ready() -> void:
 	app.view.scroll.scroll_vertical=int(app.view.scroll.get_v_scroll_bar().max_value)
 	await get_tree().process_frame
 	await shot("catalogue-bottom")
-	await key(KEY_F2)
-	check(is_instance_valid(app.card_console) and app.view.process_mode==Node.PROCESS_MODE_DISABLED,"F2 opens console and suspends base view")
+	await key(KEY_A,true,true)
+	check(is_instance_valid(app.card_console) and app.view.process_mode==Node.PROCESS_MODE_DISABLED,"Ctrl+Shift+A opens console and suspends base view")
 	app.card_console.submit("addcard 短点连射 2")
 	app.card_console.submit("owned")
 	check(Game.state.deck==["noren_36","noren_36"],"Console UI adds only requested owned copies")

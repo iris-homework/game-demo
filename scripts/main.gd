@@ -81,7 +81,7 @@ func show_notice(message: String) -> void:
 
 func _input(event: InputEvent) -> void:
 	if is_instance_valid(card_console): return
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F2:
+	if preload("res://scripts/card_console.gd").is_toggle_event(event):
 		get_viewport().set_input_as_handled()
 		if Game.config.developmentMode and not Game.battle_busy and not Game.transition_locked:
 			open_card_console()
