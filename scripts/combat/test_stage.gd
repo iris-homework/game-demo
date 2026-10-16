@@ -371,8 +371,9 @@ func ranged_attack(attacker: Node2D, defender: Node2D, hits: Array, on_hit: Call
 		var origin: Vector2 = attacker.position
 		var destination := origin - Vector2(direction * RANGED_RETREAT_DISTANCE, 0)
 		destination.x = clampf(destination.x, 100, 1310)
-		await move_actor(attacker, origin.lerp(destination, 0.5) - Vector2(0,30), 0.12)
-		await move_actor(attacker, destination, 0.14)
+		# Match the attack approach: switch pose, then glide along the ground in one tween.
+		var duration := clampf(origin.distance_to(destination)/2300.0,0.15,0.34)
+		await move_actor(attacker, destination, duration)
 	for i in hits.size():
 		var hit: Dictionary = hits[i]
 		set_phase("aim")

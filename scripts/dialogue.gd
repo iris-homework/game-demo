@@ -22,7 +22,7 @@ func _ready() -> void:
 	portrait(Game.state.portraits.left, "left", side == "left", 173, 642)
 	portrait(Game.state.portraits.right, "right", side == "right", 173, 642)
 	map_chrome(e.title)
-	history_button = button(self, "对话记录", Vector2(936,16), Vector2(140,44), open_history)
+	history_button = button(self, "对话记录", Vector2(856,16), Vector2(108,44), open_history)
 	history_button.add_theme_font_size_override("font_size", 17)
 	history_button.tooltip_text = "回看本次冒险的对白与选择"
 	skip_button = button(self, "跳过剧情", Vector2(1096,16), Vector2(140,44), skip)

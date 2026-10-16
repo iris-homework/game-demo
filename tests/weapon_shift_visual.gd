@@ -172,7 +172,7 @@ func exercise_ranged_actions() -> void:
 	view.select_card("card_000");view.play_selected(0)
 	var seen := await observe_battle_poses(["retreat","shoot"],"ranged-")
 	print("RANGED QA: attack finished")
-	check(seen==["retreat","shoot"],"Close attack uses new diagonal retreat before existing gun shot")
+	check(seen==["retreat","shoot"],"Close attack uses a ground retreat before the gun shot")
 	check(view.model.enemies[0].hp==111 and view.model.ammo==1,"Ranged visual replacement preserves attack damage and ammo")
 	check(actor.pose=="gun_idle" and actor.sprite.material==null,"Ranged attack returns to clean gun idle")
 	view.model.block=5

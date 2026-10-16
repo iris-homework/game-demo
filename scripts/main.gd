@@ -18,10 +18,15 @@ var view_process_mode := Node.PROCESS_MODE_INHERIT
 var shown_page := ""
 var transition: ColorRect
 var transition_count := 0
+var deck_browser: Control
+var deck_background_buttons: Array = []
+var deck_background_process_mode := Node.PROCESS_MODE_INHERIT
+var deck_previous_focus: Control
 
 func _ready() -> void:
 	Game.changed.connect(show_page)
 	Game.notice.connect(show_notice)
+	Game.current_deck_requested.connect(open_current_deck)
 	show_page()
 
 func show_page() -> void:
@@ -31,6 +36,7 @@ func show_page() -> void:
 	else: swap_view()
 
 func swap_view() -> void:
+	if is_instance_valid(deck_browser): close_current_deck()
 	if is_instance_valid(card_console): close_card_console()
 	if is_instance_valid(debug_panel):
 		debug_panel.queue_free()
@@ -80,6 +86,11 @@ func show_notice(message: String) -> void:
 		if is_instance_valid(notice_ui): notice_ui.queue_free())
 
 func _input(event: InputEvent) -> void:
+	if is_instance_valid(deck_browser):
+		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+			get_viewport().set_input_as_handled()
+			close_current_deck()
+		return
 	if is_instance_valid(card_console): return
 	if preload("res://scripts/card_console.gd").is_toggle_event(event):
 		get_viewport().set_input_as_handled()
@@ -144,7 +155,7 @@ func debug_change(kind: String, value: int) -> void:
 	show_notice("测试状态已更新。")
 
 func open_card_console() -> void:
-	if is_instance_valid(card_console) or is_instance_valid(debug_panel): return
+	if is_instance_valid(card_console) or is_instance_valid(debug_panel) or is_instance_valid(deck_browser): return
 	if "pile_overlay" in view and is_instance_valid(view.pile_overlay): return
 	if view.has_method("cancel_selection"): view.cancel_selection()
 	view_process_mode = view.process_mode
@@ -171,3 +182,38 @@ func close_card_console() -> void:
 			item[0].focus_mode = item[2]
 	console_buttons.clear()
 	if is_instance_valid(view) and view.has_method("refresh_library"): view.refresh_library()
+
+func open_current_deck() -> void:
+	if Game.state.is_empty() or Game.battle_busy or Game.transition_locked: return
+	if is_instance_valid(deck_browser) or is_instance_valid(card_console) or is_instance_valid(debug_panel): return
+	if "pile_overlay" in view and is_instance_valid(view.pile_overlay): return
+	var trigger := view.get_node_or_null("current_deck_button") as Button
+	if trigger == null or trigger.disabled: return
+	if view.has_method("cancel_selection"): view.cancel_selection()
+	deck_previous_focus = get_viewport().gui_get_focus_owner()
+	deck_background_process_mode = view.process_mode
+	view.process_mode = Node.PROCESS_MODE_DISABLED
+	deck_background_buttons.clear()
+	for node in view.find_children("*", "BaseButton", true, false):
+		deck_background_buttons.append([node,node.disabled,node.focus_mode])
+		node.release_focus()
+		node.disabled = true
+		node.focus_mode = Control.FOCUS_NONE
+	deck_browser = preload("res://scripts/card_library.gd").new()
+	deck_browser.setup_current_deck(Game.state.get("combat", {}) if Game.page == "battle" else {})
+	deck_browser.closed.connect(close_current_deck)
+	add_child(deck_browser)
+
+func close_current_deck() -> void:
+	if not is_instance_valid(deck_browser): return
+	remove_child(deck_browser)
+	deck_browser.queue_free()
+	deck_browser = null
+	if is_instance_valid(view): view.process_mode = deck_background_process_mode
+	for item in deck_background_buttons:
+		if is_instance_valid(item[0]):
+			item[0].disabled = item[1]
+			item[0].focus_mode = item[2]
+	deck_background_buttons.clear()
+	if is_instance_valid(deck_previous_focus): deck_previous_focus.grab_focus()
+	deck_previous_focus = null

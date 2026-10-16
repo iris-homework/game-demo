@@ -4,6 +4,7 @@ extends Node
 signal status_changed
 signal changed
 signal notice(message: String)
+signal current_deck_requested
 var assets: Dictionary
 var characters: Dictionary
 var player_characters: Dictionary
@@ -652,6 +653,10 @@ func open_card_library() -> void:
 	# Like the archive, this is a menu page, never an adventure checkpoint.
 	page = "card_library"
 	changed.emit()
+
+func open_current_deck() -> void:
+	if state.is_empty() or transition_locked or battle_busy: return
+	current_deck_requested.emit()
 
 func library_cards() -> Array:
 	# Enumerate definitions, not owned copies or a battle's frozen snapshot.

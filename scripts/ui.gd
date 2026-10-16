@@ -188,6 +188,10 @@ func status_bar(section: String, show_days: bool = true, weeks_action: Callable 
 			rect(self, Vector2(x, 45.0), Vector2(28.0, 10.0), CYAN if index < day else Color("253544"))
 	if weeks_action.is_valid():
 		button(self, "周次", Vector2(1096.0, 16.0), Vector2(140.0, 44.0), weeks_action).add_theme_font_size_override("font_size", 17)
+	var deck_button := button(self, "牌库", Vector2(976,16), Vector2(108,44), Game.open_current_deck)
+	deck_button.name = "current_deck_button"
+	deck_button.tooltip_text = "查看当前完整卡组及每种牌的数量"
+	deck_button.disabled = Game.state.is_empty()
 	button(self, "退出演练" if Game.training_mode else "菜单", Vector2(1248.0, 16.0), Vector2(140.0, 44.0), Game.menu)
 	hp_bar_width = 166.0
 	refresh_hp()

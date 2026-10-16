@@ -43,7 +43,7 @@ func _ready() -> void:
 		if phase=="shoot": shot.call_deferred("shoot-pose")
 		elif phase=="retreat": shot.call_deferred("retreat-pose"))
 	view.select_card("card_002");view.play_selected(0);await idle()
-	check("retreat" in phases and "shoot" in phases,"Close ranged attack hops back before firing")
+	check("retreat" in phases and "shoot" in phases,"Close ranged attack slides back before firing")
 	await key(KEY_A,true,true)
 	var frozen_battle: Dictionary=view.model.snapshot()
 	await pointer(Vector2(1310,740),1);await pointer(Vector2(1310,740),0)
