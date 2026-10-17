@@ -1,0 +1,21 @@
+Library of Ruina game-audio reference candidates
+
+Game: Library of Ruina
+Game publisher/developer: Project Moon
+Game audio and underlying rights remain with their respective rights holders.
+
+Downloaded on 2026-10-18 from the community archive:
+Library of Ruina - Organized Assets
+https://drive.google.com/drive/folders/12ifYsKtsT7SdkjCiJOGaH40aJ-0uJ4X9
+
+The archive is a community resource, not an official reuse license.
+No permission to reuse these clips in another publicly distributed game was
+established during this search. No CC0, CC BY, or MIT license is claimed.
+Attribution alone does not establish permission.
+
+The seven WAV assets are byte-identical copies of the community downloads.
+They have not been compared against a locally installed copy of the game.
+Individual source URLs and SHA256 hashes are recorded in sources.json.
+
+The combined audition file contains the same third-party audio, downmixed and
+resampled to 48 kHz mono, attenuated by approximately 6 dB and separated by silence.

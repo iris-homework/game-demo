@@ -1,0 +1,114 @@
+{
+  "source": "Library of Ruina - Organized Assets, community archive",
+  "root_url": "https://drive.google.com/drive/folders/12ifYsKtsT7SdkjCiJOGaH40aJ-0uJ4X9",
+  "sfx_folder_url": "https://drive.google.com/drive/folders/12oCyStslJKwrw4gRjwCiKtN1IhJ63q9A",
+  "download_date": "2026-10-18",
+  "rights": "Game audio credited to Project Moon. Community archive is not an official redistribution license; no permission for reuse in another released game was established.",
+  "provenance_limit": "These are the files in the community game-assets archive; not compared with a locally installed original game.",
+  "clips": [
+    {
+      "file": "kuro_Hori.wav",
+      "group": "Kurokumo Clan",
+      "file_url": "https://drive.google.com/file/d/1zMctHONAS0R5lBynQdDPQyINTgxB_b_w/view",
+      "download_url": "https://drive.google.com/uc?export=download&id=1zMctHONAS0R5lBynQdDPQyINTgxB_b_w",
+      "bytes": 204808,
+      "sha256": "6711847bfbb0f7d0c63c37b5f0aecdb29ee95335dfaa9a175d13b313867d5c38",
+      "sample_rate": 48000,
+      "channels": 2,
+      "sample_width_bytes": 2,
+      "duration_seconds": 1.0664791666666666
+    },
+    {
+      "file": "kuro_Vert.wav",
+      "group": "Kurokumo Clan",
+      "file_url": "https://drive.google.com/file/d/1I1JaQqPelt-hWAeocUSXgunZJJHGYwUe/view",
+      "download_url": "https://drive.google.com/uc?export=download&id=1I1JaQqPelt-hWAeocUSXgunZJJHGYwUe",
+      "bytes": 204808,
+      "sha256": "fd0915098b4ce9da1792645988d18caeefc7784b042278398bd1a81b1a0ac701",
+      "sample_rate": 48000,
+      "channels": 2,
+      "sample_width_bytes": 2,
+      "duration_seconds": 1.0664791666666666
+    },
+    {
+      "file": "Atk_LeweiGun.wav",
+      "group": "Full-Stop Office",
+      "file_url": "https://drive.google.com/file/d/13EUHE3DZk8cu5OBKH4dFstx4qEfkjTYB/view",
+      "download_url": "https://drive.google.com/uc?export=download&id=13EUHE3DZk8cu5OBKH4dFstx4qEfkjTYB",
+      "bytes": 139304,
+      "sha256": "ac83711947ab68ca5d2245b8641b411fe96c1a533ecef054a1227a5d2f531fd8",
+      "sample_rate": 44100,
+      "channels": 2,
+      "sample_width_bytes": 2,
+      "duration_seconds": 0.7894557823129251
+    },
+    {
+      "file": "Atk_Stepan.wav",
+      "group": "Full-Stop Office",
+      "file_url": "https://drive.google.com/file/d/1D84FD3xAEAWBXM3LDVvqB05EOYfE6MDf/view",
+      "download_url": "https://drive.google.com/uc?export=download&id=1D84FD3xAEAWBXM3LDVvqB05EOYfE6MDf",
+      "bytes": 169052,
+      "sha256": "1a095134a5ce8f66df8cec792c52bb463b72dee9d3a3eb2dec35b1a158bb0b65",
+      "sample_rate": 44100,
+      "channels": 2,
+      "sample_width_bytes": 2,
+      "duration_seconds": 0.9580952380952381
+    },
+    {
+      "file": "Atk_Tamaki.wav",
+      "group": "Full-Stop Office",
+      "file_url": "https://drive.google.com/file/d/1cEXiBjnxOGpl8m61X82uGPLB9SHRRcMT/view",
+      "download_url": "https://drive.google.com/uc?export=download&id=1cEXiBjnxOGpl8m61X82uGPLB9SHRRcMT",
+      "bytes": 242072,
+      "sha256": "afb4eca9a714f09d4f9d45bc84b23e16733e899cc846ff95aa42881f93882f98",
+      "sample_rate": 44100,
+      "channels": 2,
+      "sample_width_bytes": 2,
+      "duration_seconds": 1.3720408163265305
+    },
+    {
+      "file": "Thumb_Gun_Normal.wav",
+      "group": "The Thumb",
+      "file_url": "https://drive.google.com/file/d/1LEPVk8xQ0nnE7gFj4L53vcKhaa-MiAj7/view",
+      "download_url": "https://drive.google.com/uc?export=download&id=1LEPVk8xQ0nnE7gFj4L53vcKhaa-MiAj7",
+      "bytes": 336400,
+      "sha256": "834ce2dd77481f97dbcca5e432210fa95d39c76b2c730a10473734ad7fb6a0c2",
+      "sample_rate": 44100,
+      "channels": 2,
+      "sample_width_bytes": 2,
+      "duration_seconds": 1.9067800453514738
+    },
+    {
+      "file": "Finger_Snapping.wav",
+      "group": "Other",
+      "file_url": "https://drive.google.com/file/d/1kExPpsA0uesbFBxWorBwiBIChVCdycSw/view",
+      "download_url": "https://drive.google.com/uc?export=download&id=1kExPpsA0uesbFBxWorBwiBIChVCdycSw",
+      "bytes": 480072,
+      "sha256": "470e54980c5c6da15d128b623646b8bc228045129943b58e5b4cd8b5dcb9f3d5",
+      "sample_rate": 48000,
+      "channels": 2,
+      "sample_width_bytes": 2,
+      "duration_seconds": 2.5001458333333333
+    }
+  ],
+  "integration_status": "Selected by user and wired into scripts/combat/combat_audio.gd on 2026-10-18",
+  "processing": "Asset WAV files are byte-identical copies of community archive downloads; no trimming, resampling, normalization, or synthesis.",
+  "active_cues": {
+    "slash": {
+      "file": "kuro_Vert.wav",
+      "preview_position": 2,
+      "volume_db": -12.0
+    },
+    "shoot": {
+      "file": "Atk_LeweiGun.wav",
+      "preview_position": 3,
+      "volume_db": -13.0
+    },
+    "snap": {
+      "file": "Finger_Snapping.wav",
+      "preview_position": 7,
+      "volume_db": -10.0
+    }
+  },
+  "integration_mix_note": "Initial inherited levels clipped during a four-voice device capture. All three cue levels reduced by 5 dB, preserving their relative levels and source bytes."
+}
