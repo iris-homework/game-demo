@@ -6,6 +6,7 @@ const ReturnGhost = preload("res://scripts/combat/return_ghost_fx.gd")
 const NeonSlash = preload("res://scripts/combat/prismatic_slash_fx.gd")
 const GunBurst = preload("res://scripts/combat/gun_burst_fx.gd")
 const BiteHit = preload("res://scripts/combat/bite_hit_fx.gd")
+const PollutionSpit = preload("res://scripts/combat/pollution_spit_fx.gd")
 const ACTOR_SCALE := 1.2544
 const ATTACK_ZOOM_FACTOR := 0.9
 const RANGED_RETREAT_DISTANCE := 280.0
@@ -278,6 +279,49 @@ func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_h
 		defender.set_pose("idle")
 	attacker.set_pose("idle")
 	set_phase("idle")
+
+func spawn_pollution_spit(attacker: Node2D, defender: Node2D, instant: bool = false) -> Node2D:
+	if not attacker.alive or attacker.kind != "fish": return null
+	var fx := PollutionSpit.new()
+	# Fish artwork mouth, transformed with the current pose, facing and foot scale.
+	fx.start = world.to_local(attacker.sprite.to_global(Vector2(150,610)))
+	fx.end = world.to_local(defender.to_global(Vector2(0,-62)))
+	fx.target_actor = defender
+	fx.size_factor = depth_scale(defender.position)
+	fx.flight_time = 0.0 if instant else 0.30
+	world.add_child(fx)
+	return fx
+
+func present_pollution_spit(attacker: Node2D, defender: Node2D, on_contact: Callable) -> void:
+	if not attacker.alive or not defender.alive or attacker.kind != "fish":
+		on_contact.call()
+		await get_tree().create_timer(0.35).timeout
+		return
+	active_attacker = attacker
+	active_defender = defender
+	attacker.face_toward(defender.position)
+	defender.face_toward(attacker.position)
+	set_phase("spit_prepare")
+	frame_attack(attacker,defender,attacker.position)
+	if camera_tween.is_running(): await camera_tween.finished
+	attacker.set_pose("bite")
+	await get_tree().create_timer(0.14).timeout
+	var fx := spawn_pollution_spit(attacker,defender)
+	fx.impacted.connect(func():
+		defender.set_pose("damaged")
+		on_contact.call()
+		set_phase("spit_impact"))
+	set_phase("spit_flight")
+	await fx.finished
+	attacker.set_pose("idle")
+	defender.set_pose("idle")
+	set_phase("idle")
+
+func wait_pollution_spits() -> void:
+	# Passive hit splashes finish before a counterattack, death exit or return starts.
+	for child in world.get_children():
+		if child.get_script() == PollutionSpit and not child.is_queued_for_deletion():
+			await child.finished
 
 func neon_fx(point: Vector2, kind: String, direction: float = 1.0) -> Node2D:
 	var fx := NeonSlash.new()

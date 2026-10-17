@@ -612,11 +612,15 @@ func end_turn_pressed() -> void:
 			shown_player_block = maxi(0,shown_player_block-int(hit.get("blocked",0)))
 			shown_player_pollution = int(hit.get("pollutionAfter", shown_player_pollution))
 			if int(hit.damage) > 0:
-				present_pollution_gain(int(shown_enemies[attacker_index].get("attackPollution",0)))
+				var pollution_gain := int(shown_enemies[attacker_index].get("attackPollution",0))
+				if pollution_gain > 0:
+					stage.spawn_pollution_spit(stage.enemies[attacker_index],stage.player,true)
+				present_pollution_gain(pollution_gain)
 			refresh_player_plate()
 			refresh_hp()
 			impact(stage.contact(stage.player),"−%d HP" % hit.damage if hit.damage > 0 else "格挡",PINK)
 		)
+		await stage.wait_pollution_spits()
 		if not attack.get("counters",[]).is_empty() and stage.player.alive:
 			await stage.attack(stage.player,stage.enemies[attacker_index],"slash",attack.counters,func(hit: Dictionary, _index: int):
 				shown_enemies[attacker_index].hp = hit.hpAfter
@@ -662,11 +666,12 @@ func present_status_event(event: Dictionary) -> void:
 	if event.type == "status_apply":
 		var source := int(event.source)
 		shown_enemies[source].block = 0
-		shown_player_pollution = int(event.stacksAfter)
-		refresh_player_plate()
 		refresh_enemy_hud()
-		present_pollution_gain(int(shown_enemies[source].intent.get("amount",0)))
-		await get_tree().create_timer(0.35).timeout
+		await stage.present_pollution_spit(stage.enemies[source],actor,func():
+			shown_player_pollution = int(event.stacksAfter)
+			refresh_player_plate()
+			present_pollution_gain(int(shown_enemies[source].intent.get("amount",0)))
+		)
 		return
 	if event.type != "status_tick": return
 	if target_index < 0:
