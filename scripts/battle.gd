@@ -74,10 +74,10 @@ func enter(params: Dictionary) -> void:
 	rect(self,Vector2.ZERO,Vector2(1440,900),Color("07080c"))
 	stage = preload("res://scripts/combat/test_stage.gd").new()
 	add_child(stage)
-	var enemy_kinds: Array[String] = []
+	var enemy_visual_ids: Array[String] = []
 	for enemy in model.enemies:
-		enemy_kinds.append("fish" if enemy.get("id","") == "fish" else "finn")
-	stage.setup(model.enemies.size(),533+actor_offset.y,enemy_kinds)
+		enemy_visual_ids.append(Game.enemy_combat_visual_id(enemy))
+	stage.setup(model.enemies.size(),533+actor_offset.y,enemy_visual_ids)
 	chrome("战斗",false)
 	label(self,battle.name,Vector2(41,112),Vector2(700,55),33)
 	label(self,"COMBAT // " + Game.place_data(battle.placeId).name,Vector2(43,166),Vector2(670,29),14,CYAN)

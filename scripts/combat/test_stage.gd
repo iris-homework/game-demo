@@ -34,7 +34,7 @@ var camera_tween: Tween
 var sound := AudioStreamPlayer.new()
 var audio_rate := 22050
 
-func setup(count: int, feet_y: float, enemy_kinds: Array[String] = []) -> void:
+func setup(count: int, feet_y: float, enemy_visual_ids: Array[String] = []) -> void:
 	position = Vector2(0,270)
 	size = Vector2(1440,420)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -53,7 +53,7 @@ func setup(count: int, feet_y: float, enemy_kinds: Array[String] = []) -> void:
 	for i in count:
 		var actor := Actor.new()
 		actors_root.add_child(actor)
-		actor.setup(enemy_kinds[i] if i < enemy_kinds.size() else "finn",enemy_home(i,count),-1.0)
+		actor.setup(enemy_visual_ids[i] if i < enemy_visual_ids.size() else "finn",enemy_home(i,count),-1.0)
 		enemies.append(actor)
 		if count > 1:
 			var marker := Label.new()
@@ -133,9 +133,7 @@ func contact(actor: Node2D) -> Vector2:
 
 func target_rect(index: int) -> Rect2:
 	var actor := enemies[index]
-	if actor.kind == "fish":
-		return Rect2(actor.to_global(Vector2(-80,-122)),Vector2(152,134)*actor.global_scale).intersection(get_global_rect())
-	return Rect2(actor.to_global(Vector2(-58,-130)),Vector2(116,145)*actor.global_scale).intersection(get_global_rect())
+	return Rect2(actor.to_global(actor.target_bounds.position),actor.target_bounds.size*actor.global_scale).intersection(get_global_rect())
 
 func move_actor(actor: Node2D, destination: Vector2, duration: float) -> void:
 	var tween := create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
@@ -206,8 +204,8 @@ func frame_attack(attacker: Node2D, defender: Node2D, destination: Vector2) -> v
 	camera_to((destination.x+defender.position.x)*0.5,magnification,0.25,target_y)
 
 func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_hit: Callable) -> void:
-	# Enemy identity selects presentation only; the supplied model hits remain authoritative.
-	if attacker.kind == "fish": style = "bite"
+	# Visual profiles select presentation only; supplied model hits remain authoritative.
+	if not attacker.attack_style_override.is_empty(): style = attacker.attack_style_override
 	if style == "shoot":
 		await ranged_attack(attacker, defender, hits, on_hit)
 		return
@@ -288,6 +286,7 @@ func neon_fx(point: Vector2, kind: String, direction: float = 1.0) -> Node2D:
 func show_strike(point: Vector2, direction: float, style: String, blocked: bool) -> void:
 	if style == "bite":
 		var bite := BiteHit.new()
+		bite.texture = active_attacker.hit_effect_texture
 		bite.position = point
 		bite.scale = Vector2(-direction,1)*depth_scale(active_defender.position)
 		bite.blocked = blocked

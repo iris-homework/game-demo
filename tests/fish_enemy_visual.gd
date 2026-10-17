@@ -59,6 +59,9 @@ func _ready() -> void:
 	Game.save_path = "user://fish_visual_unused.json"
 	Game.meta_path = "user://fish_visual_meta_unused.json"
 	output = "res://artifacts/qa/fish-enemy-2026-10-17/%d/" % DisplayServer.window_get_size().x
+	var args := OS.get_cmdline_user_args()
+	if args.has("--output-dir") and args.find("--output-dir")+1 < args.size():
+		output = args[args.find("--output-dir")+1].trim_suffix("/")+"/"
 	DirAccess.make_dir_recursive_absolute(output)
 	Game.state = Game.initial_state()
 	Game.state.credits = 321

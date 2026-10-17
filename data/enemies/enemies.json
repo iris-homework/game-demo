@@ -6,7 +6,8 @@
     "battlePortraitAssetId": "",
     "maxHp": null,
     "intentSequence": [],
-    "prototype": true
+    "prototype": true,
+    "combatVisualId": "finn"
   },
   "ike": {
     "id": "ike",
@@ -15,7 +16,8 @@
     "battlePortraitAssetId": "",
     "maxHp": null,
     "intentSequence": [],
-    "prototype": true
+    "prototype": true,
+    "combatVisualId": "finn"
   },
   "gang": {
     "id": "gang",
@@ -24,7 +26,8 @@
     "battlePortraitAssetId": "",
     "maxHp": null,
     "intentSequence": [],
-    "prototype": true
+    "prototype": true,
+    "combatVisualId": "finn"
   },
   "richard": {
     "id": "richard",
@@ -33,7 +36,8 @@
     "battlePortraitAssetId": "",
     "maxHp": null,
     "intentSequence": [],
-    "prototype": true
+    "prototype": true,
+    "combatVisualId": "finn"
   },
   "lumina": {
     "id": "lumina",
@@ -42,7 +46,8 @@
     "battlePortraitAssetId": "",
     "maxHp": null,
     "intentSequence": [],
-    "prototype": true
+    "prototype": true,
+    "combatVisualId": "finn"
   },
   "psycho": {
     "id": "psycho",
@@ -51,7 +56,8 @@
     "battlePortraitAssetId": "",
     "maxHp": null,
     "intentSequence": [],
-    "prototype": true
+    "prototype": true,
+    "combatVisualId": "finn"
   },
   "fish": {
     "id": "fish",
@@ -60,7 +66,8 @@
     "battlePortraitAssetId": "",
     "maxHp": null,
     "intentSequence": [],
-    "prototype": true
+    "prototype": true,
+    "combatVisualId": "fish"
   },
   "mech_boss": {
     "id": "mech_boss",
@@ -69,6 +76,7 @@
     "battlePortraitAssetId": "mech_battle",
     "maxHp": null,
     "intentSequence": [],
-    "prototype": true
+    "prototype": true,
+    "combatVisualId": "finn"
   }
 }

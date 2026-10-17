@@ -9,6 +9,11 @@ var alive := true
 var combat_stance := "melee"
 var tint := Color("ff4c9b")
 var poses: Dictionary = {}
+var calibrations: Dictionary = {}
+var pose_aliases: Dictionary = {}
+var target_bounds := Rect2(-58,-130,116,145)
+var attack_style_override := ""
+var hit_effect_texture: Texture2D
 var weapon_shift: Node
 const WeaponShift := preload("res://scripts/combat/weapon_shift_fx.gd")
 const NOREN := {
@@ -18,20 +23,9 @@ const NOREN := {
 	"gun_idle": [Vector2(660,1230),0.099], "shoot": [Vector2(714,1210),0.099], "retreat": [Vector2(560,1155),0.099],
 	"gun_block": [Vector2(550,1140),0.103], "gun_damaged": [Vector2(700,1230),0.099]
 }
-const FINN := {
-	"idle": [Vector2(150,237),0.495], "move": [Vector2(132,222),0.495],
-	"slash": [Vector2(70,196),0.495], "pierce": [Vector2(190,184),0.495],
-	"block": [Vector2(80,237),0.495], "damaged": [Vector2(74,230),0.495]
-}
-const FISH := {
-	"idle": [Vector2(650,1100),0.12], "move": [Vector2(650,1100),0.12],
-	"bite": [Vector2(650,1100),0.12], "bite_close": [Vector2(650,1100),0.12],
-	"damaged": [Vector2(650,1140),0.12]
-}
 
 func pose_calibrations() -> Dictionary:
-	if kind == "fish": return FISH
-	return NOREN if kind == "noren" else FINN
+	return calibrations
 
 func setup(actor_kind: String, origin: Vector2, direction: float) -> void:
 	kind = actor_kind
@@ -41,16 +35,31 @@ func setup(actor_kind: String, origin: Vector2, direction: float) -> void:
 	tint = Color("ff4c9b") if kind == "noren" else Color("6ae4f2")
 	add_child(sprite)
 	sprite.centered = false
-	for key in pose_calibrations():
-		poses[key] = load("res://assets/combat_test/%s_%s.%s" % [kind,key,"webp" if kind == "finn" else "png"])
 	if kind == "noren":
+		calibrations = NOREN.duplicate(true)
+		for key in calibrations:
+			poses[key] = load("res://assets/combat_test/noren_%s.png" % key)
 		# Match gun idle's planted feet; retain the original lunge artwork as a source.
 		poses["shoot"] = preload("res://assets/combat_test/noren_shoot_planted.png")
+	else:
+		if not Game.enemy_visual_catalog.has(kind):
+			push_warning("Unknown combat visual '%s'; using Finn placeholder." % kind)
+			kind = "finn"
+		var visual: Dictionary = Game.enemy_visual_catalog[kind]
+		pose_aliases = visual.get("poseAliases", {}).duplicate(true)
+		attack_style_override = visual.get("attackStyleOverride", "")
+		var bounds: Array = visual.targetRect
+		target_bounds = Rect2(bounds[0],bounds[1],bounds[2],bounds[3])
+		var effect_path: String = visual.get("hitEffectTexture", "")
+		if not effect_path.is_empty(): hit_effect_texture = load(effect_path)
+		for key in visual.poses:
+			var entry: Dictionary = visual.poses[key]
+			calibrations[key] = [Vector2(entry.anchor[0],entry.anchor[1]),float(entry.scale)]
+			poses[key] = load(entry.texture)
 	set_pose("idle")
 
 func set_pose(value: String) -> void:
-	# There is no authored fish guard; keep its planted stance for a fully blocked hit.
-	if kind == "fish" and value == "block": value = "idle"
+	value = pose_aliases.get(value, value)
 	if kind == "noren" and combat_stance == "ranged" and value in ["idle","block","damaged"]:
 		value = "gun_"+value
 	pose = value if poses.has(value) else "idle"

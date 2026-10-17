@@ -172,7 +172,8 @@
 | 通用按钮反馈 | `scripts/widgets/neon_button.gd` |
 | 临时牌组与临时敌人数值 | `data/prototype/combat.json` |
 | 正式卡牌目录，当前为空 | `data/cards/cards.json` |
-| 敌人 ID、显示名、战斗图与意图序列 | `data/enemies/enemies.json` |
+| 敌人 ID、显示名、战斗形象引用与意图序列 | `data/enemies/enemies.json` |
+| 敌人动作图片、脚底校准、点击范围与咬击特效 | `data/enemies/combat_visuals.json` |
 | 战斗参战敌人、地点与剧情返回节点 | `data/battles.json` |
 | 正式道具目录，当前为空 | `data/items/items.json` |
 | 共用战斗临时科技定义（名称、说明、效果） | `data/prototype/cyberware.json` |

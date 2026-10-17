@@ -1,0 +1,122 @@
+{
+  "finn": {
+    "id": "finn",
+    "placeholder": true,
+    "targetRect": [
+      -58,
+      -130,
+      116,
+      145
+    ],
+    "attackStyleOverride": "",
+    "poseAliases": {},
+    "hitEffectTexture": "",
+    "poses": {
+      "idle": {
+        "texture": "res://assets/combat_test/finn_idle.webp",
+        "anchor": [
+          150,
+          237
+        ],
+        "scale": 0.495
+      },
+      "move": {
+        "texture": "res://assets/combat_test/finn_move.webp",
+        "anchor": [
+          132,
+          222
+        ],
+        "scale": 0.495
+      },
+      "slash": {
+        "texture": "res://assets/combat_test/finn_slash.webp",
+        "anchor": [
+          70,
+          196
+        ],
+        "scale": 0.495
+      },
+      "pierce": {
+        "texture": "res://assets/combat_test/finn_pierce.webp",
+        "anchor": [
+          190,
+          184
+        ],
+        "scale": 0.495
+      },
+      "block": {
+        "texture": "res://assets/combat_test/finn_block.webp",
+        "anchor": [
+          80,
+          237
+        ],
+        "scale": 0.495
+      },
+      "damaged": {
+        "texture": "res://assets/combat_test/finn_damaged.webp",
+        "anchor": [
+          74,
+          230
+        ],
+        "scale": 0.495
+      }
+    }
+  },
+  "fish": {
+    "id": "fish",
+    "placeholder": false,
+    "targetRect": [
+      -80,
+      -122,
+      152,
+      134
+    ],
+    "attackStyleOverride": "bite",
+    "poseAliases": {
+      "block": "idle"
+    },
+    "hitEffectTexture": "res://assets/combat_test/fish_bite_hit_fx.png",
+    "poses": {
+      "idle": {
+        "texture": "res://assets/combat_test/fish_idle.png",
+        "anchor": [
+          650,
+          1100
+        ],
+        "scale": 0.12
+      },
+      "move": {
+        "texture": "res://assets/combat_test/fish_move.png",
+        "anchor": [
+          650,
+          1100
+        ],
+        "scale": 0.12
+      },
+      "bite": {
+        "texture": "res://assets/combat_test/fish_bite.png",
+        "anchor": [
+          650,
+          1100
+        ],
+        "scale": 0.12
+      },
+      "bite_close": {
+        "texture": "res://assets/combat_test/fish_bite_close.png",
+        "anchor": [
+          650,
+          1100
+        ],
+        "scale": 0.12
+      },
+      "damaged": {
+        "texture": "res://assets/combat_test/fish_damaged.png",
+        "anchor": [
+          650,
+          1140
+        ],
+        "scale": 0.12
+      }
+    }
+  }
+}
