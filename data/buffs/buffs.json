@@ -42,8 +42,8 @@
     "icon": "weak",
     "color": "e5a06b",
     "showBadge": true,
-    "description": "虚弱 · {count} 层\n敌人攻击伤害固定降低 25%，不随层数增加；每段四舍五入。该敌人回合结束时减少 1 层，减至 0 层后失效；最多 5 层。",
-    "maxStacks": 5
+    "description": "虚弱 · {count} 层\n敌人攻击伤害固定降低 25%，不随层数增加；每段四舍五入。该敌人回合结束时减少 1 层，减至 0 层后失效；最多 999 层。",
+    "maxStacks": 999
   },
   {
     "id": "parry",

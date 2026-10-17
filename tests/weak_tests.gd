@@ -14,7 +14,7 @@ func _ready() -> void:
 	Game.save_path = "user://weak_qa.json"
 	Game.meta_path = "user://weak_meta_qa.json"
 	var helper := Fixtures.new()
-	for layers in range(6):
+	for layers in [0,1,2,3,4,5,6,998,999]:
 		var m: CombatModel = helper.fixture([1])
 		m.enemies[0].weak = layers
 		m.enemies[0].intent = {"type":"attack", "amount":12, "hits":3}
@@ -64,6 +64,22 @@ func _ready() -> void:
 	restored.end_turn()
 	check(restored.enemies[0].weak == 2, "Restored/reapplied stacks decay once")
 	check(restored.buffs.enemy_badges(restored.enemies[0]).filter(func(b): return b.buffId == "weak")[0].description.contains("固定降低 25%"), "Tooltip describes fixed percentage")
+	m = helper.fixture([19])
+	m.enemies[0].weak = 998
+	helper.play(m)
+	check(m.enemies[0].weak == 999, "Card can reach the 999 cap")
+	m.buffs.apply(m, "weak", 50, 0)
+	check(m.enemies[0].weak == 999, "Overflow application clamps at 999")
+	saved = JSON.parse_string(JSON.stringify(m.snapshot()))
+	check(Game.valid_combat(saved), "999 stacks accepted by save validation")
+	var high_stack := CombatModel.new()
+	high_stack.restore(saved)
+	check(high_stack.enemies[0].weak == 999, "999 stacks survive JSON roundtrip")
+	check(high_stack.buffs.enemy_badges(high_stack.enemies[0])[0].count == 999, "HUD data preserves three-digit stack count")
+	high_stack.end_turn()
+	check(high_stack.enemies[0].weak == 998, "999 stacks decay by exactly one")
+	saved.enemies[0].weak = 1000
+	check(not Game.valid_combat(saved), "Corrupt saves over 999 are rejected")
 	var stopped := restored.snapshot()
 	restored.outcome = "win"
 	check(restored.end_turn().is_empty() and restored.enemies == stopped.enemies, "Finished battles do not tick again")

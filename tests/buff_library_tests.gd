@@ -28,8 +28,8 @@ func _ready() -> void:
 	invalid_catalog[0].handler = "unimplemented"
 	check(not Buffs.catalog_errors(invalid_catalog).is_empty(), "Unimplemented handler rejected")
 	var copy := Buffs.definition("weak")
-	copy.maxStacks = 999
-	check(Buffs.definition("weak").maxStacks == 5, "Catalog query cannot mutate definitions")
+	copy.maxStacks = 123
+	check(Buffs.definition("weak").maxStacks == 999, "Catalog query cannot mutate definitions")
 	for entry in Buffs.definitions():
 		check(not entry.name.is_empty() and not entry.description.is_empty(), entry.id + " has name and description")
 		check(entry.target in ["both", "player", "enemy"] and entry.category in ["positive", "negative"], entry.id + " target and category")
@@ -41,7 +41,7 @@ func _ready() -> void:
 	check(not Buffs.apply(m, "bleed", 1, 99) and m.snapshot() == original, "Missing enemy rejected")
 	Buffs.apply(m, "weak", 3, 0)
 	Buffs.apply(m, "weak", 3, 0)
-	check(m.enemies[0].weak == 5 and Buffs.enemy_attack_damage(m.enemies[0], 9) == 7, "Weak cap and per-hit rounding")
+	check(m.enemies[0].weak == 6 and Buffs.enemy_attack_damage(m.enemies[0], 9) == 7, "Weak stacks beyond five without increasing damage reduction")
 	Buffs.apply(m, "parry", 1, -1, {"cap":1})
 	Buffs.apply(m, "parry", 1, -1, {"cap":1})
 	check(m.parry == 1, "Parry card-specific pre-add guard")
@@ -66,7 +66,7 @@ func _ready() -> void:
 	check(Buffs.enemy_badges(m.enemies[0])[0].description.contains("固定降低 25%"), "Weak tooltip values")
 	Buffs.player_turn_end(m)
 	check(m.turn_damage_bonus == 0 and m.turn_discount == 0 and m.next_attack_bonus == 2 and m.stance_discount and m.parry == 2, "Exact expiration boundaries")
-	check(m.enemies[0].weak == 5 and m.powers.size() == 2, "Weak waits for enemy turn end; abilities retained")
+	check(m.enemies[0].weak == 6 and m.powers.size() == 2, "Weak waits for enemy turn end; abilities retained")
 	Buffs.apply(m, "bleed", 5, 0)
 	Buffs.apply(m, "block", 100, 0)
 	var hit := m.enemy_damage(0, 2, true)

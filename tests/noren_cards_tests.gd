@@ -164,8 +164,8 @@ func _ready() -> void:
 	check(result.attacks[0].counters.size()==2 and result.attacks[0].counters[0].damage==6,"Parry uses weakened pre-block total once per attack")
 	check(m.parry==1 and m.enemies[0].bleed==2,"Each parry layer adds unhalved bleed; consumes one layer")
 	check(m.block==0 and m.energy==3 and m.turn==2 and m.hand.size()==5,"New turn clears own block and draws five")
-	m=fixture([19]);m.enemies[0].weak=5;play(m)
-	check(m.enemies[0].weak==5,"Weak caps at five")
+	m=fixture([19]);m.enemies[0].weak=999;play(m)
+	check(m.enemies[0].weak==999,"Weak caps at 999")
 	m=fixture([1]);m.enemies[0].hp=1
 	check(play(m).outcome=="win","Natural victory")
 	m=fixture([1]);m.player_hp=1
