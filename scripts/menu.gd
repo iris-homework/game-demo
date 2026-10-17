@@ -103,7 +103,7 @@ func _build_right_column() -> void:
 	training_container.visible = false
 	ui_layer.add_child(training_container)
 	_menu_button("training_B04", "B04 战斗演练", Vector2(0, 0), Vector2(165, 50), func(): Game.start_training("B04"), false, 16, training_container)
-	_menu_button("training_B12", "B12 机甲演练", Vector2(185, 0), Vector2(165, 50), func(): Game.start_training("B12"), false, 16, training_container)
+	_menu_button("training_B11", "敌人测试", Vector2(185, 0), Vector2(165, 50), func(): Game.start_training("B11"), false, 16, training_container)
 
 func _build_bottom_right() -> void:
 	motion_button = _menu_button("motion_toggle", _motion_label(), Vector2(COLUMN_X, 828), Vector2(200, 44), _toggle_motion, false, 16)

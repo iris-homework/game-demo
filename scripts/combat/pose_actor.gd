@@ -23,6 +23,15 @@ const FINN := {
 	"slash": [Vector2(70,196),0.495], "pierce": [Vector2(190,184),0.495],
 	"block": [Vector2(80,237),0.495], "damaged": [Vector2(74,230),0.495]
 }
+const FISH := {
+	"idle": [Vector2(650,1100),0.12], "move": [Vector2(650,1100),0.12],
+	"bite": [Vector2(650,1100),0.12], "bite_close": [Vector2(650,1100),0.12],
+	"damaged": [Vector2(650,1140),0.12]
+}
+
+func pose_calibrations() -> Dictionary:
+	if kind == "fish": return FISH
+	return NOREN if kind == "noren" else FINN
 
 func setup(actor_kind: String, origin: Vector2, direction: float) -> void:
 	kind = actor_kind
@@ -32,18 +41,20 @@ func setup(actor_kind: String, origin: Vector2, direction: float) -> void:
 	tint = Color("ff4c9b") if kind == "noren" else Color("6ae4f2")
 	add_child(sprite)
 	sprite.centered = false
-	for key in (NOREN if kind == "noren" else FINN):
-		poses[key] = load("res://assets/combat_test/%s_%s.%s" % [kind,key,"png" if kind == "noren" else "webp"])
+	for key in pose_calibrations():
+		poses[key] = load("res://assets/combat_test/%s_%s.%s" % [kind,key,"webp" if kind == "finn" else "png"])
 	if kind == "noren":
 		# Match gun idle's planted feet; retain the original lunge artwork as a source.
 		poses["shoot"] = preload("res://assets/combat_test/noren_shoot_planted.png")
 	set_pose("idle")
 
 func set_pose(value: String) -> void:
+	# There is no authored fish guard; keep its planted stance for a fully blocked hit.
+	if kind == "fish" and value == "block": value = "idle"
 	if kind == "noren" and combat_stance == "ranged" and value in ["idle","block","damaged"]:
 		value = "gun_"+value
 	pose = value if poses.has(value) else "idle"
-	var calibration: Array = (NOREN if kind == "noren" else FINN)[pose]
+	var calibration: Array = pose_calibrations()[pose]
 	var anchor: Vector2 = calibration[0]
 	var factor: float = calibration[1]
 	sprite.texture = poses[pose]

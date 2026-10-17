@@ -1,0 +1,32 @@
+[
+  {
+    "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/变异鱼/01_站姿_idle.png",
+    "asset": "fish_idle.png",
+    "sha256": "50fb2830848d1f4ef0dc73f14ce193b21bed110f39f446c126e19b520b67a92b"
+  },
+  {
+    "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/变异鱼/02_前进_move.png",
+    "asset": "fish_move.png",
+    "sha256": "75530816281bc01c8585b3164a6248903bdd5124b3b337377d08c7ca5603e815"
+  },
+  {
+    "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/变异鱼/03_撕咬_bite.png",
+    "asset": "fish_bite.png",
+    "sha256": "0d47f027676dfad123f01a7ed1bfb22fce883d3a6318e96dfe8ed41ef8f929dc"
+  },
+  {
+    "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/变异鱼/04_受击_damaged.png",
+    "asset": "fish_damaged.png",
+    "sha256": "2a400a5ef532744082a55bced8a3860b2624b490726a85639b5294d4dc3dc676"
+  },
+  {
+    "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/变异鱼/05_撕咬咬合_bite_close.png",
+    "asset": "fish_bite_close.png",
+    "sha256": "dc2a42c216e2108ad7930999a8dcd6516a4fcf5852d7fb9f760d4e4d44d56ed7"
+  },
+  {
+    "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/变异鱼/06_咬击受击特效_bite_hit_fx.png",
+    "asset": "fish_bite_hit_fx.png",
+    "sha256": "8ee427c7c92a525e25966f4ef031095efee6e36b41c3beb1257a662f9b6dbffc"
+  }
+]

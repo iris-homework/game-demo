@@ -5,6 +5,7 @@ const Actor = preload("res://scripts/combat/pose_actor.gd")
 const ReturnGhost = preload("res://scripts/combat/return_ghost_fx.gd")
 const NeonSlash = preload("res://scripts/combat/prismatic_slash_fx.gd")
 const GunBurst = preload("res://scripts/combat/gun_burst_fx.gd")
+const BiteHit = preload("res://scripts/combat/bite_hit_fx.gd")
 const ACTOR_SCALE := 1.2544
 const ATTACK_ZOOM_FACTOR := 0.9
 const RANGED_RETREAT_DISTANCE := 280.0
@@ -33,7 +34,7 @@ var camera_tween: Tween
 var sound := AudioStreamPlayer.new()
 var audio_rate := 22050
 
-func setup(count: int, feet_y: float) -> void:
+func setup(count: int, feet_y: float, enemy_kinds: Array[String] = []) -> void:
 	position = Vector2(0,270)
 	size = Vector2(1440,420)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -52,7 +53,7 @@ func setup(count: int, feet_y: float) -> void:
 	for i in count:
 		var actor := Actor.new()
 		actors_root.add_child(actor)
-		actor.setup("finn",enemy_home(i,count),-1.0)
+		actor.setup(enemy_kinds[i] if i < enemy_kinds.size() else "finn",enemy_home(i,count),-1.0)
 		enemies.append(actor)
 		if count > 1:
 			var marker := Label.new()
@@ -132,6 +133,8 @@ func contact(actor: Node2D) -> Vector2:
 
 func target_rect(index: int) -> Rect2:
 	var actor := enemies[index]
+	if actor.kind == "fish":
+		return Rect2(actor.to_global(Vector2(-80,-122)),Vector2(152,134)*actor.global_scale).intersection(get_global_rect())
 	return Rect2(actor.to_global(Vector2(-58,-130)),Vector2(116,145)*actor.global_scale).intersection(get_global_rect())
 
 func move_actor(actor: Node2D, destination: Vector2, duration: float) -> void:
@@ -203,6 +206,8 @@ func frame_attack(attacker: Node2D, defender: Node2D, destination: Vector2) -> v
 	camera_to((destination.x+defender.position.x)*0.5,magnification,0.25,target_y)
 
 func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_hit: Callable) -> void:
+	# Enemy identity selects presentation only; the supplied model hits remain authoritative.
+	if attacker.kind == "fish": style = "bite"
 	if style == "shoot":
 		await ranged_attack(attacker, defender, hits, on_hit)
 		return
@@ -214,6 +219,7 @@ func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_h
 	attacker.face_toward(defender.position)
 	defender.face_toward(attacker.position)
 	var reach := 105.0 if style == "pierce" else 86.0
+	if style == "bite": reach = 92.0
 	var destination := attack_destination(attacker,defender,reach)
 	direction = 1.0 if defender.position.x >= destination.x else -1.0
 	set_phase("prepare")
@@ -234,12 +240,12 @@ func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_h
 		var damage := int(hit.get("damage",0))
 		set_phase("windup")
 		# The existing raised guard also serves as the slash anticipation pose.
-		attacker.set_pose("block" if style != "pierce" else "move")
+		attacker.set_pose("bite" if style == "bite" else ("block" if style != "pierce" else "move"))
 		if blocked: defender.set_pose("block")
 		# Telegraph, compress, then release quickly for both sides (enemy gets a clearer tell).
 		await move_actor(attacker,destination-Vector2(direction*10,0),0.10 if enemy_attack else 0.075)
-		await get_tree().create_timer(0.045 if enemy_attack else 0.025).timeout
-		attacker.set_pose(style)
+		await get_tree().create_timer(0.12 if style == "bite" else (0.045 if enemy_attack else 0.025)).timeout
+		attacker.set_pose("bite_close" if style == "bite" else style)
 		await move_actor(attacker,destination+Vector2(direction*10,0),0.035)
 		var contact_point: Vector2 = defender.position+Vector2(-direction*13,-62)*depth_scale(defender.position)
 		show_strike(contact_point,direction,style,blocked)
@@ -280,6 +286,13 @@ func neon_fx(point: Vector2, kind: String, direction: float = 1.0) -> Node2D:
 	return fx
 
 func show_strike(point: Vector2, direction: float, style: String, blocked: bool) -> void:
+	if style == "bite":
+		var bite := BiteHit.new()
+		bite.position = point
+		bite.scale = Vector2(-direction,1)*depth_scale(active_defender.position)
+		bite.blocked = blocked
+		world.add_child(bite)
+		return
 	var fx := neon_fx(point,style,direction)
 	fx.blocked = blocked
 	if blocked: fx.duration = 0.24

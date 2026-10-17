@@ -189,7 +189,7 @@ func input_suite() -> void:
 	check(env.frame_index != advanced_frame,"frames keep advancing while the dynamic clock runs")
 	await click(button("training_toggle"))
 	check(app.view.training_open and button("training_B04").is_visible_in_tree(),"training group expands with actual input")
-	for code in ["training_B04","training_B12"]:
+	for code in ["training_B04","training_B11"]:
 		check(get_viewport().get_visible_rect().encloses(button(code).get_global_rect()),"expanded button inside canvas " + code)
 	await shot("04-training-expanded")
 	await key(KEY_ESCAPE)
@@ -239,7 +239,7 @@ func input_suite() -> void:
 	check(Game.page == "menu","archive return button returns to menu")
 	await click(button("motion_toggle"))
 	check(not app.view.environment.get_motion_enabled(),"static choice switched off")
-	for battle_id in ["B04","B12"]:
+	for battle_id in ["B04","B11"]:
 		await click(button("training_toggle"))
 		await click(button("training_" + battle_id))
 		await wait_unlocked()

@@ -1,4 +1,5 @@
 extends Node
+var buffs := preload("res://scripts/combat/effects/buff_library.gd").new()
 ## Owns state, condition evaluation, transactional actions and checkpoints.
 ## Views only request transitions; authored content lives in data/.
 signal status_changed
@@ -902,22 +903,10 @@ func console_command(command: String) -> String:
 func valid_noren_state(c: Dictionary) -> bool:
 	var n = c.get("norenState")
 	if not n is Dictionary or not c.get("openingDrawDone") is bool: return false
-	for key in ["energy", "block", "ammo", "parry", "turnDamageBonus", "turnDiscount"]:
+	for key in ["energy", "ammo"]:
 		var value = n.get(key)
 		if not (value is int or value is float) or not is_finite(float(value)) or value < 0 or value != floor(float(value)): return false
 	if n.energy > int(c.profile.get("energyPerTurn", 3)) or n.ammo > int(c.profile.get("ammoCap", 6)): return false
-	if n.get("stance") not in ["melee", "ranged"] or n.parry > 2: return false
-	for key in ["stanceDiscount", "pressureUsed", "dissectionUsed"]:
-		if not n.get(key) is bool: return false
-	if not n.get("exhaustPile") is Array or not n.get("powers") is Array: return false
-	var seen := []
-	for power in n.powers:
-		if not power in ["high_pressure", "dissection"] or power in seen: return false
-		seen.append(power)
-	for enemy in c.enemies:
-		if not enemy is Dictionary: return false
-		for key in ["block", "bleed", "weak"]:
-			var value = enemy.get(key)
-			if not (value is int or value is float) or not is_finite(float(value)) or value < 0 or value != floor(float(value)): return false
-		if enemy.weak > 5: return false
-	return true
+	if n.get("stance") not in ["melee", "ranged"]: return false
+	if not n.get("exhaustPile") is Array: return false
+	return buffs.valid_snapshot(c)

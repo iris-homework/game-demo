@@ -1,6 +1,7 @@
 class_name CombatModel
 extends RefCounted
 const CYBERWARE_LIMIT := 6
+var buffs := preload("res://scripts/combat/effects/buff_library.gd").new()
 ## Pure, serializable combat rules. Animation and scene navigation never live here.
 var battle_id := ""
 var turn := 1
@@ -31,6 +32,8 @@ var stance_discount := false
 var pressure_used := false
 var dissection_used := false
 var opening_draw_done := false
+# Only new definitions without legacy fields use this optional state.
+var buff_state: Dictionary = {}
 
 func is_noren() -> bool:
 	return profile.get("ruleset", "") == "noren_v1"
@@ -54,7 +57,7 @@ func activate_cyberware(id: String) -> bool:
 		var bonus := int(definition.get("nextAttackBonus", 0))
 		if bonus <= 0: return false
 		used_cyberware.append(id)
-		next_attack_bonus += bonus
+		buffs.apply(self, "technology", bonus)
 		log_lines.append("%s 已激活，下次攻击伤害 +%d。" % [definition.name, next_attack_bonus])
 		return true
 	return false
@@ -136,7 +139,7 @@ func play_legacy_card(uid: String, target_index: int) -> Dictionary:
 		damage += amount
 		hits.append({"damage":amount,"blocked":0,"hpAfter":enemies[target_index].hp,"killed":enemies[target_index].hp == 0})
 		if bonus > 0:
-			next_attack_bonus = 0
+			buffs.clear(self, "technology")
 			bonus = 0
 	hand.erase(uid)
 	discard_pile.append(uid)
@@ -184,7 +187,9 @@ func use_item(_item_id: String, _target_index: int, _inventory: Dictionary, _cat
 	return {"ok":false, "reason":"道具效果待设计；当前没有可使用道具。"}
 
 func snapshot() -> Dictionary:
-	return {"battleId":battle_id,"turn":turn,"playerHp":player_hp,"maxHp":max_hp,"drawPile":draw_pile.duplicate(),"hand":hand.duplicate(),"discardPile":discard_pile.duplicate(),"instances":instances.duplicate(true),"enemies":enemies.duplicate(true),"outcome":outcome,"log":log_lines.slice(-30),"profile":profile.duplicate(true),"cardCatalog":card_catalog.duplicate(true),"usedCyberware":used_cyberware.duplicate(),"nextAttackBonus":next_attack_bonus,"norenState":{"energy":energy,"block":block,"stance":stance,"ammo":ammo,"parry":parry,"exhaustPile":exhaust_pile.duplicate(),"powers":powers.duplicate(),"turnDamageBonus":turn_damage_bonus,"turnDiscount":turn_discount,"stanceDiscount":stance_discount,"pressureUsed":pressure_used,"dissectionUsed":dissection_used},"openingDrawDone":opening_draw_done}
+	var saved := {"battleId":battle_id,"turn":turn,"playerHp":player_hp,"maxHp":max_hp,"drawPile":draw_pile.duplicate(),"hand":hand.duplicate(),"discardPile":discard_pile.duplicate(),"instances":instances.duplicate(true),"enemies":enemies.duplicate(true),"outcome":outcome,"log":log_lines.slice(-30),"profile":profile.duplicate(true),"cardCatalog":card_catalog.duplicate(true),"usedCyberware":used_cyberware.duplicate(),"nextAttackBonus":next_attack_bonus,"norenState":{"energy":energy,"block":block,"stance":stance,"ammo":ammo,"parry":parry,"exhaustPile":exhaust_pile.duplicate(),"powers":powers.duplicate(),"turnDamageBonus":turn_damage_bonus,"turnDiscount":turn_discount,"stanceDiscount":stance_discount,"pressureUsed":pressure_used,"dissectionUsed":dissection_used},"openingDrawDone":opening_draw_done}
+	if not buff_state.is_empty(): saved.buffs = buff_state.duplicate(true)
+	return saved
 
 func restore(data: Dictionary) -> void:
 	battle_id = data.battleId
@@ -196,11 +201,14 @@ func restore(data: Dictionary) -> void:
 	discard_pile = data.discardPile.duplicate()
 	instances = data.instances.duplicate(true)
 	enemies = data.enemies.duplicate(true)
+	for enemy in enemies:
+		if enemy.has("buffs"): enemy.buffs = buffs.restore_extra_state(enemy.buffs)
 	outcome = data.outcome
 	log_lines = data.log.duplicate()
 	profile = data.profile.duplicate(true)
 	card_catalog = data.cardCatalog.duplicate(true)
 	used_cyberware = data.get("usedCyberware", []).duplicate()
+	buff_state = buffs.restore_extra_state(data.get("buffs", {}))
 	next_attack_bonus = int(data.get("nextAttackBonus", 0))
 
 	var n: Dictionary = data.get("norenState", {})
@@ -222,7 +230,7 @@ func card_cost(uid: String) -> int:
 	var definition := card(uid)
 	var cost := int(definition.get("cost", 0)) if definition.get("cost") != null else 0
 	if is_noren() and definition.get("type") == "attack":
-		cost -= turn_discount + (1 if stance_discount else 0)
+		cost -= buffs.attack_discount(self)
 	return maxi(0, cost)
 
 func card_target(uid: String) -> String:
@@ -251,7 +259,7 @@ func change_stance(value: String) -> Array:
 	if value == stance: return []
 	stance = value
 	if stance == "melee": return draw_cards(1)
-	stance_discount = true
+	buffs.apply(self, "stance_discount")
 	return []
 
 func gain_ammo(amount: int) -> void:
@@ -266,12 +274,7 @@ func enemy_damage(index: int, amount: int, bypass: bool = false) -> Dictionary:
 	return {"target":index,"damage":loss,"blocked":absorbed,"hpAfter":enemy.hp,"blockAfter":enemy.block,"killed":enemy.hp == 0}
 
 func apply_bleed(index: int, amount: int, card_stance: String, single: bool) -> void:
-	if enemies[index].hp <= 0: return
-	if card_stance == "ranged": amount = roundi(amount * 0.5)
-	if amount > 0 and card_stance == "melee" and single and "dissection" in powers and not dissection_used:
-		amount += 1
-		dissection_used = true
-	enemies[index].bleed = int(enemies[index].get("bleed", 0)) + amount
+	buffs.apply(self, "bleed", amount, index, {"source":"card", "stance":card_stance, "single":single})
 
 func resolve_outcome() -> void:
 	if player_hp <= 0: outcome = "lose"
@@ -285,9 +288,10 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 	if extra_ammo < 0 or extra_ammo > extra_ammo_limit(uid): return {}
 	var effects: Array = definition.get("effects", [])
 	# Validate the complete transaction before spending resources or moving any card.
-	var allowed := ["damage","block","ammo","draw","stance","weak","bleed","parry","parry_fill","next_damage","next_discount","power","discard_attack"]
+	var allowed := ["damage","ammo","draw","stance","discard_attack"]
 	for effect in effects:
-		if not effect is Dictionary or not effect.get("type", "") in allowed: return {}
+		if not effect is Dictionary: return {}
+		if not effect.get("type", "") in allowed and not buffs.valid_card_effect(effect): return {}
 		if effect.has("amount") and (not (effect.amount is int or effect.amount is float) or effect.amount < 0): return {}
 		if effect.type == "discard_attack" and not discard_uid in discard_candidates(uid): return {}
 	var at_start := stance
@@ -302,17 +306,9 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 	var bonus := 0
 	energy -= card_cost(uid)
 	if attack:
-		bonus = next_attack_bonus + turn_damage_bonus
-		next_attack_bonus = 0
-		turn_damage_bonus = 0
-		turn_discount = 0
-		stance_discount = false
+		bonus = buffs.begin_attack(self, at_start)
 		if at_start == "melee": gain_ammo(1)
-		else:
-			ammo -= 1 + extra_ammo
-			if "high_pressure" in powers and not pressure_used:
-				bonus += 3
-				pressure_used = true
+		else: ammo -= 1 + extra_ammo
 	hand.erase(uid)
 	# Hold the resolving card outside all draw piles until its effects finish.
 	var drawn: Array = []
@@ -336,44 +332,19 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 							if ammo_before == 1: base += int(effect.get("lastAmmoBonus", 0))
 							if int(before[index].hp) * 2 <= int(before[index].maxHp): base += int(effect.get("executeBonus", 0))
 						var hit := enemy_damage(index, roundi(base * (1.5 if at_start == "ranged" else 1.0)), at_start == "ranged" and effect.get("rangedIgnoreBlock", false))
-						hit.attackDamage = hit.damage
-						hit.bleedDamage = 0
-						if at_start == "ranged" and enemies[index].hp > 0 and int(enemies[index].get("bleed", 0)) > 0:
-							var bleeding := enemy_damage(index, int(enemies[index].bleed))
-							enemies[index].bleed -= 1
-							hit.bleedDamage = bleeding.damage
-							hit.damage += bleeding.damage
-							hit.blocked += bleeding.blocked
-							hit.hpAfter = bleeding.hpAfter
-							hit.blockAfter = bleeding.blockAfter
-							hit.killed = bleeding.killed
-						hit.bleedAfter = int(enemies[index].get("bleed", 0))
+						buffs.after_attack_hit(self, index, at_start, hit)
 						damage += hit.damage
 						hits.append(hit)
 				bonus = 0
-			"block": block += amount
 			"ammo": gain_ammo(amount)
 			"draw": drawn.append_array(draw_cards(amount))
 			"stance": drawn.append_array(change_stance(effect.value))
-			"weak":
-				for index in targets_to_hit:
-					if enemies[index].hp > 0: enemies[index].weak = mini(5, int(enemies[index].get("weak", 0)) + amount)
-			"bleed":
-				for index in targets_to_hit:
-					var stacks := amount
-					if at_start == "melee" and int(before[index].get("bleed", 0)) > 0: stacks = int(effect.get("woundedMeleeAmount", amount))
-					apply_bleed(index, stacks, at_start, target_kind == "enemy")
-			"parry":
-				if parry < int(effect.cap): parry += amount
-			"parry_fill": parry = maxi(parry, amount)
-			"next_damage": turn_damage_bonus += amount
-			"next_discount": turn_discount += amount
-			"power":
-				if not effect.value in powers: powers.append(effect.value)
 			"discard_attack":
 				hand.erase(discard_uid)
 				discard_pile.append(discard_uid)
 				discarded.append(discard_uid)
+			_:
+				buffs.apply_card_effect(self, effect, targets_to_hit, {"stance":at_start, "before":before, "single":target_kind == "enemy"})
 	var exhausted: bool = definition.get("exhaust", false) or definition.type == "power"
 	if exhausted: exhaust_pile.append(uid)
 	else: discard_pile.append(uid)
@@ -386,19 +357,19 @@ func end_noren_turn() -> Dictionary:
 	var discarded := hand.duplicate()
 	discard_pile.append_array(hand)
 	hand.clear()
-	turn_damage_bonus = 0
-	turn_discount = 0
+	buffs.player_turn_end(self)
 	var attacks: Array = []
 	for index in enemies.size():
 		var enemy: Dictionary = enemies[index]
 		if enemy.hp <= 0: continue
-		enemy.block = 0 # A combatant's block clears at the start of its own turn.
+		buffs.own_turn_start(self, index)
 		var intent: Dictionary = enemy.intent
-		if intent.get("type", "") != "attack": continue
-		var per_hit := roundi(int(intent.get("amount", 0)) * (1.0 - mini(5, int(enemy.get("weak", 0))) * 0.1))
+		if intent.get("type", "") != "attack":
+			buffs.own_turn_end(self, index)
+			continue
+		var per_hit := buffs.enemy_attack_damage(enemy, int(intent.get("amount", 0)))
 		var total := per_hit * int(intent.get("hits", 1))
 		var hits: Array = []
-		var counters: Array = []
 		var damage := 0
 		for segment in int(intent.get("hits", 1)):
 			var absorbed := mini(block, per_hit)
@@ -408,23 +379,15 @@ func end_noren_turn() -> Dictionary:
 			damage += loss
 			hits.append({"damage":loss,"blocked":absorbed,"hpAfter":player_hp,"killed":player_hp == 0})
 			if player_hp == 0: break
-		if parry > 0:
-			for layer in parry:
-				if enemy.hp <= 0: break
-				var counter := enemy_damage(index, roundi(total * 0.25))
-				if enemy.hp > 0: enemy.bleed = int(enemy.get("bleed", 0)) + 1
-				counter.bleedAfter = int(enemy.get("bleed", 0))
-				counters.append(counter)
-			parry -= 1
+		var counters: Array = buffs.after_enemy_attack(self, index, total)
 		attacks.append({"id":enemy.id,"damage":damage,"hits":hits,"counters":counters})
+		buffs.own_turn_end(self, index)
 		resolve_outcome()
 		if not outcome.is_empty(): break
 	if outcome.is_empty():
 		turn += 1
-		block = 0
+		buffs.own_turn_start(self)
 		energy = int(profile.get("energyPerTurn", 3))
-		pressure_used = false
-		dissection_used = false
 		used_cyberware.clear()
 		for enemy in enemies:
 			enemy.intentIndex += 1

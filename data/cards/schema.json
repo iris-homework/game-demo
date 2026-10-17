@@ -80,8 +80,20 @@
               "next_damage",
               "next_discount",
               "power",
-              "discard_attack"
+              "discard_attack",
+              "buff"
             ]
+          },
+          "id": {
+            "type": "string",
+            "description": "For type=buff, a stable ID registered in data/buffs/buffs.json."
+          },
+          "buffTarget": {
+            "enum": [
+              "player",
+              "enemy"
+            ],
+            "description": "Optional recipient; must agree with the buff definition."
           }
         }
       }

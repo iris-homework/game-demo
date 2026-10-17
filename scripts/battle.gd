@@ -74,7 +74,10 @@ func enter(params: Dictionary) -> void:
 	rect(self,Vector2.ZERO,Vector2(1440,900),Color("07080c"))
 	stage = preload("res://scripts/combat/test_stage.gd").new()
 	add_child(stage)
-	stage.setup(model.enemies.size(),533+actor_offset.y)
+	var enemy_kinds: Array[String] = []
+	for enemy in model.enemies:
+		enemy_kinds.append("fish" if enemy.get("id","") == "fish" else "finn")
+	stage.setup(model.enemies.size(),533+actor_offset.y,enemy_kinds)
 	chrome("战斗",false)
 	label(self,battle.name,Vector2(41,112),Vector2(700,55),33)
 	label(self,"COMBAT // " + Game.place_data(battle.placeId).name,Vector2(43,166),Vector2(670,29),14,CYAN)
@@ -177,7 +180,7 @@ func refresh_enemy_hud() -> void:
 	add_child(enemy_hud)
 	for i in model.enemies.size():
 		var enemy: Dictionary = shown_enemies[i]
-		var effective := roundi(int(enemy.intent.get("amount",0)) * (1.0 - int(enemy.get("weak",0))*0.1))
+		var effective := model.buffs.enemy_attack_damage(enemy, int(enemy.intent.get("amount",0)))
 		var intent_text := "攻击 %d" % effective
 		if int(enemy.intent.get("hits",1)) > 1: intent_text += " ×%d" % int(enemy.intent.hits)
 		var plate := ActorHUD.new()
@@ -825,28 +828,12 @@ func update_enemy_plates() -> void:
 	resources_label.visible = player_plate.visible
 	resources_label.modulate.a = player_plate.modulate.a
 
-func effect_entry(id: String, count: int, color: String, description: String) -> Dictionary:
-	return {"id":id,"count":count,"color":color,"description":description}
-
 func enemy_statuses(enemy: Dictionary) -> Array:
-	var effects: Array = []
-	var bleed := int(enemy.get("bleed",0))
-	var weak := int(enemy.get("weak",0))
-	if bleed > 0: effects.append(effect_entry("bleed",bleed,"ed586b","裂伤 · %d 层\n远程攻击每段本体命中后，造成等于当前层数的额外伤害，再减少 1 层。额外伤害先扣格挡，不受远程倍率加成；跨回合保留。" % bleed))
-	if weak > 0: effects.append(effect_entry("weak",weak,"e5a06b","虚弱 · %d 层\n每层降低攻击伤害 10%%，最多 5 层；当前降低 %d%%。每段四舍五入，跨回合保留。" % [weak,mini(5,weak)*10]))
-	return effects
+	return model.buffs.enemy_badges(enemy)
 
 func refresh_player_plate() -> void:
 	if not is_instance_valid(player_plate): return
-	var effects: Array = []
-	if shown_player_parry > 0: effects.append(effect_entry("parry",shown_player_parry,"7be5bd","弹反 · %d 层\n一次敌方攻击结束后，每层反击一次，每次造成该次攻击格挡前总伤害的 25%%（四舍五入），并施加 1 层裂伤。整次反击后消耗 1 层；跨回合保留。" % shown_player_parry))
-	if model.turn_damage_bonus > 0: effects.append(effect_entry("damage",model.turn_damage_bonus,"f17988","下次攻击增伤 · +%d\n本回合下一张攻击牌的第一段基础伤害增加该数值；使用后消耗，回合结束清除。" % model.turn_damage_bonus))
-	if model.next_attack_bonus > 0: effects.append(effect_entry("technology",model.next_attack_bonus,"c095ff","科技增伤 · +%d\n下一张攻击牌的第一段基础伤害增加该数值；使用后消耗，未使用时跨回合保留。" % model.next_attack_bonus))
-	if model.turn_discount > 0: effects.append(effect_entry("discount",model.turn_discount,"f0d47f","本回合攻击减费 · %d\n下一张攻击牌少消耗该数值的能量，费用最低为 0。使用后消耗，回合结束清除。" % model.turn_discount))
-	if model.stance_discount: effects.append(effect_entry("stance_discount",1,"79d9f7","形态攻击减费 · 1\n进入远程形态获得：下一张攻击牌费用 −1，最低为 0。不叠加；跨回合保留至使用。"))
-	if "high_pressure" in model.powers: effects.append(effect_entry("high_pressure",1,"f2b969","高压枪机 · 本场持续\n每回合首次远程攻击的第一段基础伤害 +3；同名能力不叠加。\n本回合："+("已触发" if model.pressure_used else "待触发")))
-	if "dissection" in model.powers: effects.append(effect_entry("dissection",1,"d2b3ee","剖解经验 · 本场持续\n每回合首次以近战形态用单体卡牌施加裂伤时，额外施加 1 层；同名能力不叠加。\n本回合："+("已触发" if model.dissection_used else "待触发")))
-	player_plate.update_values(shown_player_hp,model.max_hp,shown_player_block,effects)
+	player_plate.update_values(shown_player_hp,model.max_hp,shown_player_block,model.buffs.player_badges(model,shown_player_parry))
 
 func refresh_hp() -> void:
 	if shown_player_hp < 0:
