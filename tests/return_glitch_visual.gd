@@ -1,68 +1,109 @@
-extends "res://tests/combat_stage_visual.gd"
-## Actual battle return sequence, sampled during the ghost-only and reveal phases.
-var ghost_frames := 0
-var reveal_frames := 0
-var fixed_button := Rect2()
-var fixed_hp := Rect2()
+extends "res://tests/noren_cards_visual.gd"
+## Real battle return flow; also runs headless. Saves disabled, no physical input.
+const Ghost = preload("res://scripts/combat/return_ghost_fx.gd")
+var cycle := ""
+var seen: Array[String] = []
+var expected_survivors := 3
+var stationary_player := false
+var snapshot: Dictionary = {}
 
-func ghosts(view: Control) -> Array:
-	return view.stage.world.get_children().filter(func(node): return node.get_script() == preload("res://scripts/combat/return_ghost_fx.gd"))
+func ghosts() -> Array:
+	return app.view.stage.world.get_children().filter(func(node): return node.get_script() == Ghost)
+
+func capture(name: String) -> void:
+	if DisplayServer.get_name() != "headless": await shot(name)
 
 func on_phase(value: String) -> void:
+	seen.append(value)
 	var view = app.view
+	if value == "return_light":
+		snapshot = view.model.snapshot()
+		if stationary_player:
+			check(view.stage.player.position == view.stage.player.home,"Player did not move before end-of-turn return")
 	if value == "home_glitch":
-		var copies := ghosts(view)
-		verify(copies.size() == 4,"All four displaced survivors get a return silhouette")
-		verify(Game.battle_busy,"Return silhouettes keep next-turn input locked")
+		check(ghosts().size() == expected_survivors,"Every survivor gets a ghost, including stationary actors")
+		check(Game.battle_busy,"Input remains locked during return")
 		for actor in view.stage.actors_root.get_children():
-			verify(actor.position == actor.home and is_zero_approx(actor.modulate.a),"Actor stays hidden at its home before reveal")
-		await settle(0.10)
-		for copy in copies:
-			verify(copy.progress > 0 and copy.progress < 0.44 and copy.echoes.size() == 3,"Neon channel silhouettes animate before the real body")
-		ghost_frames += 1
-		await shot("02-ghost-only")
+			if not actor.alive: continue
+			check(actor.position == actor.home and is_zero_approx(actor.modulate.a),"Survivor hidden at exact home")
+			check(actor.facing == (1.0 if actor == view.stage.player else -1.0),"Facing restored before ghost reveal")
+		check(view.model.snapshot() == snapshot,"Return does not mutate the combat model")
+		await get_tree().create_timer(0.10).timeout
+		await capture(cycle+"-ghost")
 	if value == "home_reveal":
-		await settle(0.12)
+		await get_tree().create_timer(0.12).timeout
 		for actor in view.stage.actors_root.get_children():
-			verify(actor.modulate.a > 0 and actor.modulate.a < 1,"Body gradually appears while echoes fade")
-		reveal_frames += 1
-		await shot("03-body-reveal")
+			if actor.alive: check(actor.modulate.a > 0 and actor.modulate.a < 1,"Survivor gradually reappears")
+		await capture(cycle+"-reveal")
+
+func verify_return() -> void:
+	# queue_free releases temporary ghosts at the end of the current frame.
+	await get_tree().process_frame
+	var stage = app.view.stage
+	check(seen.count("home_glitch") == 1 and seen.count("home_reveal") == 1,"One shared ghost/reveal sequence")
+	check(ghosts().is_empty() and stage.phase == "idle","Temporary ghosts released and stage idle")
+	for actor in stage.actors_root.get_children():
+		if not actor.alive: continue
+		check(actor.position == actor.home and actor.modulate == Color.WHITE,"Survivor ends at home with normal visibility")
+		check(actor.facing == (1.0 if actor == stage.player else -1.0),"Player faces right; enemy faces left")
+		check(actor.pose == ("gun_idle" if actor == stage.player and actor.combat_stance == "ranged" else "idle"),"Return preserves stance-specific idle")
+	check(is_equal_approx(stage.zoom,1.0),"Wide camera restored")
 
 func _ready() -> void:
-	output = "res://artifacts/qa/return-glitch-2026-10-14/%d/" % DisplayServer.window_get_size().x
+	output = "res://artifacts/qa/always-return-2026-10-17/"+("headless/" if DisplayServer.get_name() == "headless" else "render/")
 	DirAccess.make_dir_recursive_absolute(output)
-	var demo: Node = load("res://scenes/combat_stage_demo.tscn").instantiate()
-	add_child(demo)
-	await settle(0.5)
-	app = demo.get_child(0)
-	while app.shown_page != "battle" or app.view.model.enemies.size() != 3: await get_tree().process_frame
+	Game.save_enabled = false
+	Game.save_path = "user://always_return_unused.json"
+	Game.meta_path = "user://always_return_meta_unused.json"
+	Game.state = Game.initial_state()
+	get_tree().create_timer(45.0).timeout.connect(func(): get_tree().quit(2))
+	app = preload("res://scenes/main.tscn").instantiate()
+	add_child(app)
+	await get_tree().process_frame
+	Game.start_training("B11")
 	await idle()
 	var view = app.view
-	fixed_button = view.end_button.get_global_rect()
-	fixed_hp = view.enemy_plates[0].get_global_rect()
 	view.stage.phase_changed.connect(on_phase)
-	view.select_card(view.model.hand[0])
-	await view.play_selected(0)
-	await shot("01-before-return")
+	# No cards played: defender stays home while fish attack / apply pollution.
+	cycle = "melee-turn"
+	stationary_player = true
 	await view.end_turn_pressed()
-	await settle(0.1)
-	verify(ghost_frames == 1 and reveal_frames == 1,"Return plays ghost and body stages exactly once")
-	verify(ghosts(view).is_empty(),"All temporary silhouettes release after reveal")
+	await verify_return()
+	check(view.model.player_hp == 94 and view.model.turn == 2 and view.model.hand.size() == 5,"Actual enemy turn damages and draws exactly once")
+	check(not Game.battle_busy and view.cards.size() == 5,"Next hand opens after return")
+	await capture(cycle+"-complete")
+	# All actors stay at home, but face the wrong way after a hit / turn.
+	cycle = "stationary-ranged"
+	seen.clear()
+	view.stage.player.set_combat_stance("ranged")
 	for actor in view.stage.actors_root.get_children():
-		verify(actor.position == actor.home and actor.modulate == Color.WHITE,"Survivors finish at XY home with normal color and alpha")
-	verify(view.model.player_hp == 97 and view.model.enemies[0].hp == 19 and view.model.turn == 2 and view.model.hand.size() == 5,"Existing enemy damage, round count and draw resolve exactly once")
-	verify(view.end_button.get_global_rect() == fixed_button and view.enemy_plates[0].get_global_rect() == fixed_hp,"Controls and fixed enemy HP layout stay still")
-	await shot("04-complete")
-	view.stage.phase_changed.disconnect(on_phase)
-	var snapshot: Dictionary = view.model.snapshot()
-	var dead: Node2D = view.stage.enemies[2]
+		actor.face_toward(actor.position+Vector2(-100 if actor == view.stage.player else 100,0))
+	view.set_busy(true)
+	await capture(cycle+"-before")
+	await view.stage.return_home()
+	await verify_return()
+	check(view.model.snapshot() == snapshot,"Stationary return keeps model snapshot unchanged")
+	view.set_busy(false)
+	await capture(cycle+"-complete")
+	# Subpixel displacement, normal displacement, and a dead actor in one pass.
+	cycle = "mixed"
+	seen.clear()
+	stationary_player = false
+	expected_survivors = 2
+	view.stage.player.position += Vector2(0.5,0)
+	view.stage.enemies[0].position += Vector2(-160,20)
+	var dead = view.stage.enemies[1]
 	dead.alive = false
 	dead.modulate.a = 0
-	dead.position += Vector2(-100,20)
-	var dead_position := dead.position
+	dead.position += Vector2(-80,30)
+	var dead_position: Vector2 = dead.position
+	view.set_busy(true)
 	await view.stage.return_home()
-	verify(dead.position == dead_position and dead.modulate.a == 0 and ghosts(view).is_empty(),"No ghost or resurrection for dead actors; stationary survivors skip return")
-	verify(view.model.snapshot() == snapshot,"Presentation-only return never modifies the combat snapshot")
-	FileAccess.open(output+"result.json",FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures,"mode":"real rendering, direct battle view calls"},"\t"))
+	await verify_return()
+	check(dead.position == dead_position and dead.modulate.a == 0 and not dead.alive,"Dead actor neither returns nor reappears")
+	check(view.model.snapshot() == snapshot,"Mixed return keeps model snapshot unchanged")
+	view.set_busy(false)
+	await capture(cycle+"-complete")
+	FileAccess.open(output+"result.json",FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures,"physicalInput":false},"\t"))
 	print("RETURN GLITCH: %d checks, %d failures; %s" % [checks,failures,output])
 	get_tree().quit(0 if failures == 0 else 1)

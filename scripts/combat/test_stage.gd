@@ -326,7 +326,8 @@ func return_home() -> void:
 	actors.append_array(enemies)
 	var fade := create_tween().set_parallel(true)
 	for actor in actors:
-		if not actor.alive or actor.position.distance_to(actor.home) < 1: continue
+		# A stationary defender can still turn during a hit; every survivor returns.
+		if not actor.alive: continue
 		returning.append(actor)
 		neon_fx(actor.position-Vector2(0,30)*depth_scale(actor.position),"vanish")
 		actor.modulate = Color(2,1.4,1.8,1)

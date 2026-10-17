@@ -111,7 +111,8 @@ func test_bite_and_invalid_attacks() -> void:
 func test_return() -> void:
 	fixture("finn",2)
 	await stage.return_home()
-	check(cues.is_empty(),"Everyone at home: silent return")
+	check(cues.size() == 1 and cues[0].cue == "snap","Stationary survivors share one return snap")
+	cues.clear()
 	stage.player.position += Vector2(150,15)
 	var departure: Vector2 = stage.player.position
 	await stage.return_home()
@@ -131,7 +132,12 @@ func test_return() -> void:
 	check(stage.enemies[1].position == dead_position and not stage.enemies[1].alive,"Dead displaced actor does not return")
 	cues.clear()
 	await stage.return_home()
-	check(cues.is_empty(),"Only dead actor remains displaced: silent return")
+	check(cues.size() == 1 and cues[0].cue == "snap","Stationary survivors still return while dead actor stays excluded")
+	cues.clear()
+	stage.player.alive = false
+	stage.enemies[0].alive = false
+	await stage.return_home()
+	check(cues.is_empty(),"No living actors: silent return")
 	await destroy_stage()
 
 func audio_players(node: Node) -> Array[AudioStreamPlayer]:
