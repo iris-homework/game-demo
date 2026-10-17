@@ -385,7 +385,7 @@ func ranged_attack(attacker: Node2D, defender: Node2D, hits: Array, on_hit: Call
 		defender.set_pose("block" if hit.blocked > 0 else "damaged")
 		defender.sprite.modulate = Color(1.55,1.8,2.1) if int(hit.damage)==0 else Color(2.1,0.38,0.55)
 		play_hit_sound(hit.blocked > 0)
-		kick_camera(direction,9.0 if int(hit.damage)>0 else 6.0)
+		kick_camera(direction,16.0 if int(hit.damage)>0 else 10.0)
 		on_hit.call(hit,i)
 		set_phase("shoot")
 		# Hold both contact poses and local flashes; the camera impulse keeps decaying.
