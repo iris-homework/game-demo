@@ -34,7 +34,8 @@ var camera_tween: Tween
 var sound := AudioStreamPlayer.new()
 var audio_rate := 22050
 
-func setup(count: int, feet_y: float, enemy_visual_ids: Array[String] = []) -> void:
+func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual]) -> void:
+	var count := enemy_visuals.size()
 	position = Vector2(0,270)
 	size = Vector2(1440,420)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -49,11 +50,11 @@ func setup(count: int, feet_y: float, enemy_visual_ids: Array[String] = []) -> v
 	world.add_child(actors_root)
 	player = Actor.new()
 	actors_root.add_child(player)
-	player.setup("noren",Vector2(405,floor_y-30),1.0)
+	player.setup_player(Vector2(405,floor_y-30),1.0)
 	for i in count:
 		var actor := Actor.new()
 		actors_root.add_child(actor)
-		actor.setup(enemy_visual_ids[i] if i < enemy_visual_ids.size() else "finn",enemy_home(i,count),-1.0)
+		actor.setup_enemy(enemy_visuals[i],enemy_home(i,count),-1.0)
 		enemies.append(actor)
 		if count > 1:
 			var marker := Label.new()
@@ -419,7 +420,7 @@ func show_gun_bursts(attacker: Node2D, defender: Node2D, direction: float, block
 	muzzle.hold_remaining = last_hit_stop
 	muzzle.variation = round_index
 	# Barrel opening in the authored shooting texture, through its calibrated mirror/scale.
-	muzzle.position = world.to_local(attacker.sprite.to_global(Vector2(54,385))) if attacker.kind=="noren" else attacker.position+Vector2(direction*75,-65)*depth_scale(attacker.position)
+	muzzle.position = world.to_local(attacker.sprite.to_global(Vector2(54,385))) if attacker.is_player else attacker.position+Vector2(direction*75,-65)*depth_scale(attacker.position)
 	muzzle.scale = Vector2(direction,1)*depth_scale(attacker.position)
 	world.add_child(muzzle)
 	var impact := GunBurst.new()

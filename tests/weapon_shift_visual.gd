@@ -70,7 +70,7 @@ func detail_fixture() -> void:
 	add_child(fixture)
 	var actor = preload("res://scripts/combat/pose_actor.gd").new()
 	fixture.add_child(actor)
-	actor.setup("noren",Vector2(780,775),-1.0)
+	actor.setup_player(Vector2(780,775),-1.0)
 	actor.scale=Vector2.ONE*5.0
 	var original_material := CanvasItemMaterial.new()
 	actor.sprite.material=original_material
@@ -202,6 +202,8 @@ func _ready() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--suffix="):output+=arg.trim_prefix("--suffix=")+"-"
 		if arg=="--large":requested_size=Vector2i(1600,1000)
+		if arg.begins_with("--output-dir="):output=arg.trim_prefix("--output-dir=").trim_suffix("/")+"/"
+	DirAccess.make_dir_recursive_absolute(output)
 	Game.state=Game.initial_state()
 	app=preload("res://scenes/main.tscn").instantiate()
 	add_child(app)

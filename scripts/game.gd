@@ -1,4 +1,5 @@
 extends Node
+const EnemyVisuals = preload("res://scripts/combat/enemy_visual_resolver.gd")
 var buffs := preload("res://scripts/combat/effects/buff_library.gd").new()
 ## Owns state, condition evaluation, transactional actions and checkpoints.
 ## Views only request transitions; authored content lives in data/.
@@ -25,7 +26,7 @@ var last_error := ""
 var revision := 0
 var card_catalog: Dictionary = {}
 var enemy_catalog: Dictionary
-var enemy_visual_catalog: Dictionary
+var enemy_visuals := EnemyVisuals.new()
 var item_catalog: Dictionary
 var prototype_rules: Dictionary
 var reward_rules: Dictionary
@@ -52,7 +53,6 @@ func _ready() -> void:
 	for definition in read_data("cards/cards.json"):
 		if definition is Dictionary and definition.has("id"): card_catalog[definition.id] = definition
 	enemy_catalog = read_data("enemies/enemies.json")
-	enemy_visual_catalog = read_data("enemies/combat_visuals.json")
 	item_catalog = read_data("items/items.json")
 	prototype_rules = read_data("prototype/combat.json")
 	prototype_rules.cyberware = read_data("prototype/cyberware.json")
@@ -578,13 +578,8 @@ func resume() -> void:
 		changed.emit()
 
 
-func enemy_combat_visual_id(enemy: Dictionary) -> String:
-	# Old snapshots have no visual ID. Resolve them without changing saved combat state.
-	var definition: Dictionary = enemy_catalog.get(enemy.get("id", ""), {})
-	var visual_id = enemy.get("combatVisualId", definition.get("combatVisualId", ""))
-	if visual_id is String and enemy_visual_catalog.has(visual_id): return visual_id
-	push_warning("Enemy '%s' has missing/unknown combatVisualId '%s'; using Finn placeholder." % [enemy.get("id", ""), visual_id])
-	return "finn"
+func enemy_combat_visual(enemy: Dictionary) -> EnemyVisuals.Visual:
+	return enemy_visuals.resolve(enemy, enemy_catalog)
 
 func initialize_combat() -> void:
 	var battle: Dictionary = battles[state.battleId]

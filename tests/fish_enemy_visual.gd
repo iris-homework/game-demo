@@ -23,8 +23,15 @@ func on_phase(phase: String) -> void:
 	shot.call_deferred("bite-impact-%d" % fish_hits)
 
 func click_at(point: Vector2) -> void:
-	await pointer(point)
-	await get_tree().create_timer(0.15).timeout
+	# OS pointer movement can arrive after a synthetic motion; only click a settled target.
+	for attempt in 6:
+		await pointer(point)
+		await get_tree().create_timer(0.15).timeout
+		if app.view.get_global_mouse_position().distance_to(point) <= 3.0: break
+	if app.view.get_global_mouse_position().distance_to(point) > 3.0:
+		check(false,"Synthetic pointer could not settle on the requested target")
+		get_tree().quit(2)
+		return
 	print("FISH POINTER requested=",point," actual=",app.view.get_global_mouse_position()," hovered=",get_viewport().gui_get_hovered_control())
 	for down in [true,false]:
 		var event := InputEventMouseButton.new()

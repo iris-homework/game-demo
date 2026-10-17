@@ -4,6 +4,7 @@ var sprite := Sprite2D.new()
 var home := Vector2.ZERO
 var facing := -1.0
 var kind := "noren"
+var is_player := false
 var pose := "idle"
 var alive := true
 var combat_stance := "melee"
@@ -27,40 +28,39 @@ const NOREN := {
 func pose_calibrations() -> Dictionary:
 	return calibrations
 
-func setup(actor_kind: String, origin: Vector2, direction: float) -> void:
-	kind = actor_kind
+func setup_player(origin: Vector2, direction: float) -> void:
+	is_player = true
+	kind = "noren"
+	calibrations = NOREN.duplicate(true)
+	for key in calibrations:
+		poses[key] = load("res://assets/combat_test/noren_%s.png" % key)
+	poses["shoot"] = preload("res://assets/combat_test/noren_shoot_planted.png")
+	_place(origin,direction)
+
+func setup_enemy(visual: EnemyVisualResolver.Visual, origin: Vector2, direction: float) -> void:
+	# All parsing, resource loading and fallback have already finished at the boundary.
+	is_player = false
+	kind = visual.id
+	poses = visual.poses.duplicate()
+	calibrations = visual.calibrations.duplicate(true)
+	pose_aliases = visual.pose_aliases.duplicate(true)
+	target_bounds = visual.target_bounds
+	attack_style_override = visual.attack_style_override
+	hit_effect_texture = visual.hit_effect_texture
+	_place(origin,direction)
+
+func _place(origin: Vector2, direction: float) -> void:
 	home = origin
 	position = origin
 	facing = direction
-	tint = Color("ff4c9b") if kind == "noren" else Color("6ae4f2")
+	tint = Color("ff4c9b") if is_player else Color("6ae4f2")
 	add_child(sprite)
 	sprite.centered = false
-	if kind == "noren":
-		calibrations = NOREN.duplicate(true)
-		for key in calibrations:
-			poses[key] = load("res://assets/combat_test/noren_%s.png" % key)
-		# Match gun idle's planted feet; retain the original lunge artwork as a source.
-		poses["shoot"] = preload("res://assets/combat_test/noren_shoot_planted.png")
-	else:
-		if not Game.enemy_visual_catalog.has(kind):
-			push_warning("Unknown combat visual '%s'; using Finn placeholder." % kind)
-			kind = "finn"
-		var visual: Dictionary = Game.enemy_visual_catalog[kind]
-		pose_aliases = visual.get("poseAliases", {}).duplicate(true)
-		attack_style_override = visual.get("attackStyleOverride", "")
-		var bounds: Array = visual.targetRect
-		target_bounds = Rect2(bounds[0],bounds[1],bounds[2],bounds[3])
-		var effect_path: String = visual.get("hitEffectTexture", "")
-		if not effect_path.is_empty(): hit_effect_texture = load(effect_path)
-		for key in visual.poses:
-			var entry: Dictionary = visual.poses[key]
-			calibrations[key] = [Vector2(entry.anchor[0],entry.anchor[1]),float(entry.scale)]
-			poses[key] = load(entry.texture)
 	set_pose("idle")
 
 func set_pose(value: String) -> void:
 	value = pose_aliases.get(value, value)
-	if kind == "noren" and combat_stance == "ranged" and value in ["idle","block","damaged"]:
+	if is_player and combat_stance == "ranged" and value in ["idle","block","damaged"]:
 		value = "gun_"+value
 	pose = value if poses.has(value) else "idle"
 	var calibration: Array = pose_calibrations()[pose]
@@ -90,7 +90,7 @@ func set_combat_stance(value: String) -> void:
 	set_pose("idle")
 
 func transition_combat_stance(value: String) -> void:
-	if kind != "noren" or value == combat_stance or not is_inside_tree():
+	if not is_player or value == combat_stance or not is_inside_tree():
 		set_combat_stance(value)
 		return
 	if is_instance_valid(weapon_shift): weapon_shift.cancel()
