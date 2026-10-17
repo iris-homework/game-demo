@@ -21,17 +21,17 @@ func _ready() -> void:
 	check(view.stage.enemies.all(func(e): return e.kind == "fish"),"Both actors use fish art")
 	check(view.model.enemies.all(func(e): return e.hp == 30),"Both start at 30 HP in enemy test")
 	check(view.model.enemy_intent_text(view.model.enemies[0]) == "攻击 6","First opening intent")
-	check(view.model.enemy_intent_text(view.model.enemies[1]) == "污染 2","Second opening intent")
+	check(view.model.enemy_intent_text(view.model.enemies[1]) == "污染 3","Second opening intent")
 	check(view.targets[0].tooltip_text.contains("追加 2 层污染"),"Fish passive tooltip")
 	view.stage.phase_changed.connect(on_phase)
 	await shot("opening-two-fish")
-	var expected_hp := [94,80,67,47]
-	var expected_pollution := [4,9,14,17]
+	var expected_hp := [94,79,65,43]
+	var expected_pollution := [5,10,16,20]
 	var expected_hits := [
 		[[0,94,2]],
-		[[0,88,5],[0,86,7],[1,80,9]],
-		[[1,69,12],[1,67,14]],
-		[[0,47,15]]
+		[[0,87,6],[0,85,8],[1,79,10]],
+		[[1,67,14],[1,65,16]],
+		[[0,43,17]]
 	]
 	for round_index in 4:
 		hit_states.clear()
@@ -60,7 +60,7 @@ func _ready() -> void:
 	await idle()
 	view = app.view
 	view.model.enemies[0].hp = 1
-	view.model.enemies[0].intent = {"type":"pollution","amount":2}
+	view.model.enemies[0].intent = {"type":"pollution","amount":3}
 	view.model.buffs.apply(view.model,"pollution",1,0)
 	view.shown_enemies = view.model.enemies.duplicate(true)
 	view.refresh_enemy_hud()

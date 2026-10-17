@@ -33,7 +33,7 @@ func on_phase(value: String) -> void:
 		for actor in [view.stage.active_attacker,view.stage.player]:
 			check(view.stage.get_global_rect().has_point(view.stage.contact(actor)),"Spitting fish and target both remain in frame")
 	if value == "spit_impact":
-		check(view.shown_player_pollution == before_contact+2,"Active pollution display advances on green-water contact")
+		check(view.shown_player_pollution == before_contact+3,"Active pollution display advances on green-water contact")
 		check(view.model.snapshot() == flight_snapshot,"Flight and contact do not apply model effects twice")
 		check(view.stage.player.pose in ["damaged","gun_damaged"],"Player uses stance-specific hit pose")
 		if scenario == "opening":
@@ -76,7 +76,7 @@ func _ready() -> void:
 	connect_view()
 	await app.view.end_turn_pressed()
 	check(flights == 1 and splashes == 1 and contacts == 2,"Opening: one bite splash and one active spit, each contacts once")
-	check(app.view.model.player_hp == 94 and app.view.shown_player_pollution == 4,"Opening damage and stacks unchanged")
+	check(app.view.model.player_hp == 94 and app.view.shown_player_pollution == 5,"Opening damage and three-stack intent")
 	await cleared()
 	await capture("03-next-turn")
 	scenario = "multihit"
@@ -85,7 +85,7 @@ func _ready() -> void:
 	contacts = 0
 	await app.view.end_turn_pressed()
 	check(flights == 0 and splashes == 3 and contacts == 3,"Each damaging segment gets one splash; status tick gets none")
-	check(app.view.model.player_hp == 80 and app.view.shown_player_pollution == 9,"Second turn damage and stacks unchanged")
+	check(app.view.model.player_hp == 79 and app.view.shown_player_pollution == 10,"Second turn damage and stacks reflect three-stack intent")
 	await cleared()
 	scenario = "blocked"
 	await fixture()
@@ -94,13 +94,13 @@ func _ready() -> void:
 	app.view.commit()
 	await app.view.end_turn_pressed()
 	check(flights == 1 and splashes == 0 and contacts == 1,"Fully blocked bite has no pollution splash; active spit still plays")
-	check(app.view.model.player_hp == 100 and app.view.shown_player_pollution == 2,"Active status bypasses block without direct damage")
+	check(app.view.model.player_hp == 100 and app.view.shown_player_pollution == 3,"Active status bypasses block without direct damage")
 	await cleared()
 	scenario = "ranged"
 	await fixture()
 	app.view.model.stance = "ranged"
 	app.view.stage.player.set_combat_stance("ranged")
-	app.view.model.enemies[0].intent = {"type":"pollution","amount":2}
+	app.view.model.enemies[0].intent = {"type":"pollution","amount":3}
 	app.view.shown_enemies = app.view.model.enemies.duplicate(true)
 	# The second fish spits from the player's left, exercising mirrored mouth anchoring.
 	app.view.stage.enemies[1].position.x = 200
@@ -108,7 +108,7 @@ func _ready() -> void:
 	app.view.commit()
 	await app.view.end_turn_pressed()
 	check(flights == 2 and splashes == 0 and contacts == 2,"Both fish actively spit, including a mirrored source")
-	check(app.view.model.player_hp == 100 and app.view.shown_player_pollution == 4,"Status-only spits do not inflict immediate damage")
+	check(app.view.model.player_hp == 100 and app.view.shown_player_pollution == 6,"Status-only spits do not inflict immediate damage")
 	check(app.view.stage.player.pose == "gun_idle","Ranged player returns to armed idle")
 	await cleared()
 	scenario = "death"

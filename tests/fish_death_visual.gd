@@ -53,8 +53,8 @@ func _ready() -> void:
 	await view.end_turn_pressed()
 	await idle()
 	check(kill_contacts == [[0,5]], "Parry death displays five before second fish acts: " + str(kill_contacts))
-	check(view.shown_player_pollution == 7 and view.model.buffs.count(view.model,"pollution") == 7,"Parry death plus second fish intent totals seven")
-	await shot("parry-kill-pollution-seven")
+	check(view.shown_player_pollution == 8 and view.model.buffs.count(view.model,"pollution") == 8,"Parry death plus second fish intent totals eight")
+	await shot("parry-kill-pollution-eight")
 	await install_fish()
 	view = app.view
 	view.model.enemies[0].hp = 1
@@ -66,8 +66,8 @@ func _ready() -> void:
 	await view.end_turn_pressed()
 	await idle()
 	check(not view.stage.enemies[0].alive and view.shown_enemies[0].hp == 0,"Pollution lethal tick retires fish")
-	check(view.shown_player_pollution == 7 and view.model.buffs.count(view.model,"pollution") == 7,"Status death effect displayed before normal continuation")
-	await shot("status-kill-pollution-seven")
+	check(view.shown_player_pollution == 8 and view.model.buffs.count(view.model,"pollution") == 8,"Status death effect displayed before normal continuation")
+	await shot("status-kill-pollution-eight")
 	Game.finish_training("win")
 	check(Game.state.currentHp == 100 and not Game.training_mode,"Training restores adventure")
 	rules.fixtures.free()

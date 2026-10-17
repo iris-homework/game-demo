@@ -78,7 +78,7 @@
       },
       {
         "type": "pollution",
-        "amount": 2
+        "amount": 3
       }
     ],
     "prototype": false,
@@ -105,7 +105,7 @@
     "intentSequence": [
       {
         "type": "pollution",
-        "amount": 2
+        "amount": 3
       },
       {
         "type": "attack",

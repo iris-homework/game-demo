@@ -92,7 +92,7 @@ func _ready() -> void:
 	app.view.model.parry = 2
 	sync_view()
 	await app.view.end_turn_pressed()
-	check(app.view.shown_player_pollution == 7 and spit_count == 1,"Parry death adds five; surviving fish still spits two")
+	check(app.view.shown_player_pollution == 8 and spit_count == 1,"Parry death adds five; surviving fish still spits three")
 	await verify_retired()
 	await prepare_case("status")
 	app.view.model.enemies[0].hp = 1
@@ -100,7 +100,7 @@ func _ready() -> void:
 	app.view.model.buffs.apply(app.view.model,"pollution",1,0)
 	sync_view()
 	await app.view.end_turn_pressed()
-	check(app.view.shown_player_pollution == 7 and spit_count == 1,"Status death adds five; surviving fish still spits two")
+	check(app.view.shown_player_pollution == 8 and spit_count == 1,"Status death adds five; surviving fish still spits three")
 	await verify_retired()
 	# The last enemy's burst must complete before training exits.
 	await prepare_case("last-enemy")

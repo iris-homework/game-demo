@@ -33,8 +33,8 @@ func json_snapshot(m: CombatModel) -> Dictionary:
 func test_catalog_and_cycles() -> void:
 	check(Game.battles.B11.enemyIds == ["fish", "fish_second"], "B11 has two distinct ordered fish IDs")
 	var expected := [
-		[{"type":"attack", "amount":6, "hits":1}, {"type":"attack", "amount":2, "hits":2}, {"type":"pollution", "amount":2}],
-		[{"type":"pollution", "amount":2}, {"type":"attack", "amount":6, "hits":1}, {"type":"attack", "amount":2, "hits":2}]
+		[{"type":"attack", "amount":6, "hits":1}, {"type":"attack", "amount":2, "hits":2}, {"type":"pollution", "amount":3}],
+		[{"type":"pollution", "amount":3}, {"type":"attack", "amount":6, "hits":1}, {"type":"attack", "amount":2, "hits":2}]
 	]
 	var m := fish_fixture()
 	for index in 2:
@@ -94,11 +94,11 @@ func test_attack_pollution() -> void:
 	m.parry = 2
 	var result := m.end_turn()
 	check(result.attacks.is_empty() and m.player_hp == 100 and m.parry == 2 and m.enemies[0].hp == 30, "Pollution intent bypasses block without damage or parry")
-	check(m.buffs.count(m, "pollution") == 2, "Pollution intent applies two layers")
+	check(m.buffs.count(m, "pollution") == 3, "Pollution intent applies three layers")
 	var applications := events(result, "status_apply")
 	check(applications.size() == 1, "Pollution intent emits one status application")
 	if applications.size() == 1:
-		check(applications[0].source == 0 and applications[0].target == -1 and applications[0].buffId == "pollution" and applications[0].stacksAfter == 2, "Application event carries source recipient and stacks")
+		check(applications[0].source == 0 and applications[0].target == -1 and applications[0].buffId == "pollution" and applications[0].stacksAfter == 3, "Application event carries source recipient and stacks")
 
 func test_ticks_and_death() -> void:
 	for block_value in [0, 2, 8]:
@@ -122,7 +122,7 @@ func test_ticks_and_death() -> void:
 	m.buffs.apply(m, "pollution", 2, 1)
 	var result := m.end_turn()
 	check(result.get("turnEvents", []).map(func(e): return e.type) == ["status_tick", "attack", "status_tick", "status_apply", "status_tick"], "Player tick before enemy actions; each enemy ticks after own action")
-	check(m.player_hp == 91 and m.buffs.count(m, "pollution") == 6, "Player old pollution ticks before fish adds four new layers")
+	check(m.player_hp == 91 and m.buffs.count(m, "pollution") == 7, "Player old pollution ticks before fish adds five new layers")
 	check(m.enemies[0].hp == 26 and m.enemies[1].hp == 28 and m.buffs.count(m, "pollution", 0) == 3 and m.buffs.count(m, "pollution", 1) == 1, "Both enemies tick and decay once at own turn end")
 	# Direct hook isolates block handling from the enemy own-turn-start clear.
 	m = fish_fixture(["fish"])
@@ -222,15 +222,15 @@ func test_death_pollution() -> void:
 	m.buffs.apply(m, "pollution", 1, 0)
 	result = m.end_turn()
 	var tick: Dictionary = events(result, "status_tick")[0]
-	check(result.outcome == "win" and m.buffs.count(m, "pollution") == 7, "Enemy pollution death adds five after its pollution intent")
-	check(tick.deathPollution == 5 and tick.playerPollutionAfter == 7, "Status death event retains passive presentation data")
+	check(result.outcome == "win" and m.buffs.count(m, "pollution") == 8, "Enemy pollution death adds five after its pollution intent")
+	check(tick.deathPollution == 5 and tick.playerPollutionAfter == 8, "Status death event retains passive presentation data")
 	m = fish_fixture()
 	m.enemy_damage(0, 30)
 	m.block = 3
 	result = m.end_turn()
 	tick = events(result, "status_tick")[0]
 	check(tick.damage == 2 and tick.blocked == 3 and tick.stacksAfter == 4, "Death pollution ticks normally through block then decays")
-	check(m.buffs.count(m, "pollution") == 6, "Surviving second fish adds its normal two after tick")
+	check(m.buffs.count(m, "pollution") == 7, "Surviving second fish adds its normal three after tick")
 
 func test_snapshot_and_training() -> void:
 	var m := fish_fixture()
