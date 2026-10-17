@@ -692,8 +692,7 @@ func present_status_event(event: Dictionary) -> void:
 	impact(stage.contact(actor),"−%d" % int(event.damage) if int(event.damage) > 0 else "格挡",Color("a7d85b"))
 	await get_tree().create_timer(0.25).timeout
 	if event.killed:
-		actor.alive = false
-		await create_tween().tween_property(actor,"modulate:a",0.0,0.16).finished
+		await stage.retire_actor(actor)
 	else:
 		actor.set_pose("idle")
 

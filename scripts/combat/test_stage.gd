@@ -7,6 +7,7 @@ const NeonSlash = preload("res://scripts/combat/prismatic_slash_fx.gd")
 const GunBurst = preload("res://scripts/combat/gun_burst_fx.gd")
 const BiteHit = preload("res://scripts/combat/bite_hit_fx.gd")
 const PollutionSpit = preload("res://scripts/combat/pollution_spit_fx.gd")
+const FishDeathBurst = preload("res://scripts/combat/fish_death_burst_fx.gd")
 const ACTOR_SCALE := 1.2544
 const ATTACK_ZOOM_FACTOR := 0.9
 const RANGED_RETREAT_DISTANCE := 280.0
@@ -273,12 +274,26 @@ func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_h
 		settle.tween_property(attacker,"position",destination,0.12)
 		await settle.finished
 		if bool(hit.get("killed",false)):
-			defender.alive = false
-			await create_tween().tween_property(defender,"modulate:a",0.0,0.16).finished
+			await retire_actor(defender)
 			break
 		defender.set_pose("idle")
 	attacker.set_pose("idle")
 	set_phase("idle")
+
+func retire_actor(actor: Node2D) -> void:
+	if not actor.alive: return
+	actor.alive = false
+	if actor.kind == "fish" and not actor.is_player:
+		var fx := FishDeathBurst.new()
+		fx.position = actor.position
+		fx.scale = actor.scale
+		world.add_child(fx)
+		fx.setup_sprite(actor.sprite)
+		actor.modulate.a = 0.0
+		set_phase("fish_death_burst")
+		await fx.finished
+	else:
+		await create_tween().tween_property(actor,"modulate:a",0.0,0.16).finished
 
 func spawn_pollution_spit(attacker: Node2D, defender: Node2D, instant: bool = false) -> Node2D:
 	if not attacker.alive or attacker.kind != "fish": return null
@@ -457,8 +472,7 @@ func ranged_attack(attacker: Node2D, defender: Node2D, hits: Array, on_hit: Call
 		if int(hit.blocked)>0 and int(hit.damage)>0: defender.set_pose("damaged")
 		await create_tween().tween_property(defender.sprite,"modulate",Color.WHITE,0.12).finished
 		if hit.killed:
-			defender.alive = false
-			await create_tween().tween_property(defender,"modulate:a",0.0,0.16).finished
+			await retire_actor(defender)
 			break
 		defender.set_pose("idle")
 	attacker.set_pose("idle")
