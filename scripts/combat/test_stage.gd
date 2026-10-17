@@ -4,6 +4,7 @@ signal phase_changed(phase: String)
 const Actor = preload("res://scripts/combat/pose_actor.gd")
 const ReturnGhost = preload("res://scripts/combat/return_ghost_fx.gd")
 const NeonSlash = preload("res://scripts/combat/prismatic_slash_fx.gd")
+const NorenSlash = preload("res://scripts/combat/noren_slash_fx.gd")
 const GunBurst = preload("res://scripts/combat/gun_burst_fx.gd")
 const BiteHit = preload("res://scripts/combat/bite_hit_fx.gd")
 const PollutionSpit = preload("res://scripts/combat/pollution_spit_fx.gd")
@@ -348,6 +349,15 @@ func neon_fx(point: Vector2, kind: String, direction: float = 1.0) -> Node2D:
 	return fx
 
 func show_strike(point: Vector2, direction: float, style: String, blocked: bool) -> void:
+	if style == "slash" and active_attacker == player and player.kind == "noren":
+		var slash := NorenSlash.new()
+		slash.position = point
+		slash.direction = direction
+		slash.blocked = blocked
+		slash.scale = Vector2.ONE * depth_scale(active_defender.position)
+		if blocked: slash.duration = 0.24
+		world.add_child(slash)
+		return
 	if style == "bite":
 		var bite := BiteHit.new()
 		bite.texture = active_attacker.hit_effect_texture

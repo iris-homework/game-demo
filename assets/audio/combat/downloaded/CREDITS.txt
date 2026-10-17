@@ -1,0 +1,36 @@
+Downloaded combat sound candidates for MidnightDemo (2026-10-18)
+
+slash.wav; alternatives/slash_metal_06.wav
+20 Sword Sound Effects (Attacks and Clashes) by StarNinjas
+https://opengameart.org/content/20-sword-sound-effects-attacks-and-clashes
+Author profile: https://opengameart.org/users/starninjas
+CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/
+
+alternatives/slash_whoosh.wav; alternatives/slash_melee.wav
+3 Melee sounds by remaxim; originals by qubodup / Iwan Gabovitch
+https://opengameart.org/content/3-melee-sounds
+CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/
+
+finger_snap.wav; alternatives/finger_snap_03.wav; alternatives/finger_snap_08.wav
+Snap of the fingers sounds by Vinrax
+https://opengameart.org/content/snap-of-the-fingers-sounds
+CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/
+
+shotgun.wav (adapted from shotty.wav)
+Gunshot Sounds by Vincent Sevedge (uploaded as Tabasco)
+Copyright (c) 2009 Vincent Sevedge
+https://opengameart.org/content/gunshot-sounds
+Creative Commons Attribution 3.0 Unported (CC BY 3.0)
+https://creativecommons.org/licenses/by/3.0/
+The OGA page labels this pack CC0, but the original ZIP includes a CC BY 3.0
+notice. This distribution retains and follows that more restrictive notice.
+Include this attribution and license link in the distributed project's credits
+if using shotgun.wav or the mixed preview that includes it.
+
+Changes to all prepared samples: conversion to 48 kHz / 16-bit mono PCM WAV,
+DC removal, boundary trimming where applicable, peak normalization to -3 dBFS,
+0.5 ms fade-in and 5 ms fade-out. No synthesized replacement of the source.
+Prepared by the MidnightDemo project. Source files and hashes: sources.json.
+
+These third-party notices apply only to the corresponding audio assets, not
+to the project's code or other assets.

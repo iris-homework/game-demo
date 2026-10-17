@@ -225,7 +225,8 @@ func refresh_enemy_hud() -> void:
 		var intent_label := label(intent,"%02d  ↗ %s" % [i+1,intent_text],Vector2(5,2),Vector2(116,24),14,Color("ff9bbd"))
 		intent_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		intent_label.autowrap_mode = TextServer.AUTOWRAP_OFF
-		var target := Button.new()
+		var target := preload("res://scripts/combat/enemy_target.gd").new()
+		target.armed = not selected_uid.is_empty()
 		target.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		target.pressed.connect(func():
 			var front := target_at_pointer()
@@ -233,18 +234,6 @@ func refresh_enemy_hud() -> void:
 		)
 		enemy_hud.add_child(target)
 		targets.append(target)
-		var clear := StyleBoxFlat.new()
-		clear.bg_color = Color(0,0,0,0)
-		clear.border_color = CYAN if not selected_uid.is_empty() else Color(0,0,0,0)
-		clear.set_border_width_all(1)
-		target.add_theme_stylebox_override("normal",clear)
-		var hover := clear.duplicate()
-		hover.bg_color = Color(0.95,0.2,0.5,0.06) if not selected_uid.is_empty() else Color(0.08,0.8,0.9,0.035)
-		hover.border_color = PINK if not selected_uid.is_empty() else CYAN
-		target.add_theme_stylebox_override("hover",hover)
-		target.add_theme_stylebox_override("pressed",hover)
-		target.add_theme_stylebox_override("focus",StyleBoxEmpty.new())
-		target.add_theme_stylebox_override("disabled",StyleBoxEmpty.new())
 		target.disabled = enemy.hp <= 0
 		target.tooltip_text = "攻击目标：" + enemy.displayName + "\n下次行动：" + intent_text
 		if int(enemy.get("attackPollution", 0)) > 0:
