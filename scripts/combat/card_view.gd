@@ -19,6 +19,7 @@ var preview_only := false
 var hover_tween: Tween
 var card_button: Button
 var cost_label: Label
+var effect_label: Label
 const RARITY_COLORS := {"C": Color("a6adb7"), "B": Color("5aa9ff"), "A": Color("f25b69"), "S": Color("f2c35c")}
 
 func rarity_color() -> Color:
@@ -45,8 +46,8 @@ func _ready() -> void:
 		var font_size := 11 if text.length() > 90 else (12 if text.length() > 60 else 14)
 		while font_size > 10 and base_font.get_multiline_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,152,font_size,-1,TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE).y > 112:
 			font_size -= 1
-		var description := label(self, text, Vector2(14,82), Vector2(152,114), font_size, CREAM)
-		description.add_theme_constant_override("line_spacing", 0)
+		effect_label = label(self, text, Vector2(14,82), Vector2(152,114), font_size, CREAM)
+		effect_label.add_theme_constant_override("line_spacing", 0)
 		var kind: String = {"attack":"攻击", "skill":"技能", "power":"能力"}.get(data.get("type"), "卡牌")
 		label(self, kind + (" · 消耗" if data.get("exhaust", false) else ""), Vector2(14,204), Vector2(96,19), 11, rarity_color())
 		cost_label = label(self, "费用 %d" % int(data.cost), Vector2(113,204), Vector2(57,19), 11, CREAM)
@@ -55,7 +56,7 @@ func _ready() -> void:
 		label(self, data.get("name", "临时攻击"), Vector2(17,37), Vector2(150,35), 23, INK)
 		var art := image_asset(self, data.get("artAssetId", ""), Vector2(18,78), Vector2(144,67), true)
 		if art == null: label(self, "╱╱", Vector2(54,72), Vector2(110,73), 53, PINK)
-		label(self, data.get("description", ""), Vector2(18,151), Vector2(149,38), 16, CREAM)
+		effect_label = label(self, data.get("description", ""), Vector2(18,151), Vector2(149,38), 16, CREAM)
 		label(self, "旧版测试卡 · 无费用", Vector2(18,197), Vector2(155,23), 12, MUTED)
 	card_button = Button.new()
 	card_button.flat = true
@@ -152,3 +153,14 @@ func show_cost(value: int) -> void:
 	if is_instance_valid(cost_label):
 		cost_label.text = "费用 %d" % value
 		cost_label.modulate = CYAN if value < int(data.get("cost", 0)) else Color.WHITE
+
+func show_preview(preview: Dictionary) -> void:
+	if not is_instance_valid(effect_label): return
+	var text: String = preview.get("cardText", data.get("cardText", data.get("description", "")))
+	if text.is_empty(): return
+	effect_label.text = text
+	var font_size := 14 if data.has("rarity") else 16
+	while font_size > 10 and base_font.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, effect_label.size.x, font_size, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE).y > effect_label.size.y - 2:
+		font_size -= 1
+	effect_label.add_theme_font_size_override("font_size", font_size)
+	card_button.tooltip_text = preview.get("description", data.get("description", text))

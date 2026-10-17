@@ -18,6 +18,7 @@ var presenting_enemy_turn := false
 const ENEMY_INTENT_SIZE := Vector2(126,28)
 var aim: Node2D
 var hovered_target := -1
+var preview_selection := ""
 var player_portrait: Node2D
 var enemy_portraits: Array = []
 var turn_label: Label
@@ -180,9 +181,7 @@ func refresh_enemy_hud() -> void:
 	add_child(enemy_hud)
 	for i in model.enemies.size():
 		var enemy: Dictionary = shown_enemies[i]
-		var effective := model.buffs.enemy_attack_damage(enemy, int(enemy.intent.get("amount",0)))
-		var intent_text := "攻击 %d" % effective
-		if int(enemy.intent.get("hits",1)) > 1: intent_text += " ×%d" % int(enemy.intent.hits)
+		var intent_text := model.enemy_intent_text(enemy)
 		var plate := ActorHUD.new()
 		enemy_hud.add_child(plate)
 		enemy_plates.append(plate)
@@ -287,6 +286,7 @@ func create_card(uid: String, index: int, count: int, animate: bool) -> CombatCa
 	view.setup(uid,model.card(uid))
 	view.home = hand_position(index,count)
 	add_child(view)
+	view.show_preview(model.card_preview(uid))
 	view.chosen.connect(begin_card_aim)
 	view.position = view.home
 	view.visible = not animate
@@ -334,11 +334,15 @@ func _process(_delta: float) -> void:
 	update_target_rects()
 	if not is_instance_valid(aim): return
 	aim.visible = not selected_uid.is_empty() and model.card_target(selected_uid) == "enemy" and not Game.battle_busy and not Game.transition_locked and not is_instance_valid(pile_overlay)
+	var next_target := target_at_pointer() if aim.visible else -1
+	if next_target != hovered_target or preview_selection != selected_uid:
+		hovered_target = next_target
+		preview_selection = selected_uid
+		refresh_card_previews()
 	if not aim.visible or not cards.has(selected_uid): return
 	var view: CombatCard = cards[selected_uid]
 	aim.set("origin", view.get_global_transform() * Vector2(90, 8))
 	aim.set("tip", get_global_mouse_position())
-	hovered_target = target_at_pointer()
 	aim.set("locked", hovered_target >= 0)
 	if hovered_target >= 0:
 		aim.set("target_center", stage.contact(stage.enemies[hovered_target]))
@@ -425,17 +429,22 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 		if effect.type == "discard_attack" and discard_uid.is_empty():
 			var options: Array = []
 			for candidate in model.discard_candidates(uid):
-				options.append({"value":candidate,"text":"%s · 费用 %d\n%s" % [model.card(candidate).name,model.card_cost(candidate),model.card(candidate).description]})
+				options.append({"value":candidate,"text":"%s · 费用 %d\n%s" % [model.card(candidate).name,model.card_cost(candidate),model.card_preview(candidate).text]})
 			show_card_choice("选择弃置一张攻击牌",options,func(value): play_selected(target,value,extra_ammo))
 			return
 	if extra_ammo < 0 and model.extra_ammo_limit(uid) > 0:
 		var options: Array = []
 		for count in model.extra_ammo_limit(uid) + 1:
-			options.append({"value":count,"text":"额外消耗 %d 颗弹药 · 基础伤害 +%d" % [count,count*int(model.card(uid).get("extraAmmoBonus",0))]})
+			options.append({"value":count,"text":"额外消耗 %d 颗弹药\n%s" % [count,model.card_preview(uid,target,count).text.replace("\n"," ")]})
 		show_card_choice("选择额外耗弹数量（通常耗弹 1 颗）",options,func(value): play_selected(target,discard_uid,value))
 		return
+	var played_preview := model.card_preview(uid,target,maxi(0,extra_ammo))
+	var played_cost := model.card_cost(uid)
 	var result := model.play_card(uid,target,discard_uid,maxi(0,extra_ammo))
 	if result.is_empty(): return
+	if cards.has(uid):
+		cards[uid].show_preview(played_preview)
+		cards[uid].show_cost(played_cost)
 	set_busy(true)
 	selected_uid = ""
 	aim.visible = false
@@ -651,13 +660,21 @@ func set_busy(value: bool) -> void:
 	if is_instance_valid(cyberware_button): cyberware_button.disabled = value
 	for view in cards.values():
 		view.set_enabled(not value)
-		view.show_cost(model.card_cost(view.uid))
+	refresh_card_previews()
 	refresh_resources()
+
+func refresh_card_previews() -> void:
+	for uid in cards:
+		# A resolving card keeps the numbers of this play during its exit animation.
+		if not uid in model.hand: continue
+		cards[uid].show_cost(model.card_cost(uid))
+		cards[uid].show_preview(model.card_preview(uid, hovered_target if uid == selected_uid else -1))
 
 func commit() -> void:
 	Game.commit_combat(model)
 	expected_revision = Game.revision
 	refresh_cyberware()
+	refresh_card_previews()
 	refresh_resources()
 
 func refresh_cyberware() -> void:

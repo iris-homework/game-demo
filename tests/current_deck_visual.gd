@@ -4,7 +4,19 @@ func click(button: Button) -> void:
 	# Battle hit testing polls the live pointer, so synchronize it with injected events.
 	Input.warp_mouse(get_viewport().get_final_transform() * button.get_global_rect().get_center())
 	await get_tree().create_timer(0.08).timeout
-	await super.click(button)
+	# Keep the injected press/release together so delayed OS pointer motion cannot
+	# move the release away from the button between frames.
+	var pos := button.get_global_rect().get_center()
+	var motion := InputEventMouseMotion.new()
+	motion.position = pos
+	get_viewport().push_input(motion, true)
+	for down in [true, false]:
+		var event := InputEventMouseButton.new()
+		event.position = pos
+		event.button_index = MOUSE_BUTTON_LEFT
+		event.pressed = down
+		get_viewport().push_input(event, true)
+	await settle()
 
 func idle() -> void:
 	var start := Time.get_ticks_msec()

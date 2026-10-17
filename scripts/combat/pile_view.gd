@@ -78,6 +78,8 @@ func _ready() -> void:
 		card.pivot_offset = Vector2.ZERO
 		card.scale = Vector2(1.2,1.2)
 		slot.add_child(card)
+		card.show_cost(model.card_cost(uid))
+		card.show_preview(model.card_preview(uid))
 	if displayed_uids.is_empty():
 		var empty_title := label(self, "牌堆为空", Vector2(370,365), Vector2(700,60), 32, CREAM)
 		empty_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

@@ -99,6 +99,27 @@ func intent_for(enemy: Dictionary, index: int) -> Dictionary:
 func card(uid: String) -> Dictionary:
 	return card_catalog.get(instances.get(uid, ""), {})
 
+func card_preview(uid: String, target_index: int = -1, extra_ammo: int = -1) -> Dictionary:
+	return preload("res://scripts/combat/card_preview.gd").build(self, uid, target_index, extra_ammo)
+
+func enemy_intent_text(enemy: Dictionary) -> String:
+	var intent: Dictionary = enemy.get("intent", {})
+	if intent.get("type", "") != "attack": return str(intent.get("description", "非攻击行动"))
+	var amount := int(intent.get("amount", 0))
+	if is_noren(): amount = buffs.enemy_attack_damage(enemy, amount)
+	return "攻击 %d" % amount + (" ×%d" % int(intent.hits) if int(intent.get("hits", 1)) > 1 else "")
+
+func attack_hit_count(effect: Dictionary, form: String, enemy_before: Dictionary) -> int:
+	return int(effect.get("hits", 1)) + (1 if form == "ranged" and effect.has("bleedExtraHit") and int(enemy_before.get("bleed", 0)) >= int(effect.bleedExtraHit) else 0)
+
+func attack_hit_amount(definition: Dictionary, effect: Dictionary, form: String, ammo_before: int, enemy_before: Dictionary, bonus: int, extra: int) -> int:
+	var base := int(effect.get("amount", 0)) + bonus
+	if form == "ranged":
+		base += extra * int(definition.get("extraAmmoBonus", 0))
+		if ammo_before == 1: base += int(effect.get("lastAmmoBonus", 0))
+		if int(enemy_before.hp) * 2 <= int(enemy_before.maxHp): base += int(effect.get("executeBonus", 0))
+	return roundi(base * (1.5 if form == "ranged" else 1.0))
+
 func draw_cards(amount: int = -1) -> Array:
 	var drawn: Array = []
 	if not outcome.is_empty(): return drawn
@@ -322,16 +343,11 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 		match effect.type:
 			"damage":
 				for index in targets_to_hit:
-					var count := int(effect.get("hits", 1))
-					if at_start == "ranged" and effect.has("bleedExtraHit") and int(before[index].get("bleed", 0)) >= int(effect.bleedExtraHit): count += 1
+					var count := attack_hit_count(effect, at_start, before[index])
 					for segment in count:
 						if enemies[index].hp <= 0: break
-						var base := amount + (bonus if segment == 0 else 0)
-						if at_start == "ranged":
-							base += extra_ammo * int(definition.get("extraAmmoBonus", 0))
-							if ammo_before == 1: base += int(effect.get("lastAmmoBonus", 0))
-							if int(before[index].hp) * 2 <= int(before[index].maxHp): base += int(effect.get("executeBonus", 0))
-						var hit := enemy_damage(index, roundi(base * (1.5 if at_start == "ranged" else 1.0)), at_start == "ranged" and effect.get("rangedIgnoreBlock", false))
+						var amount_per_hit := attack_hit_amount(definition, effect, at_start, ammo_before, before[index], bonus if segment == 0 else 0, extra_ammo)
+						var hit := enemy_damage(index, amount_per_hit, at_start == "ranged" and effect.get("rangedIgnoreBlock", false))
 						buffs.after_attack_hit(self, index, at_start, hit)
 						damage += hit.damage
 						hits.append(hit)
