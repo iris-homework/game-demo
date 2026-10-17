@@ -1,0 +1,25 @@
+{
+  "source": "Original procedural synthesis for MidnightDemo; no third-party samples",
+  "generator": "generate_sfx.py (Python standard library; fixed local seeds)",
+  "format": "PCM signed 16-bit mono, 48000 Hz",
+  "clips": [
+    {
+      "file": "slash.wav",
+      "duration_seconds": 0.2899791666666667,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -17.79
+    },
+    {
+      "file": "shotgun.wav",
+      "duration_seconds": 0.48,
+      "peak_dbfs": -1.72,
+      "rms_dbfs": -16.79
+    },
+    {
+      "file": "finger_snap.wav",
+      "duration_seconds": 0.18,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -26.42
+    }
+  ]
+}

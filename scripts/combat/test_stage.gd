@@ -33,6 +33,7 @@ var last_hit_stop := 0.0
 var camera_tween: Tween
 var sound := AudioStreamPlayer.new()
 var audio_rate := 22050
+var combat_audio := preload("res://scripts/combat/combat_audio.gd").new()
 
 func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual]) -> void:
 	var count := enemy_visuals.size()
@@ -66,6 +67,7 @@ func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual]) -> v
 	update_depth()
 	add_child(sound)
 	sound.volume_db = -16
+	add_child(combat_audio)
 	_update_camera()
 
 func enemy_home(index: int, count: int) -> Vector2:
@@ -245,6 +247,7 @@ func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_h
 		await move_actor(attacker,destination-Vector2(direction*10,0),0.10 if enemy_attack else 0.075)
 		await get_tree().create_timer(0.12 if style == "bite" else (0.045 if enemy_attack else 0.025)).timeout
 		attacker.set_pose("bite_close" if style == "bite" else style)
+		if style == "slash" or style == "pierce": combat_audio.play_cue("slash")
 		await move_actor(attacker,destination+Vector2(direction*10,0),0.035)
 		var contact_point: Vector2 = defender.position+Vector2(-direction*13,-62)*depth_scale(defender.position)
 		show_strike(contact_point,direction,style,blocked)
@@ -330,6 +333,7 @@ func return_home() -> void:
 	if returning.is_empty():
 		fade.kill()
 	else:
+		combat_audio.play_cue("snap")
 		await fade.finished
 		set_phase("light_flight")
 		var flight := create_tween().set_parallel(true)
@@ -393,6 +397,7 @@ func ranged_attack(attacker: Node2D, defender: Node2D, hits: Array, on_hit: Call
 		attacker.set_pose("idle")
 		await get_tree().create_timer(0.10).timeout
 		attacker.set_pose("shoot")
+		combat_audio.play_cue("shoot")
 		last_hit_stop = RANGED_HIT_STOP if int(hit.damage)>0 else RANGED_BLOCK_STOP
 		show_gun_bursts(attacker,defender,direction,int(hit.blocked)>0,i)
 		defender.set_pose("block" if hit.blocked > 0 else "damaged")
