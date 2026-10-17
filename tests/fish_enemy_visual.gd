@@ -17,7 +17,7 @@ func _process(_delta: float) -> void:
 func on_phase(phase: String) -> void:
 	if phase != "impact" or watching.stage.active_attacker.kind != "fish": return
 	fish_hits += 1
-	check(watching.stage.enemies[0].pose == "bite_close","Fish closes its jaws at the impact callback")
+	check(watching.stage.active_attacker.pose == "bite_close","Fish closes its jaws at the impact callback")
 	check(get_tree().get_nodes_in_group("bite_hit_fx").size() == 1,"Exactly one bite imprint at each impact")
 	check(watching.shown_player_hp == watching.model.player_hp,"Displayed HP follows the model at bite contact")
 	shot.call_deferred("bite-impact-%d" % fish_hits)
@@ -88,7 +88,7 @@ func _ready() -> void:
 	if failures > 0:
 		get_tree().quit(1)
 		return
-	check(app.view.model.enemies[0].id == "fish" and app.view.model.enemies[0].maxHp == 100,"Fish identity with training-only 100 HP")
+	check(app.view.model.enemies.size() == 2 and app.view.model.enemies.all(func(e): return e.maxHp == 30),"Two fish use authored 30 HP in training")
 	check(app.view.targets[0].tooltip_text.contains("变异的鱼"),"Target tooltip uses the fish name")
 	await install_fish_hand()
 	var view = app.view
@@ -112,7 +112,7 @@ func _ready() -> void:
 	var player_hp: int = view.model.player_hp
 	await view.end_turn_pressed()
 	await idle()
-	check(fish_hits == 1 and view.model.player_hp == player_hp-1,"Fish bite applies the original one damage exactly once")
+	check(fish_hits == 1 and view.model.player_hp == player_hp-6 and view.model.buffs.count(view.model,"pollution") == 4,"First fish bites for six, both fish apply two pollution")
 	check("bite" in observed and "bite_close" in observed,"Enemy attack displays open then closed jaws")
 	check(view.model.turn == 2 and view.model.hand.size() == 5,"Next turn starts after bite and return")
 	check(fish.position == fish.home and fish.pose == "idle" and view.stage.player.position == view.stage.player.home,"Both actors return to their own feet anchors")
@@ -126,7 +126,7 @@ func _ready() -> void:
 	player_hp = view.model.player_hp
 	await view.end_turn_pressed()
 	await idle()
-	check(view.model.player_hp == player_hp and fish_hits == 2,"Full guard preserves HP while still showing a bite")
+	check(view.model.player_hp == player_hp and fish_hits == 4 and view.model.buffs.count(view.model,"pollution") == 3,"Full guard absorbs pollution and all three bite segments without extra pollution")
 	check("move" in observed,"Fish advancement art is used when approaching from home")
 	check(get_tree().get_nodes_in_group("bite_hit_fx").is_empty(),"Blocked bite effect also cleans up")
 	var snapshot: Dictionary = view.model.snapshot()

@@ -10,10 +10,13 @@ var enemy_hud: Control
 var targets: Array[Button] = []
 var enemy_plates: Array[Control] = []
 var enemy_intents: Array[Control] = []
+var enemy_summary_plates: Array[Control] = []
 const ActorHUD = preload("res://scripts/combat/actor_hud.gd")
+const EnemyHPSummary = preload("res://scripts/combat/enemy_hp_summary.gd")
 var player_plate: Control
 var shown_player_block := 0
 var shown_player_parry := 0
+var shown_player_pollution := 0
 var presenting_enemy_turn := false
 const ENEMY_INTENT_SIZE := Vector2(126,28)
 var aim: Node2D
@@ -67,12 +70,14 @@ func enter(params: Dictionary) -> void:
 	shown_player_hp = model.player_hp
 	shown_player_block = model.block
 	shown_player_parry = model.parry
+	shown_player_pollution = model.buffs.count(model, "pollution")
 	# Retain existing HUD offsets; only the world imagery is replaced.
 	var place_asset: String = Game.place_data(battle.placeId).backgroundAssetId
 	var stage_asset: String = Game.assets.get(place_asset,{}).get("battleAssetId","")
 	var old_offset: Array = Game.assets.get(stage_asset,{}).get("actorOffset",[0,0])
 	actor_offset = ACTOR_OFFSET+Vector2(old_offset[0],old_offset[1])
-	rect(self,Vector2.ZERO,Vector2(1440,900),Color("07080c"))
+	var backdrop := rect(self,Vector2.ZERO,Vector2(1440,900),Color("07080c"))
+	backdrop.z_index = -3
 	stage = preload("res://scripts/combat/test_stage.gd").new()
 	add_child(stage)
 	var enemy_visuals: Array[EnemyVisualResolver.Visual] = []
@@ -82,7 +87,7 @@ func enter(params: Dictionary) -> void:
 	chrome("战斗",false)
 	label(self,battle.name,Vector2(41,112),Vector2(700,55),33)
 	label(self,"COMBAT // " + Game.place_data(battle.placeId).name,Vector2(43,166),Vector2(670,29),14,CYAN)
-	tag("演练模式 · 不影响冒险" if Game.training_mode else ("诺伦 / 形态与弹药" if model.is_noren() else "旧版测试规则"),Vector2(1030,117),CYAN,360)
+	tag("演练模式 · 不影响冒险" if Game.training_mode else ("诺伦 / 形态与弹药" if model.is_noren() else "旧版测试规则"),Vector2(760,117),CYAN,310)
 	if Game.texture(Game.place_data(battle.placeId).backgroundAssetId) == null:
 		label(self,"场景美术待补",Vector2(43,203),Vector2(330,26),13,MUTED)
 	cut_panel(self,Vector2(596,14),Vector2(248,48),INK,Color("3d9eff"),12)
@@ -90,6 +95,7 @@ func enter(params: Dictionary) -> void:
 	turn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	player_portrait = stage.player
 	player_plate = ActorHUD.new()
+	player_plate.z_index = -1
 	add_child(player_plate)
 	resources_label = label(self,"",Vector2(220,620)+actor_offset,Vector2(220,25),14,CYAN)
 	resources_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -126,7 +132,7 @@ func enter(params: Dictionary) -> void:
 	cyberware_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	refresh_cyberware()
 	if Game.config.developmentMode:
-		button(self,"调试结果",Vector2(1230,163),Vector2(160,36),show_debug_results).add_theme_font_size_override("font_size",15)
+		button(self,"调试结果",Vector2(900,163),Vector2(160,36),show_debug_results).add_theme_font_size_override("font_size",15)
 	aim = Node2D.new()
 	aim.set_script(preload("res://scripts/combat/targeting_line.gd"))
 	aim.z_index = 35
@@ -175,14 +181,38 @@ func refresh_enemy_hud() -> void:
 	targets.clear()
 	enemy_plates.clear()
 	enemy_intents.clear()
+	enemy_summary_plates.clear()
 	enemy_hud = Control.new()
 	enemy_hud.position = Vector2(0,actor_offset.y)
 	enemy_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(enemy_hud)
+	var summary := Control.new()
+	enemy_hud.add_child(summary)
+	summary.size = Vector2(344,80*mini(2,model.enemies.size())-12)
+	summary.global_position = Vector2(1072,96)
+	summary.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# A fixed-height viewport keeps larger encounters above the actor stage.
+	var summary_scroll := ScrollContainer.new()
+	summary_scroll.size = summary.size
+	summary_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	summary_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE if model.enemies.size() <= 2 else Control.MOUSE_FILTER_PASS
+	summary.add_child(summary_scroll)
+	var rows := Control.new()
+	rows.custom_minimum_size = Vector2(328,80*model.enemies.size()-12)
+	rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	summary_scroll.add_child(rows)
 	for i in model.enemies.size():
 		var enemy: Dictionary = shown_enemies[i]
+		var summary_plate := EnemyHPSummary.new()
+		rows.add_child(summary_plate)
+		summary_plate.position = Vector2(0,i*80)
+		summary_plate.setup(enemy,i+1,base_font)
+		enemy_summary_plates.append(summary_plate)
 		var intent_text := model.enemy_intent_text(enemy)
 		var plate := ActorHUD.new()
+		# Floor (-2) < foot bars (-1) < actor artwork (0).
+		# Keep the original foot placement; nearer art may cover these strips.
+		plate.z_index = -1
 		enemy_hud.add_child(plate)
 		enemy_plates.append(plate)
 		plate.update_values(int(enemy.hp),int(enemy.maxHp),int(enemy.get("block",0)),enemy_statuses(enemy))
@@ -217,6 +247,10 @@ func refresh_enemy_hud() -> void:
 		target.add_theme_stylebox_override("disabled",StyleBoxEmpty.new())
 		target.disabled = enemy.hp <= 0
 		target.tooltip_text = "攻击目标：" + enemy.displayName + "\n下次行动：" + intent_text
+		if int(enemy.get("attackPollution", 0)) > 0:
+			target.tooltip_text += "\n每段攻击实际扣血时，追加 %d 层污染；污染伤害不触发。" % int(enemy.attackPollution)
+		if int(enemy.get("deathPollution",0)) > 0:
+			target.tooltip_text += "\n死亡时，向角色施加 %d 层污染。" % int(enemy.deathPollution)
 	# Status icons receive hover before the transparent target buttons.
 	for plate in enemy_plates: enemy_hud.move_child(plate,-1)
 	update_target_rects()
@@ -477,6 +511,7 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 			shown_enemies[index].hp = hit.hpAfter
 			shown_enemies[index].block = hit.get("blockAfter",0)
 			shown_enemies[index].bleed = hit.get("bleedAfter",0)
+			present_enemy_death_effect(hit)
 			refresh_enemy_hud()
 			var text := "−%d" % hit.damage
 			if int(hit.get("bleedDamage",0)) > 0: text += " (裂伤 %d)" % hit.bleedDamage
@@ -560,10 +595,14 @@ func end_turn_pressed() -> void:
 		set_busy(false)
 		return
 	commit()
-	for attack in result.attacks:
-		var attacker_index := -1
-		for i in model.enemies.size():
-			if model.enemies[i].id == attack.id: attacker_index = i
+	for attack in result.get("turnEvents", result.attacks):
+		if attack.get("type", "attack") != "attack":
+			await present_status_event(attack)
+			continue
+		var attacker_index := int(attack.get("index", -1))
+		if attacker_index < 0:
+			for i in model.enemies.size():
+				if model.enemies[i].id == attack.id: attacker_index = i
 		if attacker_index < 0: continue
 		shown_enemies[attacker_index].block = 0
 		refresh_enemy_hud()
@@ -571,6 +610,9 @@ func end_turn_pressed() -> void:
 		await stage.attack(stage.enemies[attacker_index],stage.player,style,attack.hits,func(hit: Dictionary, _index: int):
 			shown_player_hp = int(hit.hpAfter)
 			shown_player_block = maxi(0,shown_player_block-int(hit.get("blocked",0)))
+			shown_player_pollution = int(hit.get("pollutionAfter", shown_player_pollution))
+			if int(hit.damage) > 0:
+				present_pollution_gain(int(shown_enemies[attacker_index].get("attackPollution",0)))
 			refresh_player_plate()
 			refresh_hp()
 			impact(stage.contact(stage.player),"−%d HP" % hit.damage if hit.damage > 0 else "格挡",PINK)
@@ -580,6 +622,7 @@ func end_turn_pressed() -> void:
 				shown_enemies[attacker_index].hp = hit.hpAfter
 				shown_enemies[attacker_index].block = hit.get("blockAfter",0)
 				shown_enemies[attacker_index].bleed = hit.bleedAfter
+				present_enemy_death_effect(hit)
 				refresh_enemy_hud()
 				impact(stage.contact(stage.enemies[attacker_index]),"弹反 −%d" % hit.damage,CYAN)
 			)
@@ -602,6 +645,53 @@ func end_turn_pressed() -> void:
 	refresh_counts()
 	set_busy(false)
 
+func present_enemy_death_effect(hit: Dictionary) -> void:
+	if not hit.has("playerPollutionAfter"): return
+	shown_player_pollution = int(hit.playerPollutionAfter)
+	refresh_player_plate()
+	if int(hit.get("deathPollution",0)) > 0:
+		present_pollution_gain(int(hit.deathPollution))
+
+func present_pollution_gain(amount: int) -> void:
+	if amount <= 0: return
+	impact(stage.contact(stage.player) - Vector2(0,90),"污染+%d" % amount,Color("a7d85b"),0.625)
+
+func present_status_event(event: Dictionary) -> void:
+	var target_index := int(event.get("target", -1))
+	var actor = stage.player if target_index < 0 else stage.enemies[target_index]
+	if event.type == "status_apply":
+		var source := int(event.source)
+		shown_enemies[source].block = 0
+		shown_player_pollution = int(event.stacksAfter)
+		refresh_player_plate()
+		refresh_enemy_hud()
+		present_pollution_gain(int(shown_enemies[source].intent.get("amount",0)))
+		await get_tree().create_timer(0.35).timeout
+		return
+	if event.type != "status_tick": return
+	if target_index < 0:
+		shown_player_hp = int(event.hpAfter)
+		shown_player_block = int(event.blockAfter)
+		shown_player_pollution = int(event.stacksAfter)
+		refresh_player_plate()
+		refresh_hp()
+	else:
+		var enemy: Dictionary = shown_enemies[target_index]
+		enemy.hp = event.hpAfter
+		enemy.block = event.blockAfter
+		if not enemy.has("buffs"): enemy.buffs = {}
+		enemy.buffs[event.buffId] = event.stacksAfter
+		present_enemy_death_effect(event)
+		refresh_enemy_hud()
+	actor.set_pose("damaged" if int(event.damage) > 0 else "block")
+	impact(stage.contact(actor),"−%d" % int(event.damage) if int(event.damage) > 0 else "格挡",Color("a7d85b"))
+	await get_tree().create_timer(0.25).timeout
+	if event.killed:
+		actor.alive = false
+		await create_tween().tween_property(actor,"modulate:a",0.0,0.16).finished
+	else:
+		actor.set_pose("idle")
+
 func announce_turn(text: String, enemy: bool = false) -> void:
 	var banner := preload("res://scripts/combat/turn_banner.gd").new()
 	turn_banner = banner
@@ -611,7 +701,7 @@ func announce_turn(text: String, enemy: bool = false) -> void:
 	banner.queue_free()
 	turn_banner = null
 
-func impact(pos: Vector2, text: String, color: Color) -> void:
+func impact(pos: Vector2, text: String, color: Color, text_scale: float = 1.0) -> void:
 	var occupied: Array[int] = []
 	for popup in get_tree().get_nodes_in_group("combat_damage_numbers"):
 		if popup.get_parent() == self and popup.anchor.distance_to(pos) < 10.0:
@@ -623,7 +713,7 @@ func impact(pos: Vector2, text: String, color: Color) -> void:
 			break
 	var floating := preload("res://scripts/combat/damage_number_fx.gd").new()
 	add_child(floating)
-	floating.start(text,button_font,color,pos,lane)
+	floating.start(text,button_font,color,pos,lane,text_scale)
 	# Preserve enemy-action pacing while the visual tail finishes independently.
 	await get_tree().create_timer(timing("impactDuration",0.36)+0.1).timeout
 
@@ -850,7 +940,7 @@ func enemy_statuses(enemy: Dictionary) -> Array:
 
 func refresh_player_plate() -> void:
 	if not is_instance_valid(player_plate): return
-	player_plate.update_values(shown_player_hp,model.max_hp,shown_player_block,model.buffs.player_badges(model,shown_player_parry))
+	player_plate.update_values(shown_player_hp,model.max_hp,shown_player_block,model.buffs.player_badges(model,shown_player_parry,shown_player_pollution))
 
 func refresh_hp() -> void:
 	if shown_player_hp < 0:
@@ -886,6 +976,7 @@ func refresh_resources() -> void:
 	if not presenting_enemy_turn:
 		shown_player_block = model.block
 		shown_player_parry = model.parry
+		shown_player_pollution = model.buffs.count(model, "pollution")
 	refresh_player_plate()
 	if not is_instance_valid(resources_label): return
 	if is_instance_valid(energy_panel):

@@ -104,6 +104,7 @@ func card_preview(uid: String, target_index: int = -1, extra_ammo: int = -1) -> 
 
 func enemy_intent_text(enemy: Dictionary) -> String:
 	var intent: Dictionary = enemy.get("intent", {})
+	if intent.get("type", "") == "pollution": return "污染 %d" % int(intent.get("amount", 0))
 	if intent.get("type", "") != "attack": return str(intent.get("description", "非攻击行动"))
 	var amount := int(intent.get("amount", 0))
 	if is_noren(): amount = buffs.enemy_attack_damage(enemy, amount)
@@ -292,7 +293,19 @@ func enemy_damage(index: int, amount: int, bypass: bool = false) -> Dictionary:
 	enemy.block = int(enemy.get("block", 0)) - absorbed
 	var loss := mini(maxi(0, amount - absorbed), int(enemy.hp))
 	enemy.hp -= loss
-	return {"target":index,"damage":loss,"blocked":absorbed,"hpAfter":enemy.hp,"blockAfter":enemy.block,"killed":enemy.hp == 0}
+	# Only an alive-to-dead transition triggers death effects, for every damage source.
+	var death_pollution := int(enemy.get("deathPollution",0)) if loss > 0 and enemy.hp == 0 else 0
+	if death_pollution > 0:
+		buffs.apply(self,"pollution",death_pollution)
+		log_lines.append("%s 死亡，向角色施加 %d 层污染。" % [enemy.displayName,death_pollution])
+	return {"target":index,"damage":loss,"blocked":absorbed,"hpAfter":enemy.hp,"blockAfter":enemy.block,"killed":enemy.hp == 0,"deathPollution":death_pollution,"playerPollutionAfter":buffs.count(self,"pollution")}
+
+func player_damage(amount: int) -> Dictionary:
+	var absorbed := mini(block, maxi(0, amount))
+	block -= absorbed
+	var loss := mini(player_hp, maxi(0, amount - absorbed))
+	player_hp -= loss
+	return {"target":-1,"damage":loss,"blocked":absorbed,"hpAfter":player_hp,"blockAfter":block,"killed":player_hp == 0}
 
 func apply_bleed(index: int, amount: int, card_stance: String, single: bool) -> void:
 	buffs.apply(self, "bleed", amount, index, {"source":"card", "stance":card_stance, "single":single})
@@ -373,31 +386,40 @@ func end_noren_turn() -> Dictionary:
 	var discarded := hand.duplicate()
 	discard_pile.append_array(hand)
 	hand.clear()
-	buffs.player_turn_end(self)
+	var turn_events: Array = buffs.player_turn_end(self)
+	resolve_outcome()
 	var attacks: Array = []
 	for index in enemies.size():
+		if not outcome.is_empty(): break
 		var enemy: Dictionary = enemies[index]
 		if enemy.hp <= 0: continue
 		buffs.own_turn_start(self, index)
 		var intent: Dictionary = enemy.intent
 		if intent.get("type", "") != "attack":
-			buffs.own_turn_end(self, index)
+			if intent.get("type", "") == "pollution":
+				buffs.apply(self, "pollution", int(intent.get("amount", 0)))
+				turn_events.append({"type":"status_apply","source":index,"target":-1,"buffId":"pollution","stacksAfter":buffs.count(self, "pollution")})
+				log_lines.append("%s 施加 %d 层污染。" % [enemy.displayName, int(intent.get("amount", 0))])
+			turn_events.append_array(buffs.own_turn_end(self, index))
+			resolve_outcome()
 			continue
 		var per_hit := buffs.enemy_attack_damage(enemy, int(intent.get("amount", 0)))
 		var total := per_hit * int(intent.get("hits", 1))
 		var hits: Array = []
 		var damage := 0
 		for segment in int(intent.get("hits", 1)):
-			var absorbed := mini(block, per_hit)
-			block -= absorbed
-			var loss := mini(player_hp, per_hit - absorbed)
-			player_hp -= loss
-			damage += loss
-			hits.append({"damage":loss,"blocked":absorbed,"hpAfter":player_hp,"killed":player_hp == 0})
+			var hit := player_damage(per_hit)
+			if hit.damage > 0:
+				buffs.apply(self, "pollution", int(enemy.get("attackPollution", 0)))
+			hit.pollutionAfter = buffs.count(self, "pollution")
+			damage += hit.damage
+			hits.append(hit)
 			if player_hp == 0: break
 		var counters: Array = buffs.after_enemy_attack(self, index, total)
-		attacks.append({"id":enemy.id,"damage":damage,"hits":hits,"counters":counters})
-		buffs.own_turn_end(self, index)
+		var attack := {"type":"attack","index":index,"id":enemy.id,"damage":damage,"hits":hits,"counters":counters}
+		attacks.append(attack)
+		turn_events.append(attack)
+		turn_events.append_array(buffs.own_turn_end(self, index))
 		resolve_outcome()
 		if not outcome.is_empty(): break
 	if outcome.is_empty():
@@ -408,4 +430,4 @@ func end_noren_turn() -> Dictionary:
 		for enemy in enemies:
 			enemy.intentIndex += 1
 			enemy.intent = intent_for(enemy, int(enemy.intentIndex))
-	return {"discarded":discarded,"attacks":attacks,"drawn":draw_cards(),"outcome":outcome}
+	return {"discarded":discarded,"attacks":attacks,"turnEvents":turn_events,"drawn":draw_cards(),"outcome":outcome}

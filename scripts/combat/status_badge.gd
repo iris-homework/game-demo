@@ -22,6 +22,12 @@ func poly(points: Array, color: Color) -> void:
 func _draw() -> void:
 	if hovered: draw_circle(Vector2(14,14),16,Color(tint,0.16))
 	match symbol:
+		"pollution":
+			draw_circle(Vector2(13,15),11,tint)
+			for center in [Vector2(9,12),Vector2(17,12),Vector2(13,20)]:
+				draw_circle(center,3,Color("233520"))
+			draw_circle(Vector2(3,3),2,tint)
+			draw_circle(Vector2(23,4),2,tint)
 		"bleed":
 			poly([Vector2(13,1),Vector2(4,15),Vector2(3,21),Vector2(8,27),Vector2(18,27),Vector2(23,21),Vector2(22,15)],tint)
 			draw_line(Vector2(9,16),Vector2(7,21),Color("ffbdc5"),2,true)

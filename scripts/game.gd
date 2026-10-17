@@ -586,7 +586,8 @@ func initialize_combat() -> void:
 	var definitions: Array = []
 	for id in battle.enemyIds:
 		var definition: Dictionary = enemy_catalog[id].duplicate(true)
-		if training_mode: definition.maxHp = TRAINING_ENEMY_HP
+		if training_mode and battle.get("trainingEnemyHp", TRAINING_ENEMY_HP) != null:
+			definition.maxHp = int(battle.get("trainingEnemyHp", TRAINING_ENEMY_HP))
 		definitions.append(definition)
 	var model := CombatModel.new()
 	var rules := prototype_rules.duplicate(true)

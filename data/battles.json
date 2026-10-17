@@ -143,8 +143,10 @@
     "placeId": "pump",
     "prototypeProfileId": "attack_flow_v1",
     "enemyIds": [
-      "fish"
-    ]
+      "fish",
+      "fish_second"
+    ],
+    "trainingEnemyHp": null
   },
   "B12": {
     "id": "B12",

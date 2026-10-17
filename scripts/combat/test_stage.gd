@@ -45,6 +45,7 @@ func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual]) -> v
 	add_child(world)
 	focus_y = floor_y-35
 	var ground := preload("res://scripts/combat/depth_floor.gd").new()
+	ground.z_index = -2
 	ground.baseline = floor_y
 	world.add_child(ground)
 	actors_root.y_sort_enabled = true

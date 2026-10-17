@@ -64,10 +64,27 @@
     "characterId": "fish",
     "displayName": "变异的鱼",
     "battlePortraitAssetId": "",
-    "maxHp": null,
-    "intentSequence": [],
-    "prototype": true,
-    "combatVisualId": "fish"
+    "maxHp": 30,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1
+      },
+      {
+        "type": "attack",
+        "amount": 2,
+        "hits": 2
+      },
+      {
+        "type": "pollution",
+        "amount": 2
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "fish",
+    "attackPollution": 2,
+    "deathPollution": 5
   },
   "mech_boss": {
     "id": "mech_boss",
@@ -78,5 +95,32 @@
     "intentSequence": [],
     "prototype": true,
     "combatVisualId": "finn"
+  },
+  "fish_second": {
+    "id": "fish_second",
+    "characterId": "fish",
+    "displayName": "变异的鱼",
+    "battlePortraitAssetId": "",
+    "maxHp": 30,
+    "intentSequence": [
+      {
+        "type": "pollution",
+        "amount": 2
+      },
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1
+      },
+      {
+        "type": "attack",
+        "amount": 2,
+        "hits": 2
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "fish",
+    "attackPollution": 2,
+    "deathPollution": 5
   }
 }

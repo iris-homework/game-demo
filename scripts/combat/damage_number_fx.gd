@@ -11,9 +11,11 @@ var duration := 0.64
 var anchor := Vector2.ZERO
 var drift := 0.0
 var text_width := 0.0
+var size_factor := 1.0
 const FONT_SIZE := 64
 
-func start(text: String, typeface: Font, color: Color, origin: Vector2, lane: int) -> void:
+func start(text: String, typeface: Font, color: Color, origin: Vector2, lane: int, text_scale: float = 1.0) -> void:
+	size_factor = text_scale
 	font = typeface
 	value = text.trim_suffix(" HP")
 	suffix = "HP" if text.ends_with(" HP") else ""
@@ -38,7 +40,7 @@ func update_pose() -> void:
 	var pop := clampf(elapsed/0.075,0.0,1.0)
 	var settle := smoothstep(0.075,0.19,elapsed)
 	var zoom := lerpf(0.65,1.24,1.0-pow(1.0-pop,3.0))-settle*0.24
-	scale = Vector2.ONE*zoom
+	scale = Vector2.ONE*zoom*size_factor
 	rotation = lerpf(-0.10,0.0,smoothstep(0.0,0.20,elapsed))
 	position = anchor+Vector2(drift*(1.0+elapsed*0.35),-18.0-76.0*(1.0-pow(1.0-elapsed/duration,2.0)))
 	modulate.a = 1.0-smoothstep(0.37,duration,elapsed)

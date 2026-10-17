@@ -40,8 +40,8 @@ func catalog_errors(rows) -> PackedStringArray:
 		if entry.target not in ["player", "enemy", "both"]: errors.append(entry.id + ": invalid target")
 		if entry.stacking not in ["add", "guarded_add", "flag", "unique"]: errors.append(entry.id + ": invalid stacking")
 		if entry.duration not in ["battle", "player_turn_end", "own_turn_start", "own_turn_end_decay"]: errors.append(entry.id + ": invalid duration")
-		if entry.handler not in ["block", "bleed", "weak", "parry", "attack_bonus", "attack_discount", "high_pressure", "dissection", "none"]: errors.append(entry.id + ": implement handler first")
-		if entry.handler in ["block", "bleed", "weak", "parry", "high_pressure", "dissection"] and entry.id != entry.handler: errors.append(entry.id + ": specialized handler requires its canonical ID")
+		if entry.handler not in ["block", "bleed", "weak", "pollution", "parry", "attack_bonus", "attack_discount", "high_pressure", "dissection", "none"]: errors.append(entry.id + ": implement handler first")
+		if entry.handler in ["block", "bleed", "weak", "pollution", "parry", "high_pressure", "dissection"] and entry.id != entry.handler: errors.append(entry.id + ": specialized handler requires its canonical ID")
 		if entry.handler in ["attack_bonus", "attack_discount"] and entry.target != "player": errors.append(entry.id + ": attack modifier currently requires player target")
 		if not entry.get("showBadge") is bool or not Color.html_is_valid(entry.color): errors.append(entry.id + ": invalid display")
 		if entry.has("maxStacks") and not _valid_count(entry.maxStacks): errors.append(entry.id + ": invalid maximum")
@@ -186,6 +186,8 @@ func after_attack_hit(model, index: int, form: String, hit: Dictionary) -> void:
 		hit.hpAfter = bleeding.hpAfter
 		hit.blockAfter = bleeding.blockAfter
 		hit.killed = bleeding.killed
+		hit.deathPollution = int(hit.get("deathPollution",0)) + int(bleeding.get("deathPollution",0))
+		hit.playerPollutionAfter = bleeding.playerPollutionAfter
 	hit.bleedAfter = count(model, "bleed", index)
 
 func enemy_attack_damage(enemy: Dictionary, amount: int) -> int:
@@ -205,22 +207,34 @@ func after_enemy_attack(model, index: int, total: int) -> Array:
 		_write_count(model, "parry", layers - 1)
 	return counters
 
-func player_turn_end(model) -> void:
-	own_turn_end(model)
+func player_turn_end(model) -> Array:
+	var events := own_turn_end(model)
 	for entry in _definitions().values():
 		if entry.duration != "player_turn_end": continue
 		clear(model, entry.id)
 		for index in model.enemies.size(): clear(model, entry.id, index)
+	return events
 
 func own_turn_start(model, enemy_index: int = -1) -> void:
 	for entry in _definitions().values():
 		if entry.duration == "own_turn_start": clear(model, entry.id, enemy_index)
 		if enemy_index < 0 and entry.has("usedField"): model.set(entry.usedField, false)
 
-func own_turn_end(model, enemy_index: int = -1) -> void:
+func own_turn_end(model, enemy_index: int = -1) -> Array:
+	var events: Array = []
+	if (model.player_hp if enemy_index < 0 else model.enemies[enemy_index].hp) <= 0: return events
 	for entry in _definitions().values():
 		if entry.duration != "own_turn_end_decay" or not accepts(entry.id, enemy_index): continue
-		_write_count(model, entry.id, maxi(0, count(model, entry.id, enemy_index) - 1), enemy_index)
+		var layers := count(model, entry.id, enemy_index)
+		if layers <= 0: continue
+		if entry.handler == "pollution":
+			# Status damage uses ordinary block, and never enters attack hooks.
+			var tick: Dictionary = model.player_damage(layers) if enemy_index < 0 else model.enemy_damage(enemy_index, layers)
+			tick.merge({"type":"status_tick","buffId":entry.id,"stacksAfter":layers - 1})
+			events.append(tick)
+			model.log_lines.append("污染造成 %d 点伤害，格挡 %d，剩余 %d 层。" % [tick.damage, tick.blocked, layers - 1])
+		_write_count(model, entry.id, layers - 1, enemy_index)
+	return events
 
 func _badge(entry: Dictionary, amount: int, used: bool = false) -> Dictionary:
 	var description: String = entry.description.format({"count":amount, "triggered":"已触发" if used else "待触发"})
@@ -234,11 +248,12 @@ func enemy_badges(enemy: Dictionary) -> Array:
 		if amount > 0: result.append(_badge(entry, amount))
 	return result
 
-func player_badges(model, shown_parry: int = -1) -> Array:
+func player_badges(model, shown_parry: int = -1, shown_pollution: int = -1) -> Array:
 	var result: Array = []
 	for entry in _definitions().values():
 		if not entry.showBadge or entry.target == "enemy": continue
 		var amount := shown_parry if entry.id == "parry" and shown_parry >= 0 else count(model, entry.id)
+		if entry.id == "pollution" and shown_pollution >= 0: amount = shown_pollution
 		if amount <= 0: continue
 		var used: bool = model.get(entry.usedField) if entry.has("usedField") else false
 		result.append(_badge(entry, amount, used))
