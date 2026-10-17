@@ -1,0 +1,40 @@
+{
+  "title": "Library of Ruina - Roland / Atelier Logic",
+  "source_folder": "https://drive.google.com/drive/folders/1qd6WQIrNYT66D-MGH7KdvfmGh64KS9Mm",
+  "card_reference": "https://library-of-ruina.fandom.com/zh/wiki/%E9%80%BB%E8%BE%91%E5%B7%A5%E4%BD%9C%E5%AE%A4",
+  "download_date": "2026-10-18",
+  "rights_notice": "../RIGHTS.txt; no new reuse license established",
+  "provenance_limit": "Downloaded from community game-asset archive; not compared with a local original installation",
+  "processing": "Asset files byte-identical to downloaded WAV; no trimming, resampling, normalization, or synthesis",
+  "integration_status": "Roland_Shotgun.wav wired into combat_audio.gd shoot cue at user request on 2026-10-18; revolver remains unused",
+  "clips": [
+    {
+      "file": "Roland_Revolver.wav",
+      "description": "左轮枪声",
+      "file_url": "https://drive.google.com/file/d/1BR789zCsQ6Xe9RNtItU9_zgys185PuHQ/view",
+      "download_url": "https://drive.google.com/uc?export=download&id=1BR789zCsQ6Xe9RNtItU9_zgys185PuHQ",
+      "sha256": "b8dc38f6b9e4dbe55e64637550b9486cd46c80be97c260213702a651faf82cbc",
+      "sample_rate": 44100,
+      "channels": 2,
+      "sample_width_bytes": 2,
+      "duration_seconds": 1.1795691609977323
+    },
+    {
+      "file": "Roland_Shotgun.wav",
+      "description": "霰弹枪声",
+      "file_url": "https://drive.google.com/file/d/1mqQxYeq8OeXunTparoBMVfVUegMEc6Nj/view",
+      "download_url": "https://drive.google.com/uc?export=download&id=1mqQxYeq8OeXunTparoBMVfVUegMEc6Nj",
+      "sha256": "f2a6d43ff43d17d031376d4a69e602368698719d23def5b3d0bdddce87a761c3",
+      "sample_rate": 44100,
+      "channels": 2,
+      "sample_width_bytes": 2,
+      "duration_seconds": 1.7761678004535146
+    }
+  ],
+  "active_cues": {
+    "shoot": {
+      "file": "Roland_Shotgun.wav",
+      "volume_db": -13.0
+    }
+  }
+}

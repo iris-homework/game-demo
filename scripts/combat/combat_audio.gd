@@ -4,7 +4,7 @@ signal cue_played(cue: String)
 
 const CLIPS := {
 	"slash": preload("res://assets/audio/combat/ruina_reference/kuro_Vert.wav"),
-	"shoot": preload("res://assets/audio/combat/ruina_reference/Atk_LeweiGun.wav"),
+	"shoot": preload("res://assets/audio/combat/ruina_reference/roland/Roland_Shotgun.wav"),
 	"snap": preload("res://assets/audio/combat/ruina_reference/Finger_Snapping.wav"),
 }
 # Leave headroom for repeated attacks overlapping their longer sampled tails.

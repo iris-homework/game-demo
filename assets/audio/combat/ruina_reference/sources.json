@@ -100,9 +100,10 @@
       "volume_db": -12.0
     },
     "shoot": {
-      "file": "Atk_LeweiGun.wav",
-      "preview_position": 3,
-      "volume_db": -13.0
+      "file": "roland/Roland_Shotgun.wav",
+      "source_manifest": "roland/sources.json",
+      "volume_db": -13.0,
+      "selection_note": "Replaced Atk_LeweiGun.wav with Roland shotgun at user request, 2026-10-18"
     },
     "snap": {
       "file": "Finger_Snapping.wav",
