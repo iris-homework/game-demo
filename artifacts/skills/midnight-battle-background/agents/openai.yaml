@@ -1,0 +1,6 @@
+interface:
+  display_name: "午夜委托·战斗背景制作"
+  short_description: "批量生成与试装日式赛博朋克战斗背景，统一构图、角色尺度和光色"
+  default_prompt: "使用 $midnight-battle-background，参考提供的图片批量制作战斗背景，并在独立试装场景核对比例、角色尺度和光色。"
+policy:
+  allow_implicit_invocation: true

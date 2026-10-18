@@ -1,0 +1,70 @@
+{
+  "status": "concept-preview-only",
+  "generator": "built-in image_gen",
+  "reference": "User rich frontal alley reference, previous expanded image, and red/green 46/54 layout guide",
+  "output": "alley_sample_v4_detail.png",
+  "sha256": "4762b46d6189f01a2cba21b10a52b5ec3b5a4781526a9dc15ad29a766c4d8df3",
+  "generationPromptSummary": "Rebuild repetitive facade into asymmetric coarse pipe, balcony support, shutter, fire stair and grouped props. Frontal wall only, no inward-facing side buildings. Wall occupies approximately 46 percent of source height; ground uses muted irregular repairs, shallow puddles, soft oblique shadows and cropped manhole. Readable gray-violet midtones, restrained saturation and moderate contrast. No people or UI.",
+  "originalGeneratedFile": "exec-165eb66d-74a7-4f81-805e-ae571603858e.png",
+  "calibration": {
+    "landmarkSourceScaleRatioApprox": 0.5,
+    "defaultOriginalSceneScale": 0.53,
+    "wallFootRatio": 0.46,
+    "cameraGuardSourcePixels": {
+      "vertical": 256,
+      "horizontal": 512
+    },
+    "cameraGuardMode": "mirrored texture margins; original artwork is not stretched",
+    "note": "Generated landmark sizes are approximate. Source and wide base layout use about 46/54; final fitting follows user approved parameters from screenshot on 2026-10-18.",
+    "wideVisibleBuildingRatio": 0.46,
+    "compositionRegion": "46/54 base composition inside battlefield clip below HUD; user approved y offset -61 moves the actual wall line upward; near framing follows combat camera",
+    "shaderDefaults": {
+      "brightness": 1.05,
+      "saturation": 1.15,
+      "contrastPivot": 0.25,
+      "contrast": 0.92
+    },
+    "userApprovedDefaults": {
+      "brightness": 1.05,
+      "fadeStart": 610,
+      "x": 0,
+      "saturation": 1.15,
+      "scale": 0.53,
+      "fadeStrength": 0.94,
+      "y": -61
+    }
+  },
+  "previousVersions": [
+    {
+      "output": "alley_sample_v1_bright_expanded.png",
+      "sha256": "91928148799489cb3fe43bb42635bdb970b8e00dfc2c9d5297f93069c8f89460",
+      "originalGeneratedFile": "exec-d6cd8680-7274-4f1b-8d49-294a254c530b.png",
+      "status": "retained unmodified for comparison"
+    },
+    {
+      "output": "alley_sample_v1_bright.png",
+      "sha256": "6eca625c47bac4315ab8bd45603474ed5c83edfcace6d640c7f1937112729823",
+      "originalGeneratedFile": "exec-185945e6-8843-4410-b8eb-4d881d139d4e.png",
+      "status": "retained unmodified for comparison"
+    },
+    {
+      "output": "alley_sample_v3.png",
+      "sha256": "8624fd9f9252d6a0ba250a0db2722ab439f243c3e9bf1072686e2595197ee3f9",
+      "originalGeneratedFile": "exec-b6f20523-71cb-4140-9bdc-c197ba511bd5.png",
+      "status": "retained unmodified for comparison"
+    },
+    {
+      "output": "alley_sample_v2.png",
+      "sha256": "5cd60c87dc4fb5164c27243048f9646fe874f01477fad889b897475329b464d7",
+      "originalGeneratedFile": "exec-a80da09d-3889-4108-ac30-daa2eadce45f.png",
+      "status": "retained unmodified for comparison"
+    },
+    {
+      "output": "alley_sample_v1.png",
+      "sha256": "a01349b0256ffa1f6ed91308dd6e4f60f220c76cb9cf7ffe0ea534e0b8057c62",
+      "originalGeneratedFile": "exec-25f23b50-ea3e-4072-8fc5-f467e0a2c729.png",
+      "status": "retained unmodified for comparison"
+    }
+  ],
+  "usage": "Only tests/battle_background_preview.tscn; not registered as a production asset"
+}

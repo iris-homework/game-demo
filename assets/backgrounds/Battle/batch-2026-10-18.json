@@ -1,0 +1,332 @@
+{
+  "batch": "2026-10-18-nine-battle-backgrounds",
+  "skill": "midnight-battle-background",
+  "referenceDirectory": "D:/Major Project/Development-Documentation-and-Art-Assets/卡牌游戏美术资源/场景/战斗场景参考图/",
+  "conceptDocument": "D:/Major Project/Development-Documentation-and-Art-Assets/卡牌游戏美术资源/场景/战斗场景参考图/城市地点设定.md",
+  "conceptSha256": "7823a47e77b47fb5c703228ee82bca4128fb8d529ade5a0ce07eae150debbea7",
+  "scaleReference": "artifacts/qa/alley-fit-hand-2026-10-18/1600-fixed/06-three-wide.png",
+  "generator": "built-in image_gen",
+  "scope": "generate, image review, save; no runtime integration or user approval implied",
+  "items": [
+    {
+      "id": 1,
+      "name": "白昼庭院",
+      "input": "白昼庭院背景.png",
+      "concept": "富人住区，维护良好的公共空间、独立门禁和访客登记；与普通街区形成条件反差。保留参考的浅色石材、修剪绿植、水景与日间氛围。",
+      "output": "白昼庭院_战斗背景_v1.png",
+      "referenceRead": true,
+      "conceptRead": true,
+      "generated": true,
+      "reviewed": true,
+      "saved": true,
+      "status": "图片验收通过，已保存",
+      "qa": {
+        "scope": "image-only",
+        "decision": "pass",
+        "rearBoundaryApprox": 0.44,
+        "scale": "小型登记亭/门禁作近景尺度；门禁高于普通门，保留远景住宅",
+        "color": "日间浅石材与灰紫阴影，地面中间调清楚，无大面积过曝",
+        "concept": "门禁、登记亭、维护绿植及水景齐全",
+        "composition": "前景约56%连续铺装，树影打破空白，无人物/UI",
+        "runtimeVerified": false
+      },
+      "sourceGenerated": "exec-56061733-44d2-4263-9784-6266050e289d.png",
+      "sha256": "bbd1f4c00e44cd25854f60267312d0f48451a31dc58959269cd577e6b965e410",
+      "promptFile": "artifacts/battle-background-batch-2026-10-18/prompts/01-daylight-court.txt",
+      "dimensions": [
+        1586,
+        992
+      ],
+      "referenceSha256": "63e65617a3bef991b4eae99c1a7027b9a5c1e573feaf58e6bf012efc7822d0f9",
+      "fileVerified": true
+    },
+    {
+      "id": 2,
+      "name": "蜂巢城寨",
+      "input": "蜂巢城寨背景.png",
+      "concept": "底层居民微型住房密集叠置、通道如迷宫，混乱中有生活秩序。必须出现清楚的黑市与地下诊所建筑或对应符号。",
+      "output": "蜂巢城寨_战斗背景_v1.png",
+      "referenceRead": true,
+      "conceptRead": true,
+      "generated": true,
+      "reviewed": true,
+      "saved": true,
+      "status": "图片验收通过，已保存",
+      "qa": {
+        "scope": "image-only",
+        "decision": "pass",
+        "rearBoundaryApprox": 0.48,
+        "scale": "密集微型住房与细栏杆；近景诊所入口约15%图高",
+        "color": "灰紫中间调可读，市场洋红/诊所青色为小面积强调",
+        "concept": "黑市货箱徽记及医疗十字明确，深层住房与连桥保留",
+        "composition": "横向连续平台，空井在后沿栏杆之外，中心地面通畅",
+        "runtimeVerified": false
+      },
+      "sourceGenerated": "exec-78eb9b38-8b79-41fb-b0f8-635da630593d.png",
+      "sha256": "73cc2da68a0b536e8ccfd4222ff78c9b898f257cd01b12ecca008de07c9458d9",
+      "promptFile": "artifacts/battle-background-batch-2026-10-18/prompts/02-hive-tenement.txt",
+      "dimensions": [
+        1586,
+        992
+      ],
+      "referenceSha256": "fd44fcfb4097ec6c1bc0693bcb6b6d10fd5561e1610be3edc75922695f3140f2",
+      "fileVerified": true
+    },
+    {
+      "id": 3,
+      "name": "港口",
+      "input": "港口背景.png",
+      "concept": "最大港口，船只、货物、码头和仓库提供追踪逃跑的复杂后景。保留日间、岸边工业空间、货轮与吊机。",
+      "output": "港口_战斗背景_v1.png",
+      "referenceRead": true,
+      "conceptRead": true,
+      "generated": true,
+      "reviewed": true,
+      "saved": true,
+      "status": "图片验收通过，已保存",
+      "qa": {
+        "scope": "image-only",
+        "decision": "pass",
+        "runtimeVerified": false,
+        "rearBoundaryApprox": 0.48,
+        "scale": "系船柱/集装箱与远景吊机对照，无遮挡近景巨型结构",
+        "color": "日间蓝灰环境，中心混凝土地面保持中间调；反光在边缘",
+        "concept": "货轮、集装箱、仓库、吊机和系船设施齐全",
+        "composition": "连续码头平台占约52%，水在后沿之外，轨道内嵌，无人物/UI"
+      },
+      "sourceGenerated": "exec-347f0832-f06b-454c-9dcd-a17895cd9d62.png",
+      "sha256": "f099789bd984b92febeef658208cb96f65f055339b9a4bc67d0555fd192972c1",
+      "promptFile": "artifacts/battle-background-batch-2026-10-18/prompts/03-harbor.txt",
+      "dimensions": [
+        1586,
+        992
+      ],
+      "referenceSha256": "05a045c2c25788ff66a42d4a9fbce8a51e66149f6cb39c5a5ceb7ed86268bf9e",
+      "fileVerified": true
+    },
+    {
+      "id": 4,
+      "name": "黑潮泵站",
+      "input": "黑潮泵站背景.png",
+      "concept": "发电厂与港口之间的工业水岸；污水与沃斯工业废水汇合，巨大主排污口向外海排水，粗管与泵机压迫感。",
+      "output": "黑潮泵站_战斗背景_v1.png",
+      "referenceRead": true,
+      "conceptRead": true,
+      "generated": true,
+      "reviewed": true,
+      "saved": true,
+      "status": "图片验收通过，已保存",
+      "qa": {
+        "scope": "image-only",
+        "decision": "pass",
+        "runtimeVerified": false,
+        "rearBoundaryApprox": 0.48,
+        "scale": "维修门与梯级提供尺度，大排污口处于中景",
+        "color": "黄昏灰紫中间调，近黑仅凹处；洋红指示灯局部，中心无强光",
+        "concept": "三座主排污口、工业水池、粗管泵站、港口工厂后景明确",
+        "composition": "约52%固体检修平台，水流在后栏杆外，排水格栅内嵌，无人物/UI"
+      },
+      "sourceGenerated": "exec-bfc4ac67-5c2c-4d28-9bb2-7d69589812eb.png",
+      "sha256": "4a77a334b1ec0f790b71fdd96317a5ca5380103086480624afa27c0144e375d3",
+      "promptFile": "artifacts/battle-background-batch-2026-10-18/prompts/04-black-tide-pump.txt",
+      "dimensions": [
+        1586,
+        992
+      ],
+      "referenceSha256": "4c2e1d5468356d4300e2169b2d9c5c6f13c8cc49b344d7d1dc387ad9d2bc07f2",
+      "fileVerified": true
+    },
+    {
+      "id": 5,
+      "name": "垃圾场",
+      "input": "垃圾场背景.png",
+      "concept": "城边废弃物层层堆积，回收零件和故障设备散落，垃圾堆围出不断变化的通道。",
+      "output": "垃圾场_战斗背景_v1.png",
+      "referenceRead": true,
+      "conceptRead": true,
+      "generated": true,
+      "reviewed": true,
+      "saved": true,
+      "status": "图片验收通过，已保存",
+      "qa": {
+        "scope": "image-only",
+        "decision": "pass",
+        "runtimeVerified": false,
+        "rearBoundaryApprox": 0.45,
+        "scale": "小型工棚入口/围栏与远景抓斗区分层次，废件可辨认",
+        "color": "灰紫地面可读，锈红与洋红局部点缀，低亮天空不抢主体",
+        "concept": "回收零件、故障设备、大废件堆、抓斗与回收工棚明确",
+        "composition": "约55%连续清理作业地面，废件局限后沿与下角，中心无障碍/无人物/UI",
+        "note": "首次HTTP502，第二次成功；原始失败记录保留"
+      },
+      "attempts": [
+        {
+          "result": "failed",
+          "reason": "Built-in ImageGen HTTP 502 upstream socket closed; no deliverable returned"
+        }
+      ],
+      "sourceGenerated": "exec-8ef50143-846c-4dc4-a1f6-16a61f2f29cd.png",
+      "sha256": "a55173a3b62548330e5643403b2c76697cc93ffd6cb68774b82004509fb61702",
+      "promptFile": "artifacts/battle-background-batch-2026-10-18/prompts/05-scrap-yard.txt",
+      "dimensions": [
+        1586,
+        992
+      ],
+      "referenceSha256": "adae7cc9942db00473ba169669cb280e102802fc0de07413b240a338f13d7045",
+      "fileVerified": true
+    },
+    {
+      "id": 6,
+      "name": "末班车旅馆",
+      "input": "末班车旅馆背景.png",
+      "concept": "旧环线终点站候车楼改建的旅馆，蜂巢与五号街区交界；彻夜亮招牌、夜班人与短住旅客的生活痕迹，画面无人。",
+      "output": "末班车旅馆_战斗背景_v1.png",
+      "referenceRead": true,
+      "conceptRead": true,
+      "generated": true,
+      "reviewed": true,
+      "saved": true,
+      "status": "图片验收通过，已保存",
+      "qa": {
+        "scope": "image-only",
+        "decision": "pass",
+        "runtimeVerified": false,
+        "rearBoundaryApprox": 0.49,
+        "scale": "接待入口与候车椅作为尺度参照，主体改为横向低层门面",
+        "color": "灰紫夜景与克制洋红招牌，暖色大厅集中在后景，中央地面仍可读",
+        "concept": "HOTEL字样正确，候车排椅、站台时钟、旧线路图/高架列车及行李车明确",
+        "composition": "连续站前铺装约51%，前方无台阶障碍，无人物/UI"
+      },
+      "sourceGenerated": "exec-1734ded1-12f6-4563-8ffc-425fa58b415c.png",
+      "sha256": "c2eee67eeefd8e3233b68c162e9b1e64d938832f90d4d0e93d35a33ec8aff527",
+      "promptFile": "artifacts/battle-background-batch-2026-10-18/prompts/06-last-train-hotel.txt",
+      "dimensions": [
+        1586,
+        992
+      ],
+      "referenceSha256": "6ed577932f8fe4a07525f535a516af945e4dbcb3018ef71c08c95b96a52bc59c",
+      "fileVerified": true
+    },
+    {
+      "id": 7,
+      "name": "沃斯大楼内部",
+      "input": "沃斯大楼内部.png",
+      "concept": "最高建筑沃斯总部的奢华内部，办公与接待彰显权势。窗外可见商城玻璃连廊和中央医院十字标识，体现楼下周边地标而非改成外景。",
+      "output": "沃斯大楼内部_战斗背景_v1.png",
+      "referenceRead": true,
+      "conceptRead": true,
+      "generated": true,
+      "reviewed": true,
+      "saved": true,
+      "status": "图片验收通过，已保存",
+      "qa": {
+        "scope": "image-only",
+        "decision": "pass",
+        "runtimeVerified": false,
+        "rearBoundaryApprox": 0.46,
+        "scale": "小型安检闸机、接待台和电梯门建立尺度，建筑柱廊延伸画外",
+        "color": "酒红金色企业陈设配灰紫中间调；二次生成减弱地面镜面倒影",
+        "concept": "沃斯徽记、接待安检/电梯明确，窗外商城连廊及医疗十字回应地标",
+        "composition": "约54%连续磨砂大理石地面，阶梯与家具在后沿，中心无人物/UI",
+        "initialPrompt": "artifacts/battle-background-batch-2026-10-18/prompts/07-voss-interior.txt",
+        "note": "首稿地面强反光，定向编辑后通过图片验收"
+      },
+      "attempts": [
+        {
+          "result": "revise",
+          "sourceGenerated": "exec-9064bb8a-e12e-494c-8e23-f6311852bd12.png",
+          "reason": "Floor column/banner reflections too strong for fighter readability; keep architecture and reduce floor contrast"
+        }
+      ],
+      "sourceGenerated": "exec-d9d7e1ef-4d8b-4624-bc0b-e78ee147e615.png",
+      "sha256": "a10e65b5dd86fb04f3a4b86acd5f936f7c94ca33eec12eb362c94274938e47da",
+      "promptFile": "artifacts/battle-background-batch-2026-10-18/prompts/07-voss-interior-refine.txt",
+      "dimensions": [
+        1585,
+        992
+      ],
+      "referenceSha256": "72d0b757fdc369cf1e212e3f949dbf6fc4277c11d87c0e8197a4ac3a9826677d",
+      "fileVerified": true
+    },
+    {
+      "id": 8,
+      "name": "五号街区",
+      "input": "五号街区背景.png",
+      "concept": "中产居民区，中等高度的小楼、稳定生活节奏；保留日间浅色住宅与绿植，正常生活场所中的突发战斗空间。",
+      "output": "五号街区_战斗背景_v1.png",
+      "referenceRead": true,
+      "conceptRead": true,
+      "generated": true,
+      "reviewed": true,
+      "saved": true,
+      "status": "图片验收通过，已保存",
+      "qa": {
+        "scope": "image-only",
+        "decision": "pass",
+        "runtimeVerified": false,
+        "rearBoundaryApprox": 0.43,
+        "scale": "普通小楼入口、长椅/电表箱参照，后方停车位不占战场",
+        "color": "日间中性灰路面与灰紫树影，小面积花木强调，不使用夜景霓虹",
+        "concept": "中产住宅、街边小店、生活设施，区别于白昼庭院门禁水景",
+        "composition": "路沿后方为住宅，约57%连续街面，树影/井盖打破空白，无人物/UI"
+      },
+      "sourceGenerated": "exec-2beba5a8-6c3b-4f83-88d8-0a266afce8f3.png",
+      "sha256": "a079aba35761d0a5747c9e997ccd396e466755f311c46272ffe398077cd4d39d",
+      "promptFile": "artifacts/battle-background-batch-2026-10-18/prompts/08-fifth-district.txt",
+      "dimensions": [
+        1586,
+        992
+      ],
+      "referenceSha256": "038c5128b46fec323f3b96f107bde8dea987a44db55bb8261643f5ff49d5f322",
+      "fileVerified": true
+    },
+    {
+      "id": 9,
+      "name": "义体教会",
+      "input": "义体教会背景.png",
+      "concept": "金属骨架与全息圣像构成礼拜空间，祭坛陈列精密义体；庄严科技教堂，保留参考的机械手雕塑、尖拱与半透明圣像。",
+      "output": "义体教会_战斗背景_v1.png",
+      "referenceRead": true,
+      "conceptRead": true,
+      "generated": true,
+      "reviewed": true,
+      "saved": true,
+      "status": "图片验收通过，已保存",
+      "qa": {
+        "scope": "image-only",
+        "decision": "pass",
+        "runtimeVerified": false,
+        "rearBoundaryApprox": 0.47,
+        "scale": "侧面维修门/栏杆/展示柜建立参照，祭坛和全息圣像在后景",
+        "color": "灰紫地面中间调，薄线蓝色圣像与暖灯局部，修正版减弱镜面反光",
+        "concept": "金属尖拱、全息圣像、机械手雕塑和精密义体展示柜齐全",
+        "composition": "约53%连续礼拜地面，祭坛阶梯在后沿之外，无前景人物/UI",
+        "initialPrompt": "artifacts/battle-background-batch-2026-10-18/prompts/09-cybernetic-church.txt",
+        "note": "初稿后景占比过大，定向编辑后分界约47%"
+      },
+      "attempts": [
+        {
+          "result": "revise",
+          "sourceGenerated": "exec-63541ffc-7816-4619-abff-a1baf424da55.png",
+          "reason": "Rear edge at about53% rather than46%; reduce architectural height and calm floor reflections"
+        }
+      ],
+      "sourceGenerated": "exec-282dee2f-12fb-4191-bfc8-2fbc851e017b.png",
+      "sha256": "a90fc0c06065e02cf3b3faa7a4c1e8ed2a26aceab8b34a0896c16e019cfe862c",
+      "promptFile": "artifacts/battle-background-batch-2026-10-18/prompts/09-cybernetic-church-refine.txt",
+      "dimensions": [
+        1586,
+        992
+      ],
+      "referenceSha256": "02388e87b15ea509545a8e25161acd4a33d22951ed4e67a7795d7c30eaf577a2",
+      "fileVerified": true
+    }
+  ],
+  "completion": {
+    "count": 9,
+    "visualReviewed": 9,
+    "filesVerified": 9,
+    "runtimeVerified": false,
+    "userApproved": false
+  }
+}
