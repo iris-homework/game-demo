@@ -82,16 +82,6 @@
       "sha256": "05a045c2c25788ff66a42d4a9fbce8a51e66149f6cb39c5a5ceb7ed86268bf9e"
     },
     {
-      "assetId": "alley_battle",
-      "source": "卡牌游戏美术资源/场景/后巷战斗场景.png",
-      "path": "res://assets/backgrounds/alley_battle.png",
-      "size": [
-        1586,
-        992
-      ],
-      "sha256": "8e6ec1f2cf9792e82ccf75044833203a76447fe4bced8290af3bd72d5396b13e"
-    },
-    {
       "assetId": "hive_battle",
       "source": "卡牌游戏美术资源/场景/蜂巢城寨战斗场景.png",
       "path": "res://assets/backgrounds/hive_battle.png",

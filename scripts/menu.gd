@@ -19,6 +19,10 @@ var cyberware_button: Button
 var library_button: Button
 var training_toggle: Button
 var training_container: Control
+var training_scenery_button: Button
+var scenery_dialog: Control
+var scenery_cancel: Button
+var scenery_button_states: Dictionary = {}
 var motion_button: Button
 var progress_summary: Label
 var confirm_dialog: Control
@@ -98,12 +102,82 @@ func _build_right_column() -> void:
 	training_container = Control.new()
 	training_container.name = "training_menu"
 	training_container.position = Vector2(COLUMN_X, 666)
-	training_container.size = Vector2(COLUMN_WIDTH, 50)
+	training_container.size = Vector2(COLUMN_WIDTH, 108)
 	training_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	training_container.visible = false
 	ui_layer.add_child(training_container)
 	_menu_button("training_B04", "B04 战斗演练", Vector2(0, 0), Vector2(165, 50), func(): Game.start_training("B04"), false, 16, training_container)
 	_menu_button("training_B11", "敌人测试", Vector2(185, 0), Vector2(165, 50), func(): Game.start_training("B11"), false, 16, training_container)
+	training_scenery_button = _menu_button("training_scenery", _training_scenery_label(), Vector2(0, 62), Vector2(COLUMN_WIDTH, 46), open_scenery_picker, false, 16, training_container)
+	training_scenery_button.tooltip_text = "选择 B04 战斗演练的场景"
+
+func _training_scenery_label() -> String:
+	for choice in Game.training_scenery_choices():
+		if choice.id == Game.b04_scenery_choice:
+			return "场景：" + str(choice.name)
+	return "场景：默认测试场"
+
+func open_scenery_picker() -> void:
+	if Game.training_mode or Game.battle_busy or Game.transition_locked: return
+	if is_instance_valid(confirm_dialog) and confirm_dialog.visible: return
+	if is_instance_valid(scenery_dialog): return
+	scenery_dialog = Control.new()
+	scenery_dialog.name = "training_scenery_picker"
+	scenery_dialog.size = Vector2(1440, 900)
+	scenery_dialog.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(scenery_dialog)
+	var shade := rect(scenery_dialog, Vector2.ZERO, Vector2(1440, 900), Color(0, 0, 0, 0.64))
+	shade.mouse_filter = Control.MOUSE_FILTER_STOP
+	panel(scenery_dialog, Vector2(370, 180), Vector2(700, 530), PANEL, CYAN)
+	label(scenery_dialog, "选择演练场景", Vector2(402, 204), Vector2(636, 44), 29)
+	label(scenery_dialog, "用于 B04 战斗演练", Vector2(402, 254), Vector2(636, 30), 17, MUTED)
+	var choices: Array[Dictionary] = Game.training_scenery_choices()
+	var focus_buttons: Array[Button] = []
+	for index in choices.size():
+		var choice: Dictionary = choices[index]
+		var choice_id := str(choice.id)
+		var selected: bool = choice_id == Game.b04_scenery_choice
+		var choice_button := _menu_button("scenery_choice_" + ("default" if choice_id.is_empty() else choice_id), ("✓  " if selected else "") + str(choice.name), Vector2(402 + (index % 2) * 330, 302 + floori(index / 2.0) * 58), Vector2(306, 46), _select_training_scenery.bind(choice_id), selected, 18, scenery_dialog)
+		focus_buttons.append(choice_button)
+	scenery_cancel = _menu_button("scenery_cancel", "取消", Vector2(832, 638), Vector2(206, 44), close_scenery_picker, false, 18, scenery_dialog)
+	focus_buttons.append(scenery_cancel)
+	# Keep every keyboard navigation path inside this modal, including its edges.
+	for index in focus_buttons.size():
+		var current := focus_buttons[index]
+		current.focus_next = current.get_path_to(focus_buttons[(index + 1) % focus_buttons.size()])
+		current.focus_previous = current.get_path_to(focus_buttons[posmod(index - 1, focus_buttons.size())])
+		current.focus_neighbor_left = current.focus_previous
+		current.focus_neighbor_right = current.focus_next
+		if index < choices.size():
+			current.focus_neighbor_top = current.get_path_to(focus_buttons[index - 2] if index >= 2 else scenery_cancel)
+			current.focus_neighbor_bottom = current.get_path_to(focus_buttons[index + 2] if index + 2 < choices.size() else scenery_cancel)
+		else:
+			current.focus_neighbor_top = current.get_path_to(focus_buttons[maxi(0, choices.size() - 1)])
+			current.focus_neighbor_bottom = current.get_path_to(focus_buttons[0])
+	scenery_button_states.clear()
+	for node in ui_layer.find_children("*", "Button", true, false):
+		scenery_button_states[node] = {"disabled": node.disabled, "focus": node.focus_mode}
+		node.disabled = true
+		node.focus_mode = Control.FOCUS_NONE
+	scenery_cancel.grab_focus()
+
+func _select_training_scenery(choice_id: String) -> void:
+	if Game.set_b04_scenery_choice(choice_id):
+		training_scenery_button.text = _training_scenery_label()
+		close_scenery_picker()
+
+func close_scenery_picker() -> void:
+	if not is_instance_valid(scenery_dialog): return
+	get_viewport().gui_release_focus()
+	scenery_dialog.hide()
+	scenery_dialog.queue_free()
+	scenery_dialog = null
+	for node in scenery_button_states:
+		if is_instance_valid(node):
+			node.disabled = scenery_button_states[node].disabled
+			node.focus_mode = scenery_button_states[node].focus
+	scenery_button_states.clear()
+	training_scenery_button.refresh_feedback()
 
 func _build_bottom_right() -> void:
 	motion_button = _menu_button("motion_toggle", _motion_label(), Vector2(COLUMN_X, 828), Vector2(200, 44), _toggle_motion, false, 16)
@@ -128,12 +202,14 @@ func _summary_text() -> String:
 	return "暂无委托记录"
 
 func request_new() -> void:
+	if is_instance_valid(scenery_dialog): return
 	if Game.has_save() or not Game.state.is_empty():
 		_open_confirm()
 	else:
 		Game.new_game()
 
 func _open_confirm() -> void:
+	if is_instance_valid(scenery_dialog): return
 	if is_instance_valid(confirm_dialog):
 		confirm_dialog.queue_free()
 	confirm_dialog = Control.new()
@@ -174,6 +250,17 @@ func _close_confirm() -> void:
 	new_button.refresh_feedback()
 
 func _input(event: InputEvent) -> void:
+	if is_instance_valid(scenery_dialog):
+		if event.is_action_pressed("ui_cancel"):
+			get_viewport().set_input_as_handled()
+			close_scenery_picker()
+		elif event.is_action_pressed("ui_focus_next") or event.is_action_pressed("ui_focus_prev"):
+			if get_viewport().gui_get_focus_owner() == null:
+				scenery_cancel.grab_focus()
+				get_viewport().set_input_as_handled()
+		elif event is InputEventKey and not (event.is_action("ui_accept") or event.is_action("ui_left") or event.is_action("ui_right") or event.is_action("ui_up") or event.is_action("ui_down")):
+			get_viewport().set_input_as_handled()
+		return
 	if get_viewport().gui_get_focus_owner() != null: return
 	if is_instance_valid(confirm_dialog) and confirm_dialog.visible: return
 	if event.is_action_pressed("ui_focus_next"):
@@ -211,8 +298,11 @@ func _toggle_motion() -> void:
 func _motion_label() -> String:
 	return "动态效果：开" if _motion_enabled() else "动态效果：关"
 
-## 主流程 Esc 接口：先关确认弹窗，再收演练子菜单；其余情况交回全局处理。
+## 主流程 Esc 接口：先关场景选择／确认弹窗，再收演练子菜单；其余交回全局处理。
 func handle_escape() -> bool:
+	if is_instance_valid(scenery_dialog):
+		close_scenery_picker()
+		return true
 	if is_instance_valid(confirm_dialog) and confirm_dialog.visible:
 		_close_confirm()
 		return true

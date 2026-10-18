@@ -75,9 +75,10 @@ func enter(params: Dictionary) -> void:
 	shown_player_parry = model.parry
 	shown_player_pollution = model.buffs.count(model, "pollution")
 	# Retain existing HUD offsets; only the world imagery is replaced.
-	var place_asset: String = Game.place_data(battle.placeId).backgroundAssetId
+	var scenery_place_id: String = Game.training_scenery_place_id if Game.training_mode and not Game.training_scenery_place_id.is_empty() else battle.placeId
+	var place_asset: String = Game.place_data(scenery_place_id).backgroundAssetId
 	var stage_asset: String = Game.assets.get(place_asset,{}).get("battleAssetId","")
-	var old_offset: Array = Game.assets.get(stage_asset,{}).get("actorOffset",[0,0])
+	var old_offset: Array = Game.assets.get(stage_asset,{}).get("actorOffset",Game.assets.get(place_asset,{}).get("battleActorOffset",[0,0]))
 	actor_offset = ACTOR_OFFSET+Vector2(old_offset[0],old_offset[1])
 	var backdrop := rect(self,Vector2.ZERO,Vector2(1440,900),Color("07080c"))
 	backdrop.z_index = -3
@@ -86,7 +87,9 @@ func enter(params: Dictionary) -> void:
 	var enemy_visuals: Array[EnemyVisualResolver.Visual] = []
 	for enemy in model.enemies:
 		enemy_visuals.append(Game.enemy_combat_visual(enemy))
-	stage.setup(533+actor_offset.y,enemy_visuals,Game.texture(stage_asset),float(Game.assets.get(stage_asset,{}).get("groundStart",0.5)))
+	var stage_definition: Dictionary = Game.assets.get(stage_asset,{})
+	var stage_texture: Texture2D = Game.texture(stage_asset) if stage_definition.get("battleEnabled",true) else null
+	stage.setup(533+actor_offset.y,enemy_visuals,stage_texture,float(stage_definition.get("groundStart",0.5)))
 	if stage.scenery != null:
 		var shade := Gradient.new()
 		shade.offsets = PackedFloat32Array([0.0,0.25,0.38,0.66,0.88,1.0])
@@ -102,10 +105,8 @@ func enter(params: Dictionary) -> void:
 		shade_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(shade_view)
 	chrome("战斗",false)
-	label(self,battle.name,Vector2(41,112),Vector2(700,55),33)
-	label(self,"COMBAT // " + Game.place_data(battle.placeId).name,Vector2(43,166),Vector2(670,29),14,CYAN)
 	tag("演练模式 · 不影响冒险" if Game.training_mode else ("诺伦 / 形态与弹药" if model.is_noren() else "旧版测试规则"),Vector2(760,117),CYAN,310)
-	if Game.texture(Game.place_data(battle.placeId).backgroundAssetId) == null:
+	if Game.texture(place_asset) == null:
 		label(self,"场景美术待补",Vector2(43,203),Vector2(330,26),13,MUTED)
 	cut_panel(self,Vector2(596,14),Vector2(248,48),INK,Color("3d9eff"),12)
 	turn_label = label(self,"回合 %02d  /  你的回合" % model.turn,Vector2(604,20),Vector2(232,36),18,Color("8fcaff"))
@@ -163,7 +164,7 @@ func battle_background() -> bool:
 	actor_offset = ACTOR_OFFSET
 	var place_asset: String = Game.place_data(battle.placeId).backgroundAssetId
 	var stage_asset: String = Game.assets.get(place_asset,{}).get("battleAssetId","")
-	if stage_asset.is_empty() or Game.texture(stage_asset) == null:
+	if stage_asset.is_empty() or not Game.assets.get(stage_asset,{}).get("battleEnabled",true) or Game.texture(stage_asset) == null:
 		background(place_asset,0.15)
 		return false
 	var stage_offset: Array = Game.assets[stage_asset].get("actorOffset", [0,0])

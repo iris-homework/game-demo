@@ -10,7 +10,10 @@
   "alley": {
     "path": "res://assets/backgrounds/alley.png",
     "kind": "background",
-    "battleAssetId": "alley_battle"
+    "battleActorOffset": [
+      0,
+      20
+    ]
   },
   "tower": {
     "path": "res://assets/backgrounds/tower.png",
@@ -142,14 +145,6 @@
     "kind": "battle_portrait",
     "whiteKey": true
   },
-  "alley_battle": {
-    "path": "res://assets/backgrounds/alley_battle.png",
-    "kind": "battle_background",
-    "actorOffset": [
-      0,
-      20
-    ]
-  },
   "church": {
     "path": "res://assets/backgrounds/church.png",
     "kind": "background",
@@ -183,7 +178,8 @@
     "actorOffset": [
       0,
       0
-    ]
+    ],
+    "trainingSelectable": true
   },
   "hive_battle_simplified": {
     "path": "res://assets/backgrounds/battle_simplified/hive.png",
@@ -192,7 +188,8 @@
     "actorOffset": [
       0,
       40
-    ]
+    ],
+    "trainingSelectable": true
   },
   "port_battle_simplified": {
     "path": "res://assets/backgrounds/battle_simplified/port.png",
@@ -201,7 +198,8 @@
     "actorOffset": [
       0,
       0
-    ]
+    ],
+    "trainingSelectable": true
   },
   "pump_battle_simplified": {
     "path": "res://assets/backgrounds/battle_simplified/pump.png",
@@ -210,7 +208,8 @@
     "actorOffset": [
       0,
       80
-    ]
+    ],
+    "trainingSelectable": true
   },
   "junkyard_battle_simplified": {
     "path": "res://assets/backgrounds/battle_simplified/junkyard.png",
@@ -219,7 +218,8 @@
     "actorOffset": [
       0,
       0
-    ]
+    ],
+    "trainingSelectable": true
   },
   "hotel_battle_simplified": {
     "path": "res://assets/backgrounds/battle_simplified/hotel.png",
@@ -228,7 +228,8 @@
     "actorOffset": [
       0,
       0
-    ]
+    ],
+    "trainingSelectable": true
   },
   "tower_battle_simplified": {
     "path": "res://assets/backgrounds/battle_simplified/tower.png",
@@ -237,7 +238,8 @@
     "actorOffset": [
       0,
       0
-    ]
+    ],
+    "trainingSelectable": true
   },
   "block5_battle_simplified": {
     "path": "res://assets/backgrounds/battle_simplified/block5.png",
@@ -246,7 +248,8 @@
     "actorOffset": [
       0,
       0
-    ]
+    ],
+    "trainingSelectable": true
   },
   "church_battle_simplified": {
     "path": "res://assets/backgrounds/battle_simplified/church.png",
@@ -255,6 +258,7 @@
     "actorOffset": [
       0,
       0
-    ]
+    ],
+    "trainingSelectable": true
   }
 }

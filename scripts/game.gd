@@ -38,6 +38,9 @@ var transition_locked := false
 var battle_busy := false
 var training_mode := false
 var training_backup: Dictionary = {}
+# Session-only presentation preferences; neither field belongs to adventure saves.
+var b04_scenery_choice := ""
+var training_scenery_place_id := ""
 
 func read_data(path: String):
 	return JSON.parse_string(FileAccess.get_file_as_string("res://data/" + path))
@@ -624,12 +627,36 @@ func heal_at(place_id: String) -> bool:
 			return true
 	return false
 
+func training_scenery_choices() -> Array[Dictionary]:
+	var choices: Array[Dictionary] = [{"id":"", "name":"默认测试场"}]
+	for place_id in ["garden","hive","port","pump","junkyard","hotel","tower","block5","church"]:
+		var place: Dictionary = place_data(place_id)
+		var asset_id: String = assets.get(place.get("backgroundAssetId",""),{}).get("battleAssetId","")
+		var definition: Dictionary = assets.get(asset_id,{})
+		if definition.get("battleEnabled",true) and definition.get("trainingSelectable",false) and texture(asset_id) != null:
+			choices.append({"id":place_id,"name":place.name})
+	return choices
+
+func set_b04_scenery_choice(place_id: String) -> bool:
+	if training_mode or transition_locked or battle_busy: return false
+	for choice in training_scenery_choices():
+		if choice.id == place_id:
+			b04_scenery_choice = place_id
+			return true
+	return false
+
 func start_training(battle_id: String = "B12") -> void:
 	if transition_locked or battle_busy or training_mode or not battles.has(battle_id): return
 	var fresh := initial_state(player_character_id())
 	if fresh.is_empty(): return
 	fresh.deck = state.get("deck", []).duplicate()
 	training_backup = state.duplicate(true)
+	training_scenery_place_id = ""
+	if battle_id == "B04":
+		for choice in training_scenery_choices():
+			if choice.id == b04_scenery_choice:
+				training_scenery_place_id = b04_scenery_choice
+				break
 	training_mode = true
 	state = fresh
 	state.targetId = "richard"
@@ -641,6 +668,7 @@ func restore_training() -> void:
 	state = training_backup.duplicate(true)
 	training_backup.clear()
 	training_mode = false
+	training_scenery_place_id = ""
 
 func finish_training(result: String) -> void:
 	if not training_mode or result not in ["win", "lose"]: return
