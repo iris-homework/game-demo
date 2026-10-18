@@ -122,6 +122,16 @@ func verify_workspace() -> void:
 	save_key.pressed = true
 	Input.parse_input_event(save_key)
 	await settle()
+	if not bench.profiles.has_saved() or bench.profiles.is_dirty():
+		var failure_file := FileAccess.open(output + "save-failure.json", FileAccess.WRITE)
+		if failure_file != null:
+			failure_file.store_string(JSON.stringify({
+				"feedback":bench.feedback.text, "error":bench.profiles.error_message,
+				"scene":bench.profiles.current_id, "locked":bench.tools_locked(),
+				"settings":bench.settings, "saved":bench.profiles.saved,
+				"windowFocused":get_window().has_focus(),
+			}, "\t"))
+			failure_file.close()
 	verify(bench.profiles.has_saved() and not bench.profiles.is_dirty(), "Ctrl+S saves current location and clears its dirty flag")
 	var reader := Profiles.new()
 	verify(reader.initialize(bench.profile_path) and reader.current_id == "harbor", "Fresh loader reads saved current location")
@@ -209,9 +219,18 @@ func _ready() -> void:
 	# Normalize only the isolated copy, retaining all saved location parameters.
 	var qa_profile: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(bench.profile_path))
 	qa_profile.last_scene = "alley"
-	FileAccess.open(bench.profile_path, FileAccess.WRITE).store_string(JSON.stringify(qa_profile, "\t"))
+	var qa_profile_file := FileAccess.open(bench.profile_path, FileAccess.WRITE)
+	verify(qa_profile_file != null, "QA profile copy opens for startup normalization")
+	if qa_profile_file == null:
+		get_tree().quit(1)
+		return
+	qa_profile_file.store_string(JSON.stringify(qa_profile, "\t"))
+	qa_profile_file.flush()
+	verify(qa_profile_file.get_error() == OK, "QA startup profile is fully written")
+	qa_profile_file.close()
 	add_child(bench)
 	while not bench.ready_for_preview: await get_tree().process_frame
+	verify(bench.profiles.error_message.is_empty(), "QA starts from loaded profile rather than recovery catalog")
 	verify(not Game.save_enabled and Game.training_mode, "Saving disabled; memory-only training")
 	verify(Game.save_path.ends_with("battle_background_preview_unused.json"), "Accidental direct save has test-only path")
 	verify(Game.training_backup.is_empty() and Game.state.combat.enemies.size() == 1, "Adventure not loaded")
