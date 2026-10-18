@@ -52,7 +52,7 @@ const ACTOR_OFFSET := Vector2(0,24)
 const ACTOR_SCALE := 0.85
 # Additional placement belongs to the selected stage; fallback scenes retain the base.
 var actor_offset := ACTOR_OFFSET
-const HAND_SCALE := 0.75
+const HAND_SCALE := 0.90
 const CENTER_DROP_RECT := Rect2(210,90,1020,620)
 const CARD_DRAG_THRESHOLD := 12.0
 const PILE_SIZE := Vector2(46,58)
@@ -263,7 +263,7 @@ func pile_button(pos: Vector2, title: String, action: Callable) -> void:
 
 func hand_position(index: int, count: int) -> Vector2:
 	var offset := index-(count-1)/2.0
-	var spacing := minf(92.0,820.0/maxi(count-1,1))
+	var spacing := minf(110.4,820.0/maxi(count-1,1))
 	var normalized := offset/maxf((count-1)/2.0,1.0)
 	return Vector2(720+offset*spacing-90,760+normalized*normalized*minf(24.0,(count-1)*3.0))
 
