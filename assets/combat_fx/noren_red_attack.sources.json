@@ -10,19 +10,6 @@
       "sha256": "54b26d076461252bcd305e705adf4576a73c1707fc5a110ddc2e253d1451f091"
     },
     {
-      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/output/red_slash_thrust_20261018/突刺_红色.png",
-      "asset": "res://assets/combat_fx/noren_red_thrust.png",
-      "sha256": "dd9a2e732505d5cb280b5e0934a9851ce798639479e1744a7aef8c2f9d4ac071"
-    },
-    {
-      "source": "/Users/anyone/.codex/generated_images/01a14da4-600d-79e2-bc54-bea46a61e868/exec-4d5fff04-d989-4b96-84f8-ce1f70ed4447.png",
-      "asset": "res://assets/combat_fx/noren_red_thrust_triangle.png",
-      "sha256": "75597b3c234c0a7668bf7508eff4bff4e151c9278b84e7ba86427eb20f5385ad",
-      "generation": "Built-in image_gen edit of original red thrust using user screenshot as triangular silhouette reference",
-      "reference": "/Users/anyone/Desktop/截屏2026-10-18 14.00.35.png",
-      "prompt": "artifacts/qa/triangle-thrust-2026-10-18/prompt.txt"
-    },
-    {
       "source": "/Users/anyone/.codex/generated_images/01a14da4-600d-79e2-bc54-bea46a61e868/exec-e067d9f1-3a6a-4113-bae2-55041c841a7f.png",
       "asset": "res://assets/combat_fx/noren_red_thrust_triangle_light.png",
       "sha256": "ab4ae6f858a755567d3d925aa0a8e897d20e5790dc16bdee9dc1bf5608d7e9a2",
@@ -40,5 +27,27 @@
   "active": {
     "slash": "res://assets/combat_fx/noren_red_slash.png",
     "pierce": "res://assets/combat_fx/noren_red_thrust_triangle_clean.png"
+  },
+  "removedFiles": [
+    {
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/output/red_slash_thrust_20261018/突刺_红色.png",
+      "asset": "res://assets/combat_fx/noren_red_thrust.png",
+      "sha256": "dd9a2e732505d5cb280b5e0934a9851ce798639479e1744a7aef8c2f9d4ac071",
+      "removedOn": "2026-10-18",
+      "reason": "Unused intermediate texture; removed at user request"
+    },
+    {
+      "source": "/Users/anyone/.codex/generated_images/01a14da4-600d-79e2-bc54-bea46a61e868/exec-4d5fff04-d989-4b96-84f8-ce1f70ed4447.png",
+      "asset": "res://assets/combat_fx/noren_red_thrust_triangle.png",
+      "sha256": "75597b3c234c0a7668bf7508eff4bff4e151c9278b84e7ba86427eb20f5385ad",
+      "generation": "Built-in image_gen edit of original red thrust using user screenshot as triangular silhouette reference",
+      "reference": "/Users/anyone/Desktop/截屏2026-10-18 14.00.35.png",
+      "prompt": "artifacts/qa/triangle-thrust-2026-10-18/prompt.txt",
+      "removedOn": "2026-10-18",
+      "reason": "Unused intermediate texture; removed at user request"
+    }
+  ],
+  "dependencies": {
+    "pierceOpacityReference": "res://assets/combat_fx/noren_red_thrust_triangle_light.png"
   }
 }
