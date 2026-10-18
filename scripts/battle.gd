@@ -46,6 +46,8 @@ var stage: Control
 var shown_enemies: Array = []
 var shown_player_hp := -1
 var preview_attack_style := ""
+# Visual variation must not consume the global RNG used by deck shuffling.
+var melee_animation_rng := RandomNumberGenerator.new()
 const ACTOR_OFFSET := Vector2(0,24)
 const ACTOR_SCALE := 0.85
 # Additional placement belongs to the selected stage; fallback scenes retain the base.
@@ -58,6 +60,7 @@ const DRAW_POS := Vector2(30,814)
 const DISCARD_POS := Vector2(1364,814)
 
 func _ready() -> void:
+	melee_animation_rng.randomize()
 	enter({"battleId":Game.state.battleId,"eventId":Game.state.activeEventId})
 
 func enter(params: Dictionary) -> void:
@@ -441,6 +444,15 @@ func target_at_point(point: Vector2) -> int:
 				result = i
 	return result
 
+func choose_player_attack_style(definition: Dictionary, result: Dictionary) -> String:
+	# Use the stance captured at card resolution, including attack-then-shift cards.
+	if result.get("stance", "melee") == "ranged": return "shoot"
+	if Game.training_mode and not preview_attack_style.is_empty(): return preview_attack_style
+	var authored_style: String = definition.get("animation", "")
+	if not authored_style.is_empty(): return authored_style
+	if result.get("hits", []).is_empty(): return "slash"
+	return "slash" if melee_animation_rng.randi_range(0, 1) == 0 else "pierce"
+
 func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) -> void:
 	if selected_uid.is_empty() or Game.transition_locked or Game.battle_busy or is_instance_valid(pile_overlay): return
 	var uid := selected_uid
@@ -489,9 +501,8 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 	for retired_view in retired_views:
 		if retired_view.uid == uid and result.get("exhausted",false): animate_exhaust(retired_view)
 		else: animate_discard(retired_view)
-	var style: String = model.card(uid).get("animation","slash")
-	if result.get("stance", "melee") == "ranged": style = "shoot"
-	elif Game.training_mode and not preview_attack_style.is_empty(): style = preview_attack_style
+	# Choose once per committed card; all hits and targets share its attack motion.
+	var style := choose_player_attack_style(model.card(uid), result)
 	stage.player.set_combat_stance(result.get("stance", "melee"))
 	for index in model.enemies.size():
 		var target_hits: Array = result.hits.filter(func(hit): return int(hit.get("target",target)) == index)
