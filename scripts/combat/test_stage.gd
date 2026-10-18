@@ -37,8 +37,10 @@ var camera_tween: Tween
 var sound := AudioStreamPlayer.new()
 var audio_rate := 22050
 var combat_audio := preload("res://scripts/combat/combat_audio.gd").new()
+var scenery: TextureRect
+var scenery_base_rect := Rect2()
 
-func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual]) -> void:
+func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual], scenery_texture: Texture2D = null, ground_start: float = 0.5) -> void:
 	var count := enemy_visuals.size()
 	position = Vector2(0,270)
 	size = Vector2(1440,420)
@@ -47,10 +49,13 @@ func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual]) -> v
 	floor_y = feet_y-position.y
 	add_child(world)
 	focus_y = floor_y-35
-	var ground := preload("res://scripts/combat/depth_floor.gd").new()
-	ground.z_index = -2
-	ground.baseline = floor_y
-	world.add_child(ground)
+	if scenery_texture != null:
+		setup_scenery(scenery_texture,ground_start)
+	else:
+		var ground := preload("res://scripts/combat/depth_floor.gd").new()
+		ground.z_index = -2
+		ground.baseline = floor_y
+		world.add_child(ground)
 	actors_root.y_sort_enabled = true
 	world.add_child(actors_root)
 	player = Actor.new()
@@ -73,6 +78,26 @@ func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual]) -> v
 	sound.volume_db = -16
 	add_child(combat_audio)
 	_update_camera()
+
+func setup_scenery(texture: Texture2D, ground_start: float) -> void:
+	# Place the artwork horizon behind the furthest depth lane, preserving aspect ratio.
+	var ground_line := position.y+floor_y-155.0
+	var ground_uv := clampf(ground_start,0.1,0.9)
+	var image_size := texture.get_size()
+	var image_scale := maxf(1440.0/image_size.x,maxf(ground_line/(ground_uv*image_size.y),(900.0-ground_line)/((1.0-ground_uv)*image_size.y)))
+	var dimensions := image_size*image_scale
+	scenery_base_rect = Rect2(Vector2((1440.0-dimensions.x)*0.5,ground_line-ground_uv*dimensions.y),dimensions)
+	scenery = TextureRect.new()
+	scenery.name = "BattleScenery"
+	scenery.texture = texture
+	scenery.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	scenery.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	scenery.z_index = -2
+	# Full canvas sibling avoids seams at the actor stage's clipping boundaries.
+	get_parent().add_child(scenery)
+
+func _exit_tree() -> void:
+	if is_instance_valid(scenery): scenery.queue_free()
 
 func enemy_home(index: int, count: int) -> Vector2:
 	if count == 1: return Vector2(1021,floor_y-75)
@@ -116,6 +141,14 @@ func _update_camera() -> void:
 	var effective_zoom := zoom*impact_zoom
 	world.scale = Vector2.ONE*effective_zoom
 	world.position = Vector2(720-focus_x*effective_zoom,floor_y-35-focus_y*effective_zoom)+shake
+	if is_instance_valid(scenery):
+		var dimensions := scenery_base_rect.size*effective_zoom
+		var origin := position+world.position+(scenery_base_rect.position-position)*effective_zoom
+		# The illustration ends at its edges; constrain only its framing, never actors.
+		origin.x = clampf(origin.x,1440.0-dimensions.x,0.0)
+		origin.y = clampf(origin.y,900.0-dimensions.y,0.0)
+		scenery.position = origin
+		scenery.size = dimensions
 
 func set_phase(value: String) -> void:
 	phase = value

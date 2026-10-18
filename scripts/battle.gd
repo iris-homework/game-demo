@@ -86,7 +86,21 @@ func enter(params: Dictionary) -> void:
 	var enemy_visuals: Array[EnemyVisualResolver.Visual] = []
 	for enemy in model.enemies:
 		enemy_visuals.append(Game.enemy_combat_visual(enemy))
-	stage.setup(533+actor_offset.y,enemy_visuals)
+	stage.setup(533+actor_offset.y,enemy_visuals,Game.texture(stage_asset),float(Game.assets.get(stage_asset,{}).get("groundStart",0.5)))
+	if stage.scenery != null:
+		var shade := Gradient.new()
+		shade.offsets = PackedFloat32Array([0.0,0.25,0.38,0.66,0.88,1.0])
+		shade.colors = PackedColorArray([Color(0.025,0.03,0.05,0.40),Color(0.025,0.03,0.05,0.40),Color(0.025,0.03,0.05,0.04),Color(0.025,0.03,0.05,0.04),Color(0.025,0.03,0.05,0.82),Color(0.025,0.03,0.05,0.96)])
+		var shade_texture := GradientTexture2D.new()
+		shade_texture.gradient = shade
+		shade_texture.fill_from = Vector2.ZERO
+		shade_texture.fill_to = Vector2(0,1)
+		var shade_view := TextureRect.new()
+		shade_view.texture = shade_texture
+		shade_view.size = Vector2(1440,900)
+		shade_view.z_index = -2
+		shade_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(shade_view)
 	chrome("战斗",false)
 	label(self,battle.name,Vector2(41,112),Vector2(700,55),33)
 	label(self,"COMBAT // " + Game.place_data(battle.placeId).name,Vector2(43,166),Vector2(670,29),14,CYAN)

@@ -14,7 +14,8 @@
   },
   "tower": {
     "path": "res://assets/backgrounds/tower.png",
-    "kind": "background"
+    "kind": "background",
+    "battleAssetId": "tower_battle_simplified"
   },
   "noren": {
     "path": "res://assets/characters/noren.png",
@@ -34,12 +35,13 @@
   },
   "junkyard": {
     "path": "res://assets/backgrounds/junkyard.png",
-    "kind": "background"
+    "kind": "background",
+    "battleAssetId": "junkyard_battle_simplified"
   },
   "hive": {
     "path": "res://assets/backgrounds/hive.png",
     "kind": "background",
-    "battleAssetId": "hive_battle"
+    "battleAssetId": "hive_battle_simplified"
   },
   "camp": {
     "path": "",
@@ -47,7 +49,8 @@
   },
   "block5": {
     "path": "res://assets/backgrounds/block5.png",
-    "kind": "background"
+    "kind": "background",
+    "battleAssetId": "block5_battle_simplified"
   },
   "power": {
     "path": "",
@@ -56,15 +59,17 @@
   "pump": {
     "path": "res://assets/backgrounds/pump.png",
     "kind": "background",
-    "battleAssetId": "pump_battle"
+    "battleAssetId": "pump_battle_simplified"
   },
   "garden": {
     "path": "res://assets/backgrounds/garden.png",
-    "kind": "background"
+    "kind": "background",
+    "battleAssetId": "garden_battle_simplified"
   },
   "hotel": {
     "path": "res://assets/backgrounds/hotel.png",
-    "kind": "background"
+    "kind": "background",
+    "battleAssetId": "hotel_battle_simplified"
   },
   "mall": {
     "path": "",
@@ -147,11 +152,13 @@
   },
   "church": {
     "path": "res://assets/backgrounds/church.png",
-    "kind": "background"
+    "kind": "background",
+    "battleAssetId": "church_battle_simplified"
   },
   "port": {
     "path": "res://assets/backgrounds/port.png",
-    "kind": "background"
+    "kind": "background",
+    "battleAssetId": "port_battle_simplified"
   },
   "hive_battle": {
     "path": "res://assets/backgrounds/hive_battle.png",
@@ -167,6 +174,87 @@
     "actorOffset": [
       0,
       80
+    ]
+  },
+  "garden_battle_simplified": {
+    "path": "res://assets/backgrounds/battle_simplified/garden.png",
+    "kind": "battle_background",
+    "groundStart": 0.49,
+    "actorOffset": [
+      0,
+      0
+    ]
+  },
+  "hive_battle_simplified": {
+    "path": "res://assets/backgrounds/battle_simplified/hive.png",
+    "kind": "battle_background",
+    "groundStart": 0.49,
+    "actorOffset": [
+      0,
+      40
+    ]
+  },
+  "port_battle_simplified": {
+    "path": "res://assets/backgrounds/battle_simplified/port.png",
+    "kind": "battle_background",
+    "groundStart": 0.5,
+    "actorOffset": [
+      0,
+      0
+    ]
+  },
+  "pump_battle_simplified": {
+    "path": "res://assets/backgrounds/battle_simplified/pump.png",
+    "kind": "battle_background",
+    "groundStart": 0.51,
+    "actorOffset": [
+      0,
+      80
+    ]
+  },
+  "junkyard_battle_simplified": {
+    "path": "res://assets/backgrounds/battle_simplified/junkyard.png",
+    "kind": "battle_background",
+    "groundStart": 0.49,
+    "actorOffset": [
+      0,
+      0
+    ]
+  },
+  "hotel_battle_simplified": {
+    "path": "res://assets/backgrounds/battle_simplified/hotel.png",
+    "kind": "battle_background",
+    "groundStart": 0.54,
+    "actorOffset": [
+      0,
+      0
+    ]
+  },
+  "tower_battle_simplified": {
+    "path": "res://assets/backgrounds/battle_simplified/tower.png",
+    "kind": "battle_background",
+    "groundStart": 0.49,
+    "actorOffset": [
+      0,
+      0
+    ]
+  },
+  "block5_battle_simplified": {
+    "path": "res://assets/backgrounds/battle_simplified/block5.png",
+    "kind": "battle_background",
+    "groundStart": 0.56,
+    "actorOffset": [
+      0,
+      0
+    ]
+  },
+  "church_battle_simplified": {
+    "path": "res://assets/backgrounds/battle_simplified/church.png",
+    "kind": "battle_background",
+    "groundStart": 0.5,
+    "actorOffset": [
+      0,
+      0
     ]
   }
 }

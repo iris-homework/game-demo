@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-18",
+  "images": [
+    {
+      "placeAssetId": "garden",
+      "battleAssetId": "garden_battle_simplified",
+      "name": "白昼庭院",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/战斗背景_简洁重绘_2026-10-18/白昼庭院_战斗背景_简洁重绘_v1.png",
+      "sha256": "1f8af3f420a5ab3f726bf3fad0c2b13e7ad49654c6494cdd9127837b26b59515"
+    },
+    {
+      "placeAssetId": "hive",
+      "battleAssetId": "hive_battle_simplified",
+      "name": "蜂巢城寨",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/战斗背景_简洁重绘_2026-10-18/蜂巢城寨_战斗背景_简洁重绘_v1.png",
+      "sha256": "f1cb85fc64882a5106c80077be442f93d8e45fe7793753887c3d472cc30895fd"
+    },
+    {
+      "placeAssetId": "port",
+      "battleAssetId": "port_battle_simplified",
+      "name": "港口",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/战斗背景_简洁重绘_2026-10-18/港口_战斗背景_简洁重绘_v1.png",
+      "sha256": "58c3f58c85b89f0114f64621fa19d404fd6a5a51c02b4164a177b0cde03b1334"
+    },
+    {
+      "placeAssetId": "pump",
+      "battleAssetId": "pump_battle_simplified",
+      "name": "黑潮泵站",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/战斗背景_简洁重绘_2026-10-18/黑潮泵站_战斗背景_简洁重绘_v1.png",
+      "sha256": "d29c08654bc64562550c6dd652e8a9c1da90bea9332eb993ed3288347d9ddfa6"
+    },
+    {
+      "placeAssetId": "junkyard",
+      "battleAssetId": "junkyard_battle_simplified",
+      "name": "垃圾场",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/战斗背景_简洁重绘_2026-10-18/垃圾场_战斗背景_简洁重绘_v1.png",
+      "sha256": "3ac3ae11f1c7a3e5ccc4d463465a8fb878851d5548dd0efa73823bc134da3265"
+    },
+    {
+      "placeAssetId": "hotel",
+      "battleAssetId": "hotel_battle_simplified",
+      "name": "末班车旅馆",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/战斗背景_简洁重绘_2026-10-18/末班车旅馆_战斗背景_简洁重绘_v1.png",
+      "sha256": "a1d9c35cc26dd026b84cf2014a3c85e5d74489e41208a401efbe43ff477fb4fa"
+    },
+    {
+      "placeAssetId": "tower",
+      "battleAssetId": "tower_battle_simplified",
+      "name": "沃斯大楼内部",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/战斗背景_简洁重绘_2026-10-18/沃斯大楼内部_战斗背景_简洁重绘_v1.png",
+      "sha256": "6cc2819a48d17d174aeff3d0823388a9f07d6b998aaa45a0be25ceb087978ff2"
+    },
+    {
+      "placeAssetId": "block5",
+      "battleAssetId": "block5_battle_simplified",
+      "name": "五号街区",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/战斗背景_简洁重绘_2026-10-18/五号街区_战斗背景_简洁重绘_v1.png",
+      "sha256": "40a6e708516a395a8da68fbd38c49849a0952ded87d9e7da0ee45b62c9c2f814"
+    },
+    {
+      "placeAssetId": "church",
+      "battleAssetId": "church_battle_simplified",
+      "name": "义体教会",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/战斗背景_简洁重绘_2026-10-18/义体教会_战斗背景_简洁重绘_v1.png",
+      "sha256": "0d19fc07b0f900f1d8daf9ed9bc5d34c26cf5ca16820357fa4e487f75f2ce686"
+    }
+  ]
+}
