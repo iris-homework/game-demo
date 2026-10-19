@@ -1,5 +1,5 @@
 {
-  "note": "2026-10-19 proportion correction via built-in image_gen, Noren proportions; original generation preserved in sibling files and previous runtime copies in artifacts/qa/gang-proportions-2026-10-19/before. All corrected poses are RGBA including boss idle.",
+  "note": "2026-10-19 proportion correction via built-in image_gen, Noren proportions; original generation preserved in sibling files and previous runtime copies in artifacts/qa/gang-proportions-2026-10-19/before. All corrected poses are RGBA including boss idle. 2026-10-19: henchman clothing highlights darkened with built-in image_gen; proportions and layout retained. Previous sources preserved in sibling proportion-version files.",
   "files": [
     {
       "file": "gang_boss_idle.png",
@@ -71,43 +71,43 @@
     },
     {
       "file": "gang_henchman_idle.png",
-      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮小弟/01_站姿_idle_比例统一版.png",
-      "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-61fa1c2a-2df6-4b0d-a033-85645bdedd73.png",
-      "sha256": "3cbae5ca2133577517f798ca84bd9e7bf6cdcf25543bde56a16501f2022d8cf2",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮小弟/01_站姿_idle_衣服加深版.png",
+      "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-59d2b326-36b3-4460-9ca2-08d0ab9fc3bc.png",
+      "sha256": "365344bbe9be64f97b0572096967109e6c3f2d185356c48f3467f17480ae4506",
       "dimensions": [
         1346,
         1168
       ],
       "mode": "RGBA",
       "visible_bounds": [
-        442,
-        95,
+        443,
+        91,
         968,
-        1103
+        1104
       ]
     },
     {
       "file": "gang_henchman_move.png",
-      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮小弟/02_前进_advance_比例统一版.png",
-      "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-6205043f-b952-4068-88e3-3bd0ce6ce2d4.png",
-      "sha256": "40b0f4626e01b8e6ae8b9f234174017723cb14431c6ed806cf40d8c0fd7212db",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮小弟/02_前进_advance_衣服加深版.png",
+      "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-f043684f-5809-479c-be40-b50f46edd568.png",
+      "sha256": "5f96aec7732e00b69f295a990749cf0a7672fcb7b3186018c7eff0b6ab165907",
       "dimensions": [
         1346,
         1168
       ],
       "mode": "RGBA",
       "visible_bounds": [
-        376,
-        99,
-        1033,
-        1116
+        377,
+        98,
+        1035,
+        1119
       ]
     },
     {
       "file": "gang_henchman_pierce.png",
-      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮小弟/03_拳打_punch_比例统一版.png",
-      "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-87cad074-4c47-4ff4-bbfa-7bfe3626a839.png",
-      "sha256": "f7dc310b2f4289caebb9123d8ad6366018d9e31eec7e1de78e4174bebee6804a",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮小弟/03_拳打_punch_衣服加深版.png",
+      "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-3a188484-0458-4561-a4ec-4fba4eb316dc.png",
+      "sha256": "e2f7fc23300c4c6e826e7c5cbf827ee146406fd85df7564deebed59440247b63",
       "dimensions": [
         1346,
         1168
@@ -115,26 +115,26 @@
       "mode": "RGBA",
       "visible_bounds": [
         315,
-        69,
-        1261,
+        66,
+        1262,
         1111
       ]
     },
     {
       "file": "gang_henchman_damaged.png",
-      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮小弟/04_受击_hit_比例统一版.png",
-      "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-aa0d31da-c1f1-42c4-b7b4-d494d0b9f62d.png",
-      "sha256": "bb26463c85c74137afaff79c8f4bd9c63219c73a259a111c8ec0a53a98716cfd",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮小弟/04_受击_hit_衣服加深版.png",
+      "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-44d5c588-3fe8-45a2-b79a-ed056826df69.png",
+      "sha256": "d5e7d4a0d4d787e08a97100f6ceb9b166ad4ab14ee7d527c5f62a21e8db15f45",
       "dimensions": [
         1346,
         1168
       ],
       "mode": "RGBA",
       "visible_bounds": [
-        272,
-        102,
-        1173,
-        1113
+        275,
+        100,
+        1179,
+        1115
       ]
     }
   ]

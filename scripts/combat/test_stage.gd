@@ -102,8 +102,8 @@ func _exit_tree() -> void:
 func enemy_home(index: int, count: int, formation_slot: String = "") -> Vector2:
 	# Opt-in encounter slots leave every other battle's default depth lanes intact.
 	match formation_slot:
-		"triangle_left_back": return Vector2(965,floor_y-115)
-		"triangle_left_front": return Vector2(965,floor_y+45)
+		"triangle_left_back": return Vector2(965,floor_y-135)
+		"triangle_left_front": return Vector2(965,floor_y+65)
 		"triangle_right": return Vector2(1160,floor_y-35)
 	if count == 1: return Vector2(1021,floor_y-75)
 	if count == 2: return Vector2(1000+index*105,floor_y-105+index*135)

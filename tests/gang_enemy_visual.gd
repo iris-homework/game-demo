@@ -73,7 +73,7 @@ func _ready() -> void:
 		check(actor.sprite.material == null,"Corrected RGBA idle retains source alpha without white-key: "+str(i))
 		if i == 2:
 			check(not actor.white_key_poses.get("idle",false),"Corrected boss idle is transparent and disables paper removal")
-	check(stage.enemies[0].home.x == stage.enemies[1].home.x and stage.enemies[0].home.y < stage.enemies[2].home.y and stage.enemies[2].home.y < stage.enemies[1].home.y,"Henchmen share the left column and bracket the boss depth")
+	check(stage.enemies[0].home.x == stage.enemies[1].home.x and stage.enemies[1].home.y-stage.enemies[0].home.y == 200 and stage.enemies[0].home.y < stage.enemies[2].home.y and stage.enemies[2].home.y < stage.enemies[1].home.y,"Henchmen retain their aligned left column with a larger depth gap")
 	check(stage.enemies[2].home.x > stage.enemies[0].home.x,"Boss occupies the right triangle vertex")
 	check(stage.enemy_home(0,3) == Vector2(980,stage.floor_y-110),"Unconfigured three-enemy encounter retains its original layout")
 	await capture("01-idle-triangle")
