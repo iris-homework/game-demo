@@ -72,7 +72,7 @@ static func text_line(parent: Node, text: String, font: Font, font_size: int, co
 
 static func build(data: Dictionary, font: Font) -> PanelContainer:
 	var box := PanelContainer.new()
-	box.name = "EnemyIntentTooltip"
+	box.name = data.get("node_name","EnemyIntentTooltip")
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.custom_minimum_size.x = WIDTH
 	var accent: Color = data.accent
@@ -97,7 +97,7 @@ static func build(data: Dictionary, font: Font) -> PanelContainer:
 	rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	rows.add_theme_constant_override("separation",7)
 	box.add_child(rows)
-	text_line(rows,data.enemy+"  /  下次行动",font,13,Color("99aab9"))
+	text_line(rows,data.get("eyebrow",data.enemy+"  /  下次行动"),font,13,Color("99aab9"))
 	text_line(rows,data.title,bold,23,accent)
 	text_line(rows,data.value,bold,32,Color("fff5e8"))
 	if not data.unit.is_empty(): text_line(rows,data.unit,font,13,Color("b7c2ce"))
@@ -114,5 +114,5 @@ static func build(data: Dictionary, font: Font) -> PanelContainer:
 		rows.add_child(section)
 		text_line(section,note.title,bold,14,accent)
 		text_line(section,note.body,font,14,Color("bcc9d6"))
-	text_line(rows,data.footer,font,12,Color("7c90a1"))
+	if not data.footer.is_empty(): text_line(rows,data.footer,font,12,Color("7c90a1"))
 	return box

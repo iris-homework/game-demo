@@ -27,7 +27,7 @@ func update_values(health: int, maximum: int, guard: int, effects: Array) -> voi
 			var badge := Badge.new()
 			add_child(badge)
 			badge.position = Vector2(2+(i%6)*32,34+floori(i/6.0)*33)
-			badge.setup(effect.id,effect.count,Color(effect.color),effect.description)
+			badge.setup(effect.id,effect.count,Color(effect.color),effect.description,effect)
 			badges.append(badge)
 	size.y = 34+ceilf(effects.size()/6.0)*33
 	queue_redraw()

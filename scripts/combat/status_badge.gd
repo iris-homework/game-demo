@@ -4,11 +4,13 @@ var symbol := ""
 var amount := 0
 var tint := Color.WHITE
 var hovered := false
+var metadata: Dictionary = {}
 
-func setup(kind: String, count: int, color: Color, description: String) -> void:
+func setup(kind: String, count: int, color: Color, description: String, details: Dictionary = {}) -> void:
 	symbol = kind
 	amount = count
 	tint = color
+	metadata = details.duplicate(true)
 	size = Vector2(32,32)
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	tooltip_text = description
@@ -66,24 +68,16 @@ func _draw() -> void:
 	draw_string(font,at,text,HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("fff6df"))
 
 func _make_custom_tooltip(text: String) -> Object:
-	var box := PanelContainer.new()
-	box.name = "CombatStatusTooltip"
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color("101823")
-	style.border_color = tint
-	style.set_border_width_all(1)
-	style.set_corner_radius_all(6)
-	style.content_margin_left = 14
-	style.content_margin_right = 14
-	style.content_margin_top = 10
-	style.content_margin_bottom = 12
-	box.add_theme_stylebox_override("panel",style)
-	var content := Label.new()
-	content.custom_minimum_size.x = 300
-	content.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	content.add_theme_font_override("font",get_theme_font("font"))
-	content.add_theme_font_size_override("font_size",16)
-	content.add_theme_color_override("font_color",Color("f5f3eb"))
-	content.text = text
-	box.add_child(content)
-	return box
+	var lines := text.split("\n",true,1)
+	var heading := lines[0].split(" · ",true,1)
+	var category := "战斗状态"
+	match str(metadata.get("category","")):
+		"positive": category = "增益效果"
+		"negative": category = "减益效果"
+	var data := {
+		"node_name":"CombatStatusTooltip", "enemy":"", "eyebrow":"当前状态  /  "+category,
+		"title":heading[0], "value":heading[1] if heading.size()>1 else str(amount),
+		"unit":"", "accent":tint, "summary":lines[1] if lines.size()>1 else text,
+		"notes":[], "footer":""
+	}
+	return preload("res://scripts/combat/intent_tooltip.gd").build(data,get_theme_font("font"))
