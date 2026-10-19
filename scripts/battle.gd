@@ -13,6 +13,7 @@ var enemy_intents: Array[Control] = []
 var enemy_summary_plates: Array[Control] = []
 const ActorHUD = preload("res://scripts/combat/actor_hud.gd")
 const EnemyHPSummary = preload("res://scripts/combat/enemy_hp_summary.gd")
+const EnemyIntent = preload("res://scripts/combat/enemy_intent.gd")
 var player_plate: Control
 var shown_player_ammo := 0
 var shown_player_block := 0
@@ -21,7 +22,7 @@ var shown_player_pollution := 0
 var shown_player_buffs: Dictionary = {}
 var presenting_enemy_turn := false
 var presenting_player_attack := false
-const ENEMY_INTENT_SIZE := Vector2(126,28)
+const ENEMY_INTENT_SIZE := EnemyIntent.DIMENSIONS
 var aim: Node2D
 var hovered_target := -1
 var preview_selection := ""
@@ -238,15 +239,10 @@ func refresh_enemy_hud() -> void:
 		enemy_hud.add_child(plate)
 		enemy_plates.append(plate)
 		plate.update_values(int(enemy.hp),int(enemy.maxHp),int(enemy.get("block",0)),enemy_statuses(enemy))
-		var intent := Control.new()
-		intent.size = ENEMY_INTENT_SIZE
-		intent.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var intent := EnemyIntent.new()
 		enemy_hud.add_child(intent)
 		enemy_intents.append(intent)
-		panel(intent,Vector2.ZERO,ENEMY_INTENT_SIZE,Color(0.025,0.035,0.055,0.94),Color("734457"))
-		var intent_label := label(intent,"%02d  ↗ %s" % [i+1,intent_text],Vector2(5,2),Vector2(116,24),14,Color("ff9bbd"))
-		intent_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		intent_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+		intent.setup(enemy.get("intent",{}),intent_text,button_font)
 		var target := preload("res://scripts/combat/enemy_target.gd").new()
 		target.armed = not selected_uid.is_empty()
 		target.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
