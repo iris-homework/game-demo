@@ -22,7 +22,7 @@ func on_phase(value: String) -> void:
 	check(Game.battle_busy,"Death burst keeps combat locked")
 	var effects := get_tree().get_nodes_in_group("fish_death_burst_fx")
 	check(effects.size() == 1,"Exactly one full-body death burst")
-	check(view.shown_player_pollution >= 5,"Death pollution already displayed once before burst")
+	check(view.shown_player_pollution >= 3,"Death pollution already displayed once before burst")
 	var snapshot: Dictionary = view.model.snapshot()
 	if scenario in ["melee","ranged"]:
 		await get_tree().create_timer(0.10).timeout
@@ -58,7 +58,7 @@ func verify_retired() -> void:
 	await shot(scenario+"-03-complete")
 
 func _ready() -> void:
-	output = "res://artifacts/qa/fish-death-burst-2026-10-17/"+("headless/" if DisplayServer.get_name() == "headless" else "render/")
+	output = "res://artifacts/qa/enemy-round-death-2026-10-19/fish-death-burst/"+("headless/" if DisplayServer.get_name() == "headless" else "render/")
 	DirAccess.make_dir_recursive_absolute(output)
 	Game.save_enabled = false
 	Game.save_path = "user://fish_death_burst_unused.json"
@@ -78,7 +78,7 @@ func _ready() -> void:
 		sync_view()
 		app.view.select_card("card_000")
 		await app.view.play_selected(0)
-		check(app.view.shown_player_pollution == 5 and spit_count == 0,"Death adds five stacks without a mouth-to-player spit")
+		check(app.view.shown_player_pollution == 3 and spit_count == 0,"Death adds three stacks without a mouth-to-player spit")
 		await verify_retired()
 	# Restored dead snapshots do not replay the death burst.
 	var saved: Dictionary = app.view.model.snapshot()
@@ -92,7 +92,7 @@ func _ready() -> void:
 	app.view.model.parry = 2
 	sync_view()
 	await app.view.end_turn_pressed()
-	check(app.view.shown_player_pollution == 8 and spit_count == 1,"Parry death adds five; surviving fish still spits three")
+	check(app.view.shown_player_pollution == 6 and spit_count == 1,"Parry death adds three; surviving fish still spits three")
 	await verify_retired()
 	await prepare_case("status")
 	app.view.model.enemies[0].hp = 1
@@ -100,7 +100,7 @@ func _ready() -> void:
 	app.view.model.buffs.apply(app.view.model,"pollution",1,0)
 	sync_view()
 	await app.view.end_turn_pressed()
-	check(app.view.shown_player_pollution == 8 and spit_count == 1,"Status death adds five; surviving fish still spits three")
+	check(app.view.shown_player_pollution == 6 and spit_count == 1,"Status death adds three; surviving fish still spits three")
 	await verify_retired()
 	# The last enemy's burst must complete before training exits.
 	await prepare_case("last-enemy")

@@ -30,6 +30,13 @@ func fixture(ids: Array = [1], form: String = "melee", count: int = 1) -> Combat
 		m.hand.append(uid)
 	return m
 
+func four_hit_fixture(form: String = "melee") -> CombatModel:
+	var m:=fixture([35],form)
+	m.card_catalog.noren_35.effects=[{"type":"damage","amount":1,"hits":4}]
+	m.card_catalog.noren_35.cardText="造成1点伤害，共4次。"
+	m.card_catalog.noren_35.description=m.card_catalog.noren_35.cardText
+	return m
+
 func preview_text(m: CombatModel, target: int = 0, extra: int = -1, uid: String = "card_000") -> String:
 	var before := m.snapshot()
 	var result: Dictionary = m.card_preview(uid, target, extra)
@@ -88,22 +95,22 @@ func test_numeric_effects() -> void:
 	m.stance = "ranged"
 	contains(preview_text(m), "造成9点伤害。", "Ranged 1.5 multiplier")
 	m = fixture([35], "ranged")
-	contains(preview_text(m), "造成5×2点伤害。", "Round each 3 * 1.5 segment, not total")
+	contains(preview_text(m), "造成3×3点伤害。", "Round each 3 * 1.5 segment, not total")
 	m.next_attack_bonus = 2
 	m.turn_damage_bonus = 4
-	contains(preview_text(m), "造成14＋5点伤害。", "Technology and next damage apply only to first segment")
+	contains(preview_text(m), "造成12＋3＋3点伤害。", "Technology and next damage apply only to first segment")
 	m.enemies[0].block = 999
 	m.enemies[0].hp = 1
-	contains(preview_text(m), "造成14＋5点伤害。", "Neither block nor remaining HP truncates displayed attacks")
+	contains(preview_text(m), "造成12＋3＋3点伤害。", "Neither block nor remaining HP truncates displayed attacks")
 	m = fixture([35], "ranged")
 	m.powers = ["high_pressure"]
-	contains(preview_text(m), "造成9＋5点伤害。", "Unused pressure boosts first segment only")
+	contains(preview_text(m), "造成8＋3＋3点伤害。", "Unused pressure boosts first segment only")
 	m.pressure_used = true
-	contains(preview_text(m), "造成5×2点伤害。", "Used pressure does not boost again")
+	contains(preview_text(m), "造成3×3点伤害。", "Used pressure does not boost again")
 	m.stance = "melee"
 	m.pressure_used = false
-	contains(preview_text(m), "造成3×2点伤害。", "Pressure does not boost melee")
-	m = fixture([36], "ranged")
+	contains(preview_text(m), "造成2×3点伤害。", "Pressure does not boost melee")
+	m = four_hit_fixture( "ranged")
 	m.enemies[0].bleed = 5
 	var text := preview_text(m)
 	contains(text, "造成2×4点伤害。", "Four individually rounded shots")
@@ -117,59 +124,79 @@ func test_numeric_effects() -> void:
 	check(not "裂伤追加" in text, "New bleed is not retroactively used by this card's attack")
 	m = fixture([30])
 	m.powers = ["dissection"]
-	contains(preview_text(m), "施加3层裂伤。", "Dissection adds to unwounded melee application")
+	contains(preview_text(m), "施加4层裂伤。", "Dissection adds to unwounded melee application")
 	m.enemies[0].bleed = 1
-	contains(preview_text(m), "施加5层裂伤。", "Wounded deepening then dissection")
+	contains(preview_text(m), "施加7层裂伤。", "Wounded deepening then dissection")
 	m.dissection_used = true
-	contains(preview_text(m), "施加4层裂伤。", "Used dissection does not add a layer")
+	contains(preview_text(m), "施加6层裂伤。", "Used dissection does not add a layer")
 	m.stance = "ranged"
 	m.dissection_used = false
-	contains(preview_text(m), "施加1层裂伤。", "Ranged deepening has no wounded melee or dissection bonus")
+	contains(preview_text(m), "施加2层裂伤。", "Ranged deepening has no wounded melee or dissection bonus")
 	m = fixture([6])
-	m.ammo = 5
+	m.ammo = 9
 	contains(preview_text(m), "获得1弹药。", "Ammo gain limited by remaining capacity")
-	m.ammo = 6
+	m.ammo = 10
 	contains(preview_text(m), "获得0弹药。", "Full ammo gives zero actual gain")
 	m = fixture([17])
-	m.ammo = 5
+	m.ammo = 9
 	text = preview_text(m)
 	contains(text, "回弹1。", "Melee automatic ammo precedes extra gain")
 	contains(text, "获得0弹药。", "Extra card ammo sees capacity after automatic ammo")
-	m.ammo = 4
+	m.ammo = 8
 	contains(preview_text(m), "获得1弹药。", "Extra card ammo partially fits after automatic ammo")
-	m.ammo = 6
+	m.ammo = 10
 	contains(preview_text(m), "回弹0。", "Automatic ammo capped too")
-	for number in [31, 32, 33]:
-		for layers in range(3):
+	for number in [28,35]:
+		m=fixture([number]);m.ammo=0
+		contains(preview_text(m),"回弹%d。" % (3 if number==35 else 2),"Preview counts melee attack segments")
+	m=four_hit_fixture();m.ammo=8
+	contains(preview_text(m),"回弹2。","Per-hit ammo preview respects ten-cap")
+	m=four_hit_fixture();m.ammo=0;m.enemies[0].hp=2
+	contains(preview_text(m),"回弹2。","Melee ammo preview stops at lethal segment")
+	m.enemies[0].block=2
+	contains(preview_text(m),"回弹4。","Blocked segments count before lethal damage")
+	m=fixture([38],"melee",3);m.ammo=0
+	contains(preview_text(m,-1),"回弹1。","AoE ammo preview counts shared segment once")
+	m.card_catalog.noren_38.effects=[{"type":"damage","amount":1,"hits":4}]
+	m.enemies[0].hp=1;m.enemies[1].hp=3
+	contains(preview_text(m,-1),"回弹4。","AoE ammo preview considers all targets even if one dies early")
+	m=fixture([1]);m.ammo=0
+	m.card_catalog.noren_01.effects=[{"type":"damage","amount":1},{"type":"damage","amount":1}]
+	m.enemies[0].hp=1
+	contains(preview_text(m),"回弹1。","Separate damage effects stop ammo on an already dead target")
+	m=fixture([35],"ranged");m.buffs.apply(m,"next_hit_damage",6);m.turn_damage_bonus=4
+	contains(preview_text(m),"造成18＋12＋12点伤害。","Every-hit and first-hit preview bonuses compose")
+	m.powers=["ranged_mastery"]
+	contains(preview_text(m),"造成24＋16＋16点伤害。","Mastery multiplier applies after all base bonuses")
+	m=fixture([35],"ranged");m.powers=["persistent_bleed"];m.enemies[0].bleed=5
+	contains(preview_text(m),"裂伤追加5×3点伤害。","Persistent bleed preview does not decay layers")
+	m=fixture([37]);m.powers=["persistent_bleed"];m.enemies[0].bleed=5
+	contains(preview_text(m),"裂伤追加5×2点伤害。","Melee Hunt explicitly triggers two persistent ticks")
+	for number in [3, 31, 32, 33]:
+		for layers in range(4):
 			m = fixture([number])
 			m.parry = layers
-			var gained := (1 if layers == 0 else 0) if number == 31 else ((1 if layers < 2 else 0) if number == 32 else 2 - layers)
+			var gained := mini(1,3-layers) if number == 3 else ((1 if layers == 0 else 0) if number == 31 else ((1 if layers < 2 else 0) if number == 32 else mini(1,3-layers)))
 			contains(preview_text(m), "获得%d层弹反。" % gained, "Parry card %d at %d layers" % [number, layers])
 	m = fixture([39], "melee", 3)
-	m.enemies[0].bleed = 3
-	m.enemies[1].bleed = 4
+	m.enemies[0].bleed = 2
+	m.enemies[1].bleed = 3
 	m.enemies[2].bleed = 8
 	m.enemies[2].hp = 0
-	contains(preview_text(m, 0), "获得0点格挡。", "Conditional block excludes three bleed")
-	contains(preview_text(m, 1), "获得4点格挡。", "Conditional block includes four bleed")
-	contains(preview_text(m, -1), "获得0–4点格挡。", "Untargeted conditional block gives live target range")
+	contains(preview_text(m, 0), "抽0张牌。", "Conditional third draw excludes two bleed")
+	contains(preview_text(m, 1), "抽1张牌。", "Conditional third draw includes three bleed")
+	contains(preview_text(m, -1), "抽0–1张牌。", "Untargeted third draw gives live target range")
 	m = fixture([20], "ranged")
-	m.ammo = 6
-	text = preview_text(m)
-	contains(text, "造成15–27点伤害。", "Unselected extra ammo gives full damage range")
-	contains(text, "耗弹1–3。", "Unselected ammo total includes ordinary shot")
-	contains(text, "可选额外耗弹0–2。", "Extra ammo maximum shown")
-	for extra in range(3):
-		text = preview_text(m, 0, extra)
-		contains(text, "造成%d点伤害。" % (15 + 6 * extra), "Explicit extra ammo %d damage" % extra)
-		contains(text, "耗弹%d。" % (extra + 1), "Explicit extra ammo %d total" % extra)
-		check(not "可选额外" in text, "Explicit selection removes unselected range")
-	m.ammo = 2
-	contains(preview_text(m), "造成15–21点伤害。", "Extra ammo range respects actual ammo")
-	m.ammo = 1
-	contains(preview_text(m), "造成15点伤害。", "Only mandatory ammo leaves no extra bonus")
+	for bullets in [1,2,3,10]:
+		m.ammo=bullets
+		text=preview_text(m)
+		contains(text,"造成14×%d点伤害。" % (bullets+1),"Barrage preview adds base segment to every bullet")
+		contains(text,"耗弹%d。" % bullets,"Barrage preview consumes all bullets")
+		check(not "可选额外" in text,"Barrage has no optional ammo choice")
 	m = fixture([26], "ranged")
-	contains(preview_text(m, 0, 1), "造成39点伤害。", "Finisher explicit extra bullet")
+	contains(preview_text(m),"造成66点伤害。","Finisher previews new base and ranged bonus")
+	m.powers=["ranged_mastery"]
+	contains(preview_text(m),"造成88点伤害。","Mastery changes Finisher multiplier to two")
 	m = fixture([21], "ranged")
 	m.ammo = 1
 	contains(preview_text(m), "造成15点伤害。", "Last bullet uses prepayment ammo")
@@ -185,10 +212,10 @@ func test_numeric_effects() -> void:
 	m = fixture([37], "ranged", 2)
 	m.enemies[0].bleed = 4
 	m.enemies[1].bleed = 5
-	contains(preview_text(m, 0), "造成6点伤害。", "Hunt excludes four starting bleed")
-	contains(preview_text(m, 1), "造成6×2点伤害。", "Hunt uses starting bleed for extra hit")
+	contains(preview_text(m, 0), "造成8点伤害。", "Hunt uses one ranged attack body")
+	contains(preview_text(m, 1), "造成8点伤害。", "Hunt never gains an extra body hit")
 	contains(preview_text(m, 1), "裂伤追加5＋4点伤害。", "Hunt extra hit consumes next bleed amount")
-	contains(preview_text(m, -1), "造成6–12（1–2段）点伤害。", "Varying hit counts display total and hit range")
+	contains(preview_text(m, -1), "裂伤追加4–5＋3–4点伤害。", "Untargeted Hunt shows two bleed tick ranges")
 	m = fixture([38], "ranged", 3)
 	m.next_attack_bonus = 2
 	m.enemies[0].bleed = 5
@@ -198,7 +225,7 @@ func test_numeric_effects() -> void:
 	text = preview_text(m, -1)
 	contains(text, "对每名敌人造成9点伤害。", "AoE first segment bonus applies to each live target")
 	contains(text, "裂伤追加2–5点伤害。", "AoE bleed range excludes dead targets")
-	contains(text, "对每名敌人施加1层裂伤。", "AoE ranged new bleed applied after attacks")
+	contains(text, "对每名敌人施加2层裂伤。", "AoE ranged new bleed applied after attacks")
 	m = fixture([11])
 	text = preview_text(m)
 	contains(text, "获得1弹药。", "Melee stance-specific ammo shown")
@@ -210,7 +237,13 @@ func test_numeric_effects() -> void:
 	m.enemies[0].weak = 999
 	contains(preview_text(m), "施加0层虚弱。", "Weak cap displayed as actual zero gain")
 	m = fixture([3], "ranged")
-	contains(preview_text(m), "切换至近战。抽1张牌。", "Stance entry draw shown")
+	contains(preview_text(m), "切换至近战。抽2张牌。", "Stance entry draws two in preview")
+	contains(preview_text(m), "获得1层弹反。", "Close In previews parry")
+	for available in [0,1]:
+		var limited := fixture([3], "ranged")
+		limited.draw_pile.resize(available)
+		limited.discard_pile.clear()
+		contains(preview_text(limited), "切换至近战。抽%d张牌。" % available, "Melee entry preview respects available cards")
 	m.stance = "melee"
 	contains(preview_text(m), "保持当前形态。", "Same stance does not promise entry reward")
 	m = fixture([7])
@@ -285,10 +318,10 @@ func test_potential_status_and_conditional_wording() -> void:
 			m.enemies[0].bleed = starting_bleed
 			var before := m.snapshot()
 			var preview := m.card_preview("card_000", 0)
-			var base := 2 if used else 3
-			var wounded := 4 if used else 5
+			var base := 3 if used else 4
+			var wounded := 6 if used else 7
 			var expected := "对一名敌人施加%d层裂伤。近身技：若目标在本牌使用前已有裂伤，改为施加%d层裂伤。" % [base, wounded]
-			check(preview.cardText == expected, "Deepening retains separate base and wounded branch values")
+			check(preview.cardText.replace("\n","").replace(" ","") == expected, "Deepening retains separate base and wounded branch values: "+preview.cardText)
 			check(str(preview.description).replace(" ", "") == expected, "Deepening tooltip retains separate branch values")
 			check(m.snapshot() == before, "Deepening branch preview preserves live snapshot")
 		var ranged := fixture([30], "ranged")
@@ -296,8 +329,8 @@ func test_potential_status_and_conditional_wording() -> void:
 		ranged.enemies[0].bleed = starting_bleed
 		var before := ranged.snapshot()
 		var preview := ranged.card_preview("card_000", 0)
-		var expected := "对一名敌人施加1层裂伤。近身技：若目标在本牌使用前已有裂伤，改为施加4层裂伤。"
-		check(preview.cardText == expected, "Ranged deepening halves active base and preserves inactive melee wording")
+		var expected := "对一名敌人施加2层裂伤。近身技：若目标在本牌使用前已有裂伤，改为施加6层裂伤。"
+		check(preview.cardText.replace("\n","").replace(" ","") == expected, "Ranged deepening halves active base and preserves inactive melee wording: "+preview.cardText)
 		check(str(preview.description).replace(" ", "") == expected, "Ranged deepening tooltip preserves inactive melee branch")
 		check(ranged.snapshot() == before, "Ranged deepening preview preserves live snapshot")
 
@@ -313,15 +346,15 @@ func _ready() -> void:
 	check(m.card_preview("card_000").cardText == "造成8点伤害。", "Basic attack gains damage but no implicit ammo line")
 	m = fixture([39], "melee", 2)
 	m.enemies[1].bleed = 4
-	check(m.card_preview("card_000", 0).cardText.ends_with("获得0点格挡。"), "Existing conditional block value updates")
-	check(m.card_preview("card_000", 1).cardText.ends_with("获得4点格挡。"), "Existing block uses applicable effect value")
+	check(m.card_preview("card_000", 0).cardText.replace(" ","").ends_with("额外抽0张牌。"), "Conditional third draw becomes zero below threshold: "+m.card_preview("card_000",0).cardText)
+	check(m.card_preview("card_000", 1).cardText.replace(" ","").ends_with("额外抽1张牌。"), "Conditional third draw stays one above threshold: "+m.card_preview("card_000",1).cardText)
 	m = fixture([6])
-	m.ammo = 5
+	m.ammo = 9
 	check(m.card_preview("card_000").cardText == "获得1颗弹药和4点格挡。", "Only authored ammo and block numbers update")
 	m = fixture([8])
 	check(m.card_preview("card_000").cardText == m.card("card_000").cardText, "Stance card gets no implicit draw or discount text")
 	m = fixture([33])
 	m.parry = 1
-	check(m.card_preview("card_000").cardText.contains("补至2层"), "Fill target stays a total rather than becoming an increment")
+	check(m.card_preview("card_000").cardText.replace(" ","").contains("1层弹反"), "New Counter Stance previews one gained charge: "+m.card_preview("card_000").cardText)
 	print("COMBAT PREVIEW: %d checks, %d failures" % [checks, failures.size()])
 	get_tree().quit(0 if failures.is_empty() else 1)

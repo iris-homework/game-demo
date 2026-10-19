@@ -186,7 +186,7 @@ func test_playback_lifecycle() -> void:
 			if sample >= 32767: clipped += 1
 		check(peak > 100,"Actual device mix contains non-silent samples")
 		check(clipped == 0,"Concurrent cues and impact produce no full-scale clipped samples")
-		var output := "res://artifacts/qa/combat-audio-2026-10-17/preview/output.wav"
+		var output := "res://artifacts/qa/noren-consolidation-2026-10-19/combat-audio/output.wav"
 		DirAccess.make_dir_recursive_absolute(output.get_base_dir())
 		check(capture.save_to_wav(output) == OK,"Actual mix capture is saved")
 		print("AUDIO MIX driver=%s peak=%d clipped=%d seconds=%.3f path=%s" % [AudioServer.get_driver_name(),peak,clipped,capture.get_length(),output])

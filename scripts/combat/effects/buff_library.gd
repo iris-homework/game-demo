@@ -49,6 +49,7 @@ func catalog_errors(rows) -> PackedStringArray:
 			if not _valid_count(entry.minStacks, -1, -999) or entry.minStacks > entry.get("maxStacks", 0): errors.append(entry.id + ": invalid minimum")
 			elif entry.minStacks < 0 and entry.handler != "strength": errors.append(entry.id + ": signed stacks require strength handler")
 		if entry.has("consumeOnAttack") and not entry.consumeOnAttack is bool: errors.append(entry.id + ": invalid consumption flag")
+		if entry.has("everyHit") and (not entry.everyHit is bool or entry.handler != "attack_bonus"): errors.append(entry.id + ": invalid every-hit modifier")
 	return errors
 
 func definition(id: String) -> Dictionary:
@@ -117,10 +118,11 @@ func apply(model, id: String, amount: int = 1, enemy_index: int = -1, context: D
 	var value := current + amount
 	if context.get("fill", false): value = maxi(current, amount)
 	elif entry.stacking == "guarded_add":
-		# Preserve the original pre-add guard (not a post-add clamp).
-		if current >= int(context.get("cap", entry.get("maxStacks", 2))): return true
+		# Keep each card's pre-add condition; parry also has a global cap below.
+		if current >= int(context.get("cap", entry.get("maxStacks", 3))): return true
 	elif entry.stacking in ["unique", "flag"]: value = 1
 	elif entry.has("maxStacks"): value = mini(int(entry.maxStacks), value)
+	if entry.id == "parry": value = mini(int(entry.get("maxStacks", 3)), value)
 	value = maxi(int(entry.get("minStacks", 0)), value)
 	_write_count(model, id, value, enemy_index)
 	return true
@@ -172,20 +174,28 @@ func attack_discount(model) -> int:
 func begin_attack(model, form: String) -> int:
 	var bonus := 0
 	for entry in _definitions().values():
-		if entry.handler == "attack_bonus": bonus += count(model, entry.id)
+		if entry.handler == "attack_bonus" and not entry.get("everyHit", false): bonus += count(model, entry.id)
 		if entry.get("consumeOnAttack", false): clear(model, entry.id)
 	if form == "ranged" and count(model, "high_pressure") > 0 and not model.pressure_used:
 		bonus += 3
 		model.pressure_used = true
 	return bonus
 
-func after_attack_hit(model, index: int, form: String, hit: Dictionary) -> void:
+func attack_segment_bonus(model) -> int:
+	var bonus := 0
+	for entry in _definitions().values():
+		if entry.handler == "attack_bonus" and entry.get("everyHit", false): bonus += count(model,entry.id)
+	return bonus
+
+func after_attack_hit(model, index: int, form: String, hit: Dictionary, triggers: int = -1) -> void:
 	hit.attackDamage = hit.damage
 	hit.bleedDamage = 0
-	if form == "ranged" and model.enemies[index].hp > 0 and count(model, "bleed", index) > 0:
+	var times := triggers if triggers >= 0 else (1 if form == "ranged" else 0)
+	for tick in times:
+		if model.enemies[index].hp <= 0 or count(model,"bleed",index) <= 0: break
 		var bleeding: Dictionary = model.enemy_damage(index, count(model, "bleed", index))
-		_write_count(model, "bleed", count(model, "bleed", index) - 1, index)
-		hit.bleedDamage = bleeding.damage
+		if count(model,"persistent_bleed") == 0: _write_count(model, "bleed", count(model, "bleed", index) - 1, index)
+		hit.bleedDamage += bleeding.damage
 		hit.damage += bleeding.damage
 		hit.blocked += bleeding.blocked
 		hit.hpAfter = bleeding.hpAfter
@@ -206,14 +216,12 @@ func incoming_damage(model, amount: int, enemy_index: int = -1) -> int:
 func after_enemy_attack(model, index: int, total: int) -> Array:
 	var counters: Array = []
 	var layers := count(model, "parry")
-	if layers > 0:
-		for layer in layers:
-			if model.enemies[index].hp <= 0: break
-			var counter: Dictionary = model.enemy_damage(index, roundi(total * 0.25))
-			# Raw parry application bypasses ranged halving and Dissection.
-			apply(model, "bleed", 1, index)
-			counter.bleedAfter = count(model, "bleed", index)
-			counters.append(counter)
+	if layers > 0 and model.enemies[index].hp > 0:
+		var counter: Dictionary = model.enemy_damage(index, roundi(total * 0.5))
+		model.gain_ammo(1)
+		counter.ammoAfter = model.ammo
+		counter.bleedAfter = count(model, "bleed", index)
+		counters.append(counter)
 		_write_count(model, "parry", layers - 1)
 	return counters
 

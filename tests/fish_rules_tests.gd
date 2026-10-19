@@ -41,7 +41,7 @@ func test_catalog_and_cycles() -> void:
 		var enemy: Dictionary = m.enemies[index]
 		check(enemy.hp == 30 and enemy.maxHp == 30, "Fish %d starts at 30 HP" % index)
 		check(enemy.get("combatVisualId", "") == "fish", "Fish %d shares fish visual" % index)
-		check(enemy.get("deathPollution", 0) == 5, "Fish %d has five-stack death pollution" % index)
+		check(enemy.get("deathPollution", 0) == 3, "Fish %d has three-stack death pollution" % index)
 		check(enemy.get("attackPollution", 0) == 2, "Fish %d has two-stack contact pollution" % index)
 		check(enemy.intentSequence.size() == 3, "Fish %d has exactly three intents" % index)
 	# Seven actual end-turn transitions exercise both full cycles and wrap again.
@@ -171,16 +171,16 @@ func test_death_pollution() -> void:
 	var hit := m.enemy_damage(0, 29)
 	check(hit.deathPollution == 0 and m.buffs.count(m, "pollution") == 0, "Nonlethal damage does not trigger death trait")
 	hit = m.enemy_damage(0, 1)
-	check(hit.deathPollution == 5 and hit.playerPollutionAfter == 5, "Lethal hit records five pollution")
+	check(hit.deathPollution == 3 and hit.playerPollutionAfter == 3, "Lethal hit records three pollution")
 	check(m.block == 99 and m.player_hp == 100, "Death applies stacks without consuming block or dealing immediate damage")
 	m.enemy_damage(0, 99)
-	check(m.buffs.count(m, "pollution") == 5, "Repeated damage to dead fish never reapplies death trait")
+	check(m.buffs.count(m, "pollution") == 3, "Repeated damage to dead fish never reapplies death trait")
 	var restored := CombatModel.new()
 	restored.restore(json_snapshot(m))
 	restored.enemy_damage(0, 99)
-	check(restored.buffs.count(restored, "pollution") == 5, "Restored dead fish never reapplies death trait")
+	check(restored.buffs.count(restored, "pollution") == 3, "Restored dead fish never reapplies death trait")
 	restored.enemy_damage(1, 30)
-	check(restored.buffs.count(restored, "pollution") == 10, "Second fish has independent death trigger after restore")
+	check(restored.buffs.count(restored, "pollution") == 6, "Second fish has independent death trigger after restore")
 	m = fish_fixture()
 	m.enemies[0].block = 30
 	hit = m.enemy_damage(0, 30)
@@ -191,46 +191,47 @@ func test_death_pollution() -> void:
 	m = fish_fixture()
 	m.enemies[0].hp = 6
 	var result := fixtures.play(m)
-	check(result.hits[0].deathPollution == 5 and m.buffs.count(m, "pollution") == 5, "Card kill carries death effect to animation")
+	check(result.hits[0].deathPollution == 3 and m.buffs.count(m, "pollution") == 3, "Card kill carries death effect to animation")
 	m = fish_fixture()
 	m.stance = "ranged"
 	m.enemies[0].hp = 10
 	m.enemies[0].bleed = 2
 	result = fixtures.play(m)
 	check(result.hits[0].attackDamage == 9 and result.hits[0].bleedDamage == 1 and result.hits[0].killed, "Ranged bleed can deliver lethal damage")
-	check(result.hits[0].deathPollution == 5 and result.hits[0].playerPollutionAfter == 5, "Merged bleed hit retains death effect and chronological layers")
+	check(result.hits[0].deathPollution == 3 and result.hits[0].playerPollutionAfter == 3, "Merged bleed hit retains death effect and chronological layers")
 	m = fish_fixture()
 	m.instances["card_000"] = "noren_38"
 	for enemy in m.enemies: enemy.hp = 4
 	result = fixtures.play(m)
-	check(result.outcome == "win" and m.buffs.count(m, "pollution") == 10, "AoE killing both fish applies ten before victory")
-	check(result.hits.map(func(h): return h.playerPollutionAfter) == [5, 10], "AoE death effects preserve per-target order")
+	check(result.outcome == "win" and m.buffs.count(m, "pollution") == 6, "AoE killing both fish applies six before victory")
+	check(result.hits.map(func(h): return h.playerPollutionAfter) == [3, 6], "AoE death effects preserve per-target order")
 	m = fish_fixture(["fish"])
-	m.instances["card_000"] = "noren_36"
+	m.instances["card_000"] = "noren_35"
 	m.stance = "ranged"
 	m.enemies[0].hp = 1
 	result = fixtures.play(m)
-	check(m.buffs.count(m, "pollution") == 5, "Multi-hit lethal card triggers once")
+	check(m.buffs.count(m, "pollution") == 3, "Three-hit lethal card triggers death pollution once")
+	check(result.hits.size() == 1 and result.hits[0].deathPollution == 3 and m.ammo == 1, "Lethal first shot skips remaining shots and spends normal ammo once")
 	m = fish_fixture(["fish"])
 	m.enemies[0].hp = 1
 	m.parry = 2
 	result = m.end_turn()
 	check(result.outcome == "win" and result.attacks[0].counters.size() == 1, "Lethal parry stops remaining counters")
-	check(m.buffs.count(m, "pollution") == 7 and result.attacks[0].counters[0].playerPollutionAfter == 7, "Parry death adds five after two attack-contact stacks")
+	check(m.buffs.count(m, "pollution") == 5 and result.attacks[0].counters[0].playerPollutionAfter == 5, "Parry death adds three after two attack-contact stacks")
 	m = fish_fixture(["fish_second"])
 	m.enemies[0].hp = 1
 	m.buffs.apply(m, "pollution", 1, 0)
 	result = m.end_turn()
 	var tick: Dictionary = events(result, "status_tick")[0]
-	check(result.outcome == "win" and m.buffs.count(m, "pollution") == 8, "Enemy pollution death adds five after its pollution intent")
-	check(tick.deathPollution == 5 and tick.playerPollutionAfter == 8, "Status death event retains passive presentation data")
+	check(result.outcome == "win" and m.buffs.count(m, "pollution") == 6, "Enemy pollution death adds three after its pollution intent")
+	check(tick.deathPollution == 3 and tick.playerPollutionAfter == 6, "Status death event retains passive presentation data")
 	m = fish_fixture()
 	m.enemy_damage(0, 30)
-	m.block = 3
+	m.block = 1
 	result = m.end_turn()
 	tick = events(result, "status_tick")[0]
-	check(tick.damage == 2 and tick.blocked == 3 and tick.stacksAfter == 4, "Death pollution ticks normally through block then decays")
-	check(m.buffs.count(m, "pollution") == 7, "Surviving second fish adds its normal three after tick")
+	check(tick.damage == 2 and tick.blocked == 1 and tick.stacksAfter == 2, "Death pollution ticks normally through block then decays")
+	check(m.buffs.count(m, "pollution") == 5, "Surviving second fish adds its normal three after tick")
 
 func test_snapshot_and_training() -> void:
 	var m := fish_fixture()
@@ -274,6 +275,20 @@ func test_snapshot_and_training() -> void:
 	check(restored.player_hp == 99 and restored.buffs.count(restored, "pollution") == 0, "Old fish snapshot without contact trait keeps old attack")
 	restored.enemy_damage(0, 99)
 	check(restored.buffs.count(restored, "pollution") == 0, "Old frozen fish without death trait keeps old death behavior")
+	# An already-running battle retains its explicitly frozen five-stack death trait.
+	var old_death := json_snapshot(fish_fixture())
+	for enemy in old_death.enemies: enemy.deathPollution = 5
+	old_death = JSON.parse_string(JSON.stringify(old_death))
+	check(Game.valid_combat(old_death), "Old explicit five-stack death traits remain valid")
+	restored = CombatModel.new()
+	restored.restore(old_death)
+	check(json_snapshot(restored) == old_death and restored.enemies.all(func(enemy): return enemy.deathPollution == 5), "Restore keeps explicit old death pollution instead of replacing it with current three")
+	var old_hit := restored.enemy_damage(0, 30)
+	check(old_hit.deathPollution == 5 and old_hit.playerPollutionAfter == 5, "Old frozen first fish still adds five death stacks")
+	old_hit = restored.enemy_damage(1, 30)
+	check(old_hit.deathPollution == 5 and old_hit.playerPollutionAfter == 10, "Old frozen second fish independently brings total to ten")
+	restored.enemy_damage(0, 99)
+	check(restored.buffs.count(restored, "pollution") == 10 and Game.enemy_catalog.fish.deathPollution == 3 and Game.enemy_catalog.fish_second.deathPollution == 3, "Repeated old death is ignored and current three-stack catalog stays unchanged")
 	Game.state = Game.initial_state()
 	Game.state.battleId = "B11"
 	Game.initialize_combat()

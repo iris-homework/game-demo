@@ -26,6 +26,14 @@ func saved(m: CombatModel) -> Dictionary:
 func events(result: Dictionary, kind: String) -> Array:
 	return result.turnEvents.filter(func(event): return event.type == kind)
 
+func four_hit_fixture(form: String) -> CombatModel:
+	var m: CombatModel = fixtures.fixture([36], form)
+	# This model owns a deep catalog copy; the shipped 36 remains a persistent-bleed power.
+	m.card_catalog.noren_36.merge({"name":"测试四连击", "type":"attack", "target":"enemy", "cost":2,
+		"description":"造成 1 点伤害，共 4 次。", "cardText":"造成 1 点伤害，共 4 次。",
+		"effects":[{"type":"damage", "amount":1, "hits":4}]}, true)
+	return m
+
 func test_encounter() -> void:
 	check(Game.events.E04.nodes.battle.battleId == "B04" and Game.battles.B04.placeId == "alley", "Existing event routes to B04 in alley")
 	check(Game.battles.B04.enemyIds == ["gang_henchman", "gang_henchman_second", "gang"], "Two distinct henchmen precede boss")
@@ -66,66 +74,73 @@ func test_boundary_and_cycles() -> void:
 		m.block = 999
 		m.end_turn()
 		m.enemy_damage(dead_index, 15)
-		check(m.enemies[2].intent.type == "strength_allies" and not m.enemies[2].has("intentPhase"), "Player-turn death does not immediately change boss intent")
+		check(m.enemies[2].intent.type == "strength_allies" and not m.enemies[2].has("intentPhase"), "Player-turn casualty keeps the currently shown reinforcement intent")
 		var before := saved(m)
 		var restored := CombatModel.new()
 		restored.restore(before)
-		check(saved(restored) == before and restored.enemies[2].intent.type == "strength_allies", "Loading pending death does not switch early")
+		check(saved(restored) == before and restored.enemies[2].intent.type == "strength_allies", "Loading pending casualty does not create a round boundary")
+		m.block = 999
+		seed(703+dead_index)
+		var boundary := m.end_turn()
+		var changes := events(boundary, "intent_change")
+		check(boundary.attacks.size() == 1 and boundary.attacks[0].index == 1-dead_index, "Casualty round: survivor acts, boss does not attack early")
+		check(events(boundary, "status_apply").size() == 1 and m.buffs.count(m, "strength", 1-dead_index) == 2, "Boss still executes reinforcement in casualty round")
+		check(changes.size() == 1 and boundary.turnEvents.back().type == "intent_change" and changes[0].intent.amount == 8, "Round-start switch event follows all old enemy actions")
+		check(m.turn == 3 and m.enemies[2].intent.type == "attack" and m.enemies[2].intent.amount == 8 and m.enemies[2].intentIndex == 0, "Next player phase sees attack8 without skipping first intent")
+		restored.block = 999
+		seed(703+dead_index)
+		var resumed := restored.end_turn()
+		check(JSON.parse_string(JSON.stringify(resumed.turnEvents)) == JSON.parse_string(JSON.stringify(boundary.turnEvents)) and saved(restored) == saved(m), "Resuming pending casualty with same shuffle reaches identical next-round state")
 		for step in 7:
 			m.block = 999
 			var result := m.end_turn()
-			var changes := events(result, "intent_change")
-			check(changes.size() == (1 if step == 0 else 0), "Boss switches once at first eligible boundary")
-			if step == 0:
-				check(result.turnEvents[0].type == "intent_change" and result.turnEvents[0].intent.amount == 8, "Switch event precedes first surviving henchman")
-			check(result.attacks[0].index == 1 - dead_index, "Only surviving henchman acts first")
+			check(events(result, "intent_change").is_empty(), "Active phase never repeats switch")
+			check(result.attacks[0].index == 1-dead_index, "Only surviving henchman acts first")
 			if step % 3 == 1:
 				var applications := events(result, "status_apply")
-				check(result.attacks.size() == 1 and applications.size() == 1 and applications[0].buffId == "vulnerable" and applications[0].amount == 2, "Boss second phase applies two vulnerable")
+				check(result.attacks.size() == 1 and applications.size() == 1 and applications[0].buffId == "vulnerable" and applications[0].amount == 2, "Boss cycle applies two vulnerable")
 			else:
 				var expected := 8 if step % 3 == 0 else 6
 				var magnified := step % 3 == 2
-				check(result.attacks.size() == 2 and result.attacks[1].index == 2 and result.attacks[1].hits[0].blocked == roundi(expected * (1.5 if magnified else 1.0)), "Boss attack8/vulnerable2/attack6 cycle, per-hit vulnerability")
-			check(m.buffs.count(m, "strength", 1 - dead_index) == 1, "Boss stops reinforcement after switching")
+				check(result.attacks.size() == 2 and result.attacks[1].index == 2 and result.attacks[1].hits[0].blocked == roundi(expected * (1.5 if magnified else 1.0)), "Boss attack8/vulnerable2/attack6 cycle preserves cursor and vulnerability")
+			check(m.buffs.count(m, "strength", 1-dead_index) == 2, "Reinforcement stops from next round")
 			check(Game.valid_combat(saved(m)), "Combat phase validates and keeps cursor")
-		# Losing the second henchman must not restart the already active cycle.
 		var cursor: int = m.enemies[2].intentIndex
-		m.enemy_damage(1 - dead_index, 15)
+		m.enemy_damage(1-dead_index, 15)
 		m.block = 999
 		var result := m.end_turn()
-		check(events(result, "intent_change").is_empty() and m.enemies[2].intentIndex == cursor + 1, "Second death does not restart boss cycle")
-	# Death during an enemy's action must wait until the NEXT boundary.
+		check(events(result, "intent_change").is_empty() and m.enemies[2].intentIndex == cursor+1, "Second death does not restart boss cycle")
+	# Parry and end-of-enemy-turn pollution casualties use the same next-round boundary.
+	for cause in ["parry", "pollution"]:
+		var m := gang()
+		m.enemies[0].hp = 1
+		m.block = 999
+		if cause == "parry": m.parry = 1
+		else: m.buffs.apply(m, "pollution", 1, 0)
+		var result := m.end_turn()
+		check(m.enemies[0].hp == 0 and result.attacks.size() == 2, cause+" casualty does not interrupt enemy action sequence")
+		var gains := events(result, "status_apply")
+		check(gains.size() == 1 and gains[0].target == 1 and gains[0].buffId == "strength", cause+" casualty still lets boss reinforce survivor")
+		check(events(result, "intent_change").size() == 1 and result.turnEvents.back().type == "intent_change" and m.enemies[2].intent.amount == 8 and m.enemies[2].intentIndex == 0, cause+" casualty switches only after enemy phase, visible before next player actions")
+		m.block = 999
+		result = m.end_turn()
+		check(events(result, "intent_change").is_empty() and result.attacks.back().index == 2 and result.attacks.back().hits[0].blocked == 8, cause+" next round executes attack8 once")
 	var m := gang()
-	m.enemies[0].hp = 1
-	m.block = 999
-	m.parry = 1
-	var result := m.end_turn()
-	check(m.enemies[0].hp == 0 and result.attacks[0].counters.size() == 1, "First henchman dies to parry during enemy turn")
-	check(events(result, "intent_change").is_empty() and result.attacks.size() == 2 and m.enemies[2].intent.type == "strength_allies", "No mid-turn phase switch after parry")
-	var gains := events(result, "status_apply")
-	check(gains.size() == 1 and gains[0].target == 1 and gains[0].buffId == "strength", "Original boss intent still buffs surviving henchman")
-	m.block = 999
-	result = m.end_turn()
-	check(result.turnEvents[0].type == "intent_change" and result.attacks.back().index == 2 and result.attacks.back().hits[0].blocked == 8, "Parry casualty switches at next boundary, starting at attack8")
-	# A status kill at a henchman's own turn end also waits for next boundary.
-	m = gang()
-	m.enemies[0].hp = 1
-	m.buffs.apply(m, "pollution", 1, 0)
-	m.block = 999
-	result = m.end_turn()
-	check(m.enemies[0].hp == 0 and events(result, "intent_change").is_empty() and m.enemies[2].intent.type == "strength_allies", "Enemy-turn pollution death does not switch mid-turn")
-	m.block = 999
-	result = m.end_turn()
-	check(events(result, "intent_change").size() == 1 and result.attacks.back().hits[0].blocked == 8, "Pollution casualty switches next turn")
-	m = gang()
 	m.enemy_damage(0, 15)
 	m.enemy_damage(1, 15)
 	m.block = 999
+	var result := m.end_turn()
+	check(result.attacks.is_empty() and events(result, "status_apply").is_empty() and m.enemies[2].intent.amount == 8, "Both dead: old reinforcement has no targets, then next round prepares attack8")
+	m.block = 999
+	check(m.end_turn().attacks[0].hits[0].blocked == 8, "Both dead: boss first attacks in next full round")
+	m = gang()
+	m.enemy_damage(0, 15)
+	m.player_hp = 1
 	result = m.end_turn()
-	check(result.attacks.size() == 1 and result.attacks[0].index == 2 and result.attacks[0].hits[0].blocked == 8, "Both dead at boundary leaves only boss attack8")
+	check(result.outcome == "lose" and m.turn == 1 and events(result, "intent_change").is_empty() and not m.enemies[2].has("intentPhase"), "Defeat creates no next round or phase switch")
 
 func test_strength_and_vulnerability() -> void:
-	var m: CombatModel = fixtures.fixture([36], "ranged")
+	var m: CombatModel = four_hit_fixture("ranged")
 	m.buffs.apply(m, "strength", 2)
 	m.buffs.apply(m, "vulnerable", 3, 0)
 	m.buffs.apply(m, "bleed", 3, 0)
@@ -147,7 +162,7 @@ func test_strength_and_vulnerability() -> void:
 		check(m.buffs.apply(m, "strength", 3000, index) and m.buffs.count(m, "strength", index) == 999, "Signed strength upper bound")
 		m.buffs.apply(m, "strength", -999, index)
 		check(m.buffs.count(m, "strength", index) == 0, "Opposite strength stacks cancel to zero")
-	m = fixtures.fixture([36], "melee")
+	m = four_hit_fixture("melee")
 	m.buffs.apply(m, "strength", -999)
 	m.enemies[0].block = 5
 	result = m.play_card("card_000", 0)
@@ -182,7 +197,8 @@ func test_strength_and_vulnerability() -> void:
 	m.parry = 2
 	m.block = 999
 	result = m.end_turn()
-	check(result.attacks[0].counters.map(func(h): return h.damage) == [3, 3], "Parry buff damage ignores strength and enemy vulnerable")
+	check(result.attacks[0].counters.map(func(h): return h.damage) == [5], "Single parry at half damage ignores strength and enemy vulnerable")
+	check(Game.card_catalog.noren_36.type == "power" and Game.card_catalog.noren_36.effects[0].value == "persistent_bleed", "Four-hit fixture never changes the authored power catalog")
 
 func test_snapshots() -> void:
 	var m := gang()
@@ -217,6 +233,13 @@ func test_snapshots() -> void:
 	m.enemy_damage(0, 15)
 	m.block = 999
 	m.end_turn()
+	check(m.enemies[2].intent.type == "attack" and m.enemies[2].intent.amount == 8, "Round-start snapshot advertises attack8")
+	var pending := saved(m)
+	copy = CombatModel.new()
+	copy.restore(pending)
+	check(saved(copy) == pending, "Loading round-start state preserves attack8 without advancing")
+	m.block = 999
+	m.end_turn()
 	snapshot = saved(m)
 	copy = CombatModel.new()
 	copy.restore(snapshot)
@@ -239,8 +262,9 @@ func _ready() -> void:
 	test_strength_and_vulnerability()
 	test_snapshots()
 	fixtures.free()
-	var report := {"checks":checks, "failures":failures, "phaseSwitch":"enemy_turn_start_only", "vulnerable":"attack_only"}
-	var output := "res://artifacts/qa/gang-alley-2026-10-19/rules-result.json"
+	var report := {"checks":checks, "failures":failures, "phaseSwitch":"full_round_start_before_player", "vulnerable":"attack_only"}
+	var output := "res://artifacts/qa/enemy-round-death-2026-10-19/gang-rules-result.json"
+	DirAccess.make_dir_recursive_absolute(output.get_base_dir())
 	FileAccess.open(output, FileAccess.WRITE).store_string(JSON.stringify(report, "\t"))
 	print("GANG RULES: %d checks, %d failures" % [checks, failures.size()])
 	get_tree().quit(0 if failures.is_empty() else 1)

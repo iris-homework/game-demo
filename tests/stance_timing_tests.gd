@@ -5,7 +5,9 @@ func exercise(number: int, before: String, after: String) -> void:
 	var view = app.view
 	var actor = view.stage.player
 	var played = view.cards["card_000"]
-	var attack := number in [9,10]
+	var attack: bool = view.model.card("card_000").type == "attack"
+	var hp_before: int = view.model.enemies[0].hp
+	var ammo_before: int = view.model.ammo
 	view.select_card("card_000")
 	view.play_selected(0 if attack else -1)
 	check(view.model.stance==after and Game.battle_busy,"Card commits once and locks input: %02d"%number)
@@ -33,6 +35,14 @@ func exercise(number: int, before: String, after: String) -> void:
 	check(not is_instance_valid(actor.weapon_shift) and (not is_instance_valid(played) or not played.visible),"Unlock waits for both animations")
 	check(actor.combat_stance==after and view.model.snapshot()==committed,"Final stance is correct without repeated model effects")
 	check(view.cards.size()==view.model.hand.size(),"Draw reward finishes before unlock")
+	if after == "melee":
+		check(view.model.hand.size()==4 and view.cards.size()==4,"Two entry draws create both live card views")
+	if number == 3:
+		check(view.model.parry==1 and view.model.block==0,"Close In commits exactly one parry and no block")
+	if number == 9:
+		check(view.model.enemies[0].hp==hp_before-12 and view.model.ammo==ammo_before-1,"Cut In resolves two ranged hits and spends one ammo before switching")
+	if number == 10:
+		check(not attack and view.model.enemies[0].hp==hp_before and view.model.ammo==ammo_before+2,"Quick Reload grants two ammo without attacking before the immediate ranged shift")
 	print("STANCE TIMING: card %02d %s -> %s complete"%[number,before,after])
 
 func _ready() -> void:

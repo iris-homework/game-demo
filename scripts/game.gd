@@ -699,12 +699,18 @@ func library_cards() -> Array:
 	var catalog := card_catalog.duplicate(true)
 	# Retired test cards stay loadable, but are not in the new 40-card catalogue.
 	var definitions: Array = catalog.values()
-	definitions.sort_custom(func(a: Dictionary, b: Dictionary):
-		var a_order := int(a.get("sortOrder", 2147483647))
-		var b_order := int(b.get("sortOrder", 2147483647))
-		if a_order != b_order: return a_order < b_order
-		return str(a.id).naturalnocasecmp_to(str(b.id)) < 0)
+	definitions.sort_custom(card_display_before)
 	return definitions.duplicate(true)
+
+func card_display_before(a: Dictionary, b: Dictionary) -> bool:
+	var ranks := {"C":0,"B":1,"A":2,"S":3}
+	var a_rank: int = ranks.get(str(a.get("rarity", "")).to_upper(),4)
+	var b_rank: int = ranks.get(str(b.get("rarity", "")).to_upper(),4)
+	if a_rank != b_rank: return a_rank < b_rank
+	var a_order := int(a.get("sortOrder",2147483647))
+	var b_order := int(b.get("sortOrder",2147483647))
+	if a_order != b_order: return a_order < b_order
+	return str(a.get("id", "")).naturalnocasecmp_to(str(b.get("id", ""))) < 0
 
 func load_meta() -> bool:
 	if not FileAccess.file_exists(meta_path): return false
@@ -922,7 +928,7 @@ func console_command(command: String) -> String:
 	var args := command.strip_edges().split(" ", false)
 	if args.is_empty(): return "输入 help 查看指令。"
 	match args[0].to_lower():
-		"help": return "cards [关键词]：查询卡牌名称、编号和 ID\nowned：查看已拥有数量\naddcard <牌名/编号/ID> [数量]：添加卡牌（默认 1，最多 99）\n示例：addcard 短点连射 2　或　addcard 36 2\n新增卡牌保存至当前冒险，下场战斗生效；新委托重置。"
+		"help": return "cards [关键词]：查询卡牌名称、编号和 ID\nowned：查看已拥有数量\naddcard <牌名/编号/ID> [数量]：添加卡牌（默认 1，最多 99）\n示例：addcard 深度伤口 2　或　addcard 36 2\n新增卡牌保存至当前冒险，下场战斗生效；新委托重置。"
 		"cards":
 			var lines: PackedStringArray = []
 			var query := args[1] if args.size() > 1 else ""
@@ -963,7 +969,7 @@ func valid_noren_state(c: Dictionary) -> bool:
 	for key in ["energy", "ammo"]:
 		var value = n.get(key)
 		if not (value is int or value is float) or not is_finite(float(value)) or value < 0 or value != floor(float(value)): return false
-	if n.energy > int(c.profile.get("energyPerTurn", 3)) or n.ammo > int(c.profile.get("ammoCap", 6)): return false
+	if n.energy > int(c.profile.get("energyPerTurn", 3)) or n.ammo > int(c.profile.get("ammoCap", 10)): return false
 	if n.get("stance") not in ["melee", "ranged"]: return false
 	if not n.get("exhaustPile") is Array: return false
 	return buffs.valid_snapshot(c)

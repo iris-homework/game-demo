@@ -14,11 +14,13 @@ var enemy_summary_plates: Array[Control] = []
 const ActorHUD = preload("res://scripts/combat/actor_hud.gd")
 const EnemyHPSummary = preload("res://scripts/combat/enemy_hp_summary.gd")
 var player_plate: Control
+var shown_player_ammo := 0
 var shown_player_block := 0
 var shown_player_parry := 0
 var shown_player_pollution := 0
 var shown_player_buffs: Dictionary = {}
 var presenting_enemy_turn := false
+var presenting_player_attack := false
 const ENEMY_INTENT_SIZE := Vector2(126,28)
 var aim: Node2D
 var hovered_target := -1
@@ -257,7 +259,7 @@ func refresh_enemy_hud() -> void:
 		target.disabled = enemy.hp <= 0
 		target.tooltip_text = "攻击目标：" + enemy.displayName + "\n下次行动：" + intent_text
 		if enemy.has("allyDeathIntentSequence"):
-			target.tooltip_text += "\n强化：给每名存活小弟增加1层力量。\n敌方回合开始时若已有小弟死亡，切换为攻击8 → 易伤2 → 攻击6循环。"
+			target.tooltip_text += "\n强化：给每名存活小弟增加1层力量。\n完整回合开始（玩家行动前）时若已有小弟死亡，切换为攻击8 → 易伤2 → 攻击6循环。"
 		if int(enemy.get("attackPollution", 0)) > 0:
 			target.tooltip_text += "\n每段攻击实际扣血时，追加 %d 层污染；污染伤害不触发。" % int(enemy.attackPollution)
 		if int(enemy.get("deathPollution",0)) > 0:
@@ -499,6 +501,7 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 	if cards.has(uid):
 		cards[uid].show_preview(played_preview)
 		cards[uid].show_cost(played_cost)
+	presenting_player_attack = result.get("stance", "") == "melee" and not result.hits.is_empty()
 	set_busy(true)
 	selected_uid = ""
 	aim.visible = false
@@ -530,6 +533,9 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 			shown_enemies[index].hp = hit.hpAfter
 			shown_enemies[index].block = hit.get("blockAfter",0)
 			shown_enemies[index].bleed = hit.get("bleedAfter",0)
+			if hit.has("ammoAfter"):
+				shown_player_ammo = int(hit.ammoAfter)
+				refresh_ammo()
 			present_enemy_death_effect(hit)
 			refresh_enemy_hud()
 			var text := "−%d" % hit.damage
@@ -545,6 +551,7 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 	await deal_hand(true)
 	arrange_hand()
 	refresh_counts()
+	presenting_player_attack = false
 	refresh_resources()
 	set_busy(false)
 	if not model.outcome.is_empty(): finish(model.outcome)
@@ -645,6 +652,8 @@ func end_turn_pressed() -> void:
 				shown_enemies[attacker_index].hp = hit.hpAfter
 				shown_enemies[attacker_index].block = hit.get("blockAfter",0)
 				shown_enemies[attacker_index].bleed = hit.bleedAfter
+				shown_player_ammo = int(hit.get("ammoAfter", model.ammo))
+				refresh_ammo()
 				present_enemy_death_effect(hit)
 				refresh_enemy_hud()
 				impact(stage.contact(stage.enemies[attacker_index]),"弹反 −%d" % hit.damage,CYAN)
@@ -879,6 +888,19 @@ func show_debug_results() -> void:
 	add_child(popup)
 	popup.popup_centered(Vector2i(610,185))
 
+func _unhandled_key_input(event: InputEvent) -> void:
+	if not event is InputEventKey or not event.pressed or event.echo: return
+	if event.ctrl_pressed or event.alt_pressed or event.meta_pressed or event.shift_pressed: return
+	if not initialized or Game.battle_busy or Game.transition_locked or is_instance_valid(pile_overlay): return
+	if not model.outcome.is_empty(): return
+	# Use the current hand order, independent of hovered or lifted card positions.
+	var index := [KEY_1,KEY_2,KEY_3,KEY_4,KEY_5,KEY_6,KEY_7,KEY_8,KEY_9,KEY_0].find(event.keycode)
+	if index < 0:
+		index = [KEY_KP_1,KEY_KP_2,KEY_KP_3,KEY_KP_4,KEY_KP_5,KEY_KP_6,KEY_KP_7,KEY_KP_8,KEY_KP_9,KEY_KP_0].find(event.keycode)
+	if index < 0 or index >= model.hand.size(): return
+	select_card(model.hand[index], false)
+	get_viewport().set_input_as_handled()
+
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_F5,KEY_F6,KEY_F7]:
 		if Game.training_mode and Game.config.developmentMode:
@@ -1027,6 +1049,7 @@ func build_energy_hud() -> void:
 func refresh_resources() -> void:
 	if not presenting_enemy_turn:
 		shown_player_block = model.block
+		if not presenting_player_attack: shown_player_ammo = model.ammo
 		shown_player_parry = model.parry
 		shown_player_pollution = model.buffs.count(model, "pollution")
 		shown_player_buffs = model.buff_state.duplicate(true)
@@ -1039,5 +1062,8 @@ func refresh_resources() -> void:
 	if not model.is_noren():
 		resources_label.text = "旧版战斗快照"
 		return
-	resources_label.text = "%s  ·  弹药 %d / 6" % ["近战" if model.stance == "melee" else "远程",model.ammo]
+	refresh_ammo()
 	if is_instance_valid(exhaust_button): exhaust_button.text = "消耗 / 能力 %d" % model.exhaust_pile.size()
+
+func refresh_ammo() -> void:
+	resources_label.text = "%s  ·  弹药 %d / %d" % ["近战" if model.stance == "melee" else "远程",shown_player_ammo,int(model.profile.get("ammoCap",10))]

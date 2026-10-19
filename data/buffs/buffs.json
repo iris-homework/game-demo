@@ -58,8 +58,8 @@
     "icon": "parry",
     "color": "7be5bd",
     "showBadge": true,
-    "description": "弹反 · {count} 层\n一次敌方攻击结束后，每层反击一次，每次造成该次攻击格挡前总伤害的 25%（四舍五入），并施加 1 层裂伤。整次反击后消耗 1 层；跨回合保留。",
-    "maxStacks": 2
+    "description": "弹反 · {count} 层\n一次敌方攻击结束后，反击一次，造成该次攻击格挡前总伤害的 50%（四舍五入），并获得 1 颗弹药。多段攻击合并触发；每次消耗 1 层，层数只决定可触发次数；最多 3 层，跨回合保留。",
+    "maxStacks": 3
   },
   {
     "id": "next_damage",
@@ -202,5 +202,50 @@
     "showBadge": true,
     "maxStacks": 999,
     "description": "易伤 · {count} 层\n受到的攻击伤害增加 50%，每段四舍五入后先扣格挡；不影响 Buff 伤害，增幅不随层数增加。持有者自身回合结束时减少 1 层，减至 0 后失效，最多 999 层。"
+  },
+  {
+    "id": "next_hit_damage",
+    "name": "逐段攻击增伤",
+    "category": "positive",
+    "target": "player",
+    "stacking": "add",
+    "duration": "player_turn_end",
+    "handler": "attack_bonus",
+    "icon": "damage",
+    "color": "f17988",
+    "showBadge": true,
+    "description": "逐段攻击增伤 · +{count}\n本回合下一张攻击牌的每段基础伤害增加该数值；使用后消耗，回合结束清除。",
+    "consumeOnAttack": true,
+    "everyHit": true
+  },
+  {
+    "id": "ranged_mastery",
+    "name": "弱点瞄准",
+    "category": "positive",
+    "target": "player",
+    "field": "powers",
+    "saveKey": "powers",
+    "stacking": "unique",
+    "duration": "battle",
+    "handler": "none",
+    "icon": "high_pressure",
+    "color": "f2b969",
+    "showBadge": true,
+    "description": "弱点瞄准 · 本场持续\n远程攻击本体伤害倍率由1.5倍变为2倍；不影响裂伤，同名能力不叠加。"
+  },
+  {
+    "id": "persistent_bleed",
+    "name": "深度伤口",
+    "category": "positive",
+    "target": "player",
+    "field": "powers",
+    "saveKey": "powers",
+    "stacking": "unique",
+    "duration": "battle",
+    "handler": "none",
+    "icon": "dissection",
+    "color": "ed586b",
+    "showBadge": true,
+    "description": "深度伤口 · 本场持续\n裂伤触发时不再减少层数；同名能力不叠加。"
   }
 ]

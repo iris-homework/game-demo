@@ -6,7 +6,8 @@ func on_phase(phase: String) -> void:
 	hit_states.append([app.view.stage.enemies.find(app.view.stage.active_attacker),app.view.shown_player_hp,app.view.shown_player_pollution])
 
 func _ready() -> void:
-	output = "res://artifacts/qa/fish-rules-2026-10-17/"
+	output = "res://artifacts/qa/enemy-round-death-2026-10-19/fish-rules/"
+	DirAccess.make_dir_recursive_absolute(output)
 	Game.save_enabled = false
 	Game.save_path = "user://fish_rules_visual_unused.json"
 	Game.meta_path = "user://fish_rules_visual_meta_unused.json"
@@ -23,6 +24,7 @@ func _ready() -> void:
 	check(view.model.enemy_intent_text(view.model.enemies[0]) == "攻击 6","First opening intent")
 	check(view.model.enemy_intent_text(view.model.enemies[1]) == "污染 3","Second opening intent")
 	check(view.targets[0].tooltip_text.contains("追加 2 层污染"),"Fish passive tooltip")
+	check(view.targets[0].tooltip_text.contains("死亡时，向角色施加 3 层污染"),"Fish death tooltip uses three stacks independently of two-stack contact")
 	view.stage.phase_changed.connect(on_phase)
 	await shot("opening-two-fish")
 	var expected_hp := [94,79,65,43]
@@ -70,6 +72,7 @@ func _ready() -> void:
 	check(view.model.enemies[0].hp == 0 and not view.stage.enemies[0].alive,"Enemy pollution death retires first fish")
 	check(view.stage.enemies[0].modulate.a == 0 and view.shown_enemies[0].hp == 0,"Dead fish and HUD fade together")
 	check(view.model.enemies[1].hp == 30 and view.stage.enemies[1].alive,"Second fish survives independently")
+	check(view.shown_player_pollution == 9 and view.model.buffs.count(view.model,"pollution") == 9,"Two active three-stack intents plus one three-stack death total nine")
 	await shot("first-fish-pollution-death")
 	view.model.buffs.apply(view.model,"pollution",999,1)
 	view.shown_enemies = view.model.enemies.duplicate(true)

@@ -61,7 +61,7 @@ func cleared() -> void:
 		if actor.alive: check(actor.modulate == Color.WHITE and actor.sprite.modulate == Color.WHITE,"No residual green tint or hidden survivor")
 
 func _ready() -> void:
-	output = "res://artifacts/qa/fish-spit-2026-10-17/"+("headless/" if DisplayServer.get_name() == "headless" else "render/")
+	output = "res://artifacts/qa/enemy-round-death-2026-10-19/fish-spit/"+("headless/" if DisplayServer.get_name() == "headless" else "render/")
 	DirAccess.make_dir_recursive_absolute(output)
 	Game.save_enabled = false
 	Game.save_path = "user://fish_spit_unused.json"
@@ -120,7 +120,7 @@ func _ready() -> void:
 	app.view.select_card("card_000")
 	await app.view.play_selected(0)
 	check(flights == 0 and splashes == 0 and contacts == 0,"Death pollution never spawns green-water effects")
-	check(app.view.shown_player_pollution == 5 and not app.view.stage.enemies[0].alive,"Death still applies five stacks exactly once")
+	check(app.view.shown_player_pollution == 3 and not app.view.stage.enemies[0].alive,"Death still applies three stacks exactly once")
 	await cleared()
 	FileAccess.open(output+"result.json",FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures,"physicalInput":false},"\t"))
 	rules.fixtures.free()

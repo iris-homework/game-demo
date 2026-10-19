@@ -50,7 +50,7 @@ func _ready() -> void:
 	m.parry = 2
 	result = m.end_turn()
 	check(m.player_hp == 100 and result.attacks[0].hits[0].blocked == 9, "Weak applies before player block")
-	check(result.attacks[0].counters.size() == 2 and result.attacks[0].counters.all(func(h): return h.damage == 5), "Parry uses weakened total 18, rounds 25 percent to 5")
+	check(result.attacks[0].counters.size() == 1 and result.attacks[0].counters.all(func(h): return h.damage == 9), "Parry uses weakened total 18, returns 50 percent once")
 	check(m.parry == 1 and m.enemies[0].weak == 1, "Parry and weakness each consume their own one layer")
 	check(m.buffs.enemy_attack_damage({"weak":1}, 10) == 8 and m.buffs.enemy_attack_damage({"weak":5}, 9) == 7, "Preserve per-segment rounding")
 	m = helper.fixture([19])

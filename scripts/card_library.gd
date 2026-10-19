@@ -76,10 +76,7 @@ func refresh_library() -> void:
 			if definition.is_empty(): continue
 			definition.id = id
 			definitions.append(definition)
-		definitions.sort_custom(func(a: Dictionary,b: Dictionary):
-			var a_order := int(a.get("sortOrder",2147483647))
-			var b_order := int(b.get("sortOrder",2147483647))
-			return a_order < b_order if a_order != b_order else str(a.id).naturalnocasecmp_to(str(b.id)) < 0)
+		definitions.sort_custom(Game.card_display_before)
 		var total := 0
 		for count in display_counts.values(): total += int(count)
 		counter.text = "%d 种 / %d 张" % [definitions.size(),total]

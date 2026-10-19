@@ -34,7 +34,7 @@ func _ready() -> void:
 	entry = LineEdit.new()
 	entry.position = Vector2(126,752)
 	entry.size = Vector2(1188,54)
-	entry.placeholder_text = "可选指令：addcard 短点连射 2 / owned / help"
+	entry.placeholder_text = "可选指令：addcard 深度伤口 2 / owned / help"
 	entry.add_theme_font_size_override("font_size",20)
 	entry.text_submitted.connect(submit)
 	add_child(entry)

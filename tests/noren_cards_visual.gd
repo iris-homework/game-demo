@@ -2,7 +2,7 @@ extends Node
 var app: Control
 var checks := 0
 var failures := 0
-var output := "res://artifacts/qa/noren-cards-2026-10-16/"
+var output := "res://artifacts/qa/noren-consolidation-2026-10-19/noren-visual/"
 
 func check(ok: bool, title: String) -> void:
 	checks += 1
@@ -83,6 +83,7 @@ func _ready() -> void:
 	Game.meta_path="user://noren_visual_meta_unused.json"
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--suffix="):output += arg.trim_prefix("--suffix=")+"-"
+	DirAccess.make_dir_recursive_absolute(output.get_base_dir())
 	Game.state=Game.initial_state()
 	app=preload("res://scenes/main.tscn").instantiate()
 	add_child(app)
@@ -105,7 +106,7 @@ func _ready() -> void:
 	await shot("catalogue-bottom")
 	await key(KEY_A,true,true)
 	check(is_instance_valid(app.card_console) and app.view.process_mode==Node.PROCESS_MODE_DISABLED,"Ctrl+Shift+A opens console and suspends base view")
-	app.card_console.submit("addcard 短点连射 2")
+	app.card_console.submit("addcard 深度伤口 2")
 	app.card_console.submit("owned")
 	check(Game.state.deck==["noren_36","noren_36"],"Console UI adds only requested owned copies")
 	await shot("console")
@@ -131,21 +132,43 @@ func _ready() -> void:
 	check(view.model.stance=="melee" and view.cards.size()==view.model.hand.size(),"Stance entry draw creates a live card view")
 	await shot("combat-melee")
 	await install_hand([20,26,36,38,34],"ranged")
-	view=app.view;view.model.ammo=6
-	view.select_card("card_000");view.play_selected(0)
-	check(is_instance_valid(view.pile_overlay) and view.pile_overlay.options.size()==3,"Overload offers zero to two extra bullets")
-	await shot("ammo-picker")
+	view=app.view;view.model.ammo=3
+	view.select_card("card_000")
 	var frozen: Dictionary=view.model.snapshot()
 	await key(KEY_ESCAPE)
-	check(view.model.snapshot()==frozen and not is_instance_valid(view.pile_overlay),"Cancel ammo selection spends nothing")
-	view.play_selected(0)
-	view.pile_overlay.picked.emit(2)
+	check(view.model.snapshot()==frozen and view.selected_uid.is_empty() and not is_instance_valid(view.pile_overlay),"Canceling an unplayed full-ammo attack spends nothing")
+	view.select_card("card_000");view.play_selected(0)
+	check(not is_instance_valid(view.pile_overlay) and Game.battle_busy,"Full-ammo attack commits directly without an extra-ammo picker")
+	check(view.model.enemies[0].hp==64 and view.model.ammo==0 and view.model.energy==1,"Three ammo produce four ranged hits and spend all three ammo once")
+	frozen=view.model.snapshot()
 	await idle()
-	check(view.model.enemies[0].hp==93 and view.model.ammo==3,"Chosen extra ammo actually used")
+	check(view.model.snapshot()==frozen,"Full-ammo attack presentation never repeats damage, ammo or energy spending")
+	await shot("all-ammo-attack")
 	view.select_card("card_004");view.play_selected(0)
 	await idle()
 	check(view.model.exhaust_pile.size()==1 and view.cards.size()==view.model.hand.size(),"Exhaust leaves hand and has no discard duplicate")
 	await shot("combat-ranged")
+	await install_hand([26,1,2],"ranged")
+	view=app.view
+	view.select_card("card_000");view.play_selected(0)
+	check(not is_instance_valid(view.pile_overlay) and view.model.enemies[0].hp==54 and view.model.ammo==1,"Finisher deals sixty-six damage and spends one normal ammo without a picker")
+	frozen=view.model.snapshot()
+	await idle()
+	check(view.model.snapshot()==frozen,"Finisher presentation preserves the single committed resolution")
+	await install_hand([23,36,35],"ranged")
+	view=app.view;view.model.ammo=3
+	view.select_card("card_000");view.play_selected(-1)
+	await idle()
+	view.select_card("card_001");view.play_selected(-1)
+	await idle()
+	check(view.model.powers.has("ranged_mastery") and view.model.powers.has("persistent_bleed") and view.model.exhaust_pile.size()==2,"Both new persistent powers activate and leave the card loop")
+	view.model.enemies[0].bleed=5
+	view.select_card("card_002");view.play_selected(0)
+	frozen=view.model.snapshot()
+	await idle()
+	check(view.model.enemies[0].hp==93 and view.model.enemies[0].bleed==5 and view.model.ammo==2,"Three shots use double body damage while all three bleed triggers preserve five layers")
+	check(view.model.snapshot()==frozen,"Powered multi-hit playback leaves committed buffs and damage unchanged")
+	await shot("persistent-powers")
 	await install_hand([12,1,13,2,7])
 	view=app.view;view.select_card("card_000");view.play_selected(-1)
 	check(view.pile_overlay.options.size()==2,"Dismantle lists only attack instances")
@@ -161,7 +184,7 @@ func _ready() -> void:
 	await idle()
 	view.end_turn_pressed()
 	await idle()
-	check(view.model.turn==2 and view.model.parry==0 and view.model.enemies[0].hp==110 and view.model.enemies[1].hp==115,"Enemy turn shows grouped parries and continues all enemies")
+	check(view.model.turn==2 and view.model.parry==0 and view.model.enemies.map(func(e): return e.hp)==[110,120,120] and view.model.player_hp==50,"Single parry counters only the first attack; ten block and all three enemy attacks resolve once")
 	check(view.cards.size()==5 and view.model.energy==3 and view.model.block==0,"Turn refresh creates five playable cards")
 	await shot("parry-next-turn")
 	# Already-drawn empty formal hand does not refill on rebuilding the scene.

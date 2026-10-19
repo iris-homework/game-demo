@@ -94,6 +94,20 @@
               "enemy"
             ],
             "description": "Optional recipient; must agree with the buff definition."
+          },
+          "allAmmoHits": {
+            "type": "boolean",
+            "description": "In ranged stance, total hits equal 1 plus ammo before payment."
+          },
+          "rangedBonus": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Flat base damage bonus in ranged stance, before the multiplier."
+          },
+          "bleedTriggers": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Explicit total bleed triggers per body hit, replacing the normal stance default."
           }
         }
       }
@@ -103,6 +117,10 @@
     },
     "artAssetId": {
       "type": "string"
+    },
+    "consumeAllAmmo": {
+      "type": "boolean",
+      "description": "Ranged attacks consume all ammo before executing their damage segments."
     }
   }
 }

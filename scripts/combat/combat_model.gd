@@ -98,9 +98,9 @@ func intent_for(enemy: Dictionary, index: int) -> Dictionary:
 	if enemy.get("intentPhase", "") == "ally_death": sequence = enemy.get("allyDeathIntentSequence", {}).get("sequence", sequence)
 	return (profile.intent if sequence.is_empty() else sequence[index % sequence.size()]).duplicate(true)
 
-func begin_enemy_turn_intents() -> Array:
-	# Check once at the enemy-side turn boundary, before any enemy acts.
-	# Casualties during those actions wait for the next enemy-side turn.
+func begin_round_intents() -> Array:
+	# A full round is player actions followed by enemy actions.
+	# Check only before the next player phase, after all enemy actions finish.
 	# Phase and index travel with the snapshot and never reset a second time.
 	var changes: Array = []
 	for index in enemies.size():
@@ -137,16 +137,19 @@ func enemy_intent_text(enemy: Dictionary) -> String:
 	if is_noren(): amount = enemy_intent_damage(enemy)
 	return "攻击 %d" % amount + (" ×%d" % int(intent.hits) if int(intent.get("hits", 1)) > 1 else "")
 
-func attack_hit_count(effect: Dictionary, form: String, enemy_before: Dictionary) -> int:
+func attack_hit_count(effect: Dictionary, form: String, enemy_before: Dictionary, ammo_before: int = 0) -> int:
+	if form == "ranged" and effect.get("allAmmoHits",false): return 1 + ammo_before
 	return int(effect.get("hits", 1)) + (1 if form == "ranged" and effect.has("bleedExtraHit") and int(enemy_before.get("bleed", 0)) >= int(effect.bleedExtraHit) else 0)
 
 func attack_hit_amount(definition: Dictionary, effect: Dictionary, form: String, ammo_before: int, enemy_before: Dictionary, bonus: int, extra: int) -> int:
 	var base := int(effect.get("amount", 0)) + bonus + (buffs.count(self, "strength") if definition.get("type", "") == "attack" else 0)
 	if form == "ranged":
+		base += int(effect.get("rangedBonus",0))
 		base += extra * int(definition.get("extraAmmoBonus", 0))
 		if ammo_before == 1: base += int(effect.get("lastAmmoBonus", 0))
 		if int(enemy_before.hp) * 2 <= int(enemy_before.maxHp): base += int(effect.get("executeBonus", 0))
-	return roundi(maxi(0, base) * (1.5 if form == "ranged" else 1.0))
+	var multiplier := (2.0 if buffs.count(self,"ranged_mastery") > 0 else 1.5) if form == "ranged" else 1.0
+	return roundi(maxi(0, base) * multiplier)
 
 func draw_cards(amount: int = -1) -> Array:
 	var drawn: Array = []
@@ -290,6 +293,7 @@ func discard_candidates(uid: String) -> Array:
 	return hand.filter(func(other): return other != uid and card(other).get("type") == "attack")
 
 func extra_ammo_limit(uid: String) -> int:
+	if card(uid).get("consumeAllAmmo",false): return 0
 	return mini(maxi(0, ammo - 1), int(card(uid).get("extraAmmoMax", 0))) if stance == "ranged" else 0
 
 func play_error(uid: String) -> String:
@@ -307,12 +311,12 @@ func change_stance(value: String) -> Array:
 	if value == "toggle": value = "ranged" if stance == "melee" else "melee"
 	if value == stance: return []
 	stance = value
-	if stance == "melee": return draw_cards(1)
+	if stance == "melee": return draw_cards(2)
 	buffs.apply(self, "stance_discount")
 	return []
 
 func gain_ammo(amount: int) -> void:
-	ammo = mini(int(profile.get("ammoCap", 6)), ammo + amount)
+	ammo = mini(int(profile.get("ammoCap", 10)), ammo + amount)
 
 func enemy_damage(index: int, amount: int, bypass: bool = false, attack_damage: bool = false) -> Dictionary:
 	var enemy: Dictionary = enemies[index]
@@ -350,6 +354,7 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 	if target_kind == "enemy" and (target_index < 0 or target_index >= enemies.size() or enemies[target_index].hp <= 0): return {}
 	if extra_ammo < 0 or extra_ammo > extra_ammo_limit(uid): return {}
 	var effects: Array = definition.get("effects", [])
+	if definition.has("consumeAllAmmo") and not definition.consumeAllAmmo is bool: return {}
 	# Validate the complete transaction before spending resources or moving any card.
 	var allowed := ["damage","ammo","draw","stance","discard_attack"]
 	for effect in effects:
@@ -359,6 +364,9 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 			if not (effect.amount is int or effect.amount is float): return {}
 			if effect.amount < 0 and not (effect.get("id", effect.type) == "strength" and buffs.valid_card_effect(effect)): return {}
 		if effect.type == "discard_attack" and not discard_uid in discard_candidates(uid): return {}
+		if effect.has("allAmmoHits") and not effect.allAmmoHits is bool: return {}
+		for key in ["bleedTriggers","rangedBonus"]:
+			if effect.has(key) and (not (effect[key] is int or effect[key] is float) or not is_finite(float(effect[key])) or effect[key] < 0 or effect[key] != floor(float(effect[key]))): return {}
 	var at_start := stance
 	var ammo_before := ammo
 	var before := enemies.duplicate(true)
@@ -369,11 +377,12 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 			if enemies[i].hp > 0: targets_to_hit.append(i)
 	elif target_kind == "enemy": targets_to_hit.append(target_index)
 	var bonus := 0
+	var segment_bonus := 0
 	energy -= card_cost(uid)
 	if attack:
+		segment_bonus = buffs.attack_segment_bonus(self)
 		bonus = buffs.begin_attack(self, at_start)
-		if at_start == "melee": gain_ammo(1)
-		else: ammo -= 1 + extra_ammo
+		if at_start == "ranged": ammo = 0 if definition.get("consumeAllAmmo",false) else ammo - 1 - extra_ammo
 	hand.erase(uid)
 	# Hold the resolving card outside all draw piles until its effects finish.
 	var drawn: Array = []
@@ -386,13 +395,20 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 		var amount := int(effect.get("amount", 0))
 		match effect.type:
 			"damage":
+				var ammo_segments := 0
 				for index in targets_to_hit:
-					var count := attack_hit_count(effect, at_start, before[index])
+					var count := attack_hit_count(effect, at_start, before[index],ammo_before)
 					for segment in count:
 						if enemies[index].hp <= 0: break
-						var amount_per_hit := attack_hit_amount(definition, effect, at_start, ammo_before, before[index], bonus if segment == 0 else 0, extra_ammo)
+						var amount_per_hit := attack_hit_amount(definition, effect, at_start, ammo_before, before[index], segment_bonus + (bonus if segment == 0 else 0), extra_ammo)
 						var hit := enemy_damage(index, amount_per_hit, at_start == "ranged" and effect.get("rangedIgnoreBlock", false), attack)
-						buffs.after_attack_hit(self, index, at_start, hit)
+						buffs.after_attack_hit(self, index, at_start, hit,int(effect.get("bleedTriggers",-1)))
+						if attack and at_start == "melee":
+							# A shared AoE segment grants ammo only once across its targets.
+							if segment >= ammo_segments:
+								gain_ammo(1)
+								ammo_segments = segment + 1
+							hit.ammoAfter = ammo
 						damage += hit.damage
 						hits.append(hit)
 				bonus = 0
@@ -419,7 +435,6 @@ func end_noren_turn() -> Dictionary:
 	hand.clear()
 	var turn_events: Array = buffs.player_turn_end(self)
 	resolve_outcome()
-	if outcome.is_empty(): turn_events.append_array(begin_enemy_turn_intents())
 	var attacks: Array = []
 	for index in enemies.size():
 		if not outcome.is_empty(): break
@@ -470,4 +485,5 @@ func end_noren_turn() -> Dictionary:
 		for enemy in enemies:
 			enemy.intentIndex += 1
 			enemy.intent = intent_for(enemy, int(enemy.intentIndex))
+		turn_events.append_array(begin_round_intents())
 	return {"discarded":discarded,"attacks":attacks,"turnEvents":turn_events,"drawn":draw_cards(),"outcome":outcome}

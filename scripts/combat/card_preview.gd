@@ -75,12 +75,18 @@ static func _card_text(definition: Dictionary, rows: Array) -> String:
 			parts.append(_range(values))
 		var number := parts[0] if Array(parts).all(func(value): return value == parts[0]) else "／".join(parts)
 		text = text.substr(0, found.get_start(1)) + number + text.substr(found.get_end(1))
+	var draw_rows: Array = rows.filter(func(row): return row.type == "draw")
+	pattern.compile("抽\\s*(\\d+)\\s*张牌")
+	matches = pattern.search_all(text)
+	for index in range(mini(matches.size(),draw_rows.size())-1,-1,-1):
+		var found: RegExMatch=matches[index]
+		text=text.substr(0,found.get_start(1))+_numbers(draw_rows[index].samples)+text.substr(found.get_end(1))
 	for row in rows:
 		var expression := ""
 		var number := _numbers(row.samples)
 		match row.type:
 			"ammo": expression = "获得\\s*(\\d+)\\s*颗弹药"
-			"draw": expression = "抽\\s*(\\d+)\\s*张牌"
+			"draw": continue
 			"buff":
 				match row.id:
 					"block": expression = "(\\d+)\\s*点格挡"
@@ -104,7 +110,7 @@ static func _card_text(definition: Dictionary, rows: Array) -> String:
 							expression = "补至\\s*(\\d+)\\s*层"
 							number = _numbers(row.finalSamples)
 						else: expression = "获得\\s*(\\d+)\\s*层弹反"
-					"next_damage": expression = "基础伤害(?:增加|[+])\\s*(\\d+)"
+					"next_damage", "next_hit_damage": expression = "基础伤害(?:增加|[+])\\s*(\\d+)"
 					"next_discount": expression = "费用降低\\s*(\\d+)"
 		if expression.is_empty(): continue
 		pattern.compile(expression)
@@ -130,13 +136,25 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 		target = before.size() - 1
 	var rows: Array = []
 	var bonus := 0
+	var segment_bonus := 0
 	var attack: bool = definition.get("type", "") == "attack"
 	if attack:
+		if copy.is_noren(): segment_bonus=copy.buffs.attack_segment_bonus(copy)
 		bonus = copy.buffs.begin_attack(copy, form) if copy.is_noren() else copy.next_attack_bonus
 		if copy.is_noren():
-			if form == "melee": copy.gain_ammo(1)
-			else: copy.ammo -= 1 + extra
+			if form == "ranged": copy.ammo = 0 if definition.get("consumeAllAmmo",false) else copy.ammo - 1 - extra
 			rows.append({"type":"attack_ammo", "values":[absi(copy.ammo - ammo_before)]})
+	# Track executed hits for ammo without changing potential damage presentation.
+	var ammo_targets: Array = []
+	if model.card_target(uid) == "all":
+		for index in copy.enemies.size():
+			if copy.enemies[index].hp > 0: ammo_targets.append(index)
+	else: ammo_targets.append(target)
+	var ammo_hp := {}
+	var ammo_block := {}
+	for index in ammo_targets:
+		ammo_hp[index] = int(copy.enemies[index].hp)
+		ammo_block[index] = int(copy.enemies[index].get("block",0))
 	copy.hand.erase(uid)
 	copy.draw_pile.erase(uid)
 	copy.discard_pile.erase(uid)
@@ -147,18 +165,33 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 		var amount := int(effect.get("amount", 0)) if active else 0
 		match effect.type:
 			"damage":
+				if copy.is_noren() and attack and form == "melee" and active:
+					var segments := 0
+					for index in ammo_targets:
+						for segment in copy.attack_hit_count(effect, form, before[index],ammo_before):
+							if ammo_hp[index] <= 0: break
+							var requested: int = copy.attack_hit_amount(definition, effect, form, ammo_before, before[index],segment_bonus+(bonus if segment == 0 else 0),extra)
+							requested = copy.buffs.incoming_damage(copy, requested, index)
+							var absorbed: int = mini(ammo_block[index],requested)
+							ammo_block[index] -= absorbed
+							ammo_hp[index] -= maxi(0,requested-absorbed)
+							segments = maxi(segments,segment+1)
+					var previous: int = copy.ammo
+					copy.gain_ammo(segments)
+					rows[0].values[0] += copy.ammo - previous
 				var hits: Array = []
 				var bleeding: Array = []
-				var count: int = copy.attack_hit_count(effect, form, before[target]) if copy.is_noren() else 1
+				var count: int = copy.attack_hit_count(effect, form, before[target],ammo_before) if copy.is_noren() else 1
 				for segment in count:
-					var per_hit: int = copy.attack_hit_amount(definition, effect, form, ammo_before, before[target], bonus if segment == 0 else 0, extra) if copy.is_noren() else amount + bonus
+					var per_hit: int = copy.attack_hit_amount(definition, effect, form, ammo_before, before[target], segment_bonus+(bonus if segment == 0 else 0), extra) if copy.is_noren() else amount + bonus
 					if copy.is_noren() and attack: per_hit = copy.buffs.incoming_damage(copy, per_hit, target)
 					hits.append(per_hit)
-					var layers := int(copy.enemies[target].get("bleed", 0)) if copy.is_noren() and form == "ranged" else 0
-					bleeding.append(layers)
-					# Show potential status gains even if this attack would be lethal.
-					# Keep HP/block intact; only advance the nominal bleed layers.
-					if active and layers > 0: copy.enemies[target].bleed = layers - 1
+					var times: int=int(effect.get("bleedTriggers",1 if form=="ranged" else 0)) if copy.is_noren() else 0
+					for tick in times:
+						var layers := int(copy.enemies[target].get("bleed",0))
+						bleeding.append(layers)
+						# Keep HP/block intact for potential damage, advancing only nominal layers.
+						if active and layers>0 and copy.buffs.count(copy,"persistent_bleed")==0: copy.enemies[target].bleed=layers-1
 				bonus = 0
 				rows.append({"type":"damage", "values":hits if active else [0], "bypass":copy.is_noren() and form == "ranged" and effect.get("rangedIgnoreBlock", false)})
 				rows.append({"type":"bleed_damage", "values":bleeding if active else [0]})
@@ -178,7 +211,7 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 				if changed:
 					copy.stance = value
 					if value == "melee":
-						var drawn := mini(1, draw_available)
+						var drawn := mini(2, draw_available)
 						draw_available -= drawn
 						text += "抽%d张牌。" % drawn
 					else:
@@ -207,7 +240,7 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 				if effect.type == "power":
 					rows.append({"type":"power", "text":definition.get("cardText", definition.get("description", "")) + ("\n已生效，不叠加。" if gained == 0 else "")})
 				else:
-					rows.append({"type":"buff", "id":id, "sourceType":effect.type, "finalCount":copy.buffs.count(copy, id, index), "name":entry.name, "enemy":enemy, "unit":"点" if id in ["block", "next_damage", "next_discount"] else "层", "values":[gained]})
+					rows.append({"type":"buff", "id":id, "sourceType":effect.type, "finalCount":copy.buffs.count(copy, id, index), "name":entry.name, "enemy":enemy, "unit":"点" if id in ["block", "next_damage", "next_hit_damage", "next_discount"] else "层", "values":[gained]})
 					rows.back().merge(branches)
 	return rows
 
