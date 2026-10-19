@@ -63,6 +63,33 @@
       "name": "义体教会",
       "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/战斗背景_简洁重绘_2026-10-18/义体教会_战斗背景_简洁重绘_v1.png",
       "sha256": "0d19fc07b0f900f1d8daf9ed9bc5d34c26cf5ca16820357fa4e487f75f2ce686"
+    },
+    {
+      "placeAssetId": "alley",
+      "battleAssetId": "alley_battle_simplified",
+      "name": "后巷",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/战斗背景_简洁重绘_2026-10-19/后巷_战斗背景_比例调整_v2.png",
+      "sha256": "adf727ac8d72c57550a732f6d3a0202675e4edf5b0a151277865ed7d22f8d162",
+      "size": [
+        1584,
+        993
+      ],
+      "date": "2026-10-19",
+      "version": "比例调整_v2"
+    },
+    {
+      "placeAssetId": "bar",
+      "battleAssetId": "bar_battle_simplified",
+      "name": "午夜酒吧",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/战斗背景_简洁重绘_2026-10-19/地下酒馆_战斗背景_比例调整_v2.png",
+      "sha256": "4e0165f10fc570a61c9c8fc677fc1c549cb367bb1508423bdead68e08c435a8c",
+      "size": [
+        1584,
+        993
+      ],
+      "date": "2026-10-19",
+      "version": "比例调整_v2"
     }
-  ]
+  ],
+  "updated": "2026-10-19"
 }

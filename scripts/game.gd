@@ -628,8 +628,8 @@ func heal_at(place_id: String) -> bool:
 	return false
 
 func training_scenery_choices() -> Array[Dictionary]:
-	var choices: Array[Dictionary] = [{"id":"", "name":"默认测试场"}]
-	for place_id in ["garden","hive","port","pump","junkyard","hotel","tower","block5","church"]:
+	var choices: Array[Dictionary] = [{"id":"", "name":"默认场景（后巷）"}]
+	for place_id in ["garden","hive","port","pump","junkyard","hotel","tower","block5","church","alley","bar"]:
 		var place: Dictionary = place_data(place_id)
 		var asset_id: String = assets.get(place.get("backgroundAssetId",""),{}).get("battleAssetId","")
 		var definition: Dictionary = assets.get(asset_id,{})

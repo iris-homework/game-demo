@@ -115,7 +115,7 @@ func _training_scenery_label() -> String:
 	for choice in Game.training_scenery_choices():
 		if choice.id == Game.b04_scenery_choice:
 			return "场景：" + str(choice.name)
-	return "场景：默认测试场"
+	return "场景：默认场景（后巷）"
 
 func open_scenery_picker() -> void:
 	if Game.training_mode or Game.battle_busy or Game.transition_locked: return
@@ -137,7 +137,7 @@ func open_scenery_picker() -> void:
 		var choice: Dictionary = choices[index]
 		var choice_id := str(choice.id)
 		var selected: bool = choice_id == Game.b04_scenery_choice
-		var choice_button := _menu_button("scenery_choice_" + ("default" if choice_id.is_empty() else choice_id), ("✓  " if selected else "") + str(choice.name), Vector2(402 + (index % 2) * 330, 302 + floori(index / 2.0) * 58), Vector2(306, 46), _select_training_scenery.bind(choice_id), selected, 18, scenery_dialog)
+		var choice_button := _menu_button("scenery_choice_" + ("default" if choice_id.is_empty() else choice_id), ("✓  " if selected else "") + str(choice.name), Vector2(402 + (index % 2) * 330, 302 + floori(index / 2.0) * 52), Vector2(306, 46), _select_training_scenery.bind(choice_id), selected, 18, scenery_dialog)
 		focus_buttons.append(choice_button)
 	scenery_cancel = _menu_button("scenery_cancel", "取消", Vector2(832, 638), Vector2(206, 44), close_scenery_picker, false, 18, scenery_dialog)
 	focus_buttons.append(scenery_cancel)

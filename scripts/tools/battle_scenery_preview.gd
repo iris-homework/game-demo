@@ -1,6 +1,6 @@
 extends Node
 ## Isolated, playable preview of the real battle view. No adventure files are written.
-const PLACE_IDS := ["garden", "hive", "port", "pump", "junkyard", "hotel", "tower", "block5", "church"]
+const PLACE_IDS := ["garden", "hive", "port", "pump", "junkyard", "hotel", "tower", "block5", "church", "alley", "bar"]
 const PREVIEW_BATTLE := "B04"
 var app: Control
 var controls: DemoUI
@@ -72,7 +72,7 @@ func build_controls() -> void:
 	next_button = controls.button(controls,"›",Vector2(341,213),Vector2(42,36),func(): switch_to(selected_index+1))
 	restart_button = controls.button(controls,"重新演练",Vector2(393,213),Vector2(116,36),restart)
 	restart_button.add_theme_font_size_override("font_size",16)
-	controls.label(controls,"9 张 · 可出牌",Vector2(521,219),Vector2(130,26),14,DemoUI.MUTED)
+	controls.label(controls,"%d 张 · 可出牌" % PLACE_IDS.size(),Vector2(521,219),Vector2(130,26),14,DemoUI.MUTED)
 	selector.tooltip_text = "切换背景保留当前演练；出牌或选牌期间请先完成或取消。"
 
 func _process(_delta: float) -> void:

@@ -5,7 +5,8 @@
   },
   "bar": {
     "path": "res://assets/backgrounds/bar.png",
-    "kind": "background"
+    "kind": "background",
+    "battleAssetId": "bar_battle_simplified"
   },
   "alley": {
     "path": "res://assets/backgrounds/alley.png",
@@ -13,7 +14,8 @@
     "battleActorOffset": [
       0,
       20
-    ]
+    ],
+    "battleAssetId": "alley_battle_simplified"
   },
   "tower": {
     "path": "res://assets/backgrounds/tower.png",
@@ -255,6 +257,26 @@
     "path": "res://assets/backgrounds/battle_simplified/church.png",
     "kind": "battle_background",
     "groundStart": 0.5,
+    "actorOffset": [
+      0,
+      0
+    ],
+    "trainingSelectable": true
+  },
+  "alley_battle_simplified": {
+    "path": "res://assets/backgrounds/battle_simplified/alley.png",
+    "kind": "battle_background",
+    "groundStart": 0.516,
+    "actorOffset": [
+      0,
+      20
+    ],
+    "trainingSelectable": true
+  },
+  "bar_battle_simplified": {
+    "path": "res://assets/backgrounds/battle_simplified/bar.png",
+    "kind": "battle_background",
+    "groundStart": 0.563,
     "actorOffset": [
       0,
       0
