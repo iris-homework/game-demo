@@ -15,6 +15,9 @@ var pose_aliases: Dictionary = {}
 var target_bounds := Rect2(-58,-130,116,145)
 var attack_style_override := ""
 var hit_effect_texture: Texture2D
+var white_key_poses: Dictionary = {}
+var source_facing := -1.0
+var white_key_material: ShaderMaterial
 var weapon_shift: Node
 const WeaponShift := preload("res://scripts/combat/weapon_shift_fx.gd")
 const NOREN := {
@@ -47,6 +50,11 @@ func setup_enemy(visual: EnemyVisualResolver.Visual, origin: Vector2, direction:
 	target_bounds = visual.target_bounds
 	attack_style_override = visual.attack_style_override
 	hit_effect_texture = visual.hit_effect_texture
+	white_key_poses = visual.white_key_poses.duplicate()
+	source_facing = visual.source_facing
+	if true in white_key_poses.values():
+		white_key_material = ShaderMaterial.new()
+		white_key_material.shader = preload("res://shaders/white_key.gdshader")
 	_place(origin,direction)
 
 func _place(origin: Vector2, direction: float) -> void:
@@ -67,8 +75,11 @@ func set_pose(value: String) -> void:
 	var anchor: Vector2 = calibration[0]
 	var factor: float = calibration[1]
 	sprite.texture = poses[pose]
-	# Source artwork faces left. Mirror texture and anchor together.
-	sprite.scale = Vector2(-facing,1)*factor
+	# Player stance transitions temporarily own the sprite's material.
+	if not is_player:
+		sprite.material = white_key_material if white_key_poses.get(pose, false) else null
+	# Mirror the source art and its soles together; each profile declares its facing.
+	sprite.scale = Vector2(facing*source_facing,1)*factor
 	sprite.position = -anchor*sprite.scale
 
 func face_toward(point: Vector2) -> void:

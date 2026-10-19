@@ -6,7 +6,7 @@ var origins: Array[Vector2] = []
 const COLORS := [Color("46ffef",0.44),Color("ff4dbc",0.42),Color("afa0ff",0.70)]
 const OFFSETS := [-8.0,7.0,0.0]
 
-func setup(source: Sprite2D) -> void:
+func setup(source: Sprite2D, white_key_enabled: bool = false) -> void:
 	for i in 3:
 		var echo := Sprite2D.new()
 		echo.texture = source.texture
@@ -17,6 +17,7 @@ func setup(source: Sprite2D) -> void:
 		shader_material.shader = preload("res://shaders/return_ghost.gdshader")
 		shader_material.set_shader_parameter("neon_color",COLORS[i])
 		shader_material.set_shader_parameter("seed",float(i)*13.0)
+		shader_material.set_shader_parameter("white_key_enabled",white_key_enabled)
 		echo.material = shader_material
 		add_child(echo)
 		echoes.append(echo)

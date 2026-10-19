@@ -87,14 +87,39 @@ func initialize(id: String, hp: int, maximum: int, rules: Dictionary, enemy_defs
 			enemy.bleed = 0
 			enemy.weak = 0
 		enemy.intentIndex = 0
-		enemy.intent = intent_for(enemy, 0)
 		enemies.append(enemy)
+	for enemy in enemies:
+		enemy.intent = intent_for(enemy, 0)
 	if player_hp <= 0: outcome = "lose"
 	log_lines.append("战斗连接已建立。")
 
 func intent_for(enemy: Dictionary, index: int) -> Dictionary:
 	var sequence: Array = enemy.get("intentSequence", [])
+	if enemy.get("intentPhase", "") == "ally_death": sequence = enemy.get("allyDeathIntentSequence", {}).get("sequence", sequence)
 	return (profile.intent if sequence.is_empty() else sequence[index % sequence.size()]).duplicate(true)
+
+func begin_enemy_turn_intents() -> Array:
+	# Check once at the enemy-side turn boundary, before any enemy acts.
+	# Casualties during those actions wait for the next enemy-side turn.
+	# Phase and index travel with the snapshot and never reset a second time.
+	var changes: Array = []
+	for index in enemies.size():
+		var enemy: Dictionary = enemies[index]
+		if enemy.hp <= 0 or not enemy.has("allyDeathIntentSequence") or enemy.get("intentPhase", "") == "ally_death": continue
+		var watched: Array = enemy.allyDeathIntentSequence.get("allyIds", [])
+		if enemies.any(func(ally): return ally.id in watched and ally.hp <= 0):
+			enemy.intentPhase = "ally_death"
+			enemy.intentIndex = 0
+			enemy.intent = intent_for(enemy, 0)
+			changes.append({"type":"intent_change", "target":index, "intent":enemy.intent.duplicate(true), "intentIndex":0, "intentPhase":"ally_death"})
+	return changes
+
+func enemy_intent_damage(enemy: Dictionary, after_player_turn_end: bool = true) -> int:
+	var amount := buffs.enemy_attack_damage(enemy, int(enemy.get("intent", {}).get("amount", 0)))
+	# During the player's turn, show the amount that will actually be used after
+	# their own turn-end decay, without changing any live status or intent state.
+	var layers := buffs.count(self, "vulnerable") - (1 if after_player_turn_end else 0)
+	return roundi(amount * (1.5 if layers > 0 else 1.0))
 
 func card(uid: String) -> Dictionary:
 	return card_catalog.get(instances.get(uid, ""), {})
@@ -105,21 +130,23 @@ func card_preview(uid: String, target_index: int = -1, extra_ammo: int = -1) -> 
 func enemy_intent_text(enemy: Dictionary) -> String:
 	var intent: Dictionary = enemy.get("intent", {})
 	if intent.get("type", "") == "pollution": return "污染 %d" % int(intent.get("amount", 0))
+	if intent.get("type", "") == "vulnerable": return "易伤 %d" % int(intent.get("amount", 0))
+	if intent.get("type", "") == "strength_allies": return "强化 +%d" % int(intent.get("amount", 0))
 	if intent.get("type", "") != "attack": return str(intent.get("description", "非攻击行动"))
 	var amount := int(intent.get("amount", 0))
-	if is_noren(): amount = buffs.enemy_attack_damage(enemy, amount)
+	if is_noren(): amount = enemy_intent_damage(enemy)
 	return "攻击 %d" % amount + (" ×%d" % int(intent.hits) if int(intent.get("hits", 1)) > 1 else "")
 
 func attack_hit_count(effect: Dictionary, form: String, enemy_before: Dictionary) -> int:
 	return int(effect.get("hits", 1)) + (1 if form == "ranged" and effect.has("bleedExtraHit") and int(enemy_before.get("bleed", 0)) >= int(effect.bleedExtraHit) else 0)
 
 func attack_hit_amount(definition: Dictionary, effect: Dictionary, form: String, ammo_before: int, enemy_before: Dictionary, bonus: int, extra: int) -> int:
-	var base := int(effect.get("amount", 0)) + bonus
+	var base := int(effect.get("amount", 0)) + bonus + (buffs.count(self, "strength") if definition.get("type", "") == "attack" else 0)
 	if form == "ranged":
 		base += extra * int(definition.get("extraAmmoBonus", 0))
 		if ammo_before == 1: base += int(effect.get("lastAmmoBonus", 0))
 		if int(enemy_before.hp) * 2 <= int(enemy_before.maxHp): base += int(effect.get("executeBonus", 0))
-	return roundi(base * (1.5 if form == "ranged" else 1.0))
+	return roundi(maxi(0, base) * (1.5 if form == "ranged" else 1.0))
 
 func draw_cards(amount: int = -1) -> Array:
 	var drawn: Array = []
@@ -287,8 +314,9 @@ func change_stance(value: String) -> Array:
 func gain_ammo(amount: int) -> void:
 	ammo = mini(int(profile.get("ammoCap", 6)), ammo + amount)
 
-func enemy_damage(index: int, amount: int, bypass: bool = false) -> Dictionary:
+func enemy_damage(index: int, amount: int, bypass: bool = false, attack_damage: bool = false) -> Dictionary:
 	var enemy: Dictionary = enemies[index]
+	amount = buffs.incoming_damage(self, amount, index) if attack_damage else maxi(0, amount)
 	var absorbed := 0 if bypass else mini(amount, int(enemy.get("block", 0)))
 	enemy.block = int(enemy.get("block", 0)) - absorbed
 	var loss := mini(maxi(0, amount - absorbed), int(enemy.hp))
@@ -300,7 +328,8 @@ func enemy_damage(index: int, amount: int, bypass: bool = false) -> Dictionary:
 		log_lines.append("%s 死亡，向角色施加 %d 层污染。" % [enemy.displayName,death_pollution])
 	return {"target":index,"damage":loss,"blocked":absorbed,"hpAfter":enemy.hp,"blockAfter":enemy.block,"killed":enemy.hp == 0,"deathPollution":death_pollution,"playerPollutionAfter":buffs.count(self,"pollution")}
 
-func player_damage(amount: int) -> Dictionary:
+func player_damage(amount: int, attack_damage: bool = false) -> Dictionary:
+	if attack_damage: amount = buffs.incoming_damage(self, amount)
 	var absorbed := mini(block, maxi(0, amount))
 	block -= absorbed
 	var loss := mini(player_hp, maxi(0, amount - absorbed))
@@ -326,7 +355,9 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 	for effect in effects:
 		if not effect is Dictionary: return {}
 		if not effect.get("type", "") in allowed and not buffs.valid_card_effect(effect): return {}
-		if effect.has("amount") and (not (effect.amount is int or effect.amount is float) or effect.amount < 0): return {}
+		if effect.has("amount"):
+			if not (effect.amount is int or effect.amount is float): return {}
+			if effect.amount < 0 and not (effect.get("id", effect.type) == "strength" and buffs.valid_card_effect(effect)): return {}
 		if effect.type == "discard_attack" and not discard_uid in discard_candidates(uid): return {}
 	var at_start := stance
 	var ammo_before := ammo
@@ -360,7 +391,7 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 					for segment in count:
 						if enemies[index].hp <= 0: break
 						var amount_per_hit := attack_hit_amount(definition, effect, at_start, ammo_before, before[index], bonus if segment == 0 else 0, extra_ammo)
-						var hit := enemy_damage(index, amount_per_hit, at_start == "ranged" and effect.get("rangedIgnoreBlock", false))
+						var hit := enemy_damage(index, amount_per_hit, at_start == "ranged" and effect.get("rangedIgnoreBlock", false), attack)
 						buffs.after_attack_hit(self, index, at_start, hit)
 						damage += hit.damage
 						hits.append(hit)
@@ -388,6 +419,7 @@ func end_noren_turn() -> Dictionary:
 	hand.clear()
 	var turn_events: Array = buffs.player_turn_end(self)
 	resolve_outcome()
+	if outcome.is_empty(): turn_events.append_array(begin_enemy_turn_intents())
 	var attacks: Array = []
 	for index in enemies.size():
 		if not outcome.is_empty(): break
@@ -396,19 +428,27 @@ func end_noren_turn() -> Dictionary:
 		buffs.own_turn_start(self, index)
 		var intent: Dictionary = enemy.intent
 		if intent.get("type", "") != "attack":
-			if intent.get("type", "") == "pollution":
-				buffs.apply(self, "pollution", int(intent.get("amount", 0)))
-				turn_events.append({"type":"status_apply","source":index,"target":-1,"buffId":"pollution","stacksAfter":buffs.count(self, "pollution")})
-				log_lines.append("%s 施加 %d 层污染。" % [enemy.displayName, int(intent.get("amount", 0))])
+			var kind: String = intent.get("type", "")
+			var amount := int(intent.get("amount", 0))
+			if kind in ["pollution", "vulnerable"]:
+				buffs.apply(self, kind, amount)
+				turn_events.append({"type":"status_apply","source":index,"target":-1,"buffId":kind,"amount":amount,"stacksAfter":buffs.count(self, kind)})
+				log_lines.append("%s 施加 %d 层%s。" % [enemy.displayName, amount, buffs.definition(kind).name])
+			elif kind == "strength_allies":
+				for ally_index in enemies.size():
+					if enemies[ally_index].hp <= 0 or not enemies[ally_index].id in intent.get("targetIds", []): continue
+					buffs.apply(self, "strength", amount, ally_index)
+					turn_events.append({"type":"status_apply","source":index,"target":ally_index,"buffId":"strength","amount":amount,"stacksAfter":buffs.count(self, "strength", ally_index)})
+				log_lines.append("%s 强化小弟，力量 +%d。" % [enemy.displayName, amount])
 			turn_events.append_array(buffs.own_turn_end(self, index))
 			resolve_outcome()
 			continue
 		var per_hit := buffs.enemy_attack_damage(enemy, int(intent.get("amount", 0)))
-		var total := per_hit * int(intent.get("hits", 1))
+		var total := buffs.incoming_damage(self, per_hit) * int(intent.get("hits", 1))
 		var hits: Array = []
 		var damage := 0
 		for segment in int(intent.get("hits", 1)):
-			var hit := player_damage(per_hit)
+			var hit := player_damage(per_hit, true)
 			if hit.damage > 0:
 				buffs.apply(self, "pollution", int(enemy.get("attackPollution", 0)))
 			hit.pollutionAfter = buffs.count(self, "pollution")

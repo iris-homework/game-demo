@@ -140,7 +140,7 @@ func _ready() -> void:
 	for battle_id in ["B04","B12"]:
 		Game.start_training(battle_id)
 		await idle()
-		check(app.view.stage.enemies[0].kind == "finn","Other battle keeps its existing presentation: "+battle_id)
+		check(app.view.stage.enemies[0].kind == ("gang_henchman" if battle_id == "B04" else "finn"),"Other battle uses its configured presentation: "+battle_id)
 		Game.finish_training("lose")
 		await idle()
 		check(Game.state == adventure,"Other training still restores adventure: "+battle_id)

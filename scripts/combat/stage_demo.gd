@@ -13,6 +13,9 @@ func _ready() -> void:
 	while Game.battle_busy or Game.transition_locked: await get_tree().process_frame
 	# Only this isolated entry duplicates the encounter, never the enemy catalog.
 	var template: Dictionary = view.model.enemies[0].duplicate(true)
+	template.erase("formationSlot")
+	template.hp = Game.TRAINING_ENEMY_HP
+	template.maxHp = Game.TRAINING_ENEMY_HP
 	view.model.enemies.clear()
 	for i in 3:
 		var enemy := template.duplicate(true)

@@ -11,13 +11,15 @@ func model_for(id: String, hp: int = 100) -> CombatModel:
 	var m := CombatModel.new()
 	var definitions: Array = []
 	for enemy_id in Game.battles[id].enemyIds: definitions.append(Game.enemy_catalog[enemy_id])
-	# Exercise the historical one-fish prototype snapshot independently of the
-	# new authored encounter (covered by fish_rules_tests).
-	if id == "B11":
+	# Freeze historical single-enemy prototypes independently of authored
+	# encounters (covered by fish_rules_tests and gang_rules_tests).
+	if id in ["B04", "B11"]:
 		var legacy_fish: Dictionary = definitions[0].duplicate(true)
 		legacy_fish.maxHp = null
 		legacy_fish.intentSequence = []
 		legacy_fish.erase("attackPollution")
+		legacy_fish.erase("allyDeathIntentSequence")
+		legacy_fish.erase("formationSlot")
 		definitions = [legacy_fish]
 	m.initialize(id,hp,100,Game.prototype_rules,definitions)
 	return m

@@ -22,12 +22,44 @@
   "gang": {
     "id": "gang",
     "characterId": "gang",
-    "displayName": "黑帮头目",
+    "displayName": "黑帮老大",
     "battlePortraitAssetId": "",
-    "maxHp": null,
-    "intentSequence": [],
-    "prototype": true,
-    "combatVisualId": "finn"
+    "maxHp": 30,
+    "intentSequence": [
+      {
+        "type": "strength_allies",
+        "amount": 1,
+        "targetIds": [
+          "gang_henchman",
+          "gang_henchman_second"
+        ]
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "gang_boss",
+    "formationSlot": "triangle_right",
+    "allyDeathIntentSequence": {
+      "allyIds": [
+        "gang_henchman",
+        "gang_henchman_second"
+      ],
+      "sequence": [
+        {
+          "type": "attack",
+          "amount": 8,
+          "hits": 1
+        },
+        {
+          "type": "vulnerable",
+          "amount": 2
+        },
+        {
+          "type": "attack",
+          "amount": 6,
+          "hits": 1
+        }
+      ]
+    }
   },
   "richard": {
     "id": "richard",
@@ -122,5 +154,39 @@
     "combatVisualId": "fish",
     "attackPollution": 2,
     "deathPollution": 5
+  },
+  "gang_henchman": {
+    "id": "gang_henchman",
+    "characterId": "gang",
+    "displayName": "黑帮小弟",
+    "battlePortraitAssetId": "",
+    "maxHp": 15,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 4,
+        "hits": 1
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "gang_henchman",
+    "formationSlot": "triangle_left_back"
+  },
+  "gang_henchman_second": {
+    "id": "gang_henchman_second",
+    "characterId": "gang",
+    "displayName": "黑帮小弟",
+    "battlePortraitAssetId": "",
+    "maxHp": 15,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 4,
+        "hits": 1
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "gang_henchman",
+    "formationSlot": "triangle_left_front"
   }
 }

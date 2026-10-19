@@ -152,6 +152,7 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 				var count: int = copy.attack_hit_count(effect, form, before[target]) if copy.is_noren() else 1
 				for segment in count:
 					var per_hit: int = copy.attack_hit_amount(definition, effect, form, ammo_before, before[target], bonus if segment == 0 else 0, extra) if copy.is_noren() else amount + bonus
+					if copy.is_noren() and attack: per_hit = copy.buffs.incoming_damage(copy, per_hit, target)
 					hits.append(per_hit)
 					var layers := int(copy.enemies[target].get("bleed", 0)) if copy.is_noren() and form == "ranged" else 0
 					bleeding.append(layers)

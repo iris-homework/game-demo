@@ -1,0 +1,141 @@
+{
+  "note": "2026-10-19 proportion correction via built-in image_gen, Noren proportions; original generation preserved in sibling files and previous runtime copies in artifacts/qa/gang-proportions-2026-10-19/before. All corrected poses are RGBA including boss idle.",
+  "files": [
+    {
+      "file": "gang_boss_idle.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮头目/01_站姿_idle_比例统一版.png",
+      "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-6e045bed-b21b-4c75-9568-f6100f66267a.png",
+      "sha256": "972078a6dc1ffc015bd89499a267daea81fa74b009d567e91bdc2de7817bf446",
+      "dimensions": [
+        1347,
+        1168
+      ],
+      "mode": "RGBA",
+      "visible_bounds": [
+        324,
+        99,
+        1051,
+        1109
+      ]
+    },
+    {
+      "file": "gang_boss_move.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮头目/02_前进_advance_比例统一版.png",
+      "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-0ef7632c-a6c1-4c75-9544-bac499179172.png",
+      "sha256": "41b93728fd10e0d610e4e97865283a0d0784c98794a624da6fb207d1316f74ad",
+      "dimensions": [
+        1346,
+        1168
+      ],
+      "mode": "RGBA",
+      "visible_bounds": [
+        108,
+        77,
+        1245,
+        1138
+      ]
+    },
+    {
+      "file": "gang_boss_pierce.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮头目/03_前踢击_front_kick_比例统一版.png",
+      "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-a8b6a0aa-199b-4e02-bc79-38a2a7d2d89b.png",
+      "sha256": "01024e36d9e167192b95d9317c908cdda8fa4ffede40e40f9b12800d2d9fa16e",
+      "dimensions": [
+        1346,
+        1168
+      ],
+      "mode": "RGBA",
+      "visible_bounds": [
+        89,
+        51,
+        1266,
+        1112
+      ]
+    },
+    {
+      "file": "gang_boss_damaged.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮头目/04_受击_hit_比例统一版.png",
+      "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-05753be5-395e-42fb-bb95-101c6d9ea98e.png",
+      "sha256": "711d9a11c198a50b7396f1267d0208b423d61b225548e381ecdc26e4340abe3b",
+      "dimensions": [
+        1346,
+        1168
+      ],
+      "mode": "RGBA",
+      "visible_bounds": [
+        132,
+        63,
+        1238,
+        1126
+      ]
+    },
+    {
+      "file": "gang_henchman_idle.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮小弟/01_站姿_idle_比例统一版.png",
+      "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-61fa1c2a-2df6-4b0d-a033-85645bdedd73.png",
+      "sha256": "3cbae5ca2133577517f798ca84bd9e7bf6cdcf25543bde56a16501f2022d8cf2",
+      "dimensions": [
+        1346,
+        1168
+      ],
+      "mode": "RGBA",
+      "visible_bounds": [
+        442,
+        95,
+        968,
+        1103
+      ]
+    },
+    {
+      "file": "gang_henchman_move.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮小弟/02_前进_advance_比例统一版.png",
+      "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-6205043f-b952-4068-88e3-3bd0ce6ce2d4.png",
+      "sha256": "40b0f4626e01b8e6ae8b9f234174017723cb14431c6ed806cf40d8c0fd7212db",
+      "dimensions": [
+        1346,
+        1168
+      ],
+      "mode": "RGBA",
+      "visible_bounds": [
+        376,
+        99,
+        1033,
+        1116
+      ]
+    },
+    {
+      "file": "gang_henchman_pierce.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮小弟/03_拳打_punch_比例统一版.png",
+      "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-87cad074-4c47-4ff4-bbfa-7bfe3626a839.png",
+      "sha256": "f7dc310b2f4289caebb9123d8ad6366018d9e31eec7e1de78e4174bebee6804a",
+      "dimensions": [
+        1346,
+        1168
+      ],
+      "mode": "RGBA",
+      "visible_bounds": [
+        315,
+        69,
+        1261,
+        1111
+      ]
+    },
+    {
+      "file": "gang_henchman_damaged.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮小弟/04_受击_hit_比例统一版.png",
+      "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-aa0d31da-c1f1-42c4-b7b4-d494d0b9f62d.png",
+      "sha256": "bb26463c85c74137afaff79c8f4bd9c63219c73a259a111c8ec0a53a98716cfd",
+      "dimensions": [
+        1346,
+        1168
+      ],
+      "mode": "RGBA",
+      "visible_bounds": [
+        272,
+        102,
+        1173,
+        1113
+      ]
+    }
+  ]
+}

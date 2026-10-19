@@ -64,7 +64,7 @@ func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual], scen
 	for i in count:
 		var actor := Actor.new()
 		actors_root.add_child(actor)
-		actor.setup_enemy(enemy_visuals[i],enemy_home(i,count),-1.0)
+		actor.setup_enemy(enemy_visuals[i],enemy_home(i,count,enemy_visuals[i].formation_slot),-1.0)
 		enemies.append(actor)
 		if count > 1:
 			var marker := Label.new()
@@ -99,7 +99,12 @@ func setup_scenery(texture: Texture2D, ground_start: float) -> void:
 func _exit_tree() -> void:
 	if is_instance_valid(scenery): scenery.queue_free()
 
-func enemy_home(index: int, count: int) -> Vector2:
+func enemy_home(index: int, count: int, formation_slot: String = "") -> Vector2:
+	# Opt-in encounter slots leave every other battle's default depth lanes intact.
+	match formation_slot:
+		"triangle_left_back": return Vector2(965,floor_y-115)
+		"triangle_left_front": return Vector2(965,floor_y+45)
+		"triangle_right": return Vector2(1160,floor_y-35)
 	if count == 1: return Vector2(1021,floor_y-75)
 	if count == 2: return Vector2(1000+index*105,floor_y-105+index*135)
 	# Three clear depth lanes; additional columns remain within the stage.
@@ -466,7 +471,7 @@ func return_home() -> void:
 			ghost.scale = Vector2.ONE*depth_scale(actor.home)
 			ghost.z_index = 1
 			world.add_child(ghost)
-			ghost.setup(actor.sprite)
+			ghost.setup(actor.sprite,actor.white_key_poses.get(actor.pose,false))
 			ghosts.append(ghost)
 			reveal.tween_method(ghost.set_progress,0.0,1.0,0.50)
 			reveal.tween_property(actor,"modulate",Color.WHITE,0.28).set_delay(0.22).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)

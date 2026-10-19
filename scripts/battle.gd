@@ -17,6 +17,7 @@ var player_plate: Control
 var shown_player_block := 0
 var shown_player_parry := 0
 var shown_player_pollution := 0
+var shown_player_buffs: Dictionary = {}
 var presenting_enemy_turn := false
 const ENEMY_INTENT_SIZE := Vector2(126,28)
 var aim: Node2D
@@ -74,6 +75,7 @@ func enter(params: Dictionary) -> void:
 	shown_player_block = model.block
 	shown_player_parry = model.parry
 	shown_player_pollution = model.buffs.count(model, "pollution")
+	shown_player_buffs = model.buff_state.duplicate(true)
 	# Retain existing HUD offsets; only the world imagery is replaced.
 	var scenery_place_id: String = Game.training_scenery_place_id if Game.training_mode and not Game.training_scenery_place_id.is_empty() else battle.placeId
 	var place_asset: String = Game.place_data(scenery_place_id).backgroundAssetId
@@ -206,14 +208,14 @@ func refresh_enemy_hud() -> void:
 	add_child(enemy_hud)
 	var summary := Control.new()
 	enemy_hud.add_child(summary)
-	summary.size = Vector2(344,80*mini(2,model.enemies.size())-12)
+	summary.size = Vector2(344,80*mini(3,model.enemies.size())-12)
 	summary.global_position = Vector2(1072,96)
 	summary.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	# A fixed-height viewport keeps larger encounters above the actor stage.
 	var summary_scroll := ScrollContainer.new()
 	summary_scroll.size = summary.size
 	summary_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	summary_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE if model.enemies.size() <= 2 else Control.MOUSE_FILTER_PASS
+	summary_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE if model.enemies.size() <= 3 else Control.MOUSE_FILTER_PASS
 	summary.add_child(summary_scroll)
 	var rows := Control.new()
 	rows.custom_minimum_size = Vector2(328,80*model.enemies.size()-12)
@@ -254,6 +256,8 @@ func refresh_enemy_hud() -> void:
 		targets.append(target)
 		target.disabled = enemy.hp <= 0
 		target.tooltip_text = "攻击目标：" + enemy.displayName + "\n下次行动：" + intent_text
+		if enemy.has("allyDeathIntentSequence"):
+			target.tooltip_text += "\n强化：给每名存活小弟增加1层力量。\n敌方回合开始时若已有小弟死亡，切换为攻击8 → 易伤2 → 攻击6循环。"
 		if int(enemy.get("attackPollution", 0)) > 0:
 			target.tooltip_text += "\n每段攻击实际扣血时，追加 %d 层污染；污染伤害不触发。" % int(enemy.attackPollution)
 		if int(enemy.get("deathPollution",0)) > 0:
@@ -678,15 +682,30 @@ func present_pollution_gain(amount: int) -> void:
 func present_status_event(event: Dictionary) -> void:
 	var target_index := int(event.get("target", -1))
 	var actor = stage.player if target_index < 0 else stage.enemies[target_index]
+	if event.type == "intent_change":
+		var enemy: Dictionary = shown_enemies[target_index]
+		enemy.intent = event.intent.duplicate(true)
+		enemy.intentIndex = event.intentIndex
+		enemy.intentPhase = event.intentPhase
+		refresh_enemy_hud()
+		return
+	if event.type == "status_decay":
+		apply_shown_status(event)
+		return
 	if event.type == "status_apply":
 		var source := int(event.source)
 		shown_enemies[source].block = 0
 		refresh_enemy_hud()
-		await stage.present_pollution_spit(stage.enemies[source],actor,func():
-			shown_player_pollution = int(event.stacksAfter)
-			refresh_player_plate()
-			present_pollution_gain(int(shown_enemies[source].intent.get("amount",0)))
-		)
+		if event.buffId == "pollution":
+			await stage.present_pollution_spit(stage.enemies[source],actor,func():
+				apply_shown_status(event)
+				present_pollution_gain(int(event.get("amount", shown_enemies[source].intent.get("amount",0))))
+			)
+		else:
+			apply_shown_status(event)
+			var definition := model.buffs.definition(event.buffId)
+			impact(stage.contact(actor)-Vector2(0,70),"%s+%d" % [definition.name,int(event.get("amount",0))],Color(definition.color),0.75)
+			await get_tree().create_timer(0.30).timeout
 		return
 	if event.type != "status_tick": return
 	if target_index < 0:
@@ -710,6 +729,20 @@ func present_status_event(event: Dictionary) -> void:
 		await stage.retire_actor(actor)
 	else:
 		actor.set_pose("idle")
+
+func apply_shown_status(event: Dictionary) -> void:
+	var index := int(event.get("target", -1))
+	if index < 0:
+		if event.buffId == "pollution": shown_player_pollution = int(event.stacksAfter)
+		if int(event.stacksAfter) == 0: shown_player_buffs.erase(event.buffId)
+		else: shown_player_buffs[event.buffId] = int(event.stacksAfter)
+		refresh_player_plate()
+	else:
+		var enemy: Dictionary = shown_enemies[index]
+		if not enemy.has("buffs"): enemy.buffs = {}
+		if int(event.stacksAfter) == 0: enemy.buffs.erase(event.buffId)
+		else: enemy.buffs[event.buffId] = int(event.stacksAfter)
+		refresh_enemy_hud()
 
 func announce_turn(text: String, enemy: bool = false) -> void:
 	var banner := preload("res://scripts/combat/turn_banner.gd").new()
@@ -959,7 +992,7 @@ func enemy_statuses(enemy: Dictionary) -> Array:
 
 func refresh_player_plate() -> void:
 	if not is_instance_valid(player_plate): return
-	player_plate.update_values(shown_player_hp,model.max_hp,shown_player_block,model.buffs.player_badges(model,shown_player_parry,shown_player_pollution))
+	player_plate.update_values(shown_player_hp,model.max_hp,shown_player_block,model.buffs.player_badges(model,shown_player_parry,shown_player_pollution,shown_player_buffs))
 
 func refresh_hp() -> void:
 	if shown_player_hp < 0:
@@ -996,6 +1029,7 @@ func refresh_resources() -> void:
 		shown_player_block = model.block
 		shown_player_parry = model.parry
 		shown_player_pollution = model.buffs.count(model, "pollution")
+		shown_player_buffs = model.buff_state.duplicate(true)
 	refresh_player_plate()
 	if not is_instance_valid(resources_label): return
 	if is_instance_valid(energy_panel):

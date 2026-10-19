@@ -847,6 +847,29 @@ func valid_combat(c: Dictionary) -> bool:
 		if not enemy.intent.get("amount",0) is float and not enemy.intent.get("amount",0) is int: return false
 		if not enemy.intent.get("hits",1) is float and not enemy.intent.get("hits",1) is int: return false
 		if enemy.intent.get("amount",0) < 0 or enemy.intent.get("hits",1) < 1: return false
+		if not valid_conditional_intent(enemy, c.enemies): return false
+	return true
+
+func valid_conditional_intent(enemy: Dictionary, encounter: Array) -> bool:
+	# Optional phase data is frozen per encounter; old saves need no migration.
+	if not enemy.has("allyDeathIntentSequence"): return not enemy.has("intentPhase")
+	var branch = enemy.allyDeathIntentSequence
+	if not branch is Dictionary or not branch.get("allyIds") is Array or not branch.get("sequence") is Array: return false
+	if branch.allyIds.is_empty() or branch.sequence.is_empty() or not enemy.get("intentSequence") is Array: return false
+	var seen: Array = []
+	for id in branch.allyIds:
+		if not id is String or id == enemy.id or id in seen or not encounter.any(func(ally): return ally is Dictionary and ally.get("id") == id): return false
+		seen.append(id)
+	if enemy.get("intentPhase", "") not in ["", "ally_death"]: return false
+	if not buffs._valid_count(enemy.intentIndex): return false
+	for intent in enemy.intentSequence + branch.sequence + [enemy.intent]:
+		if not intent is Dictionary or intent.get("type", "") not in ["attack", "vulnerable", "strength_allies"]: return false
+		if not buffs._valid_count(intent.get("amount"), 999): return false
+		if not buffs._valid_count(intent.get("hits", 1)) or intent.get("hits", 1) < 1: return false
+		if intent.type == "strength_allies":
+			if not intent.get("targetIds") is Array or intent.targetIds.is_empty(): return false
+			for id in intent.targetIds:
+				if not id in branch.allyIds: return false
 	return true
 
 func valid_cyberware_state(c: Dictionary) -> bool:

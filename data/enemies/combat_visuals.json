@@ -118,5 +118,115 @@
         "scale": 0.12
       }
     }
+  },
+  "gang_boss": {
+    "id": "gang_boss",
+    "placeholder": false,
+    "sourceFacing": "right",
+    "targetRect": [
+      -48,
+      -134,
+      96,
+      145
+    ],
+    "attackStyleOverride": "pierce",
+    "poseAliases": {
+      "block": "idle",
+      "slash": "pierce"
+    },
+    "hitEffectTexture": "",
+    "poses": {
+      "idle": {
+        "texture": "res://assets/combat_test/gang_boss_idle.png",
+        "anchor": [
+          750,
+          1109
+        ],
+        "scale": 0.128,
+        "whiteKey": false
+      },
+      "move": {
+        "texture": "res://assets/combat_test/gang_boss_move.png",
+        "anchor": [
+          840,
+          1138
+        ],
+        "scale": 0.12,
+        "whiteKey": false
+      },
+      "pierce": {
+        "texture": "res://assets/combat_test/gang_boss_pierce.png",
+        "anchor": [
+          600,
+          1112
+        ],
+        "scale": 0.121,
+        "whiteKey": false
+      },
+      "damaged": {
+        "texture": "res://assets/combat_test/gang_boss_damaged.png",
+        "anchor": [
+          840,
+          1126
+        ],
+        "scale": 0.126,
+        "whiteKey": false
+      }
+    }
+  },
+  "gang_henchman": {
+    "id": "gang_henchman",
+    "placeholder": false,
+    "sourceFacing": "right",
+    "targetRect": [
+      -37,
+      -119,
+      74,
+      130
+    ],
+    "attackStyleOverride": "pierce",
+    "poseAliases": {
+      "block": "idle",
+      "slash": "pierce"
+    },
+    "hitEffectTexture": "",
+    "poses": {
+      "idle": {
+        "texture": "res://assets/combat_test/gang_henchman_idle.png",
+        "anchor": [
+          735,
+          1103
+        ],
+        "scale": 0.108,
+        "whiteKey": false
+      },
+      "move": {
+        "texture": "res://assets/combat_test/gang_henchman_move.png",
+        "anchor": [
+          735,
+          1116
+        ],
+        "scale": 0.107,
+        "whiteKey": false
+      },
+      "pierce": {
+        "texture": "res://assets/combat_test/gang_henchman_pierce.png",
+        "anchor": [
+          720,
+          1111
+        ],
+        "scale": 0.107,
+        "whiteKey": false
+      },
+      "damaged": {
+        "texture": "res://assets/combat_test/gang_henchman_damaged.png",
+        "anchor": [
+          790,
+          1113
+        ],
+        "scale": 0.112,
+        "whiteKey": false
+      }
+    }
   }
 }

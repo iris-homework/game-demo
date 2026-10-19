@@ -173,5 +173,34 @@
     "showBadge": true,
     "description": "污染 · {count} 层\n自身回合结束时，受到等于当前层数的伤害，再减少 1 层；伤害先扣格挡。最多 999 层。污染伤害不触发鱼的追加污染或弹反。",
     "maxStacks": 999
+  },
+  {
+    "id": "strength",
+    "name": "力量",
+    "category": "positive",
+    "target": "both",
+    "stacking": "add",
+    "duration": "battle",
+    "handler": "strength",
+    "icon": "strength",
+    "color": "efb16c",
+    "showBadge": true,
+    "minStacks": -999,
+    "maxStacks": 999,
+    "description": "力量 · {count} 层\n每层使每段攻击的基础伤害 +1，负层数降低伤害，最低为 0；特殊 Buff 伤害不受影响。不会随回合减少，范围 −999～999。"
+  },
+  {
+    "id": "vulnerable",
+    "name": "易伤",
+    "category": "negative",
+    "target": "both",
+    "stacking": "add",
+    "duration": "own_turn_end_decay",
+    "handler": "vulnerable",
+    "icon": "vulnerable",
+    "color": "da91df",
+    "showBadge": true,
+    "maxStacks": 999,
+    "description": "易伤 · {count} 层\n受到的攻击伤害增加 50%，每段四舍五入后先扣格挡；不影响 Buff 伤害，增幅不随层数增加。持有者自身回合结束时减少 1 层，减至 0 后失效，最多 999 层。"
   }
 ]

@@ -47,6 +47,8 @@
     "name": "后巷深处",
     "participants": [
       "@player",
+      "gang_henchman",
+      "gang_henchman_second",
       "gang"
     ],
     "returnNodeByResult": {
@@ -59,8 +61,11 @@
     "placeId": "alley",
     "prototypeProfileId": "attack_flow_v1",
     "enemyIds": [
+      "gang_henchman",
+      "gang_henchman_second",
       "gang"
-    ]
+    ],
+    "trainingEnemyHp": null
   },
   "B05A": {
     "id": "B05A",

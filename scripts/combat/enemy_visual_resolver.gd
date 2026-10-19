@@ -4,6 +4,7 @@ extends RefCounted
 const CATALOG_PATH := "res://data/enemies/combat_visuals.json"
 const EMERGENCY_IDLE := preload("res://assets/combat_test/finn_idle.webp")
 const ATTACK_STYLES := ["", "slash", "pierce", "bite", "shoot"]
+const FORMATION_SLOTS := ["", "triangle_left_back", "triangle_left_front", "triangle_right"]
 
 class Visual extends RefCounted:
 	var id := ""
@@ -13,6 +14,9 @@ class Visual extends RefCounted:
 	var target_bounds := Rect2(-58,-130,116,145)
 	var attack_style_override := ""
 	var hit_effect_texture: Texture2D
+	var white_key_poses: Dictionary = {}
+	var source_facing := -1.0
+	var formation_slot := ""
 	var diagnostics: Array[String] = []
 
 var catalog: Dictionary = {}
@@ -45,15 +49,21 @@ func resolve(enemy: Dictionary, enemies: Dictionary) -> Visual:
 		if id in visited: continue
 		visited.append(id)
 		var visual := _parse(id, catalog.get(id), problems)
-		if visual != null: return _finish(visual, problems, enemy)
+		if visual != null: return _finish(visual, problems, enemy, current)
 	# This single code-owned pose survives a missing/broken Finn catalog entry.
 	var emergency := Visual.new()
 	emergency.id = "fallback_finn"
 	emergency.poses = {"idle":EMERGENCY_IDLE}
 	emergency.calibrations = {"idle":[Vector2(150,237),0.495]}
-	return _finish(emergency, problems, enemy)
+	return _finish(emergency, problems, enemy, current)
 
-func _finish(visual: Visual, problems: Array[String], enemy: Dictionary) -> Visual:
+func _finish(visual: Visual, problems: Array[String], enemy: Dictionary, current) -> Visual:
+	# Formation belongs to the encounter's enemy instance, never to the art profile.
+	var slot = enemy.get("formationSlot", current.get("formationSlot", "") if current is Dictionary else "")
+	if slot is String and slot in FORMATION_SLOTS:
+		visual.formation_slot = slot
+	else:
+		problems.append("unsupported formationSlot")
 	visual.diagnostics = problems.duplicate()
 	if not problems.is_empty():
 		push_warning("Enemy '%s' visual -> '%s': %s" % [enemy.get("id", ""), visual.id, "; ".join(problems)])
@@ -80,8 +90,12 @@ func _parse(id: String, raw, problems: Array[String]) -> Visual:
 	var style = raw.get("attackStyleOverride", "")
 	if not style is String or not style in ATTACK_STYLES:
 		return _invalid(problems,id,"unsupported attackStyleOverride")
+	var source_facing = raw.get("sourceFacing", "left")
+	if not source_facing is String or not source_facing in ["left", "right"]:
+		return _invalid(problems,id,"sourceFacing must be left or right")
 	var visual := Visual.new()
 	visual.id = id
+	visual.source_facing = 1.0 if source_facing == "right" else -1.0
 	visual.target_bounds = Rect2(bounds[0],bounds[1],bounds[2],bounds[3])
 	if not visual.target_bounds.position.is_finite() or not visual.target_bounds.size.is_finite() or visual.target_bounds.size.x <= 0 or visual.target_bounds.size.y <= 0:
 		return _invalid(problems,id,"targetRect exceeds vector range")
@@ -91,6 +105,8 @@ func _parse(id: String, raw, problems: Array[String]) -> Visual:
 		if not pose is String or pose.is_empty() or not poses[pose] is Dictionary:
 			return _invalid(problems,id,"each pose must be a named object")
 		var entry: Dictionary = poses[pose]
+		if not entry.get("whiteKey", false) is bool:
+			return _invalid(problems,id,"whiteKey must be a boolean for "+pose)
 		if not _numbers(entry.get("anchor"),2) or not _number(entry.get("scale")) or entry.scale <= 0:
 			return _invalid(problems,id,"invalid anchor/scale for "+pose)
 		var anchor := Vector2(entry.anchor[0],entry.anchor[1])
@@ -102,6 +118,7 @@ func _parse(id: String, raw, problems: Array[String]) -> Visual:
 		if texture == null: return _invalid(problems,id,"missing/non-texture resource for "+pose)
 		visual.poses[pose] = texture
 		visual.calibrations[pose] = [anchor,factor]
+		visual.white_key_poses[pose] = entry.get("whiteKey", false)
 	var effect = raw.get("hitEffectTexture", "")
 	if not effect is String: return _invalid(problems,id,"hitEffectTexture must be a path string")
 	if not effect.is_empty():

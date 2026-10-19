@@ -40,11 +40,14 @@ func catalog_errors(rows) -> PackedStringArray:
 		if entry.target not in ["player", "enemy", "both"]: errors.append(entry.id + ": invalid target")
 		if entry.stacking not in ["add", "guarded_add", "flag", "unique"]: errors.append(entry.id + ": invalid stacking")
 		if entry.duration not in ["battle", "player_turn_end", "own_turn_start", "own_turn_end_decay"]: errors.append(entry.id + ": invalid duration")
-		if entry.handler not in ["block", "bleed", "weak", "pollution", "parry", "attack_bonus", "attack_discount", "high_pressure", "dissection", "none"]: errors.append(entry.id + ": implement handler first")
-		if entry.handler in ["block", "bleed", "weak", "pollution", "parry", "high_pressure", "dissection"] and entry.id != entry.handler: errors.append(entry.id + ": specialized handler requires its canonical ID")
+		if entry.handler not in ["block", "bleed", "weak", "pollution", "vulnerable", "strength", "parry", "attack_bonus", "attack_discount", "high_pressure", "dissection", "none"]: errors.append(entry.id + ": implement handler first")
+		if entry.handler in ["block", "bleed", "weak", "pollution", "vulnerable", "strength", "parry", "high_pressure", "dissection"] and entry.id != entry.handler: errors.append(entry.id + ": specialized handler requires its canonical ID")
 		if entry.handler in ["attack_bonus", "attack_discount"] and entry.target != "player": errors.append(entry.id + ": attack modifier currently requires player target")
 		if not entry.get("showBadge") is bool or not Color.html_is_valid(entry.color): errors.append(entry.id + ": invalid display")
 		if entry.has("maxStacks") and not _valid_count(entry.maxStacks): errors.append(entry.id + ": invalid maximum")
+		if entry.has("minStacks"):
+			if not _valid_count(entry.minStacks, -1, -999) or entry.minStacks > entry.get("maxStacks", 0): errors.append(entry.id + ": invalid minimum")
+			elif entry.minStacks < 0 and entry.handler != "strength": errors.append(entry.id + ": signed stacks require strength handler")
 		if entry.has("consumeOnAttack") and not entry.consumeOnAttack is bool: errors.append(entry.id + ": invalid consumption flag")
 	return errors
 
@@ -84,14 +87,14 @@ func _write_count(model, id: String, value: int, enemy_index: int = -1) -> void:
 	if enemy_index >= 0:
 		var enemy: Dictionary = model.enemies[enemy_index]
 		if not field.is_empty(): enemy[field] = value
-		elif value > 0:
+		elif value != 0:
 			if not enemy.has("buffs"): enemy.buffs = {}
 			enemy.buffs[id] = value
 		elif enemy.has("buffs"):
 			enemy.buffs.erase(id)
 			if enemy.buffs.is_empty(): enemy.erase("buffs")
 	elif field.is_empty():
-		if value > 0: model.buff_state[id] = value
+		if value != 0: model.buff_state[id] = value
 		else: model.buff_state.erase(id)
 	elif entry.stacking == "unique":
 		if value > 0 and not id in model.powers: model.powers.append(id)
@@ -100,7 +103,8 @@ func _write_count(model, id: String, value: int, enemy_index: int = -1) -> void:
 	else: model.set(field, value)
 
 func apply(model, id: String, amount: int = 1, enemy_index: int = -1, context: Dictionary = {}) -> bool:
-	if not accepts(id, enemy_index) or amount < 0: return false
+	if not accepts(id, enemy_index): return false
+	if amount < 0 and int(_definitions()[id].get("minStacks", 0)) >= 0: return false
 	if enemy_index >= 0 and (enemy_index >= model.enemies.size() or model.enemies[enemy_index].hp <= 0): return false
 	var entry: Dictionary = _definitions()[id]
 	var current := count(model, id, enemy_index)
@@ -117,6 +121,7 @@ func apply(model, id: String, amount: int = 1, enemy_index: int = -1, context: D
 		if current >= int(context.get("cap", entry.get("maxStacks", 2))): return true
 	elif entry.stacking in ["unique", "flag"]: value = 1
 	elif entry.has("maxStacks"): value = mini(int(entry.maxStacks), value)
+	value = maxi(int(entry.get("minStacks", 0)), value)
 	_write_count(model, id, value, enemy_index)
 	return true
 
@@ -191,7 +196,12 @@ func after_attack_hit(model, index: int, form: String, hit: Dictionary) -> void:
 	hit.bleedAfter = count(model, "bleed", index)
 
 func enemy_attack_damage(enemy: Dictionary, amount: int) -> int:
-	return roundi(amount * (0.75 if int(enemy.get("weak", 0)) > 0 else 1.0))
+	var strength := definition("strength")
+	var base := maxi(0, amount + (enemy_count(enemy, strength) if not strength.is_empty() else 0))
+	return roundi(base * (0.75 if int(enemy.get("weak", 0)) > 0 else 1.0))
+
+func incoming_damage(model, amount: int, enemy_index: int = -1) -> int:
+	return roundi(maxi(0, amount) * (1.5 if count(model, "vulnerable", enemy_index) > 0 else 1.0))
 
 func after_enemy_attack(model, index: int, total: int) -> Array:
 	var counters: Array = []
@@ -234,6 +244,8 @@ func own_turn_end(model, enemy_index: int = -1) -> Array:
 			events.append(tick)
 			model.log_lines.append("污染造成 %d 点伤害，格挡 %d，剩余 %d 层。" % [tick.damage, tick.blocked, layers - 1])
 		_write_count(model, entry.id, layers - 1, enemy_index)
+		if entry.handler == "vulnerable":
+			events.append({"type":"status_decay", "target":enemy_index, "buffId":entry.id, "stacksAfter":layers - 1})
 	return events
 
 func _badge(entry: Dictionary, amount: int, used: bool = false) -> Dictionary:
@@ -245,22 +257,23 @@ func enemy_badges(enemy: Dictionary) -> Array:
 	for entry in _definitions().values():
 		if not entry.showBadge or entry.target == "player": continue
 		var amount := enemy_count(enemy, entry)
-		if amount > 0: result.append(_badge(entry, amount))
+		if amount != 0: result.append(_badge(entry, amount))
 	return result
 
-func player_badges(model, shown_parry: int = -1, shown_pollution: int = -1) -> Array:
+func player_badges(model, shown_parry: int = -1, shown_pollution: int = -1, shown_extra = null) -> Array:
 	var result: Array = []
 	for entry in _definitions().values():
 		if not entry.showBadge or entry.target == "enemy": continue
 		var amount := shown_parry if entry.id == "parry" and shown_parry >= 0 else count(model, entry.id)
 		if entry.id == "pollution" and shown_pollution >= 0: amount = shown_pollution
-		if amount <= 0: continue
+		if shown_extra is Dictionary and entry.get("field", "").is_empty() and entry.id != "pollution": amount = int(shown_extra.get(entry.id, 0))
+		if amount == 0: continue
 		var used: bool = model.get(entry.usedField) if entry.has("usedField") else false
 		result.append(_badge(entry, amount, used))
 	return result
 
-func _valid_count(value, maximum: int = -1) -> bool:
-	return (value is int or value is float) and is_finite(float(value)) and value >= 0 and value == floor(float(value)) and (maximum < 0 or value <= maximum)
+func _valid_count(value, maximum: int = -1, minimum: int = 0) -> bool:
+	return (value is int or value is float) and is_finite(float(value)) and value >= minimum and value == floor(float(value)) and (maximum < 0 or value <= maximum)
 
 func valid_extra_state(state, target: String) -> bool:
 	if not state is Dictionary: return false
@@ -269,7 +282,7 @@ func valid_extra_state(state, target: String) -> bool:
 		var entry: Dictionary = _definitions()[id]
 		if not entry.get("field", "").is_empty() or entry.target not in ["both", target]: return false
 		var maximum := 1 if entry.stacking in ["unique", "flag"] else int(entry.get("maxStacks", -1))
-		if not _valid_count(state[id], maximum): return false
+		if not _valid_count(state[id], maximum, int(entry.get("minStacks", 0))): return false
 	return true
 
 func restore_extra_state(state: Dictionary) -> Dictionary:
