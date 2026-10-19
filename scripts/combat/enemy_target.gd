@@ -2,6 +2,10 @@ extends Button
 ## Visual brackets only; the full button rectangle remains the hit area.
 const BLUE := Color("3d9eff")
 var armed := false
+var tooltip_data: Dictionary = {}
+
+func _make_custom_tooltip(_text: String) -> Object:
+	return preload("res://scripts/combat/intent_tooltip.gd").build(tooltip_data,get_theme_font("font")) if not tooltip_data.is_empty() else null
 
 func _ready() -> void:
 	for state in ["normal", "hover", "pressed", "focus", "disabled"]:

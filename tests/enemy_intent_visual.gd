@@ -7,7 +7,7 @@ func verify_intents(view: Control) -> void:
 	view.update_target_rects()
 	for i in view.enemy_intents.size():
 		var intent: Control = view.enemy_intents[i]
-		check(intent.mouse_filter == Control.MOUSE_FILTER_IGNORE and intent.value_label.mouse_filter == Control.MOUSE_FILTER_IGNORE,"Intent and number preserve targeting input")
+		check(intent.mouse_filter == Control.MOUSE_FILTER_PASS and intent.value_label.mouse_filter == Control.MOUSE_FILTER_IGNORE,"Intent permits hover without consuming card input")
 		check(intent.find_children("*","Panel",true,false).is_empty(),"Intent has no background panel")
 		check(intent.size == Vector2(96,66) and intent.scale == Vector2.ONE,"Icon and value keep screen-space size")
 	check(view.model.snapshot() == before,"Rebuilding intent HUD does not change combat state")

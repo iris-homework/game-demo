@@ -243,6 +243,8 @@ func refresh_enemy_hud() -> void:
 		enemy_hud.add_child(intent)
 		enemy_intents.append(intent)
 		intent.setup(enemy.get("intent",{}),intent_text,button_font)
+		var tooltip_data := preload("res://scripts/combat/intent_tooltip.gd").describe(enemy,intent_text)
+		intent.configure_tooltip(tooltip_data)
 		var target := preload("res://scripts/combat/enemy_target.gd").new()
 		target.armed = not selected_uid.is_empty()
 		target.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
@@ -253,15 +255,11 @@ func refresh_enemy_hud() -> void:
 		enemy_hud.add_child(target)
 		targets.append(target)
 		target.disabled = enemy.hp <= 0
-		target.tooltip_text = "攻击目标：" + enemy.displayName + "\n下次行动：" + intent_text
-		if enemy.has("allyDeathIntentSequence"):
-			target.tooltip_text += "\n强化：给每名存活小弟增加1层力量。\n完整回合开始（玩家行动前）时若已有小弟死亡，切换为攻击8 → 易伤2 → 攻击6循环。"
-		if int(enemy.get("attackPollution", 0)) > 0:
-			target.tooltip_text += "\n每段攻击实际扣血时，追加 %d 层污染；污染伤害不触发。" % int(enemy.attackPollution)
-		if int(enemy.get("deathPollution",0)) > 0:
-			target.tooltip_text += "\n死亡时，向角色施加 %d 层污染。" % int(enemy.deathPollution)
+		target.tooltip_data = tooltip_data
+		target.tooltip_text = tooltip_data.plain
 	# Status icons receive hover before the transparent target buttons.
 	for plate in enemy_plates: enemy_hud.move_child(plate,-1)
+	for intent in enemy_intents: enemy_hud.move_child(intent,-1)
 	update_target_rects()
 
 func pile_button(pos: Vector2, title: String, action: Callable) -> void:

@@ -3,10 +3,18 @@ extends Control
 const DIMENSIONS := Vector2(96,66)
 var kind := ""
 var value_label: Label
+var tooltip_data: Dictionary = {}
 
 func _init() -> void:
 	size = DIMENSIONS
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mouse_filter = Control.MOUSE_FILTER_PASS
+
+func configure_tooltip(data: Dictionary) -> void:
+	tooltip_data = data
+	tooltip_text = data.plain
+
+func _make_custom_tooltip(_text: String) -> Object:
+	return preload("res://scripts/combat/intent_tooltip.gd").build(tooltip_data,get_theme_font("font")) if not tooltip_data.is_empty() else null
 
 func setup(intent: Dictionary, description: String, font: Font) -> void:
 	kind = str(intent.get("type",""))
