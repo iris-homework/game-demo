@@ -11,6 +11,9 @@ const VIEWS = {
 }
 var view: Control
 var debug_panel: Control
+var debug_background_buttons: Array = []
+var debug_background_process_mode := Node.PROCESS_MODE_INHERIT
+var debug_previous_focus: Control
 var toast: Control
 var card_console: Control
 var console_buttons: Array = []
@@ -38,9 +41,7 @@ func show_page() -> void:
 func swap_view() -> void:
 	if is_instance_valid(deck_browser): close_current_deck()
 	if is_instance_valid(card_console): close_card_console()
-	if is_instance_valid(debug_panel):
-		debug_panel.queue_free()
-		debug_panel = null
+	if is_instance_valid(debug_panel): close_debug()
 	if is_instance_valid(view):
 		remove_child(view)
 		view.queue_free()
@@ -110,8 +111,7 @@ func _input(event: InputEvent) -> void:
 	elif event.keycode == KEY_ESCAPE:
 		get_viewport().set_input_as_handled()
 		if is_instance_valid(debug_panel):
-			debug_panel.queue_free()
-			debug_panel = null
+			close_debug()
 		elif Game.page in ["map", "menu", "result", "dialogue"] and view.has_method("handle_escape") and view.handle_escape():
 			pass
 		elif Game.page == "menu" and not Game.state.is_empty(): Game.resume()
@@ -119,11 +119,20 @@ func _input(event: InputEvent) -> void:
 	elif is_instance_valid(debug_panel): get_viewport().set_input_as_handled()
 
 func toggle_debug() -> void:
-	if Game.page == "battle" and view.has_method("cancel_selection"): view.cancel_selection()
 	if is_instance_valid(debug_panel):
-		debug_panel.queue_free()
-		debug_panel = null
+		close_debug()
 		return
+	if Game.page == "battle" and view.has_method("cancel_selection"): view.cancel_selection()
+	# GUI mouse filtering alone cannot stop the battle's _input handlers.
+	debug_previous_focus = get_viewport().gui_get_focus_owner()
+	debug_background_process_mode = view.process_mode
+	view.process_mode = Node.PROCESS_MODE_DISABLED
+	debug_background_buttons.clear()
+	for node in view.find_children("*", "BaseButton", true, false):
+		debug_background_buttons.append([node, node.disabled, node.focus_mode])
+		node.release_focus()
+		node.disabled = true
+		node.focus_mode = Control.FOCUS_NONE
 	var ui := DemoUI.new()
 	debug_panel = ui
 	add_child(ui)
@@ -142,6 +151,20 @@ func toggle_debug() -> void:
 	ui.button(ui,"HP 100",Vector2(910,420),Vector2(150,54),func(): debug_change("hp",100))
 	ui.label(ui,"事件 %s / 节点 %s\n存档：%s" % [Game.state.activeEventId,Game.state.activeNodeId,ProjectSettings.globalize_path(Game.save_path)],Vector2(369,522),Vector2(676,88),15,DemoUI.MUTED)
 	ui.button(ui,"关闭 / F1",Vector2(850,638),Vector2(209,48),toggle_debug)
+
+func close_debug() -> void:
+	if not is_instance_valid(debug_panel): return
+	remove_child(debug_panel)
+	debug_panel.queue_free()
+	debug_panel = null
+	if is_instance_valid(view): view.process_mode = debug_background_process_mode
+	for item in debug_background_buttons:
+		if is_instance_valid(item[0]):
+			item[0].disabled = item[1]
+			item[0].focus_mode = item[2]
+	debug_background_buttons.clear()
+	if is_instance_valid(debug_previous_focus): debug_previous_focus.grab_focus()
+	debug_previous_focus = null
 
 func debug_change(kind: String, value: int) -> void:
 	match kind:

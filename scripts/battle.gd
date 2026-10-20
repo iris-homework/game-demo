@@ -23,6 +23,7 @@ var shown_player_pollution := 0
 var shown_player_buffs: Dictionary = {}
 var presenting_enemy_turn := false
 var presenting_player_attack := false
+var presenting_player_hits := false
 const ENEMY_INTENT_SIZE := EnemyIntent.DIMENSIONS
 var aim: Node2D
 var hovered_target := -1
@@ -503,6 +504,7 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 		cards[uid].show_preview(played_preview)
 		cards[uid].show_cost(played_cost)
 	presenting_player_attack = result.get("stance", "") == "melee" and not result.hits.is_empty()
+	presenting_player_hits = not result.hits.is_empty()
 	set_busy(true)
 	selected_uid = ""
 	aim.visible = false
@@ -554,6 +556,7 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 	arrange_hand()
 	refresh_counts()
 	presenting_player_attack = false
+	presenting_player_hits = false
 	refresh_resources()
 	set_busy(false)
 	if not model.outcome.is_empty(): finish(model.outcome)
@@ -1059,7 +1062,8 @@ func refresh_resources() -> void:
 		shown_player_block = model.block
 		if not presenting_player_attack: shown_player_ammo = model.ammo
 		shown_player_parry = model.parry
-		shown_player_pollution = model.buffs.count(model, "pollution")
+		# Player hits reveal death pollution at their own impact callbacks.
+		if not presenting_player_hits: shown_player_pollution = model.buffs.count(model, "pollution")
 		shown_player_buffs = model.buff_state.duplicate(true)
 	refresh_player_plate()
 	if not is_instance_valid(resources_label): return
