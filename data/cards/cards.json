@@ -71,21 +71,21 @@
     "cost": 1,
     "type": "skill",
     "archetype": "通用",
-    "description": "获得 4 点格挡，进入远程形态。",
+    "description": "获得 6 点格挡，进入远程形态。",
     "target": "self",
     "sortOrder": 4,
     "artAssetId": "",
     "effects": [
       {
         "type": "block",
-        "amount": 4
+        "amount": 6
       },
       {
         "type": "stance",
         "value": "ranged"
       }
     ],
-    "cardText": "获得4点格挡，进入远程形态。"
+    "cardText": "获得6点格挡，进入远程形态。"
   },
   {
     "id": "noren_05",
@@ -230,14 +230,14 @@
     "cost": 1,
     "type": "skill",
     "archetype": "通用",
-    "description": "获得 7 点格挡。近身技：获得 1 颗弹药。远程技：对一名敌人施加 1 层虚弱。",
+    "description": "获得 8 点格挡。近身技：获得 1 颗弹药。远程技：对一名敌人施加 1 层虚弱。",
     "target": "stance",
     "sortOrder": 11,
     "artAssetId": "",
     "effects": [
       {
         "type": "block",
-        "amount": 7
+        "amount": 8
       },
       {
         "type": "ammo",
@@ -250,7 +250,7 @@
         "when": "ranged"
       }
     ],
-    "cardText": "获得7点格挡。近身技：获得1颗弹药。远程技：对一名敌人施加1层虚弱。"
+    "cardText": "获得8点格挡。近身技：获得1颗弹药。远程技：对一名敌人施加1层虚弱。"
   },
   {
     "id": "noren_12",
@@ -260,21 +260,20 @@
     "cost": 0,
     "type": "skill",
     "archetype": "通用",
-    "description": "弃掉手中的 1 张攻击牌，获得 2 颗弹药。没有可弃的攻击牌时无法打出。消耗。",
+    "description": "消耗手中的另一张牌，获得 2 颗弹药。本牌进入弃牌堆。没有其他手牌时无法打出。",
     "target": "self",
     "sortOrder": 12,
     "artAssetId": "",
     "effects": [
       {
-        "type": "discard_attack"
+        "type": "exhaust_hand"
       },
       {
         "type": "ammo",
         "amount": 2
       }
     ],
-    "exhaust": true,
-    "cardText": "弃掉手中的1张攻击牌，获得2颗弹药。没有可弃的攻击牌时无法打出。消耗。"
+    "cardText": "消耗另一张手牌，获得2颗弹药。"
   },
   {
     "id": "noren_13",
@@ -424,21 +423,21 @@
     "cost": 1,
     "type": "attack",
     "archetype": "爆发直伤流",
-    "description": "造成 5 点伤害，施加 1 层虚弱。",
+    "description": "造成 7 点伤害，施加 2 层虚弱。",
     "target": "enemy",
     "sortOrder": 19,
     "artAssetId": "",
     "effects": [
       {
         "type": "damage",
-        "amount": 5
+        "amount": 7
       },
       {
         "type": "weak",
-        "amount": 1
+        "amount": 2
       }
     ],
-    "cardText": "造成5点伤害，施加1层虚弱。"
+    "cardText": "造成7点伤害，施加2层虚弱。"
   },
   {
     "id": "noren_20",

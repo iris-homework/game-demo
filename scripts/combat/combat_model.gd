@@ -292,6 +292,9 @@ func card_target(uid: String) -> String:
 func discard_candidates(uid: String) -> Array:
 	return hand.filter(func(other): return other != uid and card(other).get("type") == "attack")
 
+func exhaust_candidates(uid: String) -> Array:
+	return hand.filter(func(other): return other != uid)
+
 func extra_ammo_limit(uid: String) -> int:
 	if card(uid).get("consumeAllAmmo",false): return 0
 	return mini(maxi(0, ammo - 1), int(card(uid).get("extraAmmoMax", 0))) if stance == "ranged" else 0
@@ -305,6 +308,7 @@ func play_error(uid: String) -> String:
 	if definition.type == "attack" and stance == "ranged" and ammo < 1: return "弹药不足；先补弹或切回近战。"
 	for effect in definition.get("effects", []):
 		if effect.type == "discard_attack" and discard_candidates(uid).is_empty(): return "手中没有可弃置的攻击牌。"
+		if effect.type == "exhaust_hand" and exhaust_candidates(uid).is_empty(): return "手中没有其他可消耗的牌。"
 	return ""
 
 func change_stance(value: String) -> Array:
@@ -356,7 +360,7 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 	var effects: Array = definition.get("effects", [])
 	if definition.has("consumeAllAmmo") and not definition.consumeAllAmmo is bool: return {}
 	# Validate the complete transaction before spending resources or moving any card.
-	var allowed := ["damage","ammo","draw","stance","discard_attack"]
+	var allowed := ["damage","ammo","draw","stance","discard_attack","exhaust_hand"]
 	for effect in effects:
 		if not effect is Dictionary: return {}
 		if not effect.get("type", "") in allowed and not buffs.valid_card_effect(effect): return {}
@@ -364,6 +368,7 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 			if not (effect.amount is int or effect.amount is float): return {}
 			if effect.amount < 0 and not (effect.get("id", effect.type) == "strength" and buffs.valid_card_effect(effect)): return {}
 		if effect.type == "discard_attack" and not discard_uid in discard_candidates(uid): return {}
+		if effect.type == "exhaust_hand" and not discard_uid in exhaust_candidates(uid): return {}
 		if effect.has("allAmmoHits") and not effect.allAmmoHits is bool: return {}
 		for key in ["bleedTriggers","rangedBonus"]:
 			if effect.has(key) and (not (effect[key] is int or effect[key] is float) or not is_finite(float(effect[key])) or effect[key] < 0 or effect[key] != floor(float(effect[key]))): return {}
@@ -387,6 +392,7 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 	# Hold the resolving card outside all draw piles until its effects finish.
 	var drawn: Array = []
 	var discarded: Array = []
+	var exhausted_cards: Array = []
 	var hits: Array = []
 	var damage := 0
 	for effect in effects:
@@ -415,6 +421,10 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 			"ammo": gain_ammo(amount)
 			"draw": drawn.append_array(draw_cards(amount))
 			"stance": drawn.append_array(change_stance(effect.value))
+			"exhaust_hand":
+				hand.erase(discard_uid)
+				exhaust_pile.append(discard_uid)
+				exhausted_cards.append(discard_uid)
 			"discard_attack":
 				hand.erase(discard_uid)
 				discard_pile.append(discard_uid)
@@ -426,7 +436,7 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 	else: discard_pile.append(uid)
 	resolve_outcome()
 	log_lines.append("%s · %s · 伤害 %d" % [definition.name, "近战" if at_start == "melee" else "远程", damage])
-	return {"uid":uid,"target":target_index,"damage":damage,"hits":hits,"drawn":drawn,"discarded":discarded,"exhausted":exhausted,"stance":at_start,"outcome":outcome}
+	return {"uid":uid,"target":target_index,"damage":damage,"hits":hits,"drawn":drawn,"discarded":discarded,"exhaustedCards":exhausted_cards,"exhausted":exhausted,"stance":at_start,"outcome":outcome}
 
 func end_noren_turn() -> Dictionary:
 	if not outcome.is_empty(): return {}

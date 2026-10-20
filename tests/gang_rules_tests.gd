@@ -264,6 +264,9 @@ func _ready() -> void:
 	fixtures.free()
 	var report := {"checks":checks, "failures":failures, "phaseSwitch":"full_round_start_before_player", "vulnerable":"attack_only"}
 	var output := "res://artifacts/qa/enemy-round-death-2026-10-19/gang-rules-result.json"
+	var output_args := OS.get_cmdline_user_args()
+	if output_args.has("--output-dir"):
+		output = output_args[output_args.find("--output-dir")+1].trim_suffix("/")+"/rules-result.json"
 	DirAccess.make_dir_recursive_absolute(output.get_base_dir())
 	FileAccess.open(output, FileAccess.WRITE).store_string(JSON.stringify(report, "\t"))
 	print("GANG RULES: %d checks, %d failures" % [checks, failures.size()])

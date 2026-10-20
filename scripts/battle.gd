@@ -476,6 +476,12 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 		Game.notice.emit(error)
 		return
 	for effect in model.card(uid).get("effects", []):
+		if effect.type == "exhaust_hand" and discard_uid.is_empty():
+			var options: Array = []
+			for candidate in model.exhaust_candidates(uid):
+				options.append({"value":candidate,"text":"%s · 费用 %d\n%s" % [model.card(candidate).name,model.card_cost(candidate),model.card_preview(candidate).text]})
+			show_card_choice("选择消耗另一张手牌",options,func(value): play_selected(target,value,extra_ammo))
+			return
 		if effect.type == "discard_attack" and discard_uid.is_empty():
 			var options: Array = []
 			for candidate in model.discard_candidates(uid):
@@ -502,6 +508,7 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 	commit()
 	var retired: Array = [uid]
 	retired.append_array(result.get("discarded", []))
+	retired.append_array(result.get("exhaustedCards", []))
 	var retired_views: Array = []
 	for removed_uid in retired:
 		if not cards.has(removed_uid): continue
@@ -515,7 +522,7 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 		retired_views.append(retired_view)
 	arrange_hand()
 	for retired_view in retired_views:
-		if retired_view.uid == uid and result.get("exhausted",false): animate_exhaust(retired_view)
+		if (retired_view.uid == uid and result.get("exhausted",false)) or retired_view.uid in result.get("exhaustedCards",[]): animate_exhaust(retired_view)
 		else: animate_discard(retired_view)
 	# Choose once per committed card; all hits and targets share its attack motion.
 	var style := choose_player_attack_style(model.card(uid), result)

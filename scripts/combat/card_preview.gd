@@ -46,6 +46,7 @@ static func build(model, uid: String, target: int, extra: int) -> Dictionary:
 			"draw": lines.append("抽" + number + "张牌。")
 			"stance": lines.append(row.text)
 			"discard_attack": lines.append("弃置另一张攻击牌。")
+			"exhaust_hand": lines.append("消耗另一张手牌。")
 			"power": lines.append(row.text)
 			"buff":
 				var prefix := "对每名敌人施加" if row.enemy and kind == "all" else ("施加" if row.enemy else "获得")
@@ -219,6 +220,8 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 						text += "下次攻击费用−1。"
 				else: text = "保持当前形态。"
 				rows.append({"type":"stance", "text":text})
+			"exhaust_hand":
+				rows.append({"type":"exhaust_hand"})
 			"discard_attack":
 				if copy.profile.get("recycleDiscardWhenEmpty", true) and not copy.discard_candidates(uid).is_empty(): draw_available += 1
 				rows.append({"type":"discard_attack"})

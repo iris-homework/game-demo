@@ -44,6 +44,9 @@ func _ready() -> void:
 	Game.meta_path = "user://hand_number_keys_meta_unused.json"
 	Game.state = Game.initial_state()
 	output = "res://artifacts/qa/hand-number-keys-2026-10-19/window/"
+	var output_args := OS.get_cmdline_user_args()
+	if output_args.has("--output-dir"):
+		output = output_args[output_args.find("--output-dir")+1].trim_suffix("/")+"/"
 	DirAccess.make_dir_recursive_absolute(output)
 	app = preload("res://scenes/main.tscn").instantiate()
 	add_child(app)

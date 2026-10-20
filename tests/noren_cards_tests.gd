@@ -36,6 +36,56 @@ func four_hit_fixture(form: String = "melee") -> CombatModel:
 func play(m: CombatModel, index: int = 0, target: int = 0, discard: String = "", extra: int = 0) -> Dictionary:
 	return m.play_card("card_%03d" % index,target,discard,extra)
 
+func test_hand_exhaust() -> void:
+	for number in [1,2,23]:
+		var m := fixture([12,number])
+		var before := m.snapshot()
+		check(m.exhaust_candidates("card_000") == ["card_001"] and m.snapshot() == before,"Dismantle lists another attack, skill or power without changing state")
+		var result := play(m,0,0,"card_001")
+		check(not result.is_empty() and m.ammo == 4 and m.energy == 3,"Dismantle exhausts any card type and grants two ammo at zero cost")
+		check(m.exhaust_pile == ["card_001"] and m.discard_pile == ["card_000"] and m.hand.is_empty(),"Chosen card is exhausted while Dismantle itself is discarded")
+		check(result.exhaustedCards == ["card_001"] and result.discarded.is_empty() and not result.exhausted,"Exhausted selection and resolving card use distinct result fields")
+		check(m.enemies[0].hp == 1000 and m.block == 0 and m.powers.is_empty() and result.drawn.is_empty(),"Exhausting a card never executes that card's effects")
+		check(Game.valid_combat(m.snapshot()),"Exhausting each card type preserves all four card zones")
+	var m := fixture([12,2,2])
+	var result := play(m,0,0,"card_002")
+	check(m.hand == ["card_001"] and m.exhaust_pile == ["card_002"] and m.discard_pile == ["card_000"],"Dismantle exhausts the chosen duplicate UID and keeps its identical sibling")
+	check(result.exhaustedCards == ["card_002"] and Game.valid_combat(m.snapshot()),"Duplicate selection reports its exact UID and preserves instance uniqueness")
+	var saved: Dictionary = JSON.parse_string(JSON.stringify(m.snapshot()))
+	var restored := CombatModel.new()
+	restored.restore(saved)
+	check(JSON.parse_string(JSON.stringify(restored.snapshot())) == saved,"Selected exhaust and Dismantle discard survive an exact JSON roundtrip")
+	for selected in ["","card_000","card_002","missing_uid"]:
+		m = fixture([12,2])
+		var before := m.snapshot()
+		check(play(m,0,0,selected).is_empty() and m.snapshot() == before,"Missing, self, draw-pile and unknown selections fail atomically: "+selected)
+	for zone in ["discard","exhaust"]:
+		m = fixture([12,2])
+		m.hand.erase("card_001")
+		if zone == "discard": m.discard_pile.append("card_001")
+		else: m.exhaust_pile.append("card_001")
+		var before := m.snapshot()
+		check(m.exhaust_candidates("card_000").is_empty() and play(m,0,0,"card_001").is_empty() and m.snapshot() == before,"A card outside the hand cannot be exhausted again: "+zone)
+	m = fixture([12])
+	var before := m.snapshot()
+	check(not m.play_error("card_000").is_empty() and play(m,0,0,"card_000").is_empty() and m.snapshot() == before,"Dismantle cannot pay its own selection cost when alone")
+	# A frozen old definition retains attack-only discard and self-exhaust behavior.
+	m = fixture([12,1,2])
+	m.card_catalog.noren_12.effects = [{"type":"discard_attack"},{"type":"ammo","amount":2}]
+	m.card_catalog.noren_12.exhaust = true
+	m.card_catalog.noren_12.description = "弃掉手中的 1 张攻击牌，获得 2 颗弹药。没有可弃的攻击牌时无法打出。消耗。"
+	m.card_catalog.noren_12.cardText = m.card_catalog.noren_12.description
+	saved = JSON.parse_string(JSON.stringify(m.snapshot()))
+	check(Game.valid_combat(saved),"Old discard_attack card definitions remain valid snapshots")
+	restored = CombatModel.new()
+	restored.restore(saved)
+	check(restored.discard_candidates("card_000") == ["card_001"],"Old discard_attack still offers only other attack instances")
+	before = restored.snapshot()
+	check(play(restored,0,0,"card_002").is_empty() and restored.snapshot() == before,"Old discard_attack rejects a skill atomically")
+	result = play(restored,0,0,"card_001")
+	check(restored.ammo == 4 and restored.discard_pile == ["card_001"] and restored.exhaust_pile == ["card_000"] and restored.hand == ["card_002"],"Old Dismantle still discards the chosen attack and exhausts itself")
+	check(result.discarded == ["card_001"] and result.exhaustedCards.is_empty() and result.exhausted and Game.valid_combat(restored.snapshot()),"Old discard results remain separate from new exhaustedCards results")
+
 func _ready() -> void:
 	Game.save_enabled = false
 	Game.save_path = "user://noren_cards_qa.json"
@@ -54,9 +104,9 @@ func _ready() -> void:
 	Game.state = Game.initial_state()
 	check(Game.state.deck.is_empty(),"No nonstarter owned on new adventure")
 	check(Game.owned_card_counts() == {"noren_01":4,"noren_02":4,"noren_03":1,"noren_04":1},"Exact initial ownership")
-	var base_damage := {1:6,9:8,13:8,14:5,16:8,17:12,19:5,20:9,21:7,25:12,26:30,27:5,28:6,29:10,35:6,37:5,38:4}
-	var ranged_damage := {1:9,9:12,13:12,14:8,16:12,17:18,19:8,20:42,21:11,25:18,26:66,27:8,28:10,29:15,35:9,37:8,38:6}
-	var blocks := {2:5,4:4,6:4,11:7,31:4,32:10,33:10}
+	var base_damage := {1:6,9:8,13:8,14:5,16:8,17:12,19:7,20:9,21:7,25:12,26:30,27:5,28:6,29:10,35:6,37:5,38:4}
+	var ranged_damage := {1:9,9:12,13:12,14:8,16:12,17:18,19:11,20:42,21:11,25:18,26:66,27:8,28:10,29:15,35:9,37:8,38:6}
+	var blocks := {2:5,4:6,6:4,11:8,31:4,32:10,33:10}
 	for form in ["melee","ranged"]:
 		for number in range(1,41):
 			var m := fixture([number,1],form)
@@ -67,7 +117,7 @@ func _ready() -> void:
 			check(result.damage == (base_damage if form == "melee" else ranged_damage).get(number,0),label+" exact damage")
 			check(m.energy == 3-int(Game.card_catalog["noren_%02d" % number].cost),label+" exact cost")
 			check(m.block == blocks.get(number,0),label+" block")
-			check(("card_000" in m.exhaust_pile) == (number in [5,8,12,15,22,23,34,36,40]),label+" exhaust/power destination")
+			check(("card_000" in m.exhaust_pile) == (number in [5,8,15,22,23,34,36,40]),label+" exhaust/power destination")
 			check(not "card_000" in m.hand and not "card_000" in m.draw_pile,label+" played card cannot redraw itself")
 			check(Game.valid_combat(m.snapshot()),label+" snapshot valid")
 			var saved_state: Dictionary=JSON.parse_string(JSON.stringify(m.snapshot()))
@@ -138,12 +188,12 @@ func _ready() -> void:
 	m = fixture([16]);m.enemies[0].block=100
 	check(play(m).damage==0 and m.enemies[0].block==92,"Melee Backstep Slash obeys block")
 	m = fixture([4,1,3,1]);play(m)
-	check(m.stance=="ranged" and m.stance_discount and m.block==4,"Enter ranged grants attack discount")
+	check(m.stance=="ranged" and m.stance_discount and m.block==6,"Enter ranged grants six block and attack discount")
 	check(m.card_cost("card_001")==0,"Discount reflected in actual cost")
 	result=play(m,1)
 	check(result.damage==9 and m.energy==2 and not m.stance_discount,"Discount consumed once")
 	result=play(m,2)
-	check(m.stance=="melee" and result.drawn.size()==2 and m.parry==1 and m.block==4,"Enter melee draws two and Close In grants parry without block")
+	check(m.stance=="melee" and result.drawn.size()==2 and m.parry==1 and m.block==6,"Enter melee draws two and Close In preserves existing six block")
 	m = fixture([3]);result=play(m)
 	check(result.drawn.is_empty() and m.parry==1 and m.block==0,"Same stance grants parry without block or entry draw")
 	for layers in [1,2,3]:
@@ -174,14 +224,14 @@ func _ready() -> void:
 	check(play(m).is_empty() and m.snapshot()==before,"No-energy attack fails atomically")
 	m=fixture([1]);before=m.snapshot()
 	check(play(m,0,4).is_empty() and m.snapshot()==before,"Invalid enemy fails atomically")
-	m=fixture([12,2]);before=m.snapshot()
-	check(play(m,0,0,"card_001").is_empty() and m.snapshot()==before,"Dismantle cannot discard a skill")
-	m=fixture([12,1]);result=play(m,0,0,"card_001")
-	check(m.ammo==4 and m.discard_pile==["card_001"] and m.exhaust_pile==["card_000"],"Dismantle exact chosen instance")
+	test_hand_exhaust()
 	m=fixture([17]);m.ammo=9;play(m)
 	check(m.ammo==10,"Ammo cap applies to normal and extra gains")
 	m=fixture([14]);play(m);check(m.enemies[0].weak==1,"Melee butt applies weak")
-	m=fixture([11],"ranged");play(m);check(m.enemies[0].weak==1 and m.block==7,"Ranged steady targets enemy")
+	m=fixture([11],"ranged");play(m);check(m.enemies[0].weak==1 and m.block==8,"Ranged steady targets enemy and grants eight block")
+	for form in ["melee","ranged"]:
+		m=fixture([19],form);result=play(m)
+		check(result.damage==(7 if form=="melee" else 11) and m.enemies[0].weak==2,"Suppression deals seven base damage and applies two weak in both stances")
 	m=fixture([31,32,33]);play(m);m.energy=3;play(m,1);m.energy=3;play(m,2)
 	check(m.parry==3,"New Counter Stance adds one charge up to the three-layer cap")
 	m.enemies[0].intent={"type":"attack","amount":10,"hits":3}

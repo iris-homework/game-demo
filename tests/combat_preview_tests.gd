@@ -274,11 +274,11 @@ func test_potential_status_and_conditional_wording() -> void:
 			var preview := m.card_preview("card_000", 0)
 			var status := "weak" if number == 19 else "bleed"
 			var name := "虚弱" if number == 19 else "裂伤"
-			var expected := 1 if number == 19 else 2 if number == 27 else 4
+			var expected := 2 if number == 19 else 2 if number == 27 else 4
 			check(m.snapshot() == before, "%d potential preview preserves live snapshot" % number)
 			contains(preview.cardText, "施加%d层%s" % [expected, name], "%d card face retains potential layers even on lethal hit" % number)
 			contains(str(preview.description).replace(" ", ""), "施加%d层%s" % [expected, name], "%d tooltip retains potential layers even on lethal hit" % number)
-			contains(preview.cardText, "造成%d点伤害" % (10 if number == 29 else 5), "%d damage stays untruncated" % number)
+			contains(preview.cardText, "造成%d点伤害" % (10 if number == 29 else 7 if number == 19 else 5), "%d damage stays untruncated" % number)
 			var result := m.play_card("card_000", 0)
 			check(not result.is_empty(), "%d survival comparison executes a valid play" % number)
 			check(int(m.enemies[0].get(status, 0)) == (expected if protected else 0), "%d actual status still skips dead targets" % number)
@@ -293,10 +293,10 @@ func test_potential_status_and_conditional_wording() -> void:
 			var preview := m.card_preview("card_000", 0)
 			var status := "weak" if number == 19 else "bleed"
 			var name := "虚弱" if number == 19 else "裂伤"
-			var expected := 1
+			var expected := 2 if number == 19 else 1
 			check(m.snapshot() == before, "Ranged lethal bleed preview preserves live state")
 			contains(preview.cardText, "施加%d层%s" % [expected, name], "Follow-up status preview ignores bleed lethality")
-			contains(preview.cardText, "造成8点伤害", "Direct damage remains before block and HP clipping")
+			contains(preview.cardText, "造成%d点伤害" % (11 if number == 19 else 8), "Direct damage remains before block and HP clipping")
 			check(not m.play_card("card_000", 0).is_empty(), "Ranged comparison executes")
 			check((m.enemies[0].hp > 0) == protected, "Ranged survival matches damage and bleed order")
 			check(int(m.enemies[0][status]) == (expected if protected else 0) + (3 if number == 27 else 0), "Actual ranged status still skips targets killed by bleed")
@@ -338,6 +338,10 @@ func _ready() -> void:
 	Game.save_enabled = false
 	Game.save_path = "user://combat_preview_qa.json"
 	Game.meta_path = "user://combat_preview_meta_qa.json"
+	var exhaust_preview := fixture([12,2])
+	var exhaust_before := exhaust_preview.snapshot()
+	contains(preview_text(exhaust_preview), "消耗另一张手牌。", "Dismantle previews hand exhaustion")
+	check(exhaust_preview.snapshot() == exhaust_before, "Dismantle preview never moves candidate cards")
 	test_numeric_effects()
 	test_read_only_catalog()
 	test_potential_status_and_conditional_wording()

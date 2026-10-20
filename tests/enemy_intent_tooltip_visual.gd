@@ -51,6 +51,9 @@ func _ready() -> void:
 	Game.save_path = "user://intent_tooltip_visual_unused.json"
 	Game.meta_path = "user://intent_tooltip_visual_meta_unused.json"
 	output = "res://artifacts/qa/enemy-intent-tooltip-2026-10-20/hover/"
+	var output_args := OS.get_cmdline_user_args()
+	if output_args.has("--output-dir"):
+		output = output_args[output_args.find("--output-dir")+1].trim_suffix("/")+"/"
 	DirAccess.make_dir_recursive_absolute(output)
 	Game.state = Game.initial_state()
 	app = preload("res://scenes/main.tscn").instantiate()

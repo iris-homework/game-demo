@@ -80,9 +80,11 @@
               "next_damage",
               "next_discount",
               "power",
+              "exhaust_hand",
               "discard_attack",
               "buff"
-            ]
+            ],
+            "description": "exhaust_hand selects another hand UID of any card type and moves it to the exhaust pile; the resolving card follows its own exhaust/type fields. discard_attack is retained for frozen old definitions and discards only another attack card."
           },
           "id": {
             "type": "string",
