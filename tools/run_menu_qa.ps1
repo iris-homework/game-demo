@@ -21,7 +21,7 @@ $menuQaArgs = @('--path',$menuQaRoot,'--log-file',(Join-Path $menuQaOutput 'engi
 if ($VerboseEngine) { $menuQaArgs += '--verbose' }
 if ($Suite -eq 'import') { $menuQaArgs += @('--headless','--editor','--import','--quit') }
 elseif ($Suite -eq 'baseline') { $menuQaArgs += @('--windowed','--resolution',$Resolution,'res://tools/qa_capture.tscn','--','--target','menu','--output',(Join-Path $menuQaOutput 'menu.png')) }
-else { $menuQaArgs += @('--windowed','--position','40,40','--resolution',$Resolution,'--always-on-top','res://tests/menu_visual.tscn','--','--output-dir',$menuQaOutput,'--suite',$Suite) }
+else { $menuQaArgs += @('--windowed','--position','40,40','--resolution',$Resolution,'--always-on-top','res://tests/menu/menu_visual.tscn','--','--output-dir',$menuQaOutput,'--suite',$Suite) }
 foreach ($menuQaArg in $menuQaArgs) { if ($menuQaArg -match '["\r\n]') { throw 'Unsafe command-line path.' } }
 $menuQaCommandLine = ($menuQaArgs | ForEach-Object { '"' + $_ + '"' }) -join ' '
 $menuQaPriorAppData = $env:APPDATA

@@ -2,7 +2,7 @@ class_name EnemyVisualResolver
 extends RefCounted
 ## The only boundary between authored enemy visuals and render-ready actor data.
 const CATALOG_PATH := "res://data/enemies/combat_visuals.json"
-const EMERGENCY_IDLE := preload("res://assets/combat_test/finn_idle.webp")
+const EMERGENCY_IDLE := preload("res://assets/combat_test/finn/finn_idle.webp")
 const ATTACK_STYLES := ["", "slash", "pierce", "bite", "shoot", "laser"]
 const FORMATION_SLOTS := ["", "triangle_left_back", "triangle_left_front", "triangle_right"]
 

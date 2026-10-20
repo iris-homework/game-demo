@@ -26,12 +26,12 @@ if ([string]::IsNullOrWhiteSpace($OutputDirectory)) {
 $taskOutputRoot = (New-Item -ItemType Directory -Path $OutputDirectory -Force).FullName
 $taskScreenshots = @()
 $taskScenes = @{
-    integration = 'res://tests/r1_visual.tscn'
-    interaction = 'res://tests/interaction_visual.tscn'
-    drag = 'res://tests/drag_visual.tscn'
-    pile = 'res://tests/pile_visual.tscn'
-    story = 'res://tests/run.tscn'
-    combat = 'res://tests/combat_tests.tscn'
+    integration = 'res://tests/integration/r1_visual.tscn'
+    interaction = 'res://tests/combat/interaction/interaction_visual.tscn'
+    drag = 'res://tests/combat/interaction/drag_visual.tscn'
+    pile = 'res://tests/combat/interaction/pile_visual.tscn'
+    story = 'res://tests/story/run.tscn'
+    combat = 'res://tests/combat/rules/combat_tests.tscn'
 }
 $taskSummaries = @{
     integration = 'VISUAL INTEGRATION: 0 failures'

@@ -2,7 +2,7 @@
   "note": "2026-10-19 proportion correction via built-in image_gen, Noren proportions; original generation preserved in sibling files and previous runtime copies in artifacts/qa/gang-proportions-2026-10-19/before. All corrected poses are RGBA including boss idle. 2026-10-19: henchman clothing highlights darkened with built-in image_gen; proportions and layout retained. Previous sources preserved in sibling proportion-version files.",
   "files": [
     {
-      "file": "gang_boss_idle.png",
+      "file": "gang_boss/gang_boss_idle.png",
       "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮头目/01_站姿_idle_比例统一版.png",
       "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-6e045bed-b21b-4c75-9568-f6100f66267a.png",
       "sha256": "972078a6dc1ffc015bd89499a267daea81fa74b009d567e91bdc2de7817bf446",
@@ -19,7 +19,7 @@
       ]
     },
     {
-      "file": "gang_boss_move.png",
+      "file": "gang_boss/gang_boss_move.png",
       "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮头目/02_前进_advance_比例统一版.png",
       "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-0ef7632c-a6c1-4c75-9544-bac499179172.png",
       "sha256": "41b93728fd10e0d610e4e97865283a0d0784c98794a624da6fb207d1316f74ad",
@@ -36,7 +36,7 @@
       ]
     },
     {
-      "file": "gang_boss_pierce.png",
+      "file": "gang_boss/gang_boss_pierce.png",
       "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮头目/03_前踢击_front_kick_比例统一版.png",
       "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-a8b6a0aa-199b-4e02-bc79-38a2a7d2d89b.png",
       "sha256": "01024e36d9e167192b95d9317c908cdda8fa4ffede40e40f9b12800d2d9fa16e",
@@ -53,7 +53,7 @@
       ]
     },
     {
-      "file": "gang_boss_damaged.png",
+      "file": "gang_boss/gang_boss_damaged.png",
       "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮头目/04_受击_hit_比例统一版.png",
       "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-05753be5-395e-42fb-bb95-101c6d9ea98e.png",
       "sha256": "711d9a11c198a50b7396f1267d0208b423d61b225548e381ecdc26e4340abe3b",
@@ -70,7 +70,7 @@
       ]
     },
     {
-      "file": "gang_henchman_idle.png",
+      "file": "gang_henchman/gang_henchman_idle.png",
       "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮小弟/01_站姿_idle_衣服加深版.png",
       "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-59d2b326-36b3-4460-9ca2-08d0ab9fc3bc.png",
       "sha256": "365344bbe9be64f97b0572096967109e6c3f2d185356c48f3467f17480ae4506",
@@ -87,7 +87,7 @@
       ]
     },
     {
-      "file": "gang_henchman_move.png",
+      "file": "gang_henchman/gang_henchman_move.png",
       "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮小弟/02_前进_advance_衣服加深版.png",
       "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-f043684f-5809-479c-be40-b50f46edd568.png",
       "sha256": "5f96aec7732e00b69f295a990749cf0a7672fcb7b3186018c7eff0b6ab165907",
@@ -104,7 +104,7 @@
       ]
     },
     {
-      "file": "gang_henchman_pierce.png",
+      "file": "gang_henchman/gang_henchman_pierce.png",
       "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮小弟/03_拳打_punch_衣服加深版.png",
       "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-3a188484-0458-4561-a4ec-4fba4eb316dc.png",
       "sha256": "e2f7fc23300c4c6e826e7c5cbf827ee146406fd85df7564deebed59440247b63",
@@ -121,7 +121,7 @@
       ]
     },
     {
-      "file": "gang_henchman_damaged.png",
+      "file": "gang_henchman/gang_henchman_damaged.png",
       "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/黑帮小弟/04_受击_hit_衣服加深版.png",
       "generated_source": "/Users/anyone/.codex/generated_images/01a1536c-b155-7ec1-aefd-7d15dddc10fc/exec-44d5c588-3fe8-45a2-b79a-ed056826df69.png",
       "sha256": "d5e7d4a0d4d787e08a97100f6ceb9b166ad4ab14ee7d527c5f62a21e8db15f45",

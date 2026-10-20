@@ -243,23 +243,25 @@ B11 为两只变异鱼，各30 HP。第一只循环「攻击6 → 攻击2×2 →
 
 ## 验证命令
 
+测试按功能整理在六个目录中，完整入口和存档隔离要求见[测试目录索引](tests/README.md)。
+
 ```sh
 godot --headless --path . --editor --import --quit
-godot --headless --path . res://tests/run.tscn
-godot --headless --path . res://tests/player_character_tests.tscn
-godot --headless --path . res://tests/character_cyberware_tests.tscn
-godot --path . --fixed-fps 60 res://tests/character_cyberware_visual.tscn
-godot --path . res://tests/player_character_visual.tscn
-godot --headless --path . res://tests/combat_tests.tscn
-godot --headless --path . res://tests/cyberware_tests.tscn
-godot --path . res://tests/cyberware_visual.tscn
-godot --path . res://tests/r1_visual.tscn
-godot --path . res://tests/interaction_visual.tscn
-godot --path . res://tests/pile_visual.tscn
-godot --path . res://tests/pile_count_visual.tscn
-godot --path . res://tests/drag_visual.tscn
-godot --path . res://tests/hand_fan_visual.tscn
-godot --path . res://tests/turn_banner_visual.tscn
+godot --headless --path . res://tests/story/run.tscn
+godot --headless --path . res://tests/characters/player_character_tests.tscn
+godot --headless --path . res://tests/characters/character_cyberware_tests.tscn
+godot --path . --fixed-fps 60 res://tests/characters/character_cyberware_visual.tscn
+godot --path . res://tests/characters/player_character_visual.tscn
+godot --headless --path . res://tests/combat/rules/combat_tests.tscn
+godot --headless --path . res://tests/characters/cyberware_tests.tscn
+godot --path . res://tests/characters/cyberware_visual.tscn
+godot --path . res://tests/integration/r1_visual.tscn
+godot --path . res://tests/combat/interaction/interaction_visual.tscn
+godot --path . res://tests/combat/interaction/pile_visual.tscn
+godot --path . res://tests/combat/presentation/pile_count_visual.tscn
+godot --path . res://tests/combat/interaction/drag_visual.tscn
+godot --path . res://tests/combat/presentation/hand_fan_visual.tscn
+godot --path . res://tests/combat/presentation/turn_banner_visual.tscn
 ```
 
 R1 历史验收包含原剧情 **690** 项检查与战斗／血量／存档 **191** 项检查；图形集成验证覆盖抽弃牌、重复点击、自然胜负、双向转场、缺图、治疗与演练隔离。实际窗口也验证了鼠标选牌、指定目标和结束回合。

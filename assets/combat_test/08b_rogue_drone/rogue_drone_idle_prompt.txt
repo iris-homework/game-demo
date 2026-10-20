@@ -1,0 +1,23 @@
+08B 失控配送蜂候选配色图
+日期：2026-10-21
+状态：候选，不自动替换已审批 PNG。
+方式：内置 imagegen，transparent_background=true。
+参考：Image 1 为当前 rogue_drone_idle.png（编辑目标与结构来源）；Image 2 为
+reference_idle/luggage_lurker_idle.png（只用于检查配色区分度）。
+候选文件：rogue_drone_idle_candidate_coolgray.png
+生成原图：C:/Users/22141/.codex/generated_images/01a15a65-14d7-7820-bb67-b6da7f866826/exec-45814a2d-9afd-426d-b7c1-220308ab95a1.png
+验证：1536×1024 RGBA；四角 alpha=0；alpha≥128 的主体范围
+(55,77)—(1506,935)；目标文件与生成原图 SHA256 一致。
+SHA256：8FD42C2093A6573E9FCA5F042C934CA3D322B0FA7622FDCF78EE7A0864970048
+现有 rogue_drone_idle.png 保持 E8BE9C17F880382459216384759CA74A4121BACAD741BED8FB709F20BE1BC170。
+按 08B 设计条目：褪色冷青灰／物流蓝机舱为主，深石墨机架，局部旧白防撞框；
+黄色寻址灯只在机头；磨损主要在货箱四角。
+
+实际提示词：
+Use case: precise-object-edit
+Asset type: candidate color revision of an existing 2D game enemy idle sprite.
+Input images: Image 1 is the exact EDIT TARGET and geometry source. Image 2, the luggage creature, is a contrast reference only.
+Primary request: regenerate the same rogue delivery drone with the newly specified candidate palette: faded cold cyan-gray / logistics-blue cabin shell as the dominant color, deep graphite mechanical frame, and local areas of old off-white crash bumper. Keep the palette subdued and dusty, not bright cyan or neon turquoise. The rectangular hanging cargo box should be desaturated logistics blue-gray; its corner protectors can be old white. Keep the head-facing addressing lamp as the ONLY yellow light. Concentrate visible scuffs, scratches and edge wear primarily on the four corners of the cargo box, with only light wear on the fans and chassis.
+Subject invariants: exactly ONE drone; same broad, low, horizontally wide silhouette; same 1536x1024 landscape composition and generous transparent margins; same left-facing hovering three-quarter side view; exactly two guarded circular lift fans, one on each side; same central chassis, short wings/mechanical supports, closed hanging cargo box, box seals and locks, exact two short mechanical gripper arms in the same positions, same paneling and cable layout. Preserve the existing bold dark plum ink outline, painted cel-shaded angular facets, hand-illustrated look and restrained proportions. This must look like the same approved asset recolored, not a new vehicle redesign.
+Render: full body, single static idle frame, transparent background, alpha preserved, no floor, no ground shadow, no aura, no halo, no glow around the body, no checkerboard, no text, watermark or UI. Yellow emission limited to the small front addressing lamp. No rusty red-brown dominant surfaces, no cream/beige dominant surfaces, no extra lights, no extra rotors, no changed pose or crop.
+

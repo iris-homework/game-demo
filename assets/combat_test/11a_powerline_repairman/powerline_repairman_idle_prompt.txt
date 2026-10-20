@@ -1,0 +1,21 @@
+Generated: 2026-10-21 (Asia/Shanghai)
+Tool: built-in image_gen, transparent_background=true
+Output: powerline_repairman_idle.png
+Reference images (style only):
+assets/combat_test/reference_idle/warden_shield_idle.png
+assets/combat_test/reference_idle/gang_henchman_idle.png
+assets/combat_test/reference_idle/scavenger_hooker_idle.png
+Source: C:/Users/22141/.codex/generated_images/01a15a90-c4f3-7ab2-9a5a-a1de9bfc48aa/exec-61a36870-1ef0-40d8-90ae-31a6504dfbaa.png
+Deliverable: one static idle pose, no animation or runtime integration.
+
+Actual generation prompt:
+Use case: stylized-concept
+Asset type: single full-body transparent PNG enemy idle sprite for the 2D Japanese-anime cyberpunk game 午夜委托.
+Input images: all supplied images are STYLE REFERENCES ONLY, not edit targets. Match the reference characters' exaggerated large-head compact-body proportions, bold dark ink outlines, angular faceted cel shading, simplified readable planes, chunky boots, and polished hand-drawn 2D battle-sprite finish. The shield warden is the main reference for adult male weight and body mass, the gang henchman for stylization, the scavenger for industrial equipment rendering. Create an entirely NEW character.
+Subject: 11A powerline repairman, an adult human male heavy melee guard wearing a thick dirty ash-gray electrical-insulation protective suit. Broad thick neck mostly contained by a high padded collar. Compact heavy safety helmet with a lowered dark opaque arc-flash face shield covering his whole face; recognizably protective industrial clothing, not a robot or soldier in powered armor. Especially broad SQUARE padded insulating shoulder pieces, together wider than the large helmet/head. Strong broad stocky body with a clearly human silhouette and steady weight.
+Equipment: exactly TWO short faded mustard-yellow warning strips total on the otherwise dirty-gray suit, one on each upper sleeve; no other yellow decoration. Thick insulating gauntlets. At the belt side hangs ONE SHORT grounding cable with a small clamp, clear and tidy. Very heavy work boots with visibly thick layered dark rubber soles.
+Weapon and pose: BOTH gloved hands visibly grip the SAME single long high-voltage switch operating pole at separate points in front of the body. Shaft is straight and continuous, insulated dark gray-brown fiberglass, simple industrial construction. A distinctly readable open U-SHAPED METAL HEAD is mounted at its upper end, with two short parallel prongs and a rounded bridge, NOT a scythe, sickle, trident or spear. Pole sits in a gently diagonal almost upright resting position, blunt lower butt resting near the planted boot and U head extending beside and above shoulder height, clearly separated from face. Neutral idle key pose at the end of tapping the pole butt against the ground and returning both hands to it; no action sequence, no multiple limbs. Feet apart, knees slightly softened, stable deliberate stance. Three-quarter view facing screen LEFT, matching the shield warden's game-facing orientation.
+Composition: ONE character ONLY, entire helmet, all boots, entire pole and both ends in frame, centered comfortably with clean transparent margin on every side. Approx 4 to 4.5 heads tall, enlarged helmet/head, compact torso/legs, wide shoulders; not realistic adult anatomy and not an infant mascot. Balanced readable heavy silhouette. Illustration itself fills most of portrait canvas.
+Style and palette: crisp dark contours, sharp geometric cel-shadow planes and restrained highlights like the references. Ash-gray, charcoal and neutral muted gray-brown cloth, dark smoked visor with a simple subtle reflection, dull steel pole head; exactly two faded yellow warning patches. Padded cloth has broad folds, seam lines and limited scuffing; no photoreal fabric noise, no unnecessary tiny mechanical greebles. No magenta/cyan neon accents or luminous eyes.
+Background: genuinely transparent alpha, clean isolated cutout. No scene, no floor plane, no cast shadow, no backdrop, no gradients, no glow, no electrical effects.
+Constraints: single static idle sprite, not a sprite sheet or turnaround. No text, letters, logos, UI, watermark, borders, additional tools, shields, guns, machinery, extra characters, exposed face, extra arms or extra poles. Preserve clear U opening and natural two-handed grip.

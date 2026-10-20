@@ -53,8 +53,8 @@ VISUAL INTEGRATION: 0 failures; screenshots: /var/folders/mc/lbzb_hd50lg7htqnl3v
 
 维护文档基线（2026-10-03，Asia/Shanghai；应用版本保持 0.2.3-r1）：
 - 新增修改记录、维护文档和后续开发入口；本次没有修改运行时代码或存档格式。
-- 本轮实际执行：Godot 4.7.2 headless，tests/run.tscn：690 checks, 0 failures。
-- 本轮实际执行：tests/combat_tests.tscn：191 checks, 0 failures。
+- 本轮实际执行：Godot 4.7.2 headless，tests/story/run.tscn：690 checks, 0 failures。
+- 本轮实际执行：tests/combat/rules/combat_tests.tscn：191 checks, 0 failures。
 - 本轮未重跑图形测试；维护文档中的交互通过结果引用此前验收。
 - 已知扩展边界及文档与代码差异已单列；首回合空手恢复补牌问题为静态代码审查推导，未作为已复现修复记录。
 
@@ -66,17 +66,17 @@ VISUAL INTEGRATION: 0 failures; screenshots: /var/folders/mc/lbzb_hd50lg7htqnl3v
 2026-10-04 UI 0.3.0-ui（Asia/Shanghai）
 Godot 4.7.2 standard / Compatibility
 编辑器导入完成，未出现 SCRIPT ERROR / Parse Error。
-1280x800 res://tests/r1_visual.tscn
+1280x800 res://tests/integration/r1_visual.tscn
 VISUAL INTEGRATION: 0 failures
-1280x800 res://tests/interaction_visual.tscn
+1280x800 res://tests/combat/interaction/interaction_visual.tscn
 INTERACTION VISUAL: 16 checks, 0 failures
-1280x800 res://tests/pile_visual.tscn
+1280x800 res://tests/combat/interaction/pile_visual.tscn
 PILE VISUAL: 18 checks, 0 failures
-1600x1000 res://tests/drag_visual.tscn
+1600x1000 res://tests/combat/interaction/drag_visual.tscn
 DRAG VISUAL: 11 checks, 0 failures
-1600x1000 res://tests/r1_visual.tscn
+1600x1000 res://tests/integration/r1_visual.tscn
 VISUAL INTEGRATION: 0 failures
-补充 res://tests/visual.tscn，正常退出；人工检查菜单、对白、选项、结算截图。
+补充 res://tests/integration/visual.tscn，正常退出；人工检查菜单、对白、选项、结算截图。
 人工检查牌堆容量顶部及底部、战斗、地图选中状态、地点与义体布局。
 本轮未改规则或 JSON，未重跑 run.tscn / combat_tests.tscn。
 截图：docs/预览/UI改版；容量测试截图仍为系统临时目录下 midnight_pile_capacity_*，30 张卡仅在测试内存中生成。
@@ -118,15 +118,15 @@ Godot 4.7.2 standard / Compatibility
 1280x800、1600x1000 实际渲染：起手三张、出牌后两张、下一回合三张，静止位置 y 均为 627，scale 均为 (1,1)。
 六张截图已逐张人工检查，卡面水平对齐，底部常驻操作提示已移除。
 截图：docs/预览/手牌对齐；机甲演练共用战斗布局，不写用户存档。
-1280x800 res://tests/drag_visual.tscn
+1280x800 res://tests/combat/interaction/drag_visual.tscn
 DRAG VISUAL: 11 checks, 0 failures
 未重跑其他专项测试。
 
 2026-10-07 霓虹弃牌动画 0.3.4-fx（Asia/Shanghai）
 Godot 4.7.2 standard / Compatibility
-1280x800 res://tests/interaction_visual.tscn: INTERACTION VISUAL: 16 checks, 0 failures
-1600x1000 res://tests/drag_visual.tscn: DRAG VISUAL: 11 checks, 0 failures
-1280x800 res://tests/r1_visual.tscn: VISUAL INTEGRATION: 0 failures
+1280x800 res://tests/combat/interaction/interaction_visual.tscn: INTERACTION VISUAL: 16 checks, 0 failures
+1600x1000 res://tests/combat/interaction/drag_visual.tscn: DRAG VISUAL: 11 checks, 0 failures
+1280x800 res://tests/integration/r1_visual.tscn: VISUAL INTEGRATION: 0 failures
 真实渲染录帧：1280x800 / 1600x1000，检查单张旋转拖尾、入堆脉冲与回合末多张弃牌。
 图片和动态预览：docs/预览/弃牌动画；录帧用临时场景已移除。
 交互检查包含上一张尾动画期间继续出牌、结束回合安全回收与致命命中返回。

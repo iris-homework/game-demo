@@ -38,8 +38,8 @@ func setup_player(origin: Vector2, direction: float) -> void:
 	kind = "noren"
 	calibrations = NOREN.duplicate(true)
 	for key in calibrations:
-		poses[key] = load("res://assets/combat_test/noren_%s.png" % key)
-	poses["shoot"] = preload("res://assets/combat_test/noren_shoot_planted.png")
+		poses[key] = load("res://assets/combat_test/noren/noren_%s.png" % key)
+	poses["shoot"] = preload("res://assets/combat_test/noren/noren_shoot_planted.png")
 	_place(origin,direction)
 
 func setup_enemy(visual: EnemyVisualResolver.Visual, origin: Vector2, direction: float) -> void:
