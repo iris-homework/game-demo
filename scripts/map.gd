@@ -31,6 +31,7 @@ var selected_id := ""
 var detail: Control = null
 var markers := {}
 var map_rect := Rect2()
+var _art_rect := Rect2()
 
 var zoom_level := MIN_ZOOM
 var _pan := Vector2.ZERO
@@ -94,14 +95,22 @@ func _build_map() -> void:
 	_map_layer.add_child(_map_art)
 	var asset_id := str(Game.map_config.get("cityMapAssetId", "city_map"))
 	var texture: Texture2D = Game.texture(asset_id)
+	var content := Rect2(0.0, 0.0, 1.0, 1.0)
+	if texture != null:
+		var asset: Dictionary = Game.assets.get(asset_id, {})
+		var region: Array = asset.get("mapContentRect", [0.0, 0.0, 1.0, 1.0])
+		content = Rect2(float(region[0]), float(region[1]), float(region[2]), float(region[3]))
 	if texture == null:
 		texture = MidnightMapAssets.map_texture()
 	var source := MAP_FALLBACK_SIZE
 	if texture != null and texture.get_width() > 0 and texture.get_height() > 0:
 		source = Vector2(texture.get_size())
-	var fit_scale := minf(CANVAS.x / source.x, CANVAS.y / source.y)
-	var dimensions := source * fit_scale
+	# 地点锚点仍以原城市区域为基准，扩绘仅增加四周可浏览的画面。
+	var core_size := source * content.size
+	var fit_scale := minf(CANVAS.x / core_size.x, CANVAS.y / core_size.y)
+	var dimensions := core_size * fit_scale
 	map_rect = Rect2((CANVAS - dimensions) * 0.5, dimensions)
+	_art_rect = Rect2(map_rect.position - source * content.position * fit_scale, source * fit_scale)
 	if texture != null:
 		var view := TextureRect.new()
 		view.name = "map_texture"
@@ -112,19 +121,19 @@ func _build_map() -> void:
 		var clarity := ShaderMaterial.new()
 		clarity.shader = preload("res://scripts/map/map_clarity.gdshader")
 		view.material = clarity
-		view.position = map_rect.position
-		view.size = map_rect.size
+		view.position = _art_rect.position
+		view.size = _art_rect.size
 		view.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_map_art.add_child(view)
 	else:
 		panel(_map_art, map_rect.position, map_rect.size, Color("0e1928"), Color("264256"))
 		label(_map_art, "城市地图插画待补", map_rect.position + Vector2(30.0, 30.0), Vector2(640.0, 44.0), 26, MUTED)
-	rect(_map_art, map_rect.position, map_rect.size, Color(0.02, 0.03, 0.05, 0.12))
+	rect(_map_art, _art_rect.position, _art_rect.size, Color(0.02, 0.03, 0.05, 0.12))
 	var edge := Color(0.24, 0.62, 0.72, 0.55)
-	rect(_map_art, map_rect.position, Vector2(map_rect.size.x, 1.0), edge)
-	rect(_map_art, map_rect.position + Vector2(0.0, map_rect.size.y - 1.0), Vector2(map_rect.size.x, 1.0), edge)
-	rect(_map_art, map_rect.position, Vector2(1.0, map_rect.size.y), edge)
-	rect(_map_art, map_rect.position + Vector2(map_rect.size.x - 1.0, 0.0), Vector2(1.0, map_rect.size.y), edge)
+	rect(_map_art, _art_rect.position, Vector2(_art_rect.size.x, 1.0), edge)
+	rect(_map_art, _art_rect.position + Vector2(0.0, _art_rect.size.y - 1.0), Vector2(_art_rect.size.x, 1.0), edge)
+	rect(_map_art, _art_rect.position, Vector2(1.0, _art_rect.size.y), edge)
+	rect(_map_art, _art_rect.position + Vector2(_art_rect.size.x - 1.0, 0.0), Vector2(1.0, _art_rect.size.y), edge)
 	var gradient := Gradient.new()
 	gradient.offsets = PackedFloat32Array([0.0, 1.0])
 	gradient.colors = PackedColorArray([Color(0.02, 0.03, 0.05, 0.92), Color(0.02, 0.03, 0.05, 0.0)])
@@ -172,10 +181,11 @@ func set_map_zoom(value: float, anchor: Vector2 = MAP_VIEW.get_center()) -> void
 	_apply_map_transform()
 
 func _apply_map_transform() -> void:
-	# 每轴只允许在放大产生的额外范围内移动，最小时自动归零。
-	var extra := map_rect.size * (zoom_level - MIN_ZOOM)
-	_pan = _pan.clamp(-extra, Vector2.ZERO)
-	var offset := map_rect.position * (1.0 - zoom_level) + _pan
+	# 使用扩绘底图的真实边缘限制拖动，始终覆盖地图视口。
+	var origin_offset := map_rect.position * (1.0 - zoom_level)
+	var art_bounds := Rect2(_art_rect.position * zoom_level + origin_offset, _art_rect.size * zoom_level)
+	_pan = Vector2.ZERO if zoom_level <= MIN_ZOOM else _pan.clamp(MAP_VIEW.end - art_bounds.end, MAP_VIEW.position - art_bounds.position)
+	var offset := origin_offset + _pan
 	_map_art.position = offset
 	_map_art.scale = Vector2.ONE * zoom_level
 	_leader_layer.position = offset
