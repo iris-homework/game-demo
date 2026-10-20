@@ -105,7 +105,7 @@ func _ready() -> void:
 	view.close_pile()
 	view.model.turn_discount = 1
 	view.commit()
-	check(view.cards.card_002.cost_label.text == "费用 1", "Hand still shows discounted cost")
+	check(view.cards.card_002.cost_label.text == "1", "Hand still shows discounted cost")
 	var frozen: Dictionary = view.model.snapshot()
 	Game.open_current_deck()
 	await get_tree().process_frame
@@ -113,7 +113,7 @@ func _ready() -> void:
 	check(deck_cards.size() == 6, "Current battle deck includes all six card types")
 	for card in deck_cards:
 		check(card.effect_label.text == card.data.get("cardText", card.data.description), "Library shows original effect: " + card.data.name)
-		check(card.cost_label.text == "费用 %d" % int(card.data.cost), "Library shows original cost: " + card.data.name)
+		check(card.cost_label.text == str(int(card.data.cost)), "Library shows original cost: " + card.data.name)
 		check(card.card_button.tooltip_text == card.data.description, "Library shows original tooltip: " + card.data.name)
 	check(view.model.snapshot() == frozen, "Library browsing preserves combat state")
 	await shot("library-original-values")
@@ -123,7 +123,7 @@ func _ready() -> void:
 	var played_card: CombatCard = view.cards.card_002
 	view.play_selected(0, "", 2)
 	check(played_card.effect_label.text.contains("造成35点伤害"), "Retiring card retains chosen ammo and consumed buff values")
-	check(played_card.cost_label.text == "费用 1", "Retiring card retains the cost actually paid before discount consumption")
+	check(played_card.cost_label.text == "1", "Retiring card retains the cost actually paid before discount consumption")
 	await idle()
 	check(view.cards.card_001.effect_label.text == "造成2点伤害，共4次。", "Remaining hand refreshes damage while retaining authored hit count")
 	view.show_pile("弃牌堆", view.model.discard_pile)

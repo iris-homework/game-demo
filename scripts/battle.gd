@@ -14,6 +14,7 @@ var enemy_summary_plates: Array[Control] = []
 const ActorHUD = preload("res://scripts/combat/actor_hud.gd")
 const EnemyHPSummary = preload("res://scripts/combat/enemy_hp_summary.gd")
 const EnemyIntent = preload("res://scripts/combat/enemy_intent.gd")
+const EnergyHUD = preload("res://scripts/combat/energy_hud.gd")
 var player_plate: Control
 var shown_player_ammo := 0
 var shown_player_block := 0
@@ -1042,10 +1043,16 @@ func preview_defense(partial: bool) -> void:
 	set_busy(false)
 
 func build_energy_hud() -> void:
-	energy_panel = panel(self,Vector2(30,719),Vector2(170,56),Color("0b1b23"),Color("28565f"))
-	label(energy_panel,"能量",Vector2(12,12),Vector2(60,32),17,CYAN)
-	energy_value = label(energy_panel,"",Vector2(72,8),Vector2(86,40),25,CREAM)
+	energy_panel = EnergyHUD.new()
+	energy_panel.position = Vector2(30,719)
+	add_child(energy_panel)
+	energy_panel.title_label = label(energy_panel,"能量",Vector2(31,9),Vector2(61,17),10,CYAN)
+	energy_value = label(energy_panel,"",Vector2(90,0),Vector2(70,34),23,CREAM)
+	energy_value.add_theme_font_override("font",button_font)
+	energy_value.autowrap_mode = TextServer.AUTOWRAP_OFF
 	energy_value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	energy_value.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	energy_panel.value_label = energy_value
 
 func refresh_resources() -> void:
 	if not presenting_enemy_turn:
@@ -1059,7 +1066,7 @@ func refresh_resources() -> void:
 	if is_instance_valid(energy_panel):
 		energy_panel.visible = model.is_noren()
 		var per_turn := maxi(1,int(model.profile.get("energyPerTurn",3)))
-		energy_value.text = "%d / %d" % [model.energy,per_turn]
+		energy_panel.set_energy(model.energy,per_turn)
 	if not model.is_noren():
 		resources_label.text = "旧版战斗快照"
 		return

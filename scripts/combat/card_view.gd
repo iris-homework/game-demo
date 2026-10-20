@@ -20,6 +20,8 @@ var hover_tween: Tween
 var card_button: Button
 var cost_label: Label
 var effect_label: Label
+var rank_label: Label
+const EFFECT_SIZE := Vector2(150,88)
 const RARITY_COLORS := {"C": Color("a6adb7"), "B": Color("5aa9ff"), "A": Color("f25b69"), "S": Color("f2c35c")}
 
 func rarity_color() -> Color:
@@ -37,20 +39,38 @@ func setup(card_uid: String, definition: Dictionary, read_only: bool = false) ->
 
 func _ready() -> void:
 	if data.has("rarity"):
-		var rank := label(self, str(data.rarity).to_upper(), Vector2(14,5), Vector2(30,30), 26, INK)
-		rank.add_theme_font_override("font", button_font)
-		rank.autowrap_mode = TextServer.AUTOWRAP_OFF
-		label(self, data.get("archetype", "诺伦"), Vector2(50,13), Vector2(112,20), 10, INK)
-		label(self, data.name, Vector2(14,34), Vector2(151,35), 22, INK)
+		label(self, "费用", Vector2(10,9), Vector2(38,14), 9, INK).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		cost_label = label(self, str(int(data.cost)), Vector2(10,18), Vector2(38,34), 26, INK)
+		cost_label.add_theme_font_override("font", button_font)
+		cost_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		cost_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+		var title := label(self, data.name, Vector2(60,12), Vector2(105,47), 19, CREAM)
+		title.add_theme_font_override("font", button_font)
+		title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		var rank_font := FontVariation.new()
+		rank_font.base_font = base_font
+		rank_font.variation_embolden = 1.8
+		rank_font.spacing_top = -8
+		rank_font.spacing_bottom = -8
+		rank_label = label(self, str(data.rarity).to_upper(), Vector2(56,61), Vector2(68,49), 44, rarity_color())
+		rank_label.add_theme_font_override("font", rank_font)
+		rank_label.size = Vector2(68,49)
+		rank_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		rank_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		rank_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+		rank_label.add_theme_color_override("font_outline_color", INK)
+		rank_label.add_theme_constant_override("outline_size", 3)
+		rank_label.add_theme_color_override("font_shadow_color", rarity_color().darkened(0.65))
+		rank_label.add_theme_constant_override("shadow_offset_x", 1)
+		rank_label.add_theme_constant_override("shadow_offset_y", 1)
 		var text: String = data.get("cardText", data.get("description", ""))
-		var font_size := 11 if text.length() > 90 else (12 if text.length() > 60 else 14)
-		while font_size > 10 and base_font.get_multiline_string_size(text,HORIZONTAL_ALIGNMENT_LEFT,152,font_size,-1,TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE).y > 112:
-			font_size -= 1
-		effect_label = label(self, text, Vector2(14,82), Vector2(152,114), font_size, CREAM)
+		effect_label = label(self, text, Vector2(15,110), EFFECT_SIZE, 14, CREAM)
+		effect_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		effect_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		effect_label.add_theme_constant_override("line_spacing", 0)
+		fit_effect_text()
 		var kind: String = {"attack":"攻击", "skill":"技能", "power":"能力"}.get(data.get("type"), "卡牌")
-		label(self, kind + (" · 消耗" if data.get("exhaust", false) else ""), Vector2(14,204), Vector2(96,19), 11, rarity_color())
-		cost_label = label(self, "费用 %d" % int(data.cost), Vector2(113,204), Vector2(57,19), 11, CREAM)
+		label(self, kind + (" · 消耗" if data.get("exhaust", false) else ""), Vector2(14,206), Vector2(152,18), 10, rarity_color()).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	else:
 		label(self, "LEGACY / TEST", Vector2(17,12), Vector2(150,19), 10, INK)
 		label(self, data.get("name", "临时攻击"), Vector2(17,37), Vector2(150,35), 23, INK)
@@ -91,10 +111,20 @@ func _draw() -> void:
 	draw_polyline(outline, CREAM if selected else rarity_color(), 2.5 if selected else 1.3, true)
 	if selected or hovered:
 		draw_polyline(outline, Color(0.95,0.25,0.55,0.16) if selected else Color(0.2,0.85,0.95,0.13), 8.0, true)
-	draw_colored_polygon(PackedVector2Array([Vector2(12,5),Vector2(160,5),Vector2(175,20),Vector2(175,68),Vector2(5,78),Vector2(5,12)]),rarity_color())
 	if data.has("rarity"):
-		draw_line(Vector2(14,198),Vector2(166,198),rarity_color().darkened(0.55),1)
+		var accent := rarity_color()
+		draw_colored_polygon(PackedVector2Array([Vector2(12,5),Vector2(160,5),Vector2(175,20),Vector2(175,59),Vector2(5,59),Vector2(5,12)]), Color("202632"))
+		draw_colored_polygon(PackedVector2Array([Vector2(12,5),Vector2(48,5),Vector2(54,11),Vector2(54,49),Vector2(47,56),Vector2(5,56),Vector2(5,12)]), accent)
+		draw_colored_polygon(PackedVector2Array([Vector2(8,65),Vector2(172,65),Vector2(172,197),Vector2(8,197)]), Color("141a24"))
+		draw_line(Vector2(60,59),Vector2(166,59),accent.darkened(0.45),1)
+		# Frame the central rank without putting decoration behind the rules text.
+		for x in [17.0, 133.0]:
+			draw_line(Vector2(x,84),Vector2(x+30,84),accent.darkened(0.48),1)
+			draw_line(Vector2(x+8,88),Vector2(x+22,88),accent.darkened(0.7),1)
+		draw_line(Vector2(15,202),Vector2(165,202),accent.darkened(0.55),1)
+		draw_colored_polygon(PackedVector2Array([Vector2(158,5),Vector2(164,5),Vector2(175,16),Vector2(175,22)]),accent)
 		return
+	draw_colored_polygon(PackedVector2Array([Vector2(12,5),Vector2(160,5),Vector2(175,20),Vector2(175,68),Vector2(5,78),Vector2(5,12)]),rarity_color())
 	draw_colored_polygon(PackedVector2Array([Vector2(8,85),Vector2(172,76),Vector2(172,138),Vector2(8,149)]),Color("222736"))
 	for i in range(5):
 		draw_line(Vector2(18,90+i*10),Vector2(42+(i%2)*16,90+i*10),Color("4c6e71"),1)
@@ -151,16 +181,25 @@ func refresh_pose(force: bool = false) -> void:
 
 func show_cost(value: int) -> void:
 	if is_instance_valid(cost_label):
-		cost_label.text = "费用 %d" % value
-		cost_label.modulate = CYAN if value < int(data.get("cost", 0)) else Color.WHITE
+		cost_label.text = str(value)
+		cost_label.add_theme_color_override("font_color", Color("07514d") if value < int(data.get("cost", 0)) else INK)
+		cost_label.add_theme_color_override("font_outline_color", CYAN if value < int(data.get("cost", 0)) else Color.TRANSPARENT)
+		cost_label.add_theme_constant_override("outline_size", 1 if value < int(data.get("cost", 0)) else 0)
 
 func show_preview(preview: Dictionary) -> void:
 	if not is_instance_valid(effect_label): return
 	var text: String = preview.get("cardText", data.get("cardText", data.get("description", "")))
 	if text.is_empty(): return
 	effect_label.text = text
+	fit_effect_text()
+	card_button.tooltip_text = preview.get("description", data.get("description", text))
+
+func fit_effect_text() -> void:
+	# Initial and calculated rules use the same bounds and wrapping budget.
+	# A Label may expand to its text minimum before fitting; use the fixed design bounds.
+	var bounds := EFFECT_SIZE if data.has("rarity") else effect_label.size
 	var font_size := 14 if data.has("rarity") else 16
-	while font_size > 10 and base_font.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, effect_label.size.x, font_size, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE).y > effect_label.size.y - 2:
+	while font_size > 10 and base_font.get_multiline_string_size(effect_label.text, effect_label.horizontal_alignment, bounds.x, font_size, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE).y > bounds.y - 2:
 		font_size -= 1
 	effect_label.add_theme_font_size_override("font_size", font_size)
-	card_button.tooltip_text = preview.get("description", data.get("description", text))
+	effect_label.size = bounds
