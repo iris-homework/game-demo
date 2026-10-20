@@ -1,5 +1,7 @@
 class_name CombatModel
 extends RefCounted
+## Transient notification only; snapshot and shuffle order remain unchanged.
+signal discard_recycled(card_count: int, next_uid: String)
 const CYBERWARE_LIMIT := 4
 var buffs := preload("res://scripts/combat/effects/buff_library.gd").new()
 ## Pure, serializable combat rules. Animation and scene navigation never live here.
@@ -162,6 +164,7 @@ func draw_cards(amount: int = -1) -> Array:
 			draw_pile = discard_pile.duplicate()
 			discard_pile.clear()
 			draw_pile.shuffle()
+			discard_recycled.emit(draw_pile.size(), str(draw_pile.back()))
 		var uid = draw_pile.pop_back()
 		hand.append(uid)
 		drawn.append(uid)

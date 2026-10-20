@@ -36,6 +36,8 @@ var draw_count: Label
 var discard_count: Label
 var shown_draw_count := 0
 var shown_discard_count := 0
+var pending_recycles: Dictionary = {}
+var shuffle_fx: Node2D
 var end_button: Button
 var cyberware_button: Button
 var cyberware_status: Label
@@ -74,6 +76,7 @@ func enter(params: Dictionary) -> void:
 	if Game.state.combat.is_empty(): Game.initialize_combat()
 	model = CombatModel.new()
 	model.restore(Game.state.combat)
+	model.discard_recycled.connect(func(amount: int, next_uid: String): pending_recycles[next_uid] = amount)
 	expected_revision = Game.revision
 	shown_enemies = model.enemies.duplicate(true)
 	shown_player_hp = model.player_hp
@@ -360,16 +363,38 @@ func deal_hand(animate: bool) -> void:
 	if model.hand.is_empty(): return
 	var last_flight: Node2D
 	var duration := maxf(timing("drawDuration",0.26),0.38)
+	var batch_index := 0
 	for i in model.hand.size():
 		if cards.has(model.hand[i]): continue
+		if animate and pending_recycles.has(model.hand[i]):
+			# Finish the old deck's flights before recycling, including mid-deal.
+			if is_instance_valid(last_flight): await last_flight.landed
+			last_flight = null
+			var amount: int = pending_recycles[model.hand[i]]
+			pending_recycles.erase(model.hand[i])
+			await animate_shuffle(amount)
+			batch_index = 0
 		var view := create_card(model.hand[i],i,model.hand.size(),animate)
 		if animate:
 			var fx := preload("res://scripts/combat/draw_fx.gd").new()
 			add_child(fx)
 			fx.departed.connect(on_card_drawn)
-			fx.start(view,DRAW_POS+PILE_SIZE/2.0,duration,i*0.055)
+			fx.start(view,DRAW_POS+PILE_SIZE/2.0,duration,batch_index*0.055)
+			batch_index += 1
 			last_flight = fx
 	if animate and is_instance_valid(last_flight): await last_flight.landed
+
+func animate_shuffle(amount: int) -> void:
+	shuffle_fx = preload("res://scripts/combat/shuffle_fx.gd").new()
+	add_child(shuffle_fx)
+	shuffle_fx.transferred.connect(func(count: int):
+		shown_discard_count -= count
+		shown_draw_count += count
+		render_counts()
+	)
+	shuffle_fx.start(DISCARD_POS+PILE_SIZE/2.0,DRAW_POS+PILE_SIZE/2.0,amount)
+	await shuffle_fx.landed
+	shuffle_fx = null
 
 func _process(_delta: float) -> void:
 	update_hand_hover()
@@ -794,11 +819,7 @@ func render_counts() -> void:
 	discard_count.text = str(shown_discard_count)
 
 func on_card_drawn() -> void:
-	# Model drawing is already committed. Mirror its recycling only when the
-	# next visible card leaves an empty deck, including mid-deal recycling.
-	if shown_draw_count == 0 and model.profile.get("recycleDiscardWhenEmpty",true):
-		shown_draw_count = shown_discard_count
-		shown_discard_count = 0
+	# Recycling has already been presented before this batch can depart.
 	shown_draw_count -= 1
 	render_counts()
 
