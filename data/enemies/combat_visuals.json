@@ -228,5 +228,53 @@
         "whiteKey": false
       }
     }
+  },
+  "robot": {
+    "id": "robot",
+    "placeholder": false,
+    "sourceFacing": "left",
+    "targetRect": [
+      -54,
+      -147,
+      108,
+      158
+    ],
+    "attackStyleOverride": "laser",
+    "laserMuzzle": [
+      624,
+      403
+    ],
+    "laserPalmWidth": 120,
+    "poseAliases": {
+      "move": "idle",
+      "block": "idle"
+    },
+    "hitEffectTexture": "",
+    "poses": {
+      "idle": {
+        "texture": "res://assets/combat_test/robot_idle.png",
+        "anchor": [
+          690,
+          1124
+        ],
+        "scale": 0.125
+      },
+      "laser": {
+        "texture": "res://assets/combat_test/robot_laser_emitter_v2.png",
+        "anchor": [
+          1090,
+          934
+        ],
+        "scale": 0.15
+      },
+      "damaged": {
+        "texture": "res://assets/combat_test/robot_damaged.png",
+        "anchor": [
+          738,
+          1114
+        ],
+        "scale": 0.127
+      }
+    }
   }
 }

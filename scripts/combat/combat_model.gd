@@ -1,6 +1,6 @@
 class_name CombatModel
 extends RefCounted
-const CYBERWARE_LIMIT := 6
+const CYBERWARE_LIMIT := 4
 var buffs := preload("res://scripts/combat/effects/buff_library.gd").new()
 ## Pure, serializable combat rules. Animation and scene navigation never live here.
 var battle_id := ""
@@ -40,8 +40,8 @@ func is_noren() -> bool:
 
 
 func cyberware_cards() -> Array:
-	# Older snapshots retain eight definitions for validating earned bonuses,
-	# but only the first six are available in the current battle interface.
+	# Older snapshots retain their definitions for validating earned bonuses,
+	# but only the first four are available in the current battle interface.
 	return profile.get("cyberware", {}).get("cards", []).slice(0, CYBERWARE_LIMIT)
 
 func available_cyberware_count() -> int:

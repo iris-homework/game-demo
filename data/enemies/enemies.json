@@ -5,9 +5,15 @@
     "displayName": "故障机器人",
     "battlePortraitAssetId": "",
     "maxHp": null,
-    "intentSequence": [],
-    "prototype": true,
-    "combatVisualId": "finn"
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 10,
+        "hits": 1
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "robot"
   },
   "ike": {
     "id": "ike",

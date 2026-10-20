@@ -3,7 +3,7 @@ extends RefCounted
 ## The only boundary between authored enemy visuals and render-ready actor data.
 const CATALOG_PATH := "res://data/enemies/combat_visuals.json"
 const EMERGENCY_IDLE := preload("res://assets/combat_test/finn_idle.webp")
-const ATTACK_STYLES := ["", "slash", "pierce", "bite", "shoot"]
+const ATTACK_STYLES := ["", "slash", "pierce", "bite", "shoot", "laser"]
 const FORMATION_SLOTS := ["", "triangle_left_back", "triangle_left_front", "triangle_right"]
 
 class Visual extends RefCounted:
@@ -17,6 +17,8 @@ class Visual extends RefCounted:
 	var white_key_poses: Dictionary = {}
 	var source_facing := -1.0
 	var formation_slot := ""
+	var laser_muzzle := Vector2.ZERO
+	var laser_palm_width := 0.0
 	var diagnostics: Array[String] = []
 
 var catalog: Dictionary = {}
@@ -124,7 +126,14 @@ func _parse(id: String, raw, problems: Array[String]) -> Visual:
 	if not effect.is_empty():
 		visual.hit_effect_texture = _texture(effect)
 		if visual.hit_effect_texture == null: return _invalid(problems,id,"missing/non-texture hit effect")
-	var required: Array = ["bite","bite_close"] if style == "bite" else (["shoot"] if style == "shoot" else [])
+	if style == "laser":
+		if not _numbers(raw.get("laserMuzzle"), 2) or not _number(raw.get("laserPalmWidth")) or raw.laserPalmWidth <= 0:
+			return _invalid(problems, id, "laser requires finite muzzle and positive palm width")
+		visual.laser_muzzle = Vector2(raw.laserMuzzle[0], raw.laserMuzzle[1])
+		visual.laser_palm_width = float(raw.laserPalmWidth)
+		if not visual.laser_muzzle.is_finite() or not is_finite(visual.laser_palm_width):
+			return _invalid(problems, id, "laser calibration exceeds vector range")
+	var required: Array = ["bite","bite_close"] if style == "bite" else (["shoot"] if style == "shoot" else (["laser"] if style == "laser" else []))
 	for pose in required:
 		if not visual.poses.has(aliases.get(pose,pose)):
 			return _invalid(problems,id,"attack style requires pose "+pose)

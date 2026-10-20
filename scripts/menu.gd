@@ -102,7 +102,7 @@ func _build_right_column() -> void:
 	training_container = Control.new()
 	training_container.name = "training_menu"
 	training_container.position = Vector2(COLUMN_X, 666)
-	training_container.size = Vector2(COLUMN_WIDTH, 108)
+	training_container.size = Vector2(COLUMN_WIDTH, 156)
 	training_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	training_container.visible = false
 	ui_layer.add_child(training_container)
@@ -110,6 +110,7 @@ func _build_right_column() -> void:
 	_menu_button("training_B11", "敌人测试", Vector2(185, 0), Vector2(165, 50), func(): Game.start_training("B11"), false, 16, training_container)
 	training_scenery_button = _menu_button("training_scenery", _training_scenery_label(), Vector2(0, 62), Vector2(COLUMN_WIDTH, 46), open_scenery_picker, false, 16, training_container)
 	training_scenery_button.tooltip_text = "选择 B04 战斗演练的场景"
+	_menu_button("training_B02", "机器人测试", Vector2(0, 116), Vector2(COLUMN_WIDTH, 40), func(): Game.start_training("B02"), false, 16, training_container)
 
 func _training_scenery_label() -> String:
 	for choice in Game.training_scenery_choices():

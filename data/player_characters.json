@@ -20,9 +20,7 @@
       "test_cyberware_01",
       "test_cyberware_02",
       "test_cyberware_03",
-      "test_cyberware_04",
-      "test_cyberware_05",
-      "test_cyberware_06"
+      "test_cyberware_04"
     ],
     "combatRules": "noren_v1"
   }

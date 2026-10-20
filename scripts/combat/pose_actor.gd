@@ -14,6 +14,8 @@ var calibrations: Dictionary = {}
 var pose_aliases: Dictionary = {}
 var target_bounds := Rect2(-58,-130,116,145)
 var attack_style_override := ""
+var laser_muzzle := Vector2.ZERO
+var laser_palm_width := 0.0
 var hit_effect_texture: Texture2D
 var white_key_poses: Dictionary = {}
 var source_facing := -1.0
@@ -49,6 +51,8 @@ func setup_enemy(visual: EnemyVisualResolver.Visual, origin: Vector2, direction:
 	pose_aliases = visual.pose_aliases.duplicate(true)
 	target_bounds = visual.target_bounds
 	attack_style_override = visual.attack_style_override
+	laser_muzzle = visual.laser_muzzle
+	laser_palm_width = visual.laser_palm_width
 	hit_effect_texture = visual.hit_effect_texture
 	white_key_poses = visual.white_key_poses.duplicate()
 	source_facing = visual.source_facing

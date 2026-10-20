@@ -895,10 +895,11 @@ func valid_cyberware_state(c: Dictionary) -> bool:
 		if not is_finite(float(amount)) or amount <= 0 or amount != floor(float(amount)): return false
 		catalog[definition.id] = int(amount)
 	# New battles freeze the character's list beside its definitions. Older
-	# snapshots have no marker and retain their historical (possibly eight) cards.
+	# snapshots may also carry a longer historical list; the current slot limit
+	# applies to new character configurations, not frozen save definitions.
 	if c.profile.has("playerCyberwareIds"):
 		var ids = c.profile.playerCyberwareIds
-		if not ids is Array or ids.size() > CombatModel.CYBERWARE_LIMIT or ids != catalog.keys(): return false
+		if not ids is Array or ids != catalog.keys(): return false
 	var seen := []
 	var maximum := 0
 	# Unspent buffs can carry over from earlier turns, while cooldown IDs only

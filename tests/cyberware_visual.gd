@@ -1,5 +1,9 @@
 extends "res://tests/interaction_visual.gd"
 
+func verify(ok: bool, message: String) -> void:
+	print("CHECK: ", message)
+	super.verify(ok, message)
+
 func key(code: Key) -> void:
 	var event := InputEventKey.new()
 	event.keycode = code
@@ -9,9 +13,13 @@ func key(code: Key) -> void:
 
 func _ready() -> void:
 	Game.save_enabled = false
-	output = OS.get_temp_dir().path_join("midnight_cyberware_")
+	output = ProjectSettings.globalize_path("res://artifacts/qa/technology-four-2026-10-20/%s_" % OS.get_environment("QA_SIZE"))
 	app = load("res://scenes/main.tscn").instantiate()
 	add_child(app)
+	# Keep the original +1 attack regression independent of current Noren card rules.
+	Game.player_characters.noren.erase("combatRules")
+	Game.player_characters.noren.startingDeck = Game.prototype_rules.deck.duplicate()
+	await settle(0.4)
 	Game.start_training("B12")
 	await idle()
 	var view = app.view
@@ -23,14 +31,18 @@ func _ready() -> void:
 	await click(view.cyberware_button.get_rect().get_center())
 	verify(is_instance_valid(view.pile_overlay) and view.selected_uid.is_empty(),"Button opens cyberware and clears targeting")
 	var overlay = view.pile_overlay
-	verify(overlay.card_buttons.size() == 6,"Six cards are displayed")
+	verify(overlay.card_buttons.size() == 4,"Four cards are displayed")
+	await key(KEY_5)
+	await key(KEY_6)
 	await key(KEY_7)
 	await key(KEY_8)
-	verify(view.model.next_attack_bonus == 0,"Removed seventh and eighth shortcuts do nothing")
+	verify(view.model.next_attack_bonus == 0,"Removed fifth through eighth shortcuts do nothing")
 	for b in overlay.card_buttons:
 		verify(Rect2(64,34,1312,828).encloses(b.get_global_rect()),"Entire cyberware card is visible")
+	for i in range(1, overlay.card_buttons.size()):
+		verify(overlay.card_buttons[i].position.y == overlay.card_buttons[0].position.y and overlay.card_buttons[i].position.x >= overlay.card_buttons[i-1].get_rect().end.x, "Four cards form one row without overlap")
 	await motion(Vector2(80,180))
-	await shot("six_cards")
+	await shot("four_cards")
 	var turn: int = view.model.turn
 	view.end_turn_pressed()
 	view.show_pile("抽牌堆",view.model.draw_pile)
@@ -54,11 +66,11 @@ func _ready() -> void:
 	view.select_card(view.model.hand[0])
 	view.play_selected(99)
 	verify(view.model.next_attack_bonus == 2,"Invalid UI target preserves effect")
-	await click(Vector2(1020,380))
+	await click(view.targets[0].get_global_rect().get_center())
 	await idle()
 	verify(view.model.enemies[0].hp == 17 and view.model.next_attack_bonus == 0,"Real attack receives +2 once")
 	view.select_card(view.model.hand[0])
-	await click(Vector2(1020,380))
+	await click(view.targets[0].get_global_rect().get_center())
 	await idle()
 	verify(view.model.enemies[0].hp == 16,"Following attack has normal damage")
 	await click(view.cyberware_button.get_rect().get_center())
@@ -67,7 +79,7 @@ func _ready() -> void:
 	verify(not is_instance_valid(view.pile_overlay) and Game.page == "battle","Right-click closes without leaving battle")
 	await click(view.end_button.get_rect().get_center())
 	await idle()
-	verify(view.model.turn == turn+1 and view.cyberware_button.text.contains("6/6"),"Next turn restores all six activations in HUD")
+	verify(view.model.turn == turn+1 and view.cyberware_button.text.contains("4/4"),"Next turn restores all four activations in HUD")
 	await click(view.cyberware_button.get_rect().get_center())
 	overlay = view.pile_overlay
 	verify(not overlay.card_buttons[0].disabled and overlay.state_labels[0].text.contains("点击激活"),"Next-turn card is available again")

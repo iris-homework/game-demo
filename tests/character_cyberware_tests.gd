@@ -35,19 +35,19 @@ func _ready() -> void:
 	check(Game.player_characters.keys() == ["noren"], "Only Noren ships as playable")
 	var original: Dictionary = Game.player_characters.noren.duplicate(true)
 	var ids: Array = original.cyberwareIds.duplicate()
-	check(ids == Game.prototype_rules.cyberware.cards.map(func(c): return c.id), "Noren references all six original definitions in order")
+	check(ids == Game.prototype_rules.cyberware.cards.slice(0,4).map(func(c): return c.id), "Noren references first four original definitions in order")
 	var normal := battle_for()
-	check(normal.cyberware_cards().size() == 6 and normal.profile.playerCyberwareIds == ids, "Noren battle freezes six configured IDs")
-	check(normal.cyberware_cards() == Game.prototype_rules.cyberware.cards, "Names, descriptions and effects are unchanged")
+	check(normal.cyberware_cards().size() == 4 and normal.profile.playerCyberwareIds == ids, "Noren battle freezes four configured IDs")
+	check(normal.cyberware_cards() == Game.prototype_rules.cyberware.cards.slice(0,4), "Names, descriptions and effects are unchanged")
 	for definition in normal.cyberware_cards():
 		check(normal.activate_cyberware(definition.id), "Noren can activate " + definition.id)
-	check(normal.next_attack_bonus == 6 and normal.available_cyberware_count() == 0, "All six stack and enter cooldown")
+	check(normal.next_attack_bonus == 4 and normal.available_cyberware_count() == 0, "All four stack and enter cooldown")
 	check(not normal.activate_cyberware(FIRST), "Same-turn reuse remains rejected")
 	normal.draw_cards()
-	check(normal.play_card(normal.hand[0], 0).damage == 12 and normal.next_attack_bonus == 0, "Six bonuses apply once to next attack")
+	check(normal.play_card(normal.hand[0], 0).damage == 10 and normal.next_attack_bonus == 0, "Four bonuses apply once to next attack")
 	check(normal.play_card(normal.hand[0], 0).damage == 6, "Following attack keeps base damage")
 	normal.end_turn()
-	check(normal.available_cyberware_count() == 6 and normal.activate_cyberware(FIRST), "Next player turn releases cooldown")
+	check(normal.available_cyberware_count() == 4 and normal.activate_cyberware(FIRST), "Next player turn releases cooldown")
 	# Only in-memory fixture actors have alternative lists.
 	Game.characters["qa_subset"] = Game.characters.noren.duplicate(true)
 	Game.characters["qa_subset"].displayName = "科技配置测试角色"
@@ -89,8 +89,8 @@ func _ready() -> void:
 	var rules := Game.player_cyberware("qa_subset")
 	rules.cards[0].nextAttackBonus = 99
 	rules.cards.clear()
-	check(Game.cyberware_definition(FIFTH).nextAttackBonus == 1 and Game.player_cyberware("noren").cards.size() == 6, "Returned data cannot mutate shared catalog or another actor")
-	for bad in ["bad", [FIRST, FIRST], ["missing"], [3], [FIRST,SECOND,FIFTH,"test_cyberware_03","test_cyberware_04","test_cyberware_06","missing"]]:
+	check(Game.cyberware_definition(FIFTH).nextAttackBonus == 1 and Game.player_cyberware("noren").cards.size() == 4, "Returned data cannot mutate shared catalog or another actor")
+	for bad in ["bad", [FIRST, FIRST], ["missing"], [3], [FIRST,SECOND,FIFTH,"test_cyberware_03","test_cyberware_04"]]:
 		Game.player_characters.noren.cyberwareIds = bad
 		var before := Game.state.duplicate(true)
 		check(not Game.valid_player_character("noren"), "Invalid actor list rejected")
@@ -122,7 +122,7 @@ func _ready() -> void:
 	missing.combat.erase("usedCyberware")
 	missing.combat.erase("nextAttackBonus")
 	migrated = Game.migrate_save(missing)
-	check(Game.valid_save(migrated) and migrated.combat.profile.cyberware.cards.size() == 6, "Old pre-cyberware Noren battle gains six configured items")
+	check(Game.valid_save(migrated) and migrated.combat.profile.cyberware.cards.size() == 4, "Old pre-cyberware Noren battle gains four configured items")
 	missing = Game.state.duplicate(true)
 	missing.playerCharacterId = "qa_empty"
 	missing.combat.profile.playerCharacterId = "qa_empty"
@@ -131,16 +131,29 @@ func _ready() -> void:
 	missing.combat.erase("usedCyberware")
 	missing.combat.erase("nextAttackBonus")
 	migrated = Game.migrate_save(missing)
-	check(Game.valid_save(migrated) and migrated.combat.profile.cyberware.cards.is_empty(), "Missing legacy catalog fills from owning actor, never global six")
+	check(Game.valid_save(migrated) and migrated.combat.profile.cyberware.cards.is_empty(), "Missing legacy catalog fills from owning actor, never global four")
+	# Previously marked six-slot saves must remain loadable after reducing slots.
+	var old_six := normal.snapshot()
+	old_six.profile.cyberware.cards = Game.prototype_rules.cyberware.cards.duplicate(true)
+	old_six.profile.playerCyberwareIds = old_six.profile.cyberware.cards.map(func(c): return c.id)
+	old_six.usedCyberware = [FIFTH, "test_cyberware_06"]
+	old_six.nextAttackBonus = 2
+	var six_save := Game.state.duplicate(true)
+	six_save.combat = old_six
+	check(Game.valid_save(six_save) and Game.migrate_save(six_save).combat == old_six, "Six-slot save remains valid without rebuilding frozen definitions")
+	restored.restore(old_six)
+	check(restored.cyberware_cards().size() == 4 and restored.available_cyberware_count() == 4, "Hidden fifth and sixth cooldowns do not reduce four available slots")
+	check(not restored.activate_cyberware(FIFTH) and not restored.activate_cyberware("test_cyberware_06"), "Old fifth and sixth slots cannot reactivate")
+	check(restored.next_attack_bonus == 2 and Game.valid_combat(restored.snapshot()), "Old earned bonus remains valid after restore")
 	var old_eight := legacy_combat.duplicate(true)
-	for index in [7,8]: old_eight.profile.cyberware.cards.append({"id":"test_cyberware_%02d" % index,"name":"Legacy","nextAttackBonus":1})
+	for index in [5,6,7,8]: old_eight.profile.cyberware.cards.append({"id":"test_cyberware_%02d" % index,"name":"Legacy","nextAttackBonus":1})
 	old_eight.usedCyberware = ["test_cyberware_07","test_cyberware_08"]
 	old_eight.nextAttackBonus = 2
 	check(Game.valid_combat(old_eight), "Older eight-definition snapshot retains previously earned bonus")
 	restored.restore(old_eight)
-	check(restored.cyberware_cards().size() == 6 and not restored.activate_cyberware("test_cyberware_07"), "Old hidden seventh card remains unavailable")
+	check(restored.cyberware_cards().size() == 4 and not restored.activate_cyberware("test_cyberware_07"), "Old hidden seventh card remains unavailable")
 	var new_snapshot := normal.snapshot()
-	for bad in ["bad", [], [FIRST, FIRST], ids.slice(0, 5), ids.duplicate() + [FIRST]]:
+	for bad in ["bad", [], [FIRST, FIRST], ids.slice(0, 3), ids.duplicate() + [FIRST]]:
 		var corrupt := new_snapshot.duplicate(true)
 		corrupt.profile.playerCyberwareIds = bad
 		check(not Game.valid_combat(corrupt), "Snapshot marker must match selected definition IDs exactly")

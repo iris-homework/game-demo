@@ -6,6 +6,7 @@ const ReturnGhost = preload("res://scripts/combat/return_ghost_fx.gd")
 const NeonSlash = preload("res://scripts/combat/prismatic_slash_fx.gd")
 const NorenSlash = preload("res://scripts/combat/noren_slash_fx.gd")
 const GunBurst = preload("res://scripts/combat/gun_burst_fx.gd")
+const PalmLaser = preload("res://scripts/combat/palm_laser_fx.gd")
 const BiteHit = preload("res://scripts/combat/bite_hit_fx.gd")
 const PollutionSpit = preload("res://scripts/combat/pollution_spit_fx.gd")
 const FishDeathBurst = preload("res://scripts/combat/fish_death_burst_fx.gd")
@@ -251,6 +252,9 @@ func frame_attack(attacker: Node2D, defender: Node2D, destination: Vector2) -> v
 func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_hit: Callable) -> void:
 	# Visual profiles select presentation only; supplied model hits remain authoritative.
 	if not attacker.attack_style_override.is_empty(): style = attacker.attack_style_override
+	if style == "laser":
+		await laser_attack(attacker, defender, hits, on_hit)
+		return
 	if style == "shoot":
 		await ranged_attack(attacker, defender, hits, on_hit)
 		return
@@ -545,3 +549,41 @@ func show_gun_bursts(attacker: Node2D, defender: Node2D, direction: float, block
 	impact.position = defender.position+Vector2(-direction*8,-62)*depth_scale(defender.position)
 	impact.scale = Vector2(direction,1)*depth_scale(defender.position)
 	world.add_child(impact)
+
+
+func laser_attack(attacker: Node2D, defender: Node2D, hits: Array, on_hit: Callable) -> void:
+	if not attacker.alive or not defender.alive: return
+	active_attacker = attacker
+	active_defender = defender
+	attacker.face_toward(defender.position)
+	defender.face_toward(attacker.position)
+	# Keep the full distance visible; firing does not approach or push the robot.
+	await wide()
+	for i in hits.size():
+		var hit: Dictionary = hits[i]
+		attacker.set_pose("laser")
+		var fx := PalmLaser.new()
+		fx.start = world.to_local(attacker.sprite.to_global(attacker.laser_muzzle))
+		fx.target = world.to_local(defender.to_global(Vector2(0, -62)))
+		fx.max_width = 0.96 * attacker.laser_palm_width * absf(attacker.sprite.scale.y) * absf(attacker.scale.y)
+		fx.blocked = int(hit.get("blocked", 0)) > 0
+		world.add_child(fx)
+		set_phase("laser_charge")
+		await get_tree().create_timer(PalmLaser.CHARGE_TIME).timeout
+		set_phase("laser_grow")
+		await get_tree().create_timer(PalmLaser.GROW_TIME).timeout
+		last_hit_stop = 0.10
+		defender.set_pose("block" if fx.blocked else "damaged")
+		defender.sprite.modulate = Color(1.6, 1.1, 1.6)
+		play_hit_sound(fx.blocked)
+		kick_camera(signf(defender.position.x - attacker.position.x), 6.0 if int(hit.get("damage", 0)) > 0 else 3.0)
+		on_hit.call(hit, i)
+		set_phase("laser_impact")
+		await fx.finished
+		defender.sprite.modulate = Color.WHITE
+		if bool(hit.get("killed", false)):
+			await retire_actor(defender)
+			break
+		defender.set_pose("idle")
+	attacker.set_pose("idle")
+	set_phase("idle")

@@ -8,7 +8,7 @@ func _ready() -> void:
 	m.enemies[0].hp = 30
 	m.enemies[0].maxHp = 30
 	m.draw_cards()
-	check(m.cyberware_cards().size() == 6,"Exactly six prototype cyberware cards")
+	check(m.cyberware_cards().size() == 4,"Exactly four prototype cyberware cards")
 	var before := m.snapshot()
 	check(not m.activate_cyberware("missing"),"Unknown cyberware rejected")
 	check(m.snapshot() == before,"Invalid activation leaves all state intact")
@@ -64,7 +64,7 @@ func _ready() -> void:
 	var migrated = Game.migrate_save(legacy)
 	check(Game.valid_save(migrated),"Legacy schema-2 battle remains loadable")
 	restored.restore(migrated.combat)
-	check(restored.cyberware_cards().size() == 6 and restored.next_attack_bonus == 0 and restored.used_cyberware.is_empty(),"Legacy battle gains six unused cards, no free buff")
+	check(restored.cyberware_cards().size() == 4 and restored.next_attack_bonus == 0 and restored.used_cyberware.is_empty(),"Legacy battle gains four unused cards, no free buff")
 	check(not legacy.combat.profile.has("cyberware"),"Migration does not mutate input")
 	for bad_bonus in [-1,0.5,"1",999]:
 		var corrupt := m.snapshot()
@@ -77,10 +77,10 @@ func _ready() -> void:
 	var all := model_for("B04")
 	all.enemies[0].hp = 30
 	all.enemies[0].maxHp = 30
-	for definition in all.cyberware_cards(): check(all.activate_cyberware(definition.id),"Each of six cards activates once")
-	check(all.next_attack_bonus == 6 and Game.valid_combat(all.snapshot()),"All six stacked activations are valid")
+	for definition in all.cyberware_cards(): check(all.activate_cyberware(definition.id),"Each of four cards activates once")
+	check(all.next_attack_bonus == 4 and Game.valid_combat(all.snapshot()),"All four stacked activations are valid")
 	all.draw_cards()
-	check(all.play_card(all.hand[0],0).damage == 7,"Six bonuses apply to one attack")
+	check(all.play_card(all.hand[0],0).damage == 5,"Four bonuses apply to one attack")
 	all.outcome = "win"
 	check(not all.activate_cyberware(first),"Finished battle rejects activation")
 	check(not model_for("B04",0).activate_cyberware(first),"Defeated player cannot activate")
@@ -95,9 +95,9 @@ func _ready() -> void:
 	check(Game.valid_combat(old_eight),"Old eight-card snapshot and earned bonus remain valid")
 	var old_model := CombatModel.new()
 	old_model.restore(old_eight)
-	check(old_model.cyberware_cards().size() == 6 and old_model.available_cyberware_count() == 6,"Hidden legacy cooldowns do not reduce six available cards")
+	check(old_model.cyberware_cards().size() == 4 and old_model.available_cyberware_count() == 4,"Hidden legacy cooldowns do not reduce four available cards")
 	check(not old_model.activate_cyberware("test_cyberware_07") and not old_model.activate_cyberware("test_cyberware_08"),"Removed cards cannot be activated from old saves")
-	check(old_model.next_attack_bonus == 2 and Game.valid_combat(old_model.snapshot()),"Previously earned bonus survives six-card upgrade")
+	check(old_model.next_attack_bonus == 2 and Game.valid_combat(old_model.snapshot()),"Previously earned bonus survives four-card upgrade")
 	for definition in old_model.cyberware_cards(): old_model.activate_cyberware(definition.id)
 	check(old_model.available_cyberware_count() == 0,"Old save never displays a negative available count")
 	var cooling := model_for("B04")
@@ -122,7 +122,7 @@ func _ready() -> void:
 	for definition in carry.cyberware_cards(): carry.activate_cyberware(definition.id)
 	carry.end_turn()
 	for definition in carry.cyberware_cards(): carry.activate_cyberware(definition.id)
-	check(carry.next_attack_bonus == 12 and Game.valid_combat(carry.snapshot()),"Multi-turn bonus exceeding six remains valid")
+	check(carry.next_attack_bonus == 8 and Game.valid_combat(carry.snapshot()),"Multi-turn bonus exceeding four remains valid")
 	var defeated := model_for("B04",1)
 	defeated.activate_cyberware(first)
 	defeated.end_turn()

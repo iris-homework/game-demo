@@ -29,7 +29,8 @@ func _ready() -> void:
 		# Normalize legacy snapshot text for display without changing saved rules.
 		var display_name := str(definition.name).replace("义体", "科技")
 		var description := str(definition.description).replace("义体", "科技")
-		var pos := Vector2(255+(i%3)*330,197+(i/3)*275)
+		var row_width := model.cyberware_cards().size()*270 + maxi(0, model.cyberware_cards().size()-1)*30
+		var pos := Vector2((1440-row_width)/2.0+i*300,320)
 		var b := button(self,"",pos,Vector2(270,246),func(): activation_requested.emit(definition.id))
 		for state_name in ["normal","hover","pressed","disabled","focus"]:
 			var fill := Color("251638")
@@ -50,7 +51,7 @@ func _ready() -> void:
 			elif child is ColorRect: child.set_meta("active_color",child.color)
 		card_buttons.append(b)
 	status_label = label(self,"",Vector2(125,748),Vector2(1100,34),20,PURPLE)
-	label(self,"点击卡牌激活  /  数字 1—6 激活  /  Esc 或右键关闭",Vector2(124,811),Vector2(860,28),15,MUTED)
+	label(self,"点击卡牌激活  /  数字 1—4 激活  /  Esc 或右键关闭",Vector2(124,811),Vector2(860,28),15,MUTED)
 	button(self,"返回战斗  →",Vector2(1100,797),Vector2(234,46),func(): closed.emit())
 	refresh()
 	close_button.grab_focus()
@@ -71,7 +72,7 @@ func _input(event: InputEvent) -> void:
 		if not event.pressed or event.is_echo(): return
 		if event.keycode in [KEY_ESCAPE,KEY_ENTER,KEY_KP_ENTER]:
 			closed.emit()
-		elif event.keycode >= KEY_1 and event.keycode <= KEY_6:
+		elif event.keycode >= KEY_1 and event.keycode <= KEY_4:
 			var index: int = event.keycode-KEY_1
 			if index < card_buttons.size() and not card_buttons[index].disabled:
 				activation_requested.emit(model.cyberware_cards()[index].id)

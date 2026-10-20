@@ -1,0 +1,21 @@
+{
+  "note": "Idle and damage are source-byte copies. Laser pose is a new transparent imagegen edit removing the baked beam; source originals preserved.",
+  "files": [
+    {
+      "runtime": "robot_idle.png",
+      "source": "卡牌游戏美术资源/动作参考/破旧机器人/01_站姿_idle_v1.png",
+      "sha256": "30dd3510849cc9d76ac2ee9fcccd3ba2ffda8e6774009b7254a5f959d9933c02"
+    },
+    {
+      "runtime": "robot_damaged.png",
+      "source": "卡牌游戏美术资源/动作参考/破旧机器人/03_受击_hit_v1.png",
+      "sha256": "316ef1e5cc11c52e0277b7b004977773e71319c5010c2846755daf580592fac2"
+    },
+    {
+      "runtime": "robot_laser_emitter_v2.png",
+      "source": "/Users/anyone/.codex/generated_images/01a15788-c009-71a3-9f7e-82c263cd061e/exec-6374e71c-03c0-4ba0-a64b-da0b298beeff.png",
+      "editTarget": "卡牌游戏美术资源/动作参考/破旧机器人/02_掌心射线_hand_laser_v1.png",
+      "sha256": "04cc9e86c21e58c678836bafc9536d5c663d6188db2bf7d02c78733f828f4123"
+    }
+  ]
+}
