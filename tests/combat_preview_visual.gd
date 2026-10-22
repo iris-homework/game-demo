@@ -167,7 +167,7 @@ func _ready() -> void:
 				board.add_child(card)
 				card.show_preview(m.card_preview("card_000", 0))
 				card.show_cost(m.card_cost("card_000"))
-				var size: Vector2 = card.base_font.get_multiline_string_size(card.effect_label.text, HORIZONTAL_ALIGNMENT_LEFT, card.effect_label.size.x, card.effect_label.get_theme_font_size("font_size"), -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE)
+				var size: Vector2 = card.effect_label.get_theme_font("font").get_multiline_string_size(card.effect_label.text, HORIZONTAL_ALIGNMENT_LEFT, card.effect_label.size.x, card.effect_label.get_theme_font_size("font_size"), -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE)
 				check(size.y <= card.effect_label.size.y, "%s %s dynamic text fits" % [form, card.data.name])
 			await shot("cards-%s-%d" % [form, page + 1])
 			board.queue_free()
