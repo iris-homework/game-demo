@@ -1,5 +1,7 @@
 # 午夜委托 游戏demo
 
+工程入口于 **2026-10-22** 统一：从上级制作工作区或本目录开始，都先查阅[当前事实与文档索引](docs/README.md)及[工程维护约定](AGENTS.md)。下方带日期的整合与验收段落记录对应阶段；当前行为以实际代码、配置及资源引用为准，旧测试结果不代表本轮重新运行。
+
 ## 2026-10-20 故障机器人与动态掌心射线
 
 垃圾场B02接入故障机器人站姿、掌心发射和受击素材，意图为每回合单次攻击10。射线从细到粗扩张，按反馈加粗约三成，最粗仍不超过掌宽；穿过对手后延伸出屏幕，再收细消失。主菜单“演练 展开 → 机器人测试”可直接查看，演练敌人100 HP且退出恢复冒险。正式生命值未另行指定，旧进行中战斗保留冻结意图。
@@ -195,7 +197,7 @@ B11 为两只变异鱼，各30 HP。第一只循环「攻击6 → 攻击2×2 →
 
 地图支持 **100%～150%** 缩放：滚轮或右下角 **−／＋** 调整，点击百分比恢复全图。放大后按住鼠标左键上下左右拖动，地图边缘限制移动范围；最小比例固定。地点标记和文字保持原大小，拖动不会误触地点详情。
 
-城市总览使用用户提供的 `assets/map/map.jpg`，地点符号复用 `assets/icons/map/`。底图等比显示，17 个地点按建筑校准图钉尖端；科技教会已接入中央教堂，完成 E01 后可查看详情并进入，已接入专属地点背景，当前没有专属事件或服务。
+城市总览当前由 `data/map.json` 的 `cityMapAssetId: city_map_expanded` 选择 `assets/map/map-expanded-v1.png`，原始 `map.jpg` 保留。`data/assets.json` 的 `mapContentRect` 指定扩绘图中的原城市区域，17 个地点的 `mapAnchor` 仍以该区域为坐标基准；地点符号复用 `assets/icons/map/`。科技教会默认开放，已接入专属地点背景，当前没有专属事件或服务。更换底图时应核对原城市区域和锚点映射，不能直接把旧锚点映射到整张扩绘图。
 
 地点标记高 72 逻辑像素，内部符号提亮为浅灰白，配深色实底和清楚亮边。当前位置用青色标记与 56 像素诺伦圆头像，下一步可推进的主线用金色图钉；两者重合时同时显示。`!`／`?` 表示主线／可选事件，多个事件显示数量；锁与勾辅助区分开放和完成状态。目标通过真实条件推导，不使用委托对象 `targetId` 或上一次 `activeEventId` 作为目的地。
 
@@ -203,7 +205,7 @@ B11 为两只变异鱼，各30 HP。第一只循环「攻击6 → 攻击2×2 →
 
 ## 主菜单的素材边界
 
-主菜单背景使用用户审核的动画 `assets/menu/noren-bar-idle-motion-v2-neon.gif`，逐帧无损解码为 `assets/menu/noren_idle_frames/frame_000.png`…`frame_059.png`；源为 1008×567、80 ms／帧、60 帧、4.8 秒，GIF 的 SHA256 为 `3DAA68A2DAF93B60F2C99DAF645B8F1DEBBF104738638E06651135D946E17169`。运行时按 cover 缩放为 1600×900、左上角 `(-80, 0)`，诺伦坐在左吧台，原有动作与颜色未改。0.2.5-r1 的 P0 使用来源 `场景/地下酒馆.png`、`角色/诺伦.png` 的静止立绘，并叠加运行时生成的雨、瓶形霓虹和终端状态灯；这些源图与 [assets/menu/source-manifest.json](assets/menu/source-manifest.json) 仅作为来源历史保留，不再作为运行时站姿。
+主菜单当前由 [menu_environment.gd](scripts/menu/menu_environment.gd) 加载 `assets/menu/noren-bar-seated-v2-detail.png`，通过 `shaders/menu_native_art.gdshader` 显示局部动作、灯光和灯牌变化。构图保持 1600×900、左上角 `(-80, 0)`；背景来源和动作边界见[主菜单页面维护](docs/维护文档.md#主菜单页面维护)。旧 `noren-bar-idle-motion-v2-neon.gif`、60 张解码 PNG、P0 静止立绘及 [source-manifest.json](assets/menu/source-manifest.json) 是历史来源与回退资料，不是当前背景加载链。
 
 ## 存档兼容与恢复
 
@@ -226,7 +228,7 @@ B11 为两只变异鱼，各30 HP。第一只循环「攻击6 → 攻击2×2 →
 | 牌堆网格浏览与默认排序 | `scripts/combat/pile_view.gd` |
 | 通用按钮反馈 | `scripts/widgets/neon_button.gd` |
 | 临时牌组与临时敌人数值 | `data/prototype/combat.json` |
-| 正式卡牌目录，当前为空 | `data/cards/cards.json` |
+| 当前 40 种诺伦卡牌定义 | `data/cards/cards.json` |
 | 敌人 ID、显示名、战斗形象引用与意图序列 | `data/enemies/enemies.json` |
 | 敌人动作图片、脚底校准、点击范围与咬击特效 | `data/enemies/combat_visuals.json` |
 | 敌人形象统一解析、校验与回退 | `scripts/combat/enemy_visual_resolver.gd` |
