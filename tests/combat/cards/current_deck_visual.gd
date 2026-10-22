@@ -47,7 +47,7 @@ func _ready() -> void:
 	var saved := FileAccess.get_file_as_bytes(Game.save_path)
 	var original: Dictionary = Game.state.duplicate(true)
 	var revision := Game.revision
-	check(deck_button().position == Vector2(1128,16),"Map deck button sits 12 pixels left of menu")
+	check(deck_button().position == Vector2(1132,16),"Map deck button sits 8 pixels left of menu")
 	await shot("map-button")
 	await click(deck_button())
 	await idle()
