@@ -1,5 +1,14 @@
 # 测试目录索引
 
+敌人 PNG 制作、校准和发布另见[敌人制作台](../enemy_asset_pipeline/README.md)。
+按用户指定，其隔离试用入口位于 `enemy_asset_pipeline/test/test_workbench.tscn`；
+该目录还保存管线、运行时及图形集成检查，不计入下述历史 81 组统计。
+
+增强战斗测试台位于
+[`combat/workbench/`](combat/workbench/README.md)，提供左右双栏的地图、卡牌、
+诺伦与多敌人动作测试。在Godot打开该目录的 `battle_background_preview.tscn`，
+按F6运行。`launch.ps1 -Check` 用于执行专项检查。
+
 本目录保存午夜委托的逻辑回归、渲染展示与输入验证。目录按游戏模块组织，
 共 **81 组套件、243 个文件**。每组以 `.tscn` 为运行入口，同名 `.gd`
 实现检查，`.gd.uid` 保存导入标识；本索引中的链接均指向整理后的新位置。
@@ -52,6 +61,17 @@
 | 机器人 (`combat/enemies/robot`) | [robot_laser_visual](combat/enemies/robot/robot_laser_visual.tscn) · [robot_rules_tests](combat/enemies/robot/robot_rules_tests.tscn) |
 
 ### 战斗：表现与输入
+
+角色 mipmap A/B 专项位于[敌人制作台测试](../enemy_asset_pipeline/test/mipmap_workbench_qa.tscn)，
+验证正式工作台的运行期纹理、四动作过滤及截图，支持`QA_OUT_DIR`。
+
+角色目录名专项见[character_names_check](combat/workbench/character_names_check.tscn)：
+检查两个测试台的选择项、HUD、目标、提示及内部ID保持，支持headless与实际截图。
+
+归位残影矩阵专项见[return_ghost_transform](combat/presentation/return_ghost_transform.tscn)：
+检查镜像／旋转／斜切及制作台诺伦近战、持枪受伤归位，支持headless与实际截图。
+关闭正式保存；自动运行时另外隔离用户目录。日志与截图写入
+`artifacts/qa/return-ghost-transform-2026-10-21/`。
 
 | 分类 | 套件 |
 | --- | --- |
@@ -153,3 +173,12 @@ $env:LOCALAPPDATA = Join-Path $qaRoot 'appdata'
 
 本次整理保留测试名称、断言与旧测试。确认本轮验证范围时，以
 [修改记录](../docs/修改记录.md)及对应的实际执行日志为准。
+
+## 攻击演出模板专项
+
+[attack_templates_qa.tscn](../enemy_asset_pipeline/test/attack_templates_qa.tscn)
+使用隔离catalog和关闭保存的真实工作台，检查近战接近、咬击闭合命中、远程
+全程原地、显式动作覆盖默认、逐段回调、真实敌方回合及慢放恢复。
+远程夹具使用已有noren素材，不冒充缺少idle的09a已完成接入。
+Node扫描、参数、发布与回退测试为
+`enemy_asset_pipeline/test/attack_templates.test.cjs`，已加入该工具的`npm test`。

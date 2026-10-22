@@ -1,5 +1,9 @@
 # 午夜委托 游戏demo
 
+敌人 PNG 动作制作与战斗校准见[敌人制作台](enemy_asset_pipeline/README.md)。
+试用：Godot 打开 `enemy_asset_pipeline/test/test_workbench.tscn`，按 F6；
+正式入口为 `enemy_asset_pipeline/workbench.tscn`。
+
 ## 2026-10-20 故障机器人与动态掌心射线
 
 垃圾场B02接入故障机器人站姿、掌心发射和受击素材，意图为每回合单次攻击10。射线从细到粗扩张，按反馈加粗约三成，最粗仍不超过掌宽；穿过对手后延伸出屏幕，再收细消失。主菜单“演练 展开 → 机器人测试”可直接查看，演练敌人100 HP且退出恢复冒险。正式生命值未另行指定，旧进行中战斗保留冻结意图。

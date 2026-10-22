@@ -1,0 +1,45 @@
+生成日期：2026-10-22（Asia/Shanghai）
+工具：内置 imagegen，transparent_background=true
+对应图片：mutant_mouse_VFX.png
+图片 SHA256：3AC915BD2DC068412B6370D6A2561E6B5CDCBC3C0182FB522F08641D4EF9F0A6
+参考图：mutant_mouse_attack.png（仅参考甩尾方向、画风与电缆材质，不绘制角色）
+生成原图：
+C:/Users/22141/.codex/generated_images/01a1632d-458d-7711-a822-963a6a4db26d/exec-72ee07de-f378-42ca-856b-23a05f522a93.png
+
+说明：采用第二次修订版。将首版偏粗、偏亮的线束压细，减少多余碎屑，
+最终保留3个分离的导线碎屑光点与左端小型金属擦星。
+下方逐字保留两次实际提示词。
+
+--- 第一次提示词 ---
+
+Use case: stylized-concept.
+Asset type: ONE standalone transparent 2D combat VFX overlay PNG for the existing enemy 05A, 爬墙线鼠 / mutant mouse, named mutant_mouse_VFX.png.
+Reference image: the supplied mutant-mouse tail-whip attack pose is for matching the sweep direction, angular hand-painted style and cable identity ONLY. Do NOT draw the mouse, its body, eyes, claws, head, feet or the physical tail inside this effect.
+
+Primary request: create a single low, sweeping cable-arc trail that follows the tail tip from SCREEN RIGHT toward SCREEN LEFT. The effect must read as the residual path of a thin cable whip, not an energy beam. Build it from about THREE separated, slender, irregular strand-lines that braid loosely and taper away: low-saturation tarnished copper-yellow central strands with restrained dirty blue-green edge accents and dark charcoal thin boundaries. Keep the arc shallow and wide, roughly a long open crescent, with clear transparent gaps between the strands and a fading tail on the right. Small kinks and short frayed bends may suggest loose wire, but the overall sweep stays clean and readable.
+
+At the LEFT end of the arc, place ONE very small metal-scrape contact star: a compact off-white / pale warm core, a few tiny sharp copper and charcoal shard strokes, and one short gray scrape nick. It must look like metal grazing metal, not an explosion. Add only TWO or THREE tiny isolated wire-debris glints along the trail: small angular copper-yellow and muted cyan flecks, each separated by empty transparent space, with no surrounding particle cloud. Keep the whole effect subtle and gameplay-readable.
+
+Strict visual constraints: NO large electric arc, NO branching lightning, NO glowing blue current, NO neon beam, NO thick filled ribbon, NO magic slash, NO electric shock status, NO floating runes, NO sparks larger than the tiny contact star. The trail is cable/wire friction, not electricity. No broad airbrushed glow, fog, smoke, dust cloud, fire, blood or target.
+
+Composition: one coherent leftward sweeping effect only, landscape 1536x1024 canvas, centered with generous transparent margins. The entire arc, all debris glints and the small contact star comfortably inside the canvas. No character body parts, no ground or target silhouette. Separate details should remain legible when the effect is scaled small in combat.
+
+Style: crisp angular hand-painted 2D cel-shaded game VFX matching the reference's bold graphic shapes and muted cyberpunk palette; thin dark edge accents only where needed. Local tiny highlights are allowed, but the background must stay genuinely transparent.
+
+Output: true RGBA transparent PNG with preserved alpha. No white or black backdrop, checkerboard, floor, shadow, environment, text, UI, border or watermark. Not a sprite sheet, not multiple variants, not an animation strip.
+
+--- 第二次修订提示词 ---
+
+Use case: precise-object-edit.
+Asset type: revise the existing mutant_mouse_VFX transparent 2D cable-arc VFX overlay.
+Input image: the current VFX arc is the edit target. Preserve its single leftward sweeping crescent layout, the small metal-scrape contact star at the LEFT end, the low-saturation copper-yellow plus dirty blue-green and charcoal palette, the angular hand-painted style, and the transparent canvas.
+
+CHANGE ONLY these points:
+1) Make the main sweeping cable trail noticeably more slender: reduce the apparent thickness of each of the three woven strands by about 35 percent. Remove the broad bright ivory/white metallic face highlights that make the strands look like thick ribbons. Keep each strand crisp and cable-like with muted tarnished copper body, restrained dirty cyan side accent and a thin dark edge. The arc should still remain readable at small game scale, but it must read as thin residual cable lines, not a glowing ribbon, energy beam or large electric arc.
+2) Reduce detached debris flecks to EXACTLY THREE total: keep only three very small, isolated angular wire-debris glints along the path, two muted copper-yellow and one dirty cyan. Remove every other loose diamond-shaped fleck and every scattered fragment. Keep wide empty transparent gaps around the three remaining flecks.
+3) Reduce the small left-end scrape star slightly: keep a compact off-white core with a few short copper and charcoal shards and one short gray nick. It must stay a tiny metal-on-metal scrape, no large radial explosion. Remove any excess long white rays while keeping the star clearly present.
+4) Keep the rightmost end of the cable trail tapered and fading, and preserve the same shallow leftward motion.
+
+Do not alter the canvas layout or add any new effect elements. No character, body, tail, target, ground, shadow, text, border or watermark. Genuine transparent alpha. No large glow, fog, smoke, electric branch, lightning, shock effect, thick ribbon or bright neon.
+
+Deliver one revised transparent PNG only.

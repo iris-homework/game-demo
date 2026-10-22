@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://xhgvplviixu0"
-path="res://.godot/imported/fish_move.png-9722d0145090bef6dbcce6c5375c5c0e.ctex"
+path="res://.godot/imported/fish_move.png-5f533f1064ae3160547c9f7eb5348bcf.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/combat_test/fish/fish_move.png"
-dest_files=["res://.godot/imported/fish_move.png-9722d0145090bef6dbcce6c5375c5c0e.ctex"]
+source_file="res://assets/combat_test/12a_fish/fish_move.png"
+dest_files=["res://.godot/imported/fish_move.png-5f533f1064ae3160547c9f7eb5348bcf.ctex"]
 
 [params]
 

@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cow5ukaq54wvg"
-path="res://.godot/imported/finn_block.webp-7b56eb913322a9bb29ab2264761fec1a.ctex"
+path="res://.godot/imported/finn_block.webp-6880dc01aea0499ae5bb7e8f345133b0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/combat_test/finn/finn_block.webp"
-dest_files=["res://.godot/imported/finn_block.webp-7b56eb913322a9bb29ab2264761fec1a.ctex"]
+source_file="res://assets/combat_test/Finn/finn_block.webp"
+dest_files=["res://.godot/imported/finn_block.webp-6880dc01aea0499ae5bb7e8f345133b0.ctex"]
 
 [params]
 

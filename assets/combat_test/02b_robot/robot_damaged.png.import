@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://r03ra7tme4tt"
-path="res://.godot/imported/robot_damaged.png-d08d6cc4bbc6d2d2fb331304a266354a.ctex"
+path="res://.godot/imported/robot_damaged.png-fd910731af22bae5696be9a6b5e81bdd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/combat_test/robot/robot_damaged.png"
-dest_files=["res://.godot/imported/robot_damaged.png-d08d6cc4bbc6d2d2fb331304a266354a.ctex"]
+source_file="res://assets/combat_test/02b_robot/robot_damaged.png"
+dest_files=["res://.godot/imported/robot_damaged.png-fd910731af22bae5696be9a6b5e81bdd.ctex"]
 
 [params]
 

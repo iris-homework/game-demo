@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://f2x2ddburfj8"
-path="res://.godot/imported/gang_henchman_pierce.png-75213e2540aab1caa177ece9b19264c2.ctex"
+path="res://.godot/imported/gang_henchman_pierce.png-97c91c47d99e283146698996afdcecc0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/combat_test/gang_henchman/gang_henchman_pierce.png"
-dest_files=["res://.godot/imported/gang_henchman_pierce.png-75213e2540aab1caa177ece9b19264c2.ctex"]
+source_file="res://assets/combat_test/03a_gang_henchman/gang_henchman_pierce.png"
+dest_files=["res://.godot/imported/gang_henchman_pierce.png-97c91c47d99e283146698996afdcecc0.ctex"]
 
 [params]
 

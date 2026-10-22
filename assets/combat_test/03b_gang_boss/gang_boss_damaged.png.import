@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://buqr3lkyi3h1l"
-path="res://.godot/imported/gang_boss_damaged.png-1851cb252c6aaaf79355dd3a17d680bd.ctex"
+path="res://.godot/imported/gang_boss_damaged.png-3262c2079e4682e54bfcd17f5ce2f974.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/combat_test/gang_boss/gang_boss_damaged.png"
-dest_files=["res://.godot/imported/gang_boss_damaged.png-1851cb252c6aaaf79355dd3a17d680bd.ctex"]
+source_file="res://assets/combat_test/03b_gang_boss/gang_boss_damaged.png"
+dest_files=["res://.godot/imported/gang_boss_damaged.png-3262c2079e4682e54bfcd17f5ce2f974.ctex"]
 
 [params]
 

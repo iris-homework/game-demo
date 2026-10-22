@@ -1,0 +1,24 @@
+生成日期：2026-10-22（Asia/Shanghai）
+工具：内置 imagegen，transparent_background=true
+对应图片：mutant_mouse_attack.png
+图片 SHA256：0CC71D4C94F5565E903AC6F449DFF54B09079C15D1B498725ECB7EF4F2BAE87A
+参考图：mutant_mouse.png（同一角色身份、比例、材质与配色）
+生成原图：
+C:/Users/22141/.codex/generated_images/01a1632d-458d-7711-a822-963a6a4db26d/exec-6c596aec-dd4d-4975-9b55-98eba19aab29.png
+
+说明：采用甩尾攻击弧线最大的峰值姿态；收势时尾端卷回脚边的后续帧未包含。
+下方逐字保留实际提示词。
+
+Use case: identity-preserve.
+Asset type: one transparent PNG attack key-pose sprite for the existing 2D side-view combat enemy 05A, 爬墙线鼠 / mutant mouse.
+Input image: the supplied idle sprite is the exact character, anatomical identity, palette, rendering style, scale and camera reference.
+
+Primary request: transform the same mutant mouse into ONE dramatic tail-whip attack pose at the peak of its sweep. Keep the body low, wide and heavy, all four clawed paws firmly braced on an implied ground plane, shoulders lowered, chest close to the floor, head still aimed toward SCREEN LEFT with a hostile focus. Twist the hindquarters sharply toward SCREEN RIGHT and lift the tail base to show the whole body driving the strike. Sweep the heavy cable-like tail around the outside of the rump and over the back in a bold, readable C-shaped arc, carrying it forward toward SCREEN LEFT at roughly head-and-shoulder height so the motion clearly cuts across the empty space in front of the enemy. At the end of the arc, curl the tail tip into a tight hook as if just completing the sweep. Keep the head, eye and forepaws unobstructed by the tail. This is one frozen peak instant; do NOT show the earlier wind-up or the later return-to-feet frame.
+
+Preserve the exact character identity and visual language: same angular near-black ink outlines, faceted hand-painted cel shading, warm gray-brown matted fur with plum shadows and sharp pink-magenta rim highlights, small sickly teal-green eye, huge torn ears swept back by the attack, protruding rodent incisors, copper wire held in the mouth, black cable scraps tangled across the back, and the same thick naked tail bound with black cable wraps, copper strands, loose wire tips and a small metal plate near the end. The added centrifugal force may make the loose copper strands and tail scraps flare slightly outward, but they must remain attached and belong to the same single tail. Same side three-quarter combat view facing LEFT. Same compact rat proportions.
+
+Anatomy and silhouette: EXACTLY FOUR legs, TWO large ears, ONE head and ONE continuous tail. No extra tails, duplicated tail tips, extra limbs or split cable forming a second creature. The tail must read as one thick fleshy tail wrapped in cable, not a bundle of many independent whips. A low, grounded power stance rather than a jump or pounce. No bite and no front-claw attack.
+
+Composition: one complete creature, landscape 1536x1024 framing. Place the body slightly toward the right and reserve clean negative space at the left for the sweeping tail. All ear tips, incisors, four paws, the full tail base and the complete curled tail tip must stay comfortably inside the canvas with transparent margins. One coherent pose only.
+
+Output: genuinely transparent alpha background with preserved transparent edges. No floor, cast shadow, target, victim, impact effect, sparks, dust, wind, checkerboard, black backdrop, glow, speed lines, motion blur, trails, ghost images, text, UI, border or watermark. Not a sprite sheet and not an animation strip.

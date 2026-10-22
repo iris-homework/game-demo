@@ -1,0 +1,25 @@
+生成日期：2026-10-22（Asia/Shanghai）
+工具：内置 imagegen，transparent_background=true
+对应图片：mutant_mouse_move.png
+图片 SHA256：36BCAEA492C7E433852F32963C9653D5AB01A6A1584251D10B7507818EF7A84E
+参考图：mutant_mouse.png（同一角色身份、比例、材质与配色）
+生成原图：
+C:/Users/22141/.codex/generated_images/01a1632d-458d-7711-a822-963a6a4db26d/exec-5202a1de-95b5-4eb3-850d-1410c54d621c.png
+
+说明：采用低伏短跳的起跳／初段腾空姿态，前爪前探、后腿收拢，
+线束尾向后上方甩起作为平衡；本轮只交付单张移动帧。
+下方逐字保留实际提示词。
+
+Use case: identity-preserve.
+Asset type: one transparent PNG movement key-pose sprite for the existing 2D side-view combat enemy 05A, 爬墙线鼠 / mutant mouse.
+Input image: the supplied idle sprite is the exact character, anatomical identity, palette, rendering style, scale and camera reference.
+
+Primary request: transform the same mutant mouse into ONE clearly readable low short-hop locomotion pose traveling toward SCREEN LEFT, suitable for a fast small enemy's move frame and suggesting its ability to hop over low obstacles. Keep the leap low and compact, with only a small amount of air beneath the body: the belly stays close to an implied ground plane, not a high arc. Draw the takeoff/early-air phase: long head and muzzle aimed forward and slightly down, shoulders lowered, both forepaws stretched forward and angled down as if reaching to catch the top of a low ledge, hind legs strongly compressed and tucked close under the rump after pushing off. Sweep the ragged ears back from the motion. Let the heavy cable-wrapped tail lag behind and whip upward toward SCREEN RIGHT as a counterweight, with its trailing metal scraps lifted slightly.
+
+Preserve the exact character identity and visual language: same angular near-black ink outlines, faceted hand-painted cel shading, warm gray-brown matted fur with plum shadows and sharp pink-magenta rim highlights, small sickly teal-green eye, huge torn ears, protruding rodent incisors, copper wire held in the mouth, black cable scraps tangled across the back, and cables plus small metal plate/scraps wrapped around the naked tail. Same side three-quarter combat view facing LEFT. Same compact rat proportions. Exactly FOUR legs, TWO large ears, ONE tail, ONE head; no extra limbs or duplicated body.
+
+Motion silhouette: clearly different from the grounded sniffing idle, but the same creature. Emphasize compressed forebody, stretched reaching forelimbs, tucked driving hindquarters and a strong counterbalancing tail. No attack lunge, no biting, no upward rearing, no swimming pose.
+
+Composition: one complete creature, landscape 1536x1024 framing, centered with generous transparent padding on every side; all ear tips, incisors, all four paws and the full tail inside frame. Keep the creature large and readable, comparable to the supplied idle. One single coherent pose only.
+
+Output: genuinely transparent alpha background with preserved transparent edges. No floor, cast shadow, ledge, wall, scenery, dust, debris cloud, checkerboard, black backdrop, glow, speed lines, motion blur, trails, ghost images, text, UI, border or watermark. Not a sprite sheet and not an animation strip.

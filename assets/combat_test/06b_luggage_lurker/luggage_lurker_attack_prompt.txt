@@ -1,0 +1,23 @@
+Luggage Lurker attack sprite
+Date: 2026-10-22 (Asia/Shanghai)
+Tool: built-in image_gen
+Reference: C:/Users/22141/AppData/Local/Temp/codex-clipboard-26e8168b-b1b2-4e0d-a949-f8200b190136.png
+Output: assets/combat_test/06b_luggage_lurker/luggage_lurker_attack.png
+Source: C:/Users/22141/.codex/generated_images/01a15a50-b11a-7540-869a-a8adee9ab319/exec-4c8ddb8e-265f-4b89-9d0a-9f8b06535387.png
+SHA256: 7454502BB94A8F316EFF43059C7FDEDAF62C973A8EEA2C14EF8AA5B9B8C65982
+Validation: 1536x1024 RGBA PNG; four corners alpha 0; 641065 fully transparent pixels; alpha>=128 bounds (36,11)-(1492,991).
+Selected attack: open-lid suitcase clamp key pose. The separate handle ram is not included.
+Single static sprite only, not continuous animation or runtime integration.
+A faint translucent exterior halo remains in the generated image.
+
+Prompt (verbatim):
+Use case: precise-object-edit / 2D game attack key pose.
+Input image is the EXACT identity, style and material reference for the Luggage Lurker suitcase robot. Produce ONE transparent PNG attack sprite of this SAME enemy.
+Preserve the battered deep-brown hard-shell suitcase, chipped gray/cream metal corner guards, dark reinforcing bands, original worn cream/teal/ochre station stickers in matching positions on their panels, latches, small wheels, four flat mechanical legs, single small rectangular orange indicator, and short folded handle at the back. Match the reference's confident near-black outlines and angular hard-edged painted cel shading, warm neutral metal highlights and dark muted mechanical shadows. No redesign.
+
+Attack selected for this single image: CLAMPING SUITCASE POUNCE, the readable open-lid windup just as it lunges toward screen-left. Lift the entire upper lid about 55 degrees on mechanical hinges along the rear/right edge so that the left/front edge opens widely. The interior must be a shallow industrial luggage cavity with a ring of BLUNT rectangular luggage fastening buckles, restrained straps, dark steel hinge actuators and a compact motor. These are real luggage fasteners, NOT teeth. Clearly show the same brown sticker-covered outer lid and some of its dark inner lining. Four short flat mechanical legs are deployed: rear/right pair compressed in a powerful crouch pushing the box forward, front/left pair reach a little forward and down to catch the short pounce. Keep the body low, heavy and squat, angled subtly forward toward the left, never a tall spider stance. One near-side rear leg and one near-side front leg should read clearly, far-side legs may be partially occluded. Keep the folded luggage handle at the rear in its existing compact form. The single orange indicator remains visible on the lower/front chassis.
+Capture ONLY this one coherent physical instant. Do not combine it with the separate telescopic-handle ram attack. No target or victim.
+Composition: full object, three-quarter left-facing side battle view consistent with the reference. Similar body proportions, allow extra vertical room for the opened lid. Entire silhouette including lid, legs and wheels comfortably inside the canvas with transparent margins on all four sides. Sharp sprite for later Godot animation, no duplicate poses or sprite sheet.
+Background: genuine fully transparent alpha outside the silhouette, including gaps between legs and between lid and body. No floor, cast shadow, exterior halo, fog, background glow, checkerboard painted in or environment.
+Avoid: organic mouth, teeth, fangs, tongue, flesh, eyes, monsters inside, treasure, extra weapons, additional lights, sparks, impact effects, motion streaks, dust, blur, writing, captions, UI or watermark. Deliver one finished transparent 2D attack sprite.
+

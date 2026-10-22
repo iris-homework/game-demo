@@ -1,0 +1,1791 @@
+{
+  "schemaVersion": 1,
+  "profiles": [
+    {
+      "id": "fish",
+      "label": "变异的鱼",
+      "kind": "actor",
+      "bodyScale": 1,
+      "runtimeScale": 1,
+      "animations": [
+        {
+          "id": "idle",
+          "name": "idle",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 650,
+            "y": 1100
+          },
+          "defaultScale": 0.12,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "fish_idle.png",
+              "path": "game/assets/combat_test/12a_fish/fish_idle.png",
+              "width": 1254,
+              "height": 1254,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "move",
+          "name": "move",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 650,
+            "y": 1100
+          },
+          "defaultScale": 0.12,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "fish_move.png",
+              "path": "game/assets/combat_test/12a_fish/fish_move.png",
+              "width": 1254,
+              "height": 1254,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "bite",
+          "name": "bite",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 650,
+            "y": 1100
+          },
+          "defaultScale": 0.12,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "fish_bite.png",
+              "path": "game/assets/combat_test/12a_fish/fish_bite.png",
+              "width": 1254,
+              "height": 1254,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "bite_close",
+          "name": "bite_close",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 650,
+            "y": 1100
+          },
+          "defaultScale": 0.12,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "fish_bite_close.png",
+              "path": "game/assets/combat_test/12a_fish/fish_bite_close.png",
+              "width": 1254,
+              "height": 1254,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "damaged",
+          "name": "damaged",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 650,
+            "y": 1140
+          },
+          "defaultScale": 0.12,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "fish_damaged.png",
+              "path": "game/assets/combat_test/12a_fish/fish_damaged.png",
+              "width": 1254,
+              "height": 1254,
+              "duration": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gang_boss",
+      "label": "黑帮老大",
+      "kind": "actor",
+      "bodyScale": 1,
+      "runtimeScale": 1,
+      "animations": [
+        {
+          "id": "idle",
+          "name": "idle",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 750,
+            "y": 1109
+          },
+          "defaultScale": 0.128,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "gang_boss_idle.png",
+              "path": "game/assets/combat_test/03b_gang_boss/gang_boss_idle.png",
+              "width": 1347,
+              "height": 1168,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "move",
+          "name": "move",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 840,
+            "y": 1138
+          },
+          "defaultScale": 0.12,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "gang_boss_move.png",
+              "path": "game/assets/combat_test/03b_gang_boss/gang_boss_move.png",
+              "width": 1346,
+              "height": 1168,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "pierce",
+          "name": "pierce",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 600,
+            "y": 1112
+          },
+          "defaultScale": 0.121,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "gang_boss_pierce.png",
+              "path": "game/assets/combat_test/03b_gang_boss/gang_boss_pierce.png",
+              "width": 1346,
+              "height": 1168,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "damaged",
+          "name": "damaged",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 840,
+            "y": 1126
+          },
+          "defaultScale": 0.126,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "gang_boss_damaged.png",
+              "path": "game/assets/combat_test/03b_gang_boss/gang_boss_damaged.png",
+              "width": 1346,
+              "height": 1168,
+              "duration": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gang_henchman",
+      "label": "黑帮小弟",
+      "kind": "actor",
+      "bodyScale": 1,
+      "runtimeScale": 1,
+      "animations": [
+        {
+          "id": "idle",
+          "name": "idle",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 735,
+            "y": 1103
+          },
+          "defaultScale": 0.108,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "gang_henchman_idle.png",
+              "path": "game/assets/combat_test/03a_gang_henchman/gang_henchman_idle.png",
+              "width": 1346,
+              "height": 1168,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "move",
+          "name": "move",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 735,
+            "y": 1116
+          },
+          "defaultScale": 0.107,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "gang_henchman_move.png",
+              "path": "game/assets/combat_test/03a_gang_henchman/gang_henchman_move.png",
+              "width": 1346,
+              "height": 1168,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "pierce",
+          "name": "pierce",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 720,
+            "y": 1111
+          },
+          "defaultScale": 0.107,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "gang_henchman_pierce.png",
+              "path": "game/assets/combat_test/03a_gang_henchman/gang_henchman_pierce.png",
+              "width": 1346,
+              "height": 1168,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "damaged",
+          "name": "damaged",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 790,
+            "y": 1113
+          },
+          "defaultScale": 0.112,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "gang_henchman_damaged.png",
+              "path": "game/assets/combat_test/03a_gang_henchman/gang_henchman_damaged.png",
+              "width": 1346,
+              "height": 1168,
+              "duration": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "robot",
+      "label": "故障机器人",
+      "kind": "actor",
+      "bodyScale": 1,
+      "runtimeScale": 1,
+      "animations": [
+        {
+          "id": "idle",
+          "name": "idle",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 690,
+            "y": 1124
+          },
+          "defaultScale": 0.125,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "robot_idle.png",
+              "path": "game/assets/combat_test/02b_robot/robot_idle.png",
+              "width": 1346,
+              "height": 1168,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "laser",
+          "name": "laser",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 1090,
+            "y": 934
+          },
+          "defaultScale": 0.15,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "robot_laser_emitter_v2.png",
+              "path": "game/assets/combat_test/02b_robot/robot_laser_emitter_v2.png",
+              "width": 1602,
+              "height": 981,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "damaged",
+          "name": "damaged",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 738,
+            "y": 1114
+          },
+          "defaultScale": 0.127,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "robot_damaged.png",
+              "path": "game/assets/combat_test/02b_robot/robot_damaged.png",
+              "width": 1346,
+              "height": 1168,
+              "duration": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "noren",
+      "label": "诺伦",
+      "kind": "actor",
+      "bodyScale": 1,
+      "runtimeScale": 1,
+      "animations": [
+        {
+          "id": "idle",
+          "name": "idle",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 710,
+            "y": 1240
+          },
+          "defaultScale": 0.099,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "noren_idle.png",
+              "path": "game/assets/combat_test/noren/noren_idle.png",
+              "width": 1224,
+              "height": 1285,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "move",
+          "name": "move",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 920,
+            "y": 1048
+          },
+          "defaultScale": 0.103,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "noren_move.png",
+              "path": "game/assets/combat_test/noren/noren_move.png",
+              "width": 1434,
+              "height": 1097,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "slash",
+          "name": "slash",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 725,
+            "y": 1110
+          },
+          "defaultScale": 0.103,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "noren_slash.png",
+              "path": "game/assets/combat_test/noren/noren_slash.png",
+              "width": 1224,
+              "height": 1285,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "pierce",
+          "name": "pierce",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 1000,
+            "y": 941
+          },
+          "defaultScale": 0.132,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "noren_pierce.png",
+              "path": "game/assets/combat_test/noren/noren_pierce.png",
+              "width": 1536,
+              "height": 1024,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "block",
+          "name": "block",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 550,
+            "y": 1140
+          },
+          "defaultScale": 0.103,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "noren_block.png",
+              "path": "game/assets/combat_test/noren/noren_block.png",
+              "width": 1343,
+              "height": 1171,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "damaged",
+          "name": "damaged",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 700,
+            "y": 1230
+          },
+          "defaultScale": 0.099,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "noren_damaged.png",
+              "path": "game/assets/combat_test/noren/noren_damaged.png",
+              "width": 1224,
+              "height": 1285,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "gun_idle",
+          "name": "gun_idle",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 660,
+            "y": 1230
+          },
+          "defaultScale": 0.099,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "noren_gun_idle.png",
+              "path": "game/assets/combat_test/noren/noren_gun_idle.png",
+              "width": 1224,
+              "height": 1285,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "shoot",
+          "name": "shoot",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 714,
+            "y": 1210
+          },
+          "defaultScale": 0.099,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "noren_shoot_planted.png",
+              "path": "game/assets/combat_test/noren/noren_shoot_planted.png",
+              "width": 1223,
+              "height": 1286,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "retreat",
+          "name": "retreat",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 560,
+            "y": 1155
+          },
+          "defaultScale": 0.099,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "noren_retreat.png",
+              "path": "game/assets/combat_test/noren/noren_retreat.png",
+              "width": 1224,
+              "height": 1285,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "gun_block",
+          "name": "gun_block",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 550,
+            "y": 1140
+          },
+          "defaultScale": 0.103,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "noren_gun_block.png",
+              "path": "game/assets/combat_test/noren/noren_gun_block.png",
+              "width": 1343,
+              "height": 1171,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "gun_damaged",
+          "name": "gun_damaged",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 700,
+            "y": 1230
+          },
+          "defaultScale": 0.099,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "noren_gun_damaged.png",
+              "path": "game/assets/combat_test/noren/noren_gun_damaged.png",
+              "width": 1224,
+              "height": 1285,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "blunt",
+          "name": "blunt",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 711.5,
+            "y": 1134
+          },
+          "defaultScale": 0.110669,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "noren_blunt.png",
+              "path": "game/assets/combat_test/noren/noren_blunt.png",
+              "width": 1338,
+              "height": 1175,
+              "duration": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "warden_shield",
+      "label": "巡界盾手",
+      "kind": "actor",
+      "bodyScale": 1,
+      "runtimeScale": 1,
+      "animations": [
+        {
+          "id": "idle",
+          "name": "idle",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 637.5,
+            "y": 1238
+          },
+          "defaultScale": 0.1282051282051282,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "warden_shield_idle.png",
+              "path": "game/assets/combat_test/01a_warden_shield/warden_shield_idle.png",
+              "width": 1199,
+              "height": 1312,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "move",
+          "name": "move",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 582,
+            "y": 1212
+          },
+          "defaultScale": 0.12987,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "warden_shield_move.png",
+              "path": "game/assets/combat_test/01a_warden_shield/warden_shield_move.png",
+              "width": 1199,
+              "height": 1312,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "pierce",
+          "name": "攻击",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 604.5,
+            "y": 1189
+          },
+          "defaultScale": 0.140562,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "warden_shield_attack.png",
+              "path": "game/assets/combat_test/01a_warden_shield/warden_shield_attack.png",
+              "width": 1199,
+              "height": 1312,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "damaged",
+          "name": "damaged",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 594,
+            "y": 1202
+          },
+          "defaultScale": 0.1417,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "warden_shield_damaged.png",
+              "path": "game/assets/combat_test/01a_warden_shield/warden_shield_damaged.png",
+              "width": 1199,
+              "height": 1312,
+              "duration": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scavenger_hooker",
+      "label": "拾荒钩客",
+      "kind": "actor",
+      "bodyScale": 1,
+      "runtimeScale": 1,
+      "animations": [
+        {
+          "id": "idle",
+          "name": "idle",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 696,
+            "y": 1127
+          },
+          "defaultScale": 0.13195098963242224,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "scavenger_hooker_idle.png",
+              "path": "game/assets/combat_test/02b_scavenger_hooker/scavenger_hooker_idle.png",
+              "width": 1346,
+              "height": 1168,
+              "duration": 1,
+              "anchor": {
+                "x": 770,
+                "y": 1100
+              }
+            }
+          ]
+        },
+        {
+          "id": "move",
+          "name": "move",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 650.5,
+            "y": 1111
+          },
+          "defaultScale": 0.126597,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "scavenger_hooker_move.png",
+              "path": "game/assets/combat_test/02b_scavenger_hooker/scavenger_hooker_move.png",
+              "width": 1346,
+              "height": 1168,
+              "duration": 1,
+              "anchor": {
+                "x": 900,
+                "y": 1090
+              }
+            }
+          ]
+        },
+        {
+          "id": "pierce",
+          "name": "攻击",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 674.5,
+            "y": 1114
+          },
+          "defaultScale": 0.125291,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "scavenger_hooker_attack.png",
+              "path": "game/assets/combat_test/02b_scavenger_hooker/scavenger_hooker_attack.png",
+              "width": 1346,
+              "height": 1168,
+              "duration": 1,
+              "anchor": {
+                "x": 900,
+                "y": 1090
+              }
+            }
+          ]
+        },
+        {
+          "id": "damaged",
+          "name": "damaged",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 680.5,
+            "y": 1105
+          },
+          "defaultScale": 0.13171,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "scavenger_hooker_damaged.png",
+              "path": "game/assets/combat_test/02b_scavenger_hooker/scavenger_hooker_damaged.png",
+              "width": 1346,
+              "height": 1168,
+              "duration": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chip_broker",
+      "label": "筹码掮客",
+      "kind": "actor",
+      "bodyScale": 1,
+      "runtimeScale": 1,
+      "animations": [
+        {
+          "id": "idle",
+          "name": "idle",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 612,
+            "y": 1270
+          },
+          "defaultScale": 0.11503697617091208,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "chip_broker_idle.png",
+              "path": "game/assets/combat_test/04b_chip_broker/chip_broker_idle.png",
+              "width": 1203,
+              "height": 1308,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "move",
+          "name": "move",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 613,
+            "y": 1264
+          },
+          "defaultScale": 0.115607,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "chip_broker_move.png",
+              "path": "game/assets/combat_test/04b_chip_broker/chip_broker_move.png",
+              "width": 1202,
+              "height": 1308,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "pierce",
+          "name": "攻击",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 752,
+            "y": 1140
+          },
+          "defaultScale": 0.125561,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "chip_broker_attack.png",
+              "path": "game/assets/combat_test/04b_chip_broker/chip_broker_attack.png",
+              "width": 1357,
+              "height": 1159,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "damaged",
+          "name": "damaged",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 751,
+            "y": 1270
+          },
+          "defaultScale": 0.117548,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "chip_broker_damaged.png",
+              "path": "game/assets/combat_test/04b_chip_broker/chip_broker_damaged.png",
+              "width": 1202,
+              "height": 1308,
+              "duration": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mutant_mouse",
+      "label": "爬墙线鼠",
+      "kind": "actor",
+      "bodyScale": 1,
+      "runtimeScale": 1,
+      "animations": [
+        {
+          "id": "idle",
+          "name": "idle",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 788,
+            "y": 841
+          },
+          "defaultScale": 0.22508038585209003,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "mutant_mouse.png",
+              "path": "game/assets/combat_test/05a_mutant_mouse/mutant_mouse.png",
+              "width": 1536,
+              "height": 1024,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "move",
+          "name": "move",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 792.5,
+            "y": 868
+          },
+          "defaultScale": 0.215054,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "mutant_mouse_move.png",
+              "path": "game/assets/combat_test/05a_mutant_mouse/mutant_mouse_move.png",
+              "width": 1536,
+              "height": 1024,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "pierce",
+          "name": "攻击",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 798,
+            "y": 910
+          },
+          "defaultScale": 0.174782,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "mutant_mouse_attack.png",
+              "path": "game/assets/combat_test/05a_mutant_mouse/mutant_mouse_attack.png",
+              "width": 1536,
+              "height": 1024,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "damaged",
+          "name": "damaged",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 773.5,
+            "y": 826
+          },
+          "defaultScale": 0.223285,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "mutant_mouse_damaged.png",
+              "path": "game/assets/combat_test/05a_mutant_mouse/mutant_mouse_damaged.png",
+              "width": 1536,
+              "height": 1024,
+              "duration": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "luggage_lurker",
+      "label": "行李潜伏客",
+      "kind": "actor",
+      "bodyScale": 1,
+      "runtimeScale": 1,
+      "animations": [
+        {
+          "id": "idle",
+          "name": "idle",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 779.5,
+            "y": 893
+          },
+          "defaultScale": 0.18134715025906736,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "luggage_lurker_idle.png",
+              "path": "game/assets/combat_test/06b_luggage_lurker/luggage_lurker_idle.png",
+              "width": 1536,
+              "height": 1024,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "move",
+          "name": "move",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 780,
+            "y": 891
+          },
+          "defaultScale": 0.182768,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "luggage_lurker_move.png",
+              "path": "game/assets/combat_test/06b_luggage_lurker/luggage_lurker_move.png",
+              "width": 1536,
+              "height": 1024,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "pierce",
+          "name": "攻击",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 780.5,
+            "y": 968
+          },
+          "defaultScale": 0.149254,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "luggage_lurker_attack_bite.png",
+              "path": "game/assets/combat_test/06b_luggage_lurker/luggage_lurker_attack_bite.png",
+              "width": 1536,
+              "height": 1024,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "damaged",
+          "name": "damaged",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 780.5,
+            "y": 937
+          },
+          "defaultScale": 0.162602,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "luggage_lurker_damaged.png",
+              "path": "game/assets/combat_test/06b_luggage_lurker/luggage_lurker_damaged.png",
+              "width": 1536,
+              "height": 1024,
+              "duration": 1,
+              "anchor": {
+                "x": 798,
+                "y": 937
+              }
+            }
+          ]
+        },
+        {
+          "id": "bite",
+          "name": "咬击",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 780.5,
+            "y": 968
+          },
+          "defaultScale": 0.060328,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "luggage_lurker_attack_bite.png",
+              "path": "game/assets/combat_test/06b_luggage_lurker/luggage_lurker_attack_bite.png",
+              "width": 1536,
+              "height": 1024,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "bite_close",
+          "name": "咬合",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 781,
+            "y": 920
+          },
+          "defaultScale": 0.075855,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "luggage_lurker_attack_bite_close.png",
+              "path": "game/assets/combat_test/06b_luggage_lurker/luggage_lurker_attack_bite_close.png",
+              "width": 1536,
+              "height": 1024,
+              "duration": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "penitent_ascetic",
+      "label": "赎罪苦修者",
+      "kind": "actor",
+      "bodyScale": 1,
+      "runtimeScale": 1,
+      "animations": [
+        {
+          "id": "idle",
+          "name": "idle",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 585,
+            "y": 1303
+          },
+          "defaultScale": 0.11299435028248588,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "penitent_ascetic_idle.png",
+              "path": "game/assets/combat_test/07b_penitent_ascetic/penitent_ascetic_idle.png",
+              "width": 1168,
+              "height": 1346,
+              "duration": 1,
+              "anchor": {
+                "x": 655,
+                "y": 1251
+              }
+            }
+          ]
+        },
+        {
+          "id": "move",
+          "name": "move",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 795,
+            "y": 992
+          },
+          "defaultScale": 0.147524,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "penitent_ascetic_move.png",
+              "path": "game/assets/combat_test/07b_penitent_ascetic/penitent_ascetic_move.png",
+              "width": 1536,
+              "height": 1024,
+              "duration": 1,
+              "anchor": {
+                "x": 450,
+                "y": 933
+              }
+            }
+          ]
+        },
+        {
+          "id": "pierce",
+          "name": "攻击",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 662.5,
+            "y": 1142
+          },
+          "defaultScale": 0.132953,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "penitent_ascetic_attack.png",
+              "path": "game/assets/combat_test/07b_penitent_ascetic/penitent_ascetic_attack.png",
+              "width": 1312,
+              "height": 1199,
+              "duration": 1,
+              "anchor": {
+                "x": 800,
+                "y": 1067
+              }
+            }
+          ]
+        },
+        {
+          "id": "damaged",
+          "name": "damaged",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 585.5,
+            "y": 1276
+          },
+          "defaultScale": 0.117155,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "penitent_ascetic_damaged.png",
+              "path": "game/assets/combat_test/07b_penitent_ascetic/penitent_ascetic_damaged.png",
+              "width": 1168,
+              "height": 1346,
+              "duration": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rogue_drone",
+      "label": "失控配送蜂",
+      "kind": "actor",
+      "bodyScale": 1,
+      "runtimeScale": 1,
+      "animations": [
+        {
+          "id": "idle",
+          "name": "idle",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 781,
+            "y": 907
+          },
+          "defaultScale": 0.171990171990172,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "rogue_drone_idle.png",
+              "path": "game/assets/combat_test/08b_rogue_drone/rogue_drone_idle.png",
+              "width": 1536,
+              "height": 1024,
+              "duration": 1,
+              "anchor": {
+                "x": 781,
+                "y": 2500
+              }
+            }
+          ]
+        },
+        {
+          "id": "move",
+          "name": "move",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 774,
+            "y": 907
+          },
+          "defaultScale": 0.180879,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "rogue_drone_move.png",
+              "path": "game/assets/combat_test/08b_rogue_drone/rogue_drone_move.png",
+              "width": 1536,
+              "height": 1024,
+              "duration": 1,
+              "anchor": {
+                "x": 774,
+                "y": 2500
+              }
+            }
+          ]
+        },
+        {
+          "id": "pierce",
+          "name": "攻击",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 773,
+            "y": 970
+          },
+          "defaultScale": 0.153341,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "rogue_drone_attack.png",
+              "path": "game/assets/combat_test/08b_rogue_drone/rogue_drone_attack.png",
+              "width": 1536,
+              "height": 1024,
+              "duration": 1,
+              "anchor": {
+                "x": 773,
+                "y": 2500
+              }
+            }
+          ]
+        },
+        {
+          "id": "damaged",
+          "name": "damaged",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 779.5,
+            "y": 963
+          },
+          "defaultScale": 0.159453,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "rogue_drone_damaged.png",
+              "path": "game/assets/combat_test/08b_rogue_drone/rogue_drone_damaged.png",
+              "width": 1536,
+              "height": 1024,
+              "duration": 1,
+              "anchor": {
+                "x": 779.5,
+                "y": 2500
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pruning_hound",
+      "label": "修枝猎犬",
+      "kind": "actor",
+      "bodyScale": 1,
+      "runtimeScale": 1,
+      "animations": [
+        {
+          "id": "idle",
+          "name": "idle",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 765,
+            "y": 969
+          },
+          "defaultScale": 0.17676767676767677,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "pruning_hound_idle.png",
+              "path": "game/assets/combat_test/10a_pruning_hound/pruning_hound_idle.png",
+              "width": 1484,
+              "height": 1060,
+              "duration": 1,
+              "anchor": {
+                "x": 960,
+                "y": 915
+              }
+            }
+          ]
+        },
+        {
+          "id": "move",
+          "name": "move",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 748.5,
+            "y": 961
+          },
+          "defaultScale": 0.183007,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "pruning_hound_move.png",
+              "path": "game/assets/combat_test/10a_pruning_hound/pruning_hound_move.png",
+              "width": 1484,
+              "height": 1060,
+              "duration": 1,
+              "anchor": {
+                "x": 895,
+                "y": 961
+              }
+            }
+          ]
+        },
+        {
+          "id": "pierce",
+          "name": "攻击",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 757.5,
+            "y": 1001
+          },
+          "defaultScale": 0.152672,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "pruning_hound_attack.png",
+              "path": "game/assets/combat_test/10a_pruning_hound/pruning_hound_attack.png",
+              "width": 1484,
+              "height": 1060,
+              "duration": 1,
+              "anchor": {
+                "x": 863,
+                "y": 1300
+              }
+            }
+          ]
+        },
+        {
+          "id": "damaged",
+          "name": "damaged",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 764.5,
+            "y": 966
+          },
+          "defaultScale": 0.190996,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "pruning_hound_damaged.png",
+              "path": "game/assets/combat_test/10a_pruning_hound/pruning_hound_damaged.png",
+              "width": 1484,
+              "height": 1060,
+              "duration": 1,
+              "anchor": {
+                "x": 883,
+                "y": 902
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "powerline_repairman",
+      "label": "输电抢修工",
+      "kind": "actor",
+      "bodyScale": 1,
+      "runtimeScale": 1,
+      "animations": [
+        {
+          "id": "idle",
+          "name": "idle",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 658.5,
+            "y": 1285
+          },
+          "defaultScale": 0.11382113821138211,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "powerline_repairman_idle.png",
+              "path": "game/assets/combat_test/11a_powerline_repairman/powerline_repairman_idle.png",
+              "width": 1199,
+              "height": 1312,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "move",
+          "name": "move",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 555,
+            "y": 1277
+          },
+          "defaultScale": 0.11336,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "powerline_repairman_move.png",
+              "path": "game/assets/combat_test/11a_powerline_repairman/powerline_repairman_move.png",
+              "width": 1199,
+              "height": 1312,
+              "duration": 1,
+              "anchor": {
+                "x": 743,
+                "y": 1240
+              }
+            }
+          ]
+        },
+        {
+          "id": "pierce",
+          "name": "攻击",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 609.5,
+            "y": 1265
+          },
+          "defaultScale": 0.123784,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "powerline_repairman_attack.png",
+              "path": "game/assets/combat_test/11a_powerline_repairman/powerline_repairman_attack.png",
+              "width": 1199,
+              "height": 1312,
+              "duration": 1,
+              "anchor": {
+                "x": 800,
+                "y": 1150
+              }
+            }
+          ]
+        },
+        {
+          "id": "damaged",
+          "name": "damaged",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 617,
+            "y": 1234
+          },
+          "defaultScale": 0.130475,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "powerline_repairman_damaged.png",
+              "path": "game/assets/combat_test/11a_powerline_repairman/powerline_repairman_damaged.png",
+              "width": 1199,
+              "height": 1312,
+              "duration": 1,
+              "anchor": {
+                "x": 850,
+                "y": 1200
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beacon_jellyfish",
+      "label": "信标水母",
+      "kind": "actor",
+      "bodyScale": 1,
+      "runtimeScale": 1,
+      "animations": [
+        {
+          "id": "idle",
+          "name": "idle",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 634.5,
+            "y": 1192
+          },
+          "defaultScale": 0.1285583103764922,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "beacon_jellyfish_idle.png",
+              "path": "game/assets/combat_test/13b_beacon_jellyfish/beacon_jellyfish_idle.png",
+              "width": 1254,
+              "height": 1254,
+              "duration": 1,
+              "anchor": {
+                "x": 634.5,
+                "y": 1500
+              }
+            }
+          ]
+        },
+        {
+          "id": "move",
+          "name": "move",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 637.5,
+            "y": 1158
+          },
+          "defaultScale": 0.13766,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "beacon_jellyfish_move.png",
+              "path": "game/assets/combat_test/13b_beacon_jellyfish/beacon_jellyfish_move.png",
+              "width": 1254,
+              "height": 1254,
+              "duration": 1,
+              "anchor": {
+                "x": 637.5,
+                "y": 1500
+              }
+            }
+          ]
+        },
+        {
+          "id": "pierce",
+          "name": "攻击",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 797.5,
+            "y": 910
+          },
+          "defaultScale": 0.188934,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "beacon_jellyfish_attack.png",
+              "path": "game/assets/combat_test/13b_beacon_jellyfish/beacon_jellyfish_attack.png",
+              "width": 1536,
+              "height": 1024,
+              "duration": 1,
+              "anchor": {
+                "x": 797.5,
+                "y": 1500
+              }
+            }
+          ]
+        },
+        {
+          "id": "damaged",
+          "name": "damaged",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 633,
+            "y": 1089
+          },
+          "defaultScale": 0.164319,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "beacon_jellyfish_damaged.png",
+              "path": "game/assets/combat_test/13b_beacon_jellyfish/beacon_jellyfish_damaged.png",
+              "width": 1254,
+              "height": 1254,
+              "duration": 1,
+              "anchor": {
+                "x": 633,
+                "y": 1500
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mirror_inspector",
+      "label": "镜面监察员",
+      "kind": "actor",
+      "bodyScale": 1,
+      "runtimeScale": 1,
+      "animations": [
+        {
+          "id": "pierce",
+          "name": "攻击",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 733,
+            "y": 1148
+          },
+          "defaultScale": 0.124666,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "mirror_inspector_attack_shoot.png",
+              "path": "game/assets/combat_test/09a_mirror_inspector/mirror_inspector_attack_shoot.png",
+              "width": 1346,
+              "height": 1168,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "damaged",
+          "name": "damaged",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 530,
+            "y": 1452
+          },
+          "defaultScale": 0.101892,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "mirror_inspector_damaged.png",
+              "path": "game/assets/combat_test/09a_mirror_inspector/mirror_inspector_damaged.png",
+              "width": 1024,
+              "height": 1536,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "idle",
+          "name": "idle",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 540,
+            "y": 1505
+          },
+          "defaultScale": 0.095628,
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            {
+              "name": "mirror_inspector_idle.png",
+              "path": "game/assets/combat_test/09a_mirror_inspector/mirror_inspector_idle.png",
+              "width": 1024,
+              "height": 1536,
+              "duration": 1
+            }
+          ]
+        },
+        {
+          "id": "shoot",
+          "name": "射击",
+          "anchorMode": "canvas_bottom_center",
+          "sourceAnchor": {
+            "x": 733,
+            "y": 1148
+          },
+          "defaultScale": 0.124666,
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            {
+              "name": "mirror_inspector_attack_shoot.png",
+              "path": "game/assets/combat_test/09a_mirror_inspector/mirror_inspector_attack_shoot.png",
+              "width": 1346,
+              "height": 1168,
+              "duration": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

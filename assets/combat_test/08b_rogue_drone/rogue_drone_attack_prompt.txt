@@ -1,0 +1,24 @@
+08B 失控配送蜂攻击素材
+日期：2026-10-22
+方式：内置 imagegen，transparent_background=true。
+参考：assets/combat_test/08b_rogue_drone/rogue_drone_idle.png
+输出：assets/combat_test/08b_rogue_drone/rogue_drone_attack.png
+生成原图：C:/Users/22141/.codex/generated_images/01a1624e-f8f3-7522-95e7-7f03cd473407/exec-518e8070-98f3-4f40-baac-4e4e939f3c24.png
+表现：货箱倾转、箱底朝左前送，双分拣爪向左下方张开夹落的单张攻击关键姿态。
+验证：1536×1024 RGBA PNG；四角 alpha=0；alpha≥128 的主体边界为
+(31,44)—(1515,990)，主体未触边；目标文件与生成原图 SHA256 一致。
+主体外围仍有淡半透明光晕。
+SHA256：02CA1098EAF328FA6412314397E551E6765E1356B008170D23F3F6F71D6763F3
+仅交付静态攻击姿态，未制作完整冲撞、刹车、夹落和回收时序，未接入运行时，
+未运行游戏测试。
+
+实际提示词：
+Use case: precise-object-edit
+Asset type: one static attack action sprite for existing 2D cyberpunk RPG enemy 08B rogue delivery drone, 失控配送蜂.
+Input image: exact identity and visual style reference, rogue_drone_idle.png. Derive a NEW attack pose of this SAME machine.
+Primary request: depict the committed attack key pose combining the cargo-bottom ram and forward-down sorting-claw strike in a single coherent pose. Facing LEFT toward an off-screen opponent, the machine pitches its forward left end upward and rear right end downward, rotating the underside of its still securely attached CLOSED cargo box toward the left target, so the armored box BOTTOM is a clearly visible broad leading striking plane. Capture the short horizontal ram at full commitment just before its braking bank. Make the pose substantially different from idle: the box's left bottom edge is thrust prominently toward the target, with visible underside plate geometry and meaningful pitch of the chassis. Both small jointed mechanical sorting grippers attached below the cargo extend down and FORWARD LEFT, jaws open in an imminent forward-down clamping strike. Keep their reach short and mechanically credible, not huge monster arms. The drone has risen slightly before the claw strike; no ground contact.
+Strict identity invariants: one SAME low wide machine with exactly TWO large circular guarded lifting fans flanking its central fuselage, same dark fan blades and old-white rim trims, worn faded cold teal gray / logistics blue armor, graphite chassis, old-white cargo bumper rails, corner chips and scratches, magenta exposed cables, one shallow sealed rectangular cargo box with same latch, same small tail fin, and ONE amber-yellow front addressing lamp. Preserve panel design, proportions and all major parts. Lamp remains pointing toward the left front and visible. Cargo stays sealed and attached. No weapons, missiles, lasers or extra limbs.
+Style: closely match the supplied dark plum near-black thick contour lines, angular cel-shaded painted industrial surfaces, crisp faceted highlights, muted blue gray metal with ivory edges, worn hand-painted 2D anime cyberpunk enemy art. Clean readable silhouette suitable for game use.
+Composition: ONE drone, ONE static pose, three-quarter front-left camera, facing LEFT, full machine entirely visible, landscape canvas approximately 1536x1024. Generous empty transparent margin around BOTH fans, cargo and claw tips, no cropping. Maintain recognizable broad twin-fan silhouette even during the attack pitch.
+Backdrop: genuine TRANSPARENT alpha. Remove the reference's dark ambient backdrop and halo. NO floor, ground shadow, background glow, fog, motion trails, effects, sparks, impact target, lettering, UI, diagrams, arrows, frame sequence or sprite sheet. Only the machine and its small lamp glow.
+

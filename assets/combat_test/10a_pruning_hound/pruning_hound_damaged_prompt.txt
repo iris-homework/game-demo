@@ -1,0 +1,49 @@
+生成日期：2026-10-22（Asia/Shanghai）
+工具：内置 imagegen，transparent_background=true
+对应图片：pruning_hound_damaged.png
+图片 SHA256：85D59B4D4DB750CE7B50F65880DCC61726688A6A5691DAD41B1EC33195072202
+参考图：pruning_hound_idle.png（同一角色身份、比例、材质与配色）
+
+说明：生成两版。第一版受击姿态成立，但旧枝叶散落过多；第二版只减少碎屑并尝试压暗眼灯，
+保留第一版的错位剪刃、四足失稳与下沉姿态，最终采用第二版。
+眼灯在最终图中仍保持较亮的暖黄常亮状态。
+下方逐字保留两次实际提示词。
+
+--- 第一次提示词 ---
+
+Use case: precise-object-edit
+Asset type: 2D game enemy damaged sprite PNG for Godot (10A Pruning Hound)
+Primary request: Turn image 1 (the green mechanical pruning hound idle) into a single damaged / staggering pose that combines the hit reaction and the beginning of shutdown.
+
+Keep the character's identity EXACTLY: same four-legged mechanical body, slender waist, neatly clipped oval deep-green topiary carapace with layered leaf plates, same pair of large curved garden-shear blades, warm amber-yellow eye lamp, bone-white joints, charcoal mechanics, steel blades, dark green mesh clipping bag under the belly, same bold dark ink outlines, faceted cel shading, materials, palette, proportions and scale. NO magenta or pink anywhere.
+
+Damaged pose (one frozen moment, not a sequence):
+- The head is knocked askew: the scissor hinge is visibly twisted and the two shear blades are misaligned / crossed out of their normal track, one blade bent slightly upward and the other hanging lower, a small exposed hinge joint between them. Still exactly two main shear blades, no extra blades.
+- The eye lamp flickers dim amber (still warm yellow, not red).
+- The body tilts and sinks: back lowered unevenly, one rear leg slips outward with its hoof skidding sideways, the other rear leg buckles; front legs begin to fold inward. Exactly four legs total, splayed and unstable.
+- The mesh bag tips sideways and a small number of old green-brown leaves and twigs spill out around it; only a few pieces, no pile, no ground.
+- A bent panel or loose seam near the shoulder and a few scuff marks show damage, but the machine stays clean and readable, not rusty junk, no gore, no sparks explosion.
+- Composition reads as a brief stagger that is collapsing into shutdown, not a dead flat heap.
+
+Framing: single creature, full body and all four legs inside frame, generous transparent padding, facing left, similar scale and camera to image 1.
+
+Constraints: exactly four legs, exactly two main shear blades; no pink or magenta; true RGBA transparent background; no background, no checkerboard, no floor, no cast shadow, no impact lines, no dust cloud, no blood, no text, no UI, no watermark; not a sprite sheet; not an animation strip.
+
+--- 第二次提示词 ---
+
+Use case: precise-object-edit
+Asset type: 2D game enemy damaged sprite PNG (10A Pruning Hound)
+Primary request: Revise image 1 (the collapsed green mechanical pruning hound) to reduce the spilled debris and dim the eye. Preserve the exact same pose, silhouette, four-leg arrangement, misaligned shear head, bag position and rendering style.
+
+CHANGE ONLY:
+1) Debris: keep only 3 or 4 small old green-brown leaves and short twigs in total, clustered directly below and just behind the torn mesh bag. Remove every leaf and twig from the front legs, chest, ground area under the front of the body, the top of the green carapace, and the far right side. No twigs stuck upright in the canopy. No pile.
+2) Eye lamp: dim to a weak, fading warm amber glow (still amber-yellow, never red). Keep the dark eye housing and the same position.
+3) Keep the few pale scuff marks and cracked shoulder panel; do not add more damage.
+
+Keep exactly: the twisted scissor hinge with two misaligned shear blades, the four splayed legs (two front, two hind), the tilted oval topiary carapace, bone-white joints, charcoal mechanics, green mesh bag, bold dark ink outlines, faceted cel shading, transparent background, facing left, framing and padding.
+
+Constraints: exactly four legs, exactly two main shear blades, no extra debris, no magenta or pink, true RGBA transparent background, no background, no floor, no shadow, no text, no UI, no watermark, not a sprite sheet.
+
+最终图：1484×1060 RGBA，四角完全透明；alpha≥128 的主体范围为
+`(34,191)—(1473,977)`。已核对四足、双剪刃与少量袋下碎屑，无洋红。
+未接入敌人配置或动画时间轴，未运行游戏测试。

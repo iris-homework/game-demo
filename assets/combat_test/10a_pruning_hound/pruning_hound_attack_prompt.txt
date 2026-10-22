@@ -1,0 +1,31 @@
+生成日期：2026-10-22（Asia/Shanghai）
+工具：内置 imagegen，transparent_background=true
+对应图片：pruning_hound_attack.png
+图片 SHA256：21D034F83F7697EFF1D74810ED4158562C5013D64F25AB000BB6F102DEE51EEE
+参考图：pruning_hound_idle.png（同一角色身份、比例、材质与配色）
+
+说明：本轮额度恢复后生成；采用攻击动作中最易读的“张剪短扑”关键帧。
+头部剪刃大幅张开，身体前扑、前足收起、后腿蹬开；合剪与收颈落地的后续帧未包含。
+下方逐字保留实际提示词。
+
+Use case: precise-object-edit
+Asset type: 2D game enemy attack sprite PNG for Godot (10A Pruning Hound)
+Primary request: Turn image 1 (the green mechanical pruning hound idle) into a single dramatic attack pose: the short pounce with the garden-shear jaws wide open.
+
+Keep the character's identity EXACTLY: same four-legged mechanical body, slender waist, neatly clipped oval deep-green topiary carapace with layered leaf plates, same pair of large curved garden-shear blades, one warm amber-yellow eye lamp, bone-white joints, charcoal mechanics, steel blades, dark green mesh clipping bag under the belly, same bold dark ink outlines, faceted cel shading, materials, palette, proportions and scale. NO magenta or pink anywhere.
+
+Attack pose (one frozen peak frame, not a sequence):
+- The hound lunges forward and slightly upward in a short pounce, body compressed behind the shoulders, back lowered.
+- Neck thrusts forward; the head is twisted/tilted roughly 20-30 degrees sideways so the scissor hinge is clearly visible.
+- The two shear blades are spread WIDE open in a dramatic V, ready to snap shut; one blade angled up and one down, both fully visible and separated. Exactly two main shear blades.
+- Front legs are lifted and pulled back under the chest in the pounce; exactly four legs total, hind legs extended back and braced outward, hooves angled out.
+- The eye lamp flares bright warm amber; the mesh bag swings backward with the lunge.
+- Strong forward diagonal composition, hostile and agile, clean mechanical precision.
+
+Composition: single creature, full body and all four legs plus fully open shear head inside frame, generous transparent padding, facing left.
+
+Constraints: exactly four legs, exactly two main shear blades; no pink or magenta; true RGBA transparent background; no background, no checkerboard, no floor, no cast shadow, no impact lines, no dust, no blood, no text, no UI, no watermark; not a sprite sheet; not an animation strip.
+
+最终图：1484×1060 RGBA，四角完全透明；alpha≥128 的主体范围为
+`(19,71)—(1477,1033)`。已核对四足、双剪刃、无洋红。
+未接入敌人配置或动画时间轴，未运行游戏测试。

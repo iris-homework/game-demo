@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cuvyjyi3xpb4x"
-path="res://.godot/imported/finn_evade.webp-e7ff2be006feebcfc0cd092d302a6ed4.ctex"
+path="res://.godot/imported/finn_evade.webp-1918f63f96a43a02dc3b68a5b0a7c275.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/combat_test/finn/finn_evade.webp"
-dest_files=["res://.godot/imported/finn_evade.webp-e7ff2be006feebcfc0cd092d302a6ed4.ctex"]
+source_file="res://assets/combat_test/Finn/finn_evade.webp"
+dest_files=["res://.godot/imported/finn_evade.webp-1918f63f96a43a02dc3b68a5b0a7c275.ctex"]
 
 [params]
 

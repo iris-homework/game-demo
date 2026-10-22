@@ -1,0 +1,16 @@
+Intended output: powerline_repairman_attack.png
+Prepared: 2026-10-22 (Asia/Shanghai)
+Tool: built-in image_gen
+Status: generated.
+Edit target: assets/combat_test/11a_powerline_repairman/powerline_repairman_idle.png
+Final source: C:/Users/22141/.codex/generated_images/01a15a90-c4f3-7ab2-9a5a-a1de9bfc48aa/exec-d3908e5a-f856-4306-a6b0-1f489aad3e76.png
+Postprocess: cleared alpha values 1–2 to remove imperceptible background residue; content unchanged.
+
+Actual requested prompt:
+Use case: identity-preserve
+Asset type: single full-body transparent PNG attack key pose for the 2D anime cyberpunk battle enemy 11A 输电抢修工.
+Edit target: assets/combat_test/11a_powerline_repairman/powerline_repairman_idle.png. Preserve the exact SAME character: adult male compact heavy body with enlarged helmet, lowered dark arc-flash visor, broad square insulated shoulder pads, dirty ash-gray protective suit, exactly TWO faded mustard-yellow warning strips on the upper sleeves, thick gauntlets, one short belt grounding cable with clamp, very heavy layered work boots, and the same single straight operating pole with a clearly open U-shaped metal head. Preserve the existing bold dark outlines, angular faceted cel shading, muted gray/brown palette, screen-left three-quarter facing direction, large-head proportions and sprite scale.
+Primary request: create one heavy diagonal demolition-strike key pose. The action has passed the two-handed overhead raise and is in the forceful downward diagonal cut, with the pole already low and beginning to be dragged back along the ground. Both gloved hands visibly grip the SAME continuous shaft at separate points. Torso twists behind the swing, shoulders compress forward, hips follow, front knee bends and rear boot braces against the ground. The open U-shaped metal head is near the ground on screen LEFT, unmistakably open and leading the recovering sweep. Keep the strike heavy and deliberate, with a broad readable silhouette. The pole head emits a LOCAL YELLOW ELECTRIC LIGHT: bright warm-yellow inner glow around the U head and a few small yellow-white sparks, contained near the tip. The rest of the suit stays muted; there should be exactly the two faded yellow sleeve strips plus this attack light.
+Composition: ONE character only, whole helmet, both boots, both hands, the entire pole and both pole ends in frame with clean transparent margin. Single key pose, not a sheet or multiple views. Keep the character close to the idle target's scale.
+Background: genuinely transparent alpha with clean isolated cutout. No floor plane, cast shadow, dust cloud, painted scenery, gradient, text or UI. Yellow electric light must sit on transparent background as a compact tip effect.
+Constraints: exactly one pole and one open U head; exactly two yellow sleeve strips; preserve equipment and proportions; no exposed face, extra limbs, extra tools, weapons, armor pieces, secondary characters, neon magenta/cyan accents, large lightning bolts, full-screen aura, logos, border or watermark.

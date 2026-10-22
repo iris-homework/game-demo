@@ -10,9 +10,11 @@ func setup(source: Sprite2D, white_key_enabled: bool = false) -> void:
 	for i in 3:
 		var echo := Sprite2D.new()
 		echo.texture = source.texture
+		echo.texture_filter = source.texture_filter
 		echo.centered = source.centered
-		echo.position = source.position
-		echo.scale = source.scale
+		# Mirrored affine frames can decompose into rotation + negative Y scale.
+		# Copy the whole basis so the silhouette keeps the source's sole anchor.
+		echo.transform = source.transform
 		var shader_material := ShaderMaterial.new()
 		shader_material.shader = preload("res://shaders/return_ghost.gdshader")
 		shader_material.set_shader_parameter("neon_color",COLORS[i])

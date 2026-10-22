@@ -1,0 +1,1279 @@
+{
+  "profiles": {
+    "fish": {
+      "visual": {
+        "id": "fish",
+        "placeholder": false,
+        "targetRect": [
+          -80,
+          -122,
+          152,
+          134
+        ],
+        "attackStyleOverride": "bite",
+        "poseAliases": {
+          "block": "idle"
+        },
+        "hitEffectTexture": "res://assets/combat_test/12a_fish/fish_bite_hit_fx.png",
+        "poses": {
+          "idle": {
+            "texture": "res://assets/combat_test/12a_fish/fish_idle.png",
+            "anchor": [
+              650,
+              1100
+            ],
+            "scale": 0.12
+          },
+          "move": {
+            "texture": "res://assets/combat_test/12a_fish/fish_move.png",
+            "anchor": [
+              650,
+              1100
+            ],
+            "scale": 0.12
+          },
+          "bite": {
+            "texture": "res://assets/combat_test/12a_fish/fish_bite.png",
+            "anchor": [
+              650,
+              1100
+            ],
+            "scale": 0.12
+          },
+          "bite_close": {
+            "texture": "res://assets/combat_test/12a_fish/fish_bite_close.png",
+            "anchor": [
+              650,
+              1100
+            ],
+            "scale": 0.12
+          },
+          "damaged": {
+            "texture": "res://assets/combat_test/12a_fish/fish_damaged.png",
+            "anchor": [
+              650,
+              1140
+            ],
+            "scale": 0.12
+          }
+        },
+        "label": "变异的鱼"
+      },
+      "shadow": {
+        "enabled": true,
+        "size": [
+          32,
+          9
+        ],
+        "offset": [
+          0,
+          2
+        ],
+        "opacity": 0.7
+      },
+      "motion": {
+        "speed": 2300,
+        "reach": 86,
+        "windup": 0.045,
+        "recovery": 0.12
+      },
+      "effects": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "frameAnchors": {}
+    },
+    "gang_boss": {
+      "visual": {
+        "id": "gang_boss",
+        "placeholder": false,
+        "sourceFacing": "right",
+        "targetRect": [
+          -48,
+          -134,
+          96,
+          145
+        ],
+        "attackStyleOverride": "pierce",
+        "poseAliases": {
+          "block": "idle",
+          "slash": "pierce"
+        },
+        "hitEffectTexture": "",
+        "poses": {
+          "idle": {
+            "texture": "res://assets/combat_test/03b_gang_boss/gang_boss_idle.png",
+            "anchor": [
+              750,
+              1109
+            ],
+            "scale": 0.128,
+            "whiteKey": false
+          },
+          "move": {
+            "texture": "res://assets/combat_test/03b_gang_boss/gang_boss_move.png",
+            "anchor": [
+              840,
+              1138
+            ],
+            "scale": 0.12,
+            "whiteKey": false
+          },
+          "pierce": {
+            "texture": "res://assets/combat_test/03b_gang_boss/gang_boss_pierce.png",
+            "anchor": [
+              600,
+              1112
+            ],
+            "scale": 0.121,
+            "whiteKey": false
+          },
+          "damaged": {
+            "texture": "res://assets/combat_test/03b_gang_boss/gang_boss_damaged.png",
+            "anchor": [
+              840,
+              1126
+            ],
+            "scale": 0.126,
+            "whiteKey": false
+          }
+        },
+        "label": "黑帮老大"
+      },
+      "shadow": {
+        "enabled": true,
+        "size": [
+          32,
+          9
+        ],
+        "offset": [
+          0,
+          2
+        ],
+        "opacity": 0.7
+      },
+      "motion": {
+        "speed": 2300,
+        "reach": 105,
+        "windup": 0.045,
+        "recovery": 0.12
+      },
+      "effects": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "frameAnchors": {}
+    },
+    "gang_henchman": {
+      "visual": {
+        "id": "gang_henchman",
+        "placeholder": false,
+        "sourceFacing": "right",
+        "targetRect": [
+          -37,
+          -119,
+          74,
+          130
+        ],
+        "attackStyleOverride": "pierce",
+        "poseAliases": {
+          "block": "idle",
+          "slash": "pierce"
+        },
+        "hitEffectTexture": "",
+        "poses": {
+          "idle": {
+            "texture": "res://assets/combat_test/03a_gang_henchman/gang_henchman_idle.png",
+            "anchor": [
+              735,
+              1103
+            ],
+            "scale": 0.108,
+            "whiteKey": false
+          },
+          "move": {
+            "texture": "res://assets/combat_test/03a_gang_henchman/gang_henchman_move.png",
+            "anchor": [
+              735,
+              1116
+            ],
+            "scale": 0.107,
+            "whiteKey": false
+          },
+          "pierce": {
+            "texture": "res://assets/combat_test/03a_gang_henchman/gang_henchman_pierce.png",
+            "anchor": [
+              720,
+              1111
+            ],
+            "scale": 0.107,
+            "whiteKey": false
+          },
+          "damaged": {
+            "texture": "res://assets/combat_test/03a_gang_henchman/gang_henchman_damaged.png",
+            "anchor": [
+              790,
+              1113
+            ],
+            "scale": 0.112,
+            "whiteKey": false
+          }
+        },
+        "label": "黑帮小弟"
+      },
+      "shadow": {
+        "enabled": true,
+        "size": [
+          32,
+          9
+        ],
+        "offset": [
+          0,
+          2
+        ],
+        "opacity": 0.7
+      },
+      "motion": {
+        "speed": 2300,
+        "reach": 105,
+        "windup": 0.045,
+        "recovery": 0.12
+      },
+      "effects": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "frameAnchors": {}
+    },
+    "robot": {
+      "visual": {
+        "id": "robot",
+        "placeholder": false,
+        "sourceFacing": "left",
+        "targetRect": [
+          -54,
+          -147,
+          108,
+          158
+        ],
+        "attackStyleOverride": "laser",
+        "laserMuzzle": [
+          624,
+          403
+        ],
+        "laserPalmWidth": 120,
+        "poseAliases": {
+          "move": "idle",
+          "block": "idle"
+        },
+        "hitEffectTexture": "",
+        "poses": {
+          "idle": {
+            "texture": "res://assets/combat_test/02b_robot/robot_idle.png",
+            "anchor": [
+              690,
+              1124
+            ],
+            "scale": 0.125
+          },
+          "laser": {
+            "texture": "res://assets/combat_test/02b_robot/robot_laser_emitter_v2.png",
+            "anchor": [
+              1090,
+              934
+            ],
+            "scale": 0.15
+          },
+          "damaged": {
+            "texture": "res://assets/combat_test/02b_robot/robot_damaged.png",
+            "anchor": [
+              738,
+              1114
+            ],
+            "scale": 0.127
+          }
+        },
+        "label": "故障机器人"
+      },
+      "shadow": {
+        "enabled": true,
+        "size": [
+          32,
+          9
+        ],
+        "offset": [
+          0,
+          2
+        ],
+        "opacity": 0.7
+      },
+      "motion": {
+        "speed": 2300,
+        "reach": 86,
+        "windup": 0.045,
+        "recovery": 0.12
+      },
+      "effects": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "frameAnchors": {}
+    },
+    "noren": {
+      "visual": {
+        "id": "noren",
+        "label": "诺伦",
+        "sourceFacing": "left",
+        "targetRect": [
+          -58,
+          -130,
+          116,
+          145
+        ],
+        "poses": {
+          "idle": {
+            "anchor": [
+              710,
+              1240
+            ],
+            "scale": 0.099,
+            "texture": "res://assets/combat_test/noren/noren_idle.png"
+          },
+          "move": {
+            "anchor": [
+              920,
+              1048
+            ],
+            "scale": 0.103,
+            "texture": "res://assets/combat_test/noren/noren_move.png"
+          },
+          "slash": {
+            "anchor": [
+              725,
+              1110
+            ],
+            "scale": 0.103,
+            "texture": "res://assets/combat_test/noren/noren_slash.png"
+          },
+          "pierce": {
+            "anchor": [
+              1000,
+              941
+            ],
+            "scale": 0.132,
+            "texture": "res://assets/combat_test/noren/noren_pierce.png"
+          },
+          "block": {
+            "anchor": [
+              550,
+              1140
+            ],
+            "scale": 0.103,
+            "texture": "res://assets/combat_test/noren/noren_block.png"
+          },
+          "damaged": {
+            "anchor": [
+              700,
+              1230
+            ],
+            "scale": 0.099,
+            "texture": "res://assets/combat_test/noren/noren_damaged.png"
+          },
+          "gun_idle": {
+            "anchor": [
+              660,
+              1230
+            ],
+            "scale": 0.099,
+            "texture": "res://assets/combat_test/noren/noren_gun_idle.png"
+          },
+          "shoot": {
+            "anchor": [
+              714,
+              1210
+            ],
+            "scale": 0.099,
+            "texture": "res://assets/combat_test/noren/noren_shoot_planted.png"
+          },
+          "retreat": {
+            "anchor": [
+              560,
+              1155
+            ],
+            "scale": 0.099,
+            "texture": "res://assets/combat_test/noren/noren_retreat.png"
+          },
+          "gun_block": {
+            "anchor": [
+              550,
+              1140
+            ],
+            "scale": 0.103,
+            "texture": "res://assets/combat_test/noren/noren_gun_block.png"
+          },
+          "gun_damaged": {
+            "anchor": [
+              700,
+              1230
+            ],
+            "scale": 0.099,
+            "texture": "res://assets/combat_test/noren/noren_gun_damaged.png"
+          }
+        }
+      },
+      "shadow": {
+        "enabled": true,
+        "size": [
+          32,
+          9
+        ],
+        "offset": [
+          0,
+          2
+        ],
+        "opacity": 0.7
+      },
+      "motion": {
+        "speed": 2300,
+        "reach": 86,
+        "windup": 0.045,
+        "recovery": 0.12
+      },
+      "effects": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "frameAnchors": {}
+    },
+    "warden_shield": {
+      "visual": {
+        "id": "warden_shield",
+        "label": "巡界盾手",
+        "sourceFacing": "left",
+        "targetRect": [
+          -65,
+          -145,
+          130,
+          155
+        ],
+        "poses": {
+          "idle": {
+            "texture": "res://assets/combat_test/01a_warden_shield/warden_shield_idle.png",
+            "anchor": [
+              637.5,
+              1238
+            ],
+            "scale": 0.1282051282051282
+          }
+        },
+        "hitEffectTexture": "res://assets/combat_test/01a_warden_shield/warden_shield_VFX.png",
+        "attackStyleOverride": "",
+        "laserMuzzle": [
+          0,
+          0
+        ],
+        "laserPalmWidth": 70
+      },
+      "shadow": {
+        "enabled": true,
+        "size": [
+          32,
+          9
+        ],
+        "offset": [
+          0,
+          2
+        ],
+        "opacity": 0.7
+      },
+      "motion": {
+        "speed": 2300,
+        "reach": 86,
+        "windup": 0.045,
+        "recovery": 0.12
+      },
+      "effects": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "frameAnchors": {},
+      "discoveredVfx": {
+        "texture": "res://assets/combat_test/01a_warden_shield/warden_shield_VFX.png",
+        "source": "assets/combat_test/01a_warden_shield/warden_shield_VFX.png",
+        "status": "pending-calibration",
+        "note": "自动发现；仅作为待校准素材，未切图或绑定挂件"
+      },
+      "targetEnemyIds": []
+    },
+    "scavenger_hooker": {
+      "visual": {
+        "id": "scavenger_hooker",
+        "label": "拾荒钩客",
+        "sourceFacing": "left",
+        "targetRect": [
+          -65,
+          -145,
+          130,
+          155
+        ],
+        "poses": {
+          "idle": {
+            "texture": "res://assets/combat_test/02b_scavenger_hooker/scavenger_hooker_idle.png",
+            "anchor": [
+              696,
+              1127
+            ],
+            "scale": 0.13195098963242224
+          }
+        },
+        "hitEffectTexture": "res://assets/combat_test/02b_scavenger_hooker/scavenger_hooker_VFX.png"
+      },
+      "shadow": {
+        "enabled": true,
+        "size": [
+          32,
+          9
+        ],
+        "offset": [
+          0,
+          2
+        ],
+        "opacity": 0.7
+      },
+      "motion": {
+        "speed": 2300,
+        "reach": 86,
+        "windup": 0.045,
+        "recovery": 0.12
+      },
+      "effects": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "frameAnchors": {
+        "idle:0": [
+          770,
+          1100
+        ],
+        "move:0": [
+          900,
+          1090
+        ],
+        "pierce:0": [
+          900,
+          1090
+        ]
+      },
+      "discoveredVfx": {
+        "texture": "res://assets/combat_test/02b_scavenger_hooker/scavenger_hooker_VFX.png",
+        "source": "assets/combat_test/02b_scavenger_hooker/scavenger_hooker_VFX.png",
+        "status": "pending-calibration",
+        "note": "自动发现；仅作为待校准素材，未切图或绑定挂件"
+      }
+    },
+    "chip_broker": {
+      "visual": {
+        "id": "chip_broker",
+        "label": "筹码掮客",
+        "sourceFacing": "left",
+        "targetRect": [
+          -65,
+          -145,
+          130,
+          155
+        ],
+        "poses": {
+          "idle": {
+            "texture": "res://assets/combat_test/04b_chip_broker/chip_broker_idle.png",
+            "anchor": [
+              612,
+              1270
+            ],
+            "scale": 0.11503697617091208
+          }
+        },
+        "hitEffectTexture": "res://assets/combat_test/04b_chip_broker/chip_broker_VFX.png",
+        "attackStyleOverride": "",
+        "laserMuzzle": [
+          0,
+          0
+        ],
+        "laserPalmWidth": 70
+      },
+      "shadow": {
+        "enabled": true,
+        "size": [
+          32,
+          9
+        ],
+        "offset": [
+          0,
+          2
+        ],
+        "opacity": 0.7
+      },
+      "motion": {
+        "speed": 2300,
+        "reach": 86,
+        "windup": 0.045,
+        "recovery": 0.12
+      },
+      "effects": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "frameAnchors": {},
+      "discoveredVfx": {
+        "texture": "res://assets/combat_test/04b_chip_broker/chip_broker_VFX.png",
+        "source": "assets/combat_test/04b_chip_broker/chip_broker_VFX.png",
+        "status": "pending-calibration",
+        "note": "自动发现；仅作为待校准素材，未切图或绑定挂件"
+      },
+      "targetEnemyIds": []
+    },
+    "mutant_mouse": {
+      "visual": {
+        "id": "mutant_mouse",
+        "label": "爬墙线鼠",
+        "sourceFacing": "left",
+        "targetRect": [
+          -65,
+          -145,
+          130,
+          155
+        ],
+        "poses": {
+          "idle": {
+            "texture": "res://assets/combat_test/05a_mutant_mouse/mutant_mouse.png",
+            "anchor": [
+              788,
+              841
+            ],
+            "scale": 0.22508038585209003
+          }
+        },
+        "hitEffectTexture": "res://assets/combat_test/05a_mutant_mouse/mutant_mouse_VFX.png",
+        "attackStyleOverride": "",
+        "laserMuzzle": [
+          0,
+          0
+        ],
+        "laserPalmWidth": 70
+      },
+      "shadow": {
+        "enabled": true,
+        "size": [
+          32,
+          9
+        ],
+        "offset": [
+          0,
+          2
+        ],
+        "opacity": 0.7
+      },
+      "motion": {
+        "speed": 2300,
+        "reach": 86,
+        "windup": 0.045,
+        "recovery": 0.12
+      },
+      "effects": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "frameAnchors": {},
+      "discoveredVfx": {
+        "texture": "res://assets/combat_test/05a_mutant_mouse/mutant_mouse_VFX.png",
+        "source": "assets/combat_test/05a_mutant_mouse/mutant_mouse_VFX.png",
+        "status": "pending-calibration",
+        "note": "自动发现；仅作为待校准素材，未切图或绑定挂件"
+      },
+      "targetEnemyIds": []
+    },
+    "luggage_lurker": {
+      "visual": {
+        "id": "luggage_lurker",
+        "label": "行李潜伏客",
+        "sourceFacing": "left",
+        "targetRect": [
+          -65,
+          -145,
+          130,
+          155
+        ],
+        "poses": {
+          "idle": {
+            "texture": "res://assets/combat_test/06b_luggage_lurker/luggage_lurker_idle.png",
+            "anchor": [
+              779.5,
+              893
+            ],
+            "scale": 0.18134715025906736
+          }
+        },
+        "attackStyleOverride": "bite",
+        "laserMuzzle": [
+          0,
+          0
+        ],
+        "laserPalmWidth": 70
+      },
+      "shadow": {
+        "enabled": true,
+        "size": [
+          32,
+          9
+        ],
+        "offset": [
+          0,
+          2
+        ],
+        "opacity": 0.7
+      },
+      "motion": {
+        "speed": 2300,
+        "reach": 86,
+        "windup": 0.045,
+        "recovery": 0.12
+      },
+      "effects": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "frameAnchors": {
+        "damaged:0": [
+          798,
+          937
+        ]
+      },
+      "targetEnemyIds": [],
+      "attacks": {
+        "bite": {
+          "type": "bite",
+          "movement": "approach",
+          "windupPose": "bite",
+          "strikePose": "bite_close",
+          "recoveryPose": "idle",
+          "windup": 0.12,
+          "impactDelay": 0.035,
+          "recovery": 0.12,
+          "flightTime": 0,
+          "muzzle": [
+            0,
+            0
+          ],
+          "contact": [
+            0,
+            -62
+          ],
+          "muzzleTexture": "",
+          "projectileTexture": "",
+          "impactTexture": ""
+        }
+      },
+      "attackStyleManual": true
+    },
+    "penitent_ascetic": {
+      "visual": {
+        "id": "penitent_ascetic",
+        "label": "赎罪苦修者",
+        "sourceFacing": "left",
+        "targetRect": [
+          -65,
+          -145,
+          130,
+          155
+        ],
+        "poses": {
+          "idle": {
+            "texture": "res://assets/combat_test/07b_penitent_ascetic/penitent_ascetic_idle.png",
+            "anchor": [
+              585,
+              1303
+            ],
+            "scale": 0.11299435028248588
+          }
+        },
+        "hitEffectTexture": "res://assets/combat_test/07b_penitent_ascetic/penitent_ascetic_VFX.png",
+        "attackStyleOverride": "",
+        "laserMuzzle": [
+          0,
+          0
+        ],
+        "laserPalmWidth": 70
+      },
+      "shadow": {
+        "enabled": true,
+        "size": [
+          32,
+          9
+        ],
+        "offset": [
+          0,
+          2
+        ],
+        "opacity": 0.7
+      },
+      "motion": {
+        "speed": 2300,
+        "reach": 86,
+        "windup": 0.045,
+        "recovery": 0.12
+      },
+      "effects": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "frameAnchors": {
+        "idle:0": [
+          655,
+          1251
+        ],
+        "move:0": [
+          450,
+          933
+        ],
+        "pierce:0": [
+          800,
+          1067
+        ]
+      },
+      "discoveredVfx": {
+        "texture": "res://assets/combat_test/07b_penitent_ascetic/penitent_ascetic_VFX.png",
+        "source": "assets/combat_test/07b_penitent_ascetic/penitent_ascetic_VFX.png",
+        "status": "pending-calibration",
+        "note": "自动发现；仅作为待校准素材，未切图或绑定挂件"
+      },
+      "targetEnemyIds": []
+    },
+    "rogue_drone": {
+      "visual": {
+        "id": "rogue_drone",
+        "label": "失控配送蜂",
+        "sourceFacing": "left",
+        "targetRect": [
+          -65,
+          -145,
+          130,
+          155
+        ],
+        "poses": {
+          "idle": {
+            "texture": "res://assets/combat_test/08b_rogue_drone/rogue_drone_idle.png",
+            "anchor": [
+              781,
+              907
+            ],
+            "scale": 0.171990171990172
+          }
+        },
+        "hitEffectTexture": "res://assets/combat_test/08b_rogue_drone/rogue_drone_VFX.png",
+        "attackStyleOverride": "",
+        "laserMuzzle": [
+          0,
+          0
+        ],
+        "laserPalmWidth": 70
+      },
+      "shadow": {
+        "enabled": true,
+        "size": [
+          32,
+          9
+        ],
+        "offset": [
+          0,
+          2
+        ],
+        "opacity": 0.7
+      },
+      "motion": {
+        "speed": 2300,
+        "reach": 86,
+        "windup": 0.045,
+        "recovery": 0.12
+      },
+      "effects": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "frameAnchors": {
+        "idle:0": [
+          781,
+          2500
+        ],
+        "move:0": [
+          774,
+          2500
+        ],
+        "pierce:0": [
+          773,
+          2500
+        ],
+        "damaged:0": [
+          779.5,
+          2500
+        ]
+      },
+      "discoveredVfx": {
+        "texture": "res://assets/combat_test/08b_rogue_drone/rogue_drone_VFX.png",
+        "source": "assets/combat_test/08b_rogue_drone/rogue_drone_VFX.png",
+        "status": "pending-calibration",
+        "note": "自动发现；仅作为待校准素材，未切图或绑定挂件"
+      },
+      "targetEnemyIds": []
+    },
+    "pruning_hound": {
+      "visual": {
+        "id": "pruning_hound",
+        "label": "修枝猎犬",
+        "sourceFacing": "left",
+        "targetRect": [
+          -65,
+          -145,
+          130,
+          155
+        ],
+        "poses": {
+          "idle": {
+            "texture": "res://assets/combat_test/10a_pruning_hound/pruning_hound_idle.png",
+            "anchor": [
+              765,
+              969
+            ],
+            "scale": 0.17676767676767677
+          }
+        },
+        "hitEffectTexture": "res://assets/combat_test/10a_pruning_hound/pruning_hound_VFX.png",
+        "attackStyleOverride": "",
+        "laserMuzzle": [
+          0,
+          0
+        ],
+        "laserPalmWidth": 70
+      },
+      "shadow": {
+        "enabled": true,
+        "size": [
+          32,
+          9
+        ],
+        "offset": [
+          0,
+          2
+        ],
+        "opacity": 0.7
+      },
+      "motion": {
+        "speed": 2300,
+        "reach": 86,
+        "windup": 0.045,
+        "recovery": 0.12
+      },
+      "effects": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "frameAnchors": {
+        "idle:0": [
+          960,
+          915
+        ],
+        "move:0": [
+          895,
+          961
+        ],
+        "pierce:0": [
+          863,
+          1300
+        ],
+        "damaged:0": [
+          883,
+          902
+        ]
+      },
+      "discoveredVfx": {
+        "texture": "res://assets/combat_test/10a_pruning_hound/pruning_hound_VFX.png",
+        "source": "assets/combat_test/10a_pruning_hound/pruning_hound_VFX.png",
+        "status": "pending-calibration",
+        "note": "自动发现；仅作为待校准素材，未切图或绑定挂件"
+      },
+      "targetEnemyIds": []
+    },
+    "powerline_repairman": {
+      "visual": {
+        "id": "powerline_repairman",
+        "label": "输电抢修工",
+        "sourceFacing": "left",
+        "targetRect": [
+          -65,
+          -145,
+          130,
+          155
+        ],
+        "poses": {
+          "idle": {
+            "texture": "res://assets/combat_test/11a_powerline_repairman/powerline_repairman_idle.png",
+            "anchor": [
+              658.5,
+              1285
+            ],
+            "scale": 0.11382113821138211
+          }
+        },
+        "hitEffectTexture": "res://assets/combat_test/11a_powerline_repairman/powerline_repairman_VFX.png",
+        "attackStyleOverride": "",
+        "laserMuzzle": [
+          0,
+          0
+        ],
+        "laserPalmWidth": 70
+      },
+      "shadow": {
+        "enabled": true,
+        "size": [
+          32,
+          9
+        ],
+        "offset": [
+          0,
+          2
+        ],
+        "opacity": 0.7
+      },
+      "motion": {
+        "speed": 2300,
+        "reach": 86,
+        "windup": 0.045,
+        "recovery": 0.12
+      },
+      "effects": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "frameAnchors": {
+        "move:0": [
+          743,
+          1240
+        ],
+        "pierce:0": [
+          800,
+          1150
+        ],
+        "damaged:0": [
+          850,
+          1200
+        ]
+      },
+      "discoveredVfx": {
+        "texture": "res://assets/combat_test/11a_powerline_repairman/powerline_repairman_VFX.png",
+        "source": "assets/combat_test/11a_powerline_repairman/powerline_repairman_VFX.png",
+        "status": "pending-calibration",
+        "note": "自动发现；仅作为待校准素材，未切图或绑定挂件"
+      },
+      "targetEnemyIds": []
+    },
+    "beacon_jellyfish": {
+      "visual": {
+        "id": "beacon_jellyfish",
+        "label": "信标水母",
+        "sourceFacing": "left",
+        "targetRect": [
+          -65,
+          -145,
+          130,
+          155
+        ],
+        "poses": {
+          "idle": {
+            "texture": "res://assets/combat_test/13b_beacon_jellyfish/beacon_jellyfish_idle.png",
+            "anchor": [
+              634.5,
+              1192
+            ],
+            "scale": 0.1285583103764922
+          }
+        },
+        "hitEffectTexture": "res://assets/combat_test/13b_beacon_jellyfish/beacon_jellyfish_VFX.png",
+        "attackStyleOverride": "",
+        "laserMuzzle": [
+          0,
+          0
+        ],
+        "laserPalmWidth": 70
+      },
+      "shadow": {
+        "enabled": true,
+        "size": [
+          32,
+          9
+        ],
+        "offset": [
+          0,
+          2
+        ],
+        "opacity": 0.7
+      },
+      "motion": {
+        "speed": 2300,
+        "reach": 86,
+        "windup": 0.045,
+        "recovery": 0.12
+      },
+      "effects": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "frameAnchors": {
+        "idle:0": [
+          634.5,
+          1500
+        ],
+        "move:0": [
+          637.5,
+          1500
+        ],
+        "pierce:0": [
+          797.5,
+          1500
+        ],
+        "damaged:0": [
+          633,
+          1500
+        ]
+      },
+      "discoveredVfx": {
+        "texture": "res://assets/combat_test/13b_beacon_jellyfish/beacon_jellyfish_VFX.png",
+        "source": "assets/combat_test/13b_beacon_jellyfish/beacon_jellyfish_VFX.png",
+        "status": "pending-calibration",
+        "note": "自动发现；仅作为待校准素材，未切图或绑定挂件"
+      },
+      "targetEnemyIds": []
+    },
+    "mirror_inspector": {
+      "visual": {
+        "id": "mirror_inspector",
+        "label": "镜面监察员",
+        "sourceFacing": "left",
+        "targetRect": [
+          -65,
+          -145,
+          130,
+          155
+        ],
+        "poses": {},
+        "hitEffectTexture": "res://assets/combat_test/09a_mirror_inspector/mirror_inspector_VFX.png",
+        "attackStyleOverride": "shoot",
+        "laserMuzzle": [
+          0,
+          0
+        ],
+        "laserPalmWidth": 70
+      },
+      "shadow": {
+        "enabled": true,
+        "size": [
+          32,
+          9
+        ],
+        "offset": [
+          0,
+          2
+        ],
+        "opacity": 0.7
+      },
+      "motion": {
+        "speed": 2300,
+        "reach": 86,
+        "windup": 0.045,
+        "recovery": 0.12
+      },
+      "effects": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "frameAnchors": {},
+      "discoveredVfx": {
+        "texture": "res://assets/combat_test/09a_mirror_inspector/mirror_inspector_VFX.png",
+        "source": "assets/combat_test/09a_mirror_inspector/mirror_inspector_VFX.png",
+        "status": "pending-calibration",
+        "note": "自动发现；仅作为待校准素材，未切图或绑定挂件"
+      },
+      "attacks": {
+        "shoot": {
+          "type": "shoot",
+          "movement": "stationary",
+          "windupPose": "idle",
+          "strikePose": "shoot",
+          "recoveryPose": "idle",
+          "windup": 0.1,
+          "impactDelay": 0,
+          "recovery": 0.12,
+          "flightTime": 0.25,
+          "muzzle": [
+            0,
+            0
+          ],
+          "contact": [
+            0,
+            -62
+          ],
+          "muzzleTexture": "",
+          "projectileTexture": "",
+          "impactTexture": ""
+        }
+      },
+      "targetEnemyIds": [],
+      "attackStyleManual": true
+    }
+  }
+}

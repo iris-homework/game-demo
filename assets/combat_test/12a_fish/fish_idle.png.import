@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cl5kdfew2pgpd"
-path="res://.godot/imported/fish_idle.png-799e5990dd3c82779575132bb95078b8.ctex"
+path="res://.godot/imported/fish_idle.png-3c3b917aa7751db385be3ae69e7ff90e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/combat_test/fish/fish_idle.png"
-dest_files=["res://.godot/imported/fish_idle.png-799e5990dd3c82779575132bb95078b8.ctex"]
+source_file="res://assets/combat_test/12a_fish/fish_idle.png"
+dest_files=["res://.godot/imported/fish_idle.png-3c3b917aa7751db385be3ae69e7ff90e.ctex"]
 
 [params]
 

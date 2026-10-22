@@ -1,0 +1,27 @@
+Asset: penitent_ascetic_VFX.png
+Date: 2026-10-22 (Asia/Shanghai)
+Generator: built-in image_gen; transparent_background=true.
+Reference: penitent_ascetic_attack.png (weapon material and attack geometry).
+Selected source: exec-e1acc408-f4d0-45e9-a8fa-68a8e6184072.png (refined second generation).
+Delivery: one independent static attack VFX overlay; not a frame sequence or runtime integration.
+
+Exact initial generation prompt:
+Use case: stylized-concept.
+Asset type: ONE independent combat VFX overlay PNG for a 2D anime cyberpunk game, not a character sprite.
+Reference image: the supplied Penitent Ascetic ATTACK sprite. Use it only to match the exact weapon material and palette: the chipped old-white ceramic prosthetic hand, dark steel chain and muted dark-plum cloth-like motion energy. Do not include the woman, her body, face, clothing or a full arm. The VFX must work when overlaid on that attack animation.
+Primary effect: heavy slow chain-flail inertia, composed as a single diagonal downward blow from upper RIGHT to impact at lower LEFT. Show the large hollow ceramic mechanical HAND flail head near the lower-left landing area, palm/fingers pressed into the implied floor. Behind and above the hand, a broad sweeping motion arc travels back towards the upper right, composed of TWO thick, clean, separated ribbons: one desaturated dark plum and one pale aged bone-white, both with tapered ends and rough graphic edges. The arc communicates a large heavy weapon being dragged through the swing. Keep the art direction angular and crisp, consistent with dark cel-outlined anime combat effects.
+Chain and highlights: a short dark steel chain section leads into the frame from the upper right and connects continuously to the hollow hand. The chain itself stays mostly dark charcoal steel with restrained muted cool highlights on only TWO OR THREE individual links. Do NOT make every chain link glow; no neon chain, no self-luminous rope.
+Impact: at the lower-left blunt landing point, make a compact clustered WHITE-PALE-YELLOW blunt impact flash with FOUR broad directional pressure spikes or petals (not a generic star or magic explosion). Add only TWO or THREE small grey-white angular ceramic shard lights lifted around the point, and TWO narrow low grey-white dust arcs sweeping outward to the left and right, flattened close to the ground. No central crater, wall, or floor plane.
+Palette: deep desaturated plum, aged ivory bone-white, charcoal steel, tiny warm pale-yellow flash; low saturation and heavy visual weight. No magenta neon, blue laser, fire, lightning or sparks raining everywhere.
+Composition: horizontal landscape canvas. Main chain enters from the upper-right edge; hand impact sits toward lower-left; motion arc bridges them as one clear readable diagonal. Surround every effect with generous fully transparent negative space, with no clipping of the main hand, chain end, impact petals or shards.
+Background: genuine transparent alpha everywhere. No black or white background, no painted checkerboard, no ground, cast shadow, haze, faint aura, gradient rectangle, smoke cloud, text, UI, watermark or frame.
+Constraints: effects only, exactly one ceramic hand and one continuous chain segment, no person, no severed human flesh, no gore, no extra limb, no multiple identical hands, no attack sequence strip. Keep it a single finished key effect emphasizing mass, slowness and concentration.
+
+Exact refinement prompt (selected):
+Use case: precise-object-edit.
+Edit the supplied Penitent Ascetic heavy-chain VFX PNG. Preserve the same overall diagonal composition, the large chipped aged-white ceramic hollow mechanical hand, the continuous dark steel chain entering at upper right, and the lower-left blunt impact position.
+Simplify the weapon motion trail aggressively: replace the current many thin feathered shards and comb-like fragments with TWO broad, clean, continuous tapered ribbons only: one deep desaturated dark plum, one aged bone-white. They should read as the wide swept wake of a heavy, slow chain-flail, with smooth sharp-edged graphic contour and roughly 35% less visual noise. Remove excess loose thin splinters around the upper arc. Keep the arc behind the hand.
+Reduce chain brightness: most of the chain must remain dark charcoal steel with broad unlit surfaces; apply subtle cool grey-white highlights to ONLY TWO OR THREE individual links in total, no gold-tinted shine and no illumination on every link.
+Refine the collision: keep a compact warm white/pale-yellow blunt impact at the ceramic hand contact point with FOUR broad pressure wedges spreading up, left, right and down. Retain only TWO OR THREE clearly visible grey-white ceramic angular shard fragments in the air. Keep TWO low narrow dust arcs sweeping left and right close to the implied floor. Remove the extra explosion needles, many small chips, circular fireball and scattered debris.
+Maintain the same exact hand design, chain style, palette, dark contour and crisp anime-game illustration finish. One continuous action keyframe.
+Background: genuine transparent alpha; no floor, background, checkerboard, shadow, haze, aura, glow rectangle, text, border or watermark. Preserve transparent margins and keep all effect extremities inside the canvas.

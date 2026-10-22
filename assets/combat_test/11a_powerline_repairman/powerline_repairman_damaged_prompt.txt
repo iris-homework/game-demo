@@ -1,0 +1,27 @@
+Intended output: powerline_repairman_damaged.png
+Prepared: 2026-10-22 (Asia/Shanghai)
+Tool: built-in image_gen
+Status: generated and refined.
+Edit target: assets/combat_test/11a_powerline_repairman/powerline_repairman_idle.png
+Final source: C:/Users/22141/.codex/generated_images/01a15a90-c4f3-7ab2-9a5a-a1de9bfc48aa/exec-7a40f646-701b-40c4-ba49-05eb2c95004a.png
+
+Actual requested prompt:
+Use case: identity-preserve
+Asset type: single full-body transparent PNG damaged/hit-reaction key pose for the 2D anime cyberpunk battle enemy 11A 输电抢修工.
+Edit target: assets/combat_test/11a_powerline_repairman/powerline_repairman_idle.png. Preserve the SAME character and design: adult male, compact heavy body with enlarged helmet, lowered dark arc-flash visor, broad square insulating shoulder pads, dirty ash-gray protective suit, exactly TWO faded mustard-yellow warning strips on the upper sleeves, thick gauntlets, one short belt grounding cable with clamp, very heavy work boots with layered soles, and the same single straight operating pole with an open U-shaped metal head. Preserve the dark outlines, angular cel shading, muted gray/brown palette, screen-left three-quarter facing direction, and sprite scale.
+Primary request: create a fused post-hit reaction that leads naturally into defeat. The character has just taken one heavy blow against the broad screen-left shoulder pad: the thick pad compresses and absorbs the impact, the helmet and upper body snap back, while both feet shift backward half a step with weight landing on the rear boot. Keep the feet grounded after the step and the body sinking under its own weight.
+Defeat transition in the same single pose: the pole is slipping from both weakened gloved hands and falling diagonally toward the ground, with the open U-shaped head unmistakable and not intersecting the helmet. One boot remains planted while the other slides back. The character bows forward after the recoil, one gauntlet braced against a knee, the other hand reaching up to the helmet to begin lifting the visor. The lifted visor should reveal only a restrained, exhausted adult male face in shadow, enough to show he has been overpowered, not a new stylized hero portrait.
+Motion character: heavy, exhausted, wounded and off balance; one clearly readable key pose, not a sequence and not a combat attack. No exaggerated jump, no running, no gore.
+Composition: ONE character only, whole helmet, torso, both boots, one knee brace, both hands, entire falling pole and both pole ends in frame with clean transparent margin. Keep the character roughly the same scale as the idle target.
+Background: genuinely transparent alpha with clean isolated cutout. No floor, contact shadow, dust, speed lines, motion blur, scenery, gradient, electrical effects or glow.
+Constraints: exactly one pole and one open U head; exactly two yellow sleeve strips; preserve protective-suit identity and heavy body proportions; no extra limbs, tools, weapons, shields, armor pieces, characters, text, logos, UI, border or watermark.
+
+Refinement requested prompt:
+Use case: identity-preserve
+Asset type: single full-body transparent PNG damaged/defeat-transition key pose for 11A 输电抢修工.
+Edit target: preserve this exact generated character, helmet, exposed tired adult male face, lowered arc-flash visor in his hand, dirty ash-gray insulated suit, exactly TWO faded yellow sleeve warning strips, belt grounding cable, heavy layered boots, compact heavy proportions, faceted cel shading, bold dark outlines, and the single fallen operating pole with one clearly open U-shaped metal head.
+Change ONLY these two pose details: (1) place the empty right gloved hand clearly and firmly on the bent near knee, fingers braced on the kneepad so the "扶膝" support is unmistakable; (2) make the screen-left square shoulder pad visibly compressed and hunched from absorbing the blow, with the upper torso shifted backward half a step and the whole body off balance while still grounded. Keep the left hand lifting the visor from the face. The pole remains completely lost from both hands, lying diagonally on the ground side, U head complete.
+Do not redesign the face, clothing, helmet, equipment, proportions, camera angle or art style. Keep the same rough scale and full silhouette.
+Composition: ONE character, whole helmet and visor hand, both boots, one hand on knee, entire pole and both pole ends in frame with clean transparent margin.
+Background: genuinely transparent alpha. No floor plane, cast shadow, dust cloud, scenery, motion lines, glow, text, logos, UI or border.
+Constraints: exactly one pole and one open U head, exactly two yellow strips, no extra limbs or tools, no gore, no extra armor pieces.

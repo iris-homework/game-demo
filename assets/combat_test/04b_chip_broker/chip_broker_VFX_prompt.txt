@@ -1,0 +1,25 @@
+Built-in imagegen. 2026-10-22 Asia/Shanghai. Regenerated version.
+Output: chip_broker_VFX.png
+Reference 1: chip_broker_idle.png (chip design).
+Reference 2: previous chip_broker_VFX.png (composition).
+
+Actual regeneration prompt (verbatim):
+Use case: stylized-concept. Create one standalone transparent PNG attack VFX for the Chip Broker.
+Reference 1 is the character idle sprite: use ONLY the shape, deep-purple inset center and silver beveled razor edge of the small casino chips in her hands, and its crisp black contours / faceted cel-shading style. Do not draw the character or hands.
+Reference 2 is the previous projectile VFX: use it as the composition reference for a leftward-flying chip and fading chip silhouettes. Generate a fresh polished variant with a thinner disc and a more compact, progressively fading ghost trail.
+Output: ONE spinning silver-edged purple casino chip moving horizontally toward SCREEN LEFT. Solid leading chip at the left, oblique elliptical face and thin sharpened rim, simple inset diamond motif, readable restrained metal highlights. Behind it to the right, THREE overlapping afterimages of the SAME chip, successive approximately 50%, 25%, 10% alpha. Ghost positions trace one clean slightly curved near-horizontal trajectory and show subtly changing spin angles. These are translucent time echoes of one projectile; keep similar sizes, overlapping silhouettes and consistent design, not four independently flying discs. A few fine pale silver/lavender tapered streaks trail to the right and fade smoothly into true alpha. No thick beam or solid ribbon.
+Match the game's 2D anime cel-shaded angular linework, muted dark violet/charcoal/silver palette. Emphasize a light, fast razor-chip toss, compact and clean for combat-scale readability.
+Wide horizontal image, all chips and trailing streaks completely inside the canvas, ample transparent padding all around. True transparent RGBA background including partially transparent afterimages. Only the projectile and its motion echoes: NO person, hand, arm, victim, environment, floor, ground shadow, text, numbers, logos, watermark, magic circle, explosion, particles, flame, neon aura, pink/red/cyan emission, checkerboard or painted backdrop. ONE effect, not a sprite sheet or multiple options.
+
+Previous generation record:
+Built-in imagegen. 2026-10-22 Asia/Shanghai.
+Output: chip_broker_VFX.png
+Reference: user-attached Chip Broker idle image, held chip design only.
+
+Actual prompt (verbatim):
+Use case: stylized-concept. Asset: standalone transparent 2D game projectile VFX sprite, razor-edged casino chip in flight with fading chip afterimages.
+The reference image is ONLY a design and drawing-style reference for the small chips the woman holds. DO NOT depict the woman, any body parts, hands, character silhouette, clothes or environment. Output ONLY the flying chip effect.
+Subject: one spinning thin round metallic casino chip traveling horizontally toward SCREEN LEFT, silver bevel and dark violet inset center, simple subtle angular inset motif matching the held chips in the reference. Three-quarter oblique elliptical perspective shows the dark purple face and very thin razor silver edge. The leading solid chip is at the LEFT end of the effect, sharply drawn with crisp dark contour and faceted metal highlights. Behind it toward screen RIGHT is a short chain of THREE increasingly translucent chip-shaped afterimages, becoming progressively fainter and a little farther apart toward the trailing end, subtly changing disc tilt to suggest rapid spin. The ghosts must visibly be repeated silhouettes of the SAME circular chip, not extra separate weapons or random shards. Add only a few extremely fine silver-violet tapered linear streaks connecting the motion, trailing and fading to transparent at screen right. This reads as a single chip's rapid movement, not a fan of independent chips.
+Style: match reference's Japanese 2D cel-shaded angular graphic illustration, restrained deep purple and dark silver, sharp pale silver rim highlights. Keep silhouettes clean and simple enough to read when scaled down for combat. Real alpha fading on the afterimages. No massive neon glow, no red/pink/cyan, no fire, no lightning, no spark explosion, no impact slash, no smoke cloud, no thick energy beam, no ornamental magic circle, no symbols resembling text, no numeric casino values.
+Composition: one continuous compact horizontal VFX element centered on a wide transparent canvas, roughly 3:1 width-to-height visual footprint, plenty of completely transparent safety padding around all edges. No floor or ground shadow. TRUE transparent RGBA background, no painted black/white/checkerboard backing. No text, labels, frame, sprite sheet or multiple disconnected variants. One finished standalone projectile-and-afterimage PNG suitable to overlay on a Godot battle scene.
+

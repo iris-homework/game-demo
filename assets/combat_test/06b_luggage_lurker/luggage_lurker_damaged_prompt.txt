@@ -1,0 +1,20 @@
+Luggage Lurker damaged sprite
+Date: 2026-10-22 (Asia/Shanghai)
+Tool: built-in image_gen
+Reference: C:/Users/22141/AppData/Local/Temp/codex-clipboard-406e956f-fbd9-4b17-bc85-6770fc466263.png
+Output: assets/combat_test/06b_luggage_lurker/luggage_lurker_damaged.png
+Source: C:/Users/22141/.codex/generated_images/01a15a50-b11a-7540-869a-a8adee9ab319/exec-7a5cd50d-8796-4fb3-a506-b53aeab63fa5.png
+SHA256: 30D95751462BF638B1DFB1C94471302880F69BE025EABE6E4509D62DFDA9229A
+Validation: 1536x1024 RGBA PNG; four corners alpha 0; 675735 fully transparent pixels; alpha>=128 bounds (49,55)-(1510,957).
+Single static damage pose: tilted case, raised wheels, retracted supports, popped latches and visible motors. No loot.
+Not a continuous animation or runtime integration. A faint translucent exterior halo remains.
+
+Prompt (verbatim):
+Use case: precise-object-edit / 2D game damaged key pose.
+Use the input as the exact character identity, construction, proportions and painting style reference. Create ONE damaged PNG sprite of the SAME Luggage Lurker suitcase robot. Preserve its battered deep-brown hard shell, chipped gray metal corner guards with cream highlights, dark bands, worn cream/teal/ochre travel stickers at consistent relative positions, mechanical latches, small wheels, low folded back handle and single rectangular orange indicator. Match the angular hard-edged hand-painted cel shading and bold near-black outlines. Do not redesign it.
+
+Damage pose: the heavy box has been knocked onto one SIDE, clearly unbalanced and tilted about 40 degrees away from its normal stance. One armored lower side/corner supports the fallen body, and the opposite edge is lifted. Show the underside at an oblique angle so two wheels are visibly raised in the air, free to spin; communicate the freewheel with exposed off-angle hubs, not blur or motion effects. All four flat mechanical support legs have collapsed/retracted flush into the underside recesses rather than standing normally or being torn off. Buckles have popped OPEN but remain attached to the suitcase; the lid is skewed ajar by roughly 15-25 degrees from impact, revealing a compact industrial electric motor, cylindrical housing, shaft, gears and a few insulated wires inside. The interior is mechanical machinery, never treasure or stolen valuables. The orange indicator is very dim, suggesting a stunned or failing machine. Keep the suitcase silhouette intact and recognizable, with a few fresh dents and scuffs but no destruction into scattered pieces. No attack stance and no wide hungry mouth.
+Face generally screen-left in the same three-quarter side battle view as the reference, with perspective changed only as necessary to show the sideways fall. Clear readable damage silhouette, one coherent physical instant, entire character visible inside the canvas, ample transparent margin around every extremity.
+Background: genuine fully transparent alpha outside the subject, also within gaps. NO black backdrop, floor, contact shadow, halo, fog, background gradient or checkerboard painted in.
+No organic parts, teeth, tongue, eyeballs, blood, coins, jewelry, clothing spill, rewards, sparks, smoke, electric effects, floating debris, damage numbers, motion lines, text or watermark. No sprite sheet or duplicate poses. Deliver a single sharp finished transparent PNG damaged sprite for a 2D game.
+

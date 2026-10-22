@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cgldqtidd8bwx"
-path="res://.godot/imported/finn_blunt.webp-4a44db7c443f5e710830e319ea2d7198.ctex"
+path="res://.godot/imported/finn_blunt.webp-e16ada8a43ea48cc6405bcd4bc639ce2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/combat_test/finn/finn_blunt.webp"
-dest_files=["res://.godot/imported/finn_blunt.webp-4a44db7c443f5e710830e319ea2d7198.ctex"]
+source_file="res://assets/combat_test/Finn/finn_blunt.webp"
+dest_files=["res://.godot/imported/finn_blunt.webp-e16ada8a43ea48cc6405bcd4bc639ce2.ctex"]
 
 [params]
 

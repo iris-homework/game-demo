@@ -1,0 +1,20 @@
+{
+  "repository": "https://github.com/sparklecatta-lang/XSXB-Frame-Tuner",
+  "commit": "cb061e15132b9250feebd34a18a3fd023197837c",
+  "license": "MIT",
+  "localChanges": [
+    "isolated authoring roots and explicit publication",
+    "read-only game asset routing",
+    "per-frame foot anchors and embedded selection bridge",
+    "Midnight Chinese calibration and battle integration",
+    "disabled upstream updater and pets discovery",
+    "removed batch launchers and nested Git metadata",
+    "vendored MIT trail renderer and shader adapted for PoseActor",
+    "white canvas with same-depth published Noren stencil and live shadows",
+    "read-only idle-action-idle presentation for single-frame actions",
+    "incremental discovery of named combat PNGs without replacing authored values",
+    "asset-folder character labels in the local editor and test workbenches",
+    "direct numeric entry for transform controls with validation and cancel",
+    "opt-in runtime mipmap sampling for large character textures in the formal workbench"
+  ]
+}

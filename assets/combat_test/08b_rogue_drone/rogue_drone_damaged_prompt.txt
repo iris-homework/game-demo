@@ -1,0 +1,30 @@
+08B 失控配送蜂受击融合素材
+日期：2026-10-22
+方式：内置 imagegen，transparent_background=true。
+参考：C:/Users/22141/AppData/Local/Temp/codex-clipboard-bd2aceff-9086-4b7d-a6d2-e63a2a5bdb8c.png
+输出：assets/combat_test/08b_rogue_drone/rogue_drone_damaged.png
+初稿：C:/Users/22141/.codex/generated_images/01a1624e-f8f3-7522-95e7-7f03cd473407/exec-1adfaa3f-11b7-4960-8a4f-fb1a71375c1b.png
+最终原图：C:/Users/22141/.codex/generated_images/01a1624e-f8f3-7522-95e7-7f03cd473407/exec-be30b5ce-e9c5-44ea-aa49-3fd02430205c.png
+表现：右侧风扇护罩破裂、叶片变形停转并下垂，机身失衡下沉，货箱歪斜但锁闭，
+双爪松垂。修订移除初稿多出的第三只夹爪，保持原设计两只。
+验证：1536×1024 RGBA；四角 alpha=0；alpha≥128 的主体边界
+(77,73)—(1481,991)，主体未触边；外围仍有淡半透明光晕。
+目标文件与生成原图 SHA256 一致：
+C9AE141ACFA4F3951B5B429F5866B8477E8A48593F2F9666F10846E4643B30EC
+仅交付静态受击／停机衔接姿态，未制作连续落地动画或接入运行时，未运行游戏测试。
+
+第一次实际提示词：
+Use case: precise-object-edit
+Asset type: ONE static transparent damaged / shutdown transition sprite for existing 2D cyberpunk RPG enemy 08B rogue delivery drone.
+Input image: exact character identity, materials, proportions and drawing-style reference. Create the SAME machine in a NEW damaged pose.
+Primary request: fuse hit recoil and gentle emergency landing into one clear key pose. ONE side lifting fan has stalled: the viewer-right near fan droops markedly lower, its ring slightly dented and its blades stopped at irregular angles, with one or two mildly bent blades still inside the guard. The opposite viewer-left fan remains higher and intact, trying to stabilize. Roll the entire central fuselage toward the failed fan by roughly 20 degrees, so asymmetrical lift failure is immediately readable. The closed cargo box beneath swings sideways from inertia, hanging crooked at a slightly different angle from the fuselage, still attached by its original mounts. It is tilted down toward the low side, with its lower bumper corner close to landing height. The whole machine sags toward the ground in a controlled failing descent, not exploding or crashing apart. Its short mechanical sorting claws hang loose and partly folded, one tip slightly reaching down as a landing brace, not attacking. Make the pose visibly different from idle and attack.
+Identity invariants: exactly TWO large circular ducted lifting fans flanking the same narrow blue-gray fuselage; retain the original short tail fin, graphite frame, magenta cables, worn cool teal-gray / logistics blue armor and old ivory protective rails, angular scuffs and scratches, original ONE shallow rectangular SEALED cargo case with its center lock visibly closed. NO opening lid, spilling contents, detached cargo, extra containers or limbs. The left-facing yellow addressing lamp stays identifiable but is dimmer, a small subdued amber glow. No new red lights. Keep all components attached and recognizable.
+Style: match reference's thick near-black dark-plum outlines, hand-painted angular cel shading, crisp faceted highlights, worn industrial panels, muted blue-gray and ivory palette. This is the same illustrated anime cyberpunk game sprite, not a photorealistic machine or a 3D render.
+Composition: three-quarter front-left view, still facing LEFT. Landscape approximately 1536x1024. ONE complete machine centered with 5 percent transparent margins on all sides. Show both fans, cargo corners and grippers completely, no cropping. Convey low emergency-landing posture through the sagging silhouette and low corner, without drawing ground or scenery.
+Background: actual TRANSPARENT alpha, clean cutout. Do not copy the dark reference backdrop or ambient halo. No floor, ground plane, drop shadow, smoke cloud, explosion, sparks, motion trails, impact FX, text, arrows, UI, watermark, multiple frames or sprite sheet. Only the drone and its small subdued lamp glow.
+
+局部修订实际提示词：
+Use case: precise-object-edit.
+Edit target: the supplied damaged rogue delivery drone image. Make ONLY one small mechanical cleanup: it currently has THREE lower gripper claws, but this machine must have exactly TWO as in its original design. REMOVE the extra far viewer-left gripper, the one dangling at the leftmost bottom corner of the cargo (roughly x=280..410, y=740..880 in this 1536x1024 image), including its short connecting arm, restore the clean contour of the closed box at that spot, and make the removed area genuinely transparent. KEEP the middle claw directly beneath the front center cargo latch AND the rightmost claw beneath the low right cargo corner. Exactly TWO remaining grippers, no other limbs.
+Preserve absolutely everything else: same damaged pose, viewer-right fan drooping with cracked guard and bent stalled blades, intact raised viewer-left fan, tilted closed cargo and locked latch, sagging fuselage, tail fin, yellow lamp, magenta cables, cool teal-gray panels and ivory rails, thick dark-plum outlines and cel shading. No redesign, no new damage, no new objects. Preserve full-body landscape framing and genuine transparent alpha background. Do not add background, shadows, glow cloud, text or effects.
+

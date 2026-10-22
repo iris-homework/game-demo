@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dxt77yetytkid"
-path="res://.godot/imported/gang_henchman_idle.png-1d016c9b547f89c6cc3c106afb2ee11e.ctex"
+path="res://.godot/imported/gang_henchman_idle.png-08700680a134c2d25a688ab66fd66696.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/combat_test/gang_henchman/gang_henchman_idle.png"
-dest_files=["res://.godot/imported/gang_henchman_idle.png-1d016c9b547f89c6cc3c106afb2ee11e.ctex"]
+source_file="res://assets/combat_test/03a_gang_henchman/gang_henchman_idle.png"
+dest_files=["res://.godot/imported/gang_henchman_idle.png-08700680a134c2d25a688ab66fd66696.ctex"]
 
 [params]
 

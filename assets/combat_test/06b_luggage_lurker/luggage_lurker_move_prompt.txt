@@ -1,0 +1,20 @@
+Luggage Lurker move sprite
+Date: 2026-10-22 (Asia/Shanghai)
+Tool: built-in image_gen
+Reference: C:/Users/22141/AppData/Local/Temp/codex-clipboard-44afca33-b1d8-450f-9423-0366b40d542e.png
+Output: assets/combat_test/06b_luggage_lurker/luggage_lurker_move.png
+Source: C:/Users/22141/.codex/generated_images/01a15a50-b11a-7540-869a-a8adee9ab319/exec-d0e7f0c7-b157-4ed2-823c-0e8e4c0bbaf0.png
+SHA256: 527BAE6A3C5D697E901D753D16F542910EF29D2737E25A68F2B34ADF7DEE721D
+Validation: 1536x1024 RGBA PNG; four corners alpha 0; 788912 fully transparent pixels; alpha>=128 bounds (77,103)-(1487,915).
+Static move key pose only; not a continuous animation or runtime integration.
+The generated image retains a faint translucent exterior halo.
+
+Prompt (verbatim):
+Use case: precise-object-edit / game animation pose.
+Create ONE move-pose transparent PNG sprite of the EXACT Luggage Lurker suitcase robot in the supplied reference. The input is the identity, design and art-style reference. Preserve the deep brown worn hard shell, gray chipped metal corner guards, specific faded cream/teal/ochre station stickers and their relative locations on the panels, dark bands, buckles, single small orange rectangular indicator on the left, and the handle folded low across the back. Match its bold dark outlines, angular hand-painted cel-shaded planes and material colors precisely.
+
+Requested motion: a short rolling glide with all support legs retracted. Change the bottom assembly: fold ALL FOUR flat articulated mechanical legs completely INTO recesses beneath the suitcase. NO projecting wedge feet, NO walking or crawling legs. The luggage is supported ONLY by its small original rolling wheels. Make the wheels clearly visible, bearing weight under the compact low box, with wheel hubs rotated to suggest rolling. Keep the box close to the ground, giving it a slight forward pitch toward screen-left of about 4 degrees for a modest short slide, not a lunge or airborne jump. Keep the top lid almost closed with the same narrow seam. Keep the folded back handle retracted; no extended attack rod.
+Same left-facing three-quarter side battle view, same proportions and comparable framing as the supplied sprite. Whole subject fully visible, centered with clean transparent margins on every side. ONE single coherent pose, no sprite sheet, no duplicate figures.
+Genuine transparent alpha background. Remove the reference's exterior gray halo: no background, no floor, no cast shadow, no haze, no glow cloud, no checkerboard painted in. Keep the physical sprite sharp: no dust, speed lines, motion blur, trails, sparks, captions or watermark.
+No biological parts, no teeth or mouth, no extra lights or weapons. Deliver a finished 2D game move sprite, not an attack animation or design sheet.
+
