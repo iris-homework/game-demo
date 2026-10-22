@@ -272,7 +272,10 @@ func _notification(what: int) -> void:
 		_pointer_seen = false
 
 func _build_hud() -> void:
-	map_chrome("城市总览", show_weeks)
+	map_chrome("城市总览")
+	var deck_button := get_node("current_deck_button") as Button
+	var menu_button := get_node("menu_button") as Button
+	deck_button.position.x = menu_button.position.x - deck_button.size.x - 12.0
 
 # ------------------------------------------------------------------- 标记
 

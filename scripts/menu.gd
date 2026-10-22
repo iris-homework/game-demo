@@ -24,6 +24,7 @@ var scenery_dialog: Control
 var scenery_cancel: Button
 var scenery_button_states: Dictionary = {}
 var motion_button: Button
+var quit_button: Button
 var progress_summary: Label
 var confirm_dialog: Control
 var confirm_ok: Button
@@ -182,9 +183,11 @@ func close_scenery_picker() -> void:
 	training_scenery_button.refresh_feedback()
 
 func _build_bottom_right() -> void:
-	motion_button = _menu_button("motion_toggle", _motion_label(), Vector2(COLUMN_X, 828), Vector2(200, 44), _toggle_motion, false, 16)
+	motion_button = _menu_button("motion_toggle", _motion_label(), Vector2(COLUMN_X, 828), Vector2(165, 44), _toggle_motion, false, 16)
+	quit_button = _menu_button("quit_game", "退出游戏", Vector2(COLUMN_X + 185, 828), Vector2(165, 44), Game.request_quit, false, 16)
 	var version := str(ProjectSettings.get_setting("application/config/version", "0.2.6-r1"))
-	label(ui_layer, "v" + version, Vector2(COLUMN_X + 230, 838), Vector2(120, 24), 13, MUTED)
+	var version_label := label(ui_layer, "v" + version, Vector2(COLUMN_X, 878), Vector2(COLUMN_WIDTH, 18), 12, MUTED)
+	version_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 
 func _menu_button(node_name: String, text: String, pos: Vector2, dimensions: Vector2, action: Callable, accent: bool = false, font_size: int = 19, host: Node = null) -> Button:
 	var b := button(host if host != null else ui_layer, text, pos, dimensions, action, accent)
@@ -265,11 +268,11 @@ func _input(event: InputEvent) -> void:
 		return
 	if get_viewport().gui_get_focus_owner() != null: return
 	if is_instance_valid(confirm_dialog) and confirm_dialog.visible: return
-	if event.is_action_pressed("ui_focus_next"):
+	if event.is_action_pressed("ui_focus_next", false, true):
 		new_button.grab_focus() if continue_button.disabled else continue_button.grab_focus()
 		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("ui_focus_prev"):
-		motion_button.grab_focus()
+	elif event.is_action_pressed("ui_focus_prev", false, true):
+		quit_button.grab_focus()
 		get_viewport().set_input_as_handled()
 
 func _toggle_training() -> void:

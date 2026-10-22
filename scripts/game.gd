@@ -7,6 +7,8 @@ signal status_changed
 signal changed
 signal notice(message: String)
 signal current_deck_requested
+signal menu_requested
+signal quit_requested
 var assets: Dictionary
 var characters: Dictionary
 var player_characters: Dictionary
@@ -585,6 +587,18 @@ func load_game() -> bool:
 	last_error = "存档格式不兼容或已损坏，无法继续；可以开始新游戏。"
 	notice.emit(last_error)
 	return false
+
+## User navigation asks the main view to confirm before changing adventure state.
+func request_menu() -> void:
+	if transition_locked or battle_busy or page == "menu": return
+	if page in ["card_library", "cyberware"]:
+		menu()
+	else:
+		menu_requested.emit()
+
+func request_quit() -> void:
+	if transition_locked or battle_busy or page != "menu": return
+	quit_requested.emit()
 
 func menu() -> void:
 	if transition_locked or battle_busy: return
