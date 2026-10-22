@@ -22,6 +22,10 @@ var shown_page := ""
 var transition: ColorRect
 var transition_count := 0
 var deck_browser: Control
+var technology_browser: Control
+var technology_background_buttons: Array = []
+var technology_background_process_mode := Node.PROCESS_MODE_INHERIT
+var technology_previous_focus: Control
 var deck_background_buttons: Array = []
 var deck_background_process_mode := Node.PROCESS_MODE_INHERIT
 var deck_previous_focus: Control
@@ -36,6 +40,7 @@ func _ready() -> void:
 	Game.changed.connect(show_page)
 	Game.notice.connect(show_notice)
 	Game.current_deck_requested.connect(open_current_deck)
+	Game.technology_loadout_requested.connect(open_technology_loadout)
 	Game.menu_requested.connect(open_exit_confirmation.bind("menu"))
 	Game.quit_requested.connect(open_exit_confirmation.bind("quit"))
 	show_page()
@@ -47,6 +52,7 @@ func show_page() -> void:
 	else: swap_view()
 
 func swap_view() -> void:
+	if is_instance_valid(technology_browser): close_technology_loadout()
 	if is_instance_valid(exit_dialog): close_exit_confirmation()
 	if is_instance_valid(deck_browser): close_current_deck()
 	if is_instance_valid(card_console): close_card_console()
@@ -107,6 +113,11 @@ func _input(event: InputEvent) -> void:
 		elif event is InputEventKey and not (event.is_action("ui_accept") or event.is_action("ui_left") or event.is_action("ui_right") or event.is_action("ui_up") or event.is_action("ui_down")):
 			get_viewport().set_input_as_handled()
 		return
+	if is_instance_valid(technology_browser):
+		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+			get_viewport().set_input_as_handled()
+			close_technology_loadout()
+		return
 	if is_instance_valid(deck_browser):
 		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 			get_viewport().set_input_as_handled()
@@ -141,7 +152,7 @@ func _input(event: InputEvent) -> void:
 func open_exit_confirmation(action: String) -> void:
 	if action not in ["menu", "quit"] or Game.battle_busy or Game.transition_locked: return
 	if not is_instance_valid(view) or is_instance_valid(exit_dialog): return
-	if is_instance_valid(deck_browser) or is_instance_valid(card_console) or is_instance_valid(debug_panel): return
+	if is_instance_valid(technology_browser) or is_instance_valid(deck_browser) or is_instance_valid(card_console) or is_instance_valid(debug_panel): return
 	if "pile_overlay" in view and is_instance_valid(view.pile_overlay): return
 	if action == "quit":
 		if Game.page != "menu": return
@@ -277,7 +288,7 @@ func debug_change(kind: String, value: int) -> void:
 
 func open_card_console() -> void:
 	if is_instance_valid(exit_dialog): return
-	if is_instance_valid(card_console) or is_instance_valid(debug_panel) or is_instance_valid(deck_browser): return
+	if is_instance_valid(technology_browser) or is_instance_valid(card_console) or is_instance_valid(debug_panel) or is_instance_valid(deck_browser): return
 	if "pile_overlay" in view and is_instance_valid(view.pile_overlay): return
 	if view.has_method("cancel_selection"): view.cancel_selection()
 	view_process_mode = view.process_mode
@@ -308,7 +319,7 @@ func close_card_console() -> void:
 func open_current_deck() -> void:
 	if is_instance_valid(exit_dialog): return
 	if Game.state.is_empty() or Game.battle_busy or Game.transition_locked: return
-	if is_instance_valid(deck_browser) or is_instance_valid(card_console) or is_instance_valid(debug_panel): return
+	if is_instance_valid(technology_browser) or is_instance_valid(deck_browser) or is_instance_valid(card_console) or is_instance_valid(debug_panel): return
 	if "pile_overlay" in view and is_instance_valid(view.pile_overlay): return
 	var trigger := view.get_node_or_null("current_deck_button") as Button
 	if trigger == null or trigger.disabled: return
@@ -340,3 +351,36 @@ func close_current_deck() -> void:
 	deck_background_buttons.clear()
 	if is_instance_valid(deck_previous_focus): deck_previous_focus.grab_focus()
 	deck_previous_focus = null
+
+func open_technology_loadout() -> void:
+	if Game.page != "map" or Game.state.get("currentScene") != "map" or Game.training_mode or Game.battle_busy or Game.transition_locked: return
+	if is_instance_valid(technology_browser) or is_instance_valid(exit_dialog) or is_instance_valid(deck_browser) or is_instance_valid(card_console) or is_instance_valid(debug_panel): return
+	var trigger := view.get_node_or_null("technology_loadout_button") as Button
+	if trigger == null or trigger.disabled: return
+	technology_previous_focus = get_viewport().gui_get_focus_owner()
+	technology_background_process_mode = view.process_mode
+	view.process_mode = Node.PROCESS_MODE_DISABLED
+	technology_background_buttons.clear()
+	for node in view.find_children("*", "BaseButton", true, false):
+		technology_background_buttons.append([node,node.disabled,node.focus_mode])
+		node.release_focus()
+		node.disabled = true
+		node.focus_mode = Control.FOCUS_NONE
+	technology_browser = preload("res://scripts/technology_loadout.gd").new()
+	technology_browser.closed.connect(close_technology_loadout)
+	add_child(technology_browser)
+
+func close_technology_loadout() -> void:
+	if not is_instance_valid(technology_browser): return
+	get_viewport().gui_release_focus()
+	remove_child(technology_browser)
+	technology_browser.queue_free()
+	technology_browser = null
+	if is_instance_valid(view): view.process_mode = technology_background_process_mode
+	for item in technology_background_buttons:
+		if is_instance_valid(item[0]):
+			item[0].disabled = item[1]
+			item[0].focus_mode = item[2]
+	technology_background_buttons.clear()
+	if is_instance_valid(technology_previous_focus): technology_previous_focus.grab_focus()
+	technology_previous_focus = null

@@ -42,6 +42,7 @@
 | 范围 | 套件 |
 | --- | --- |
 | 战斗开局恢复 | [battle_restart_tests](battle_restart_tests.tscn) · [battle_restart_integration](battle_restart_integration.tscn) |
+| 地图科技配置与保存 | [technology_loadout_tests](technology_loadout_tests.tscn) |
 | 新科技效果 | [technology_effects_tests](technology_effects_tests.tscn) · [technology_effects_visual](technology_effects_visual.tscn) |
 | 固定卡面 | [fixed_card_face_tests](fixed_card_face_tests.tscn) · [fixed_card_face_visual](fixed_card_face_visual.tscn) |
 | 牌库筛选与退出确认 | [card_library_filters](card_library_filters.tscn) · [exit_confirmation_tests](exit_confirmation_tests.tscn) |

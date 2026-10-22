@@ -276,6 +276,8 @@ func _build_hud() -> void:
 	var deck_button := get_node("current_deck_button") as Button
 	var menu_button := get_node("menu_button") as Button
 	deck_button.position.x = menu_button.position.x - deck_button.size.x - 8.0
+	var technology_button := button(self,"科技配置",Vector2(deck_button.position.x-140,deck_button.position.y),Vector2(132,44),Game.open_technology_loadout)
+	technology_button.name = "technology_loadout_button"
 
 # ------------------------------------------------------------------- 标记
 

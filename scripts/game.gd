@@ -7,6 +7,7 @@ signal status_changed
 signal changed
 signal notice(message: String)
 signal current_deck_requested
+signal technology_loadout_requested
 signal menu_requested
 signal quit_requested
 var assets: Dictionary
@@ -92,13 +93,57 @@ func cyberware_definition(id: String) -> Dictionary:
 	return found
 
 func player_cyberware(player_id: String = "") -> Dictionary:
+	var use_loadout := player_id.is_empty()
 	if player_id.is_empty(): player_id = player_character_id()
 	if not valid_player_character(player_id): return {}
 	var rules: Dictionary = prototype_rules.cyberware.duplicate(true)
 	rules.cards = []
-	for id in player_characters[player_id].get("cyberwareIds", []):
+	for id in (equipped_cyberware_ids() if use_loadout else player_characters[player_id].get("cyberwareIds", [])):
 		rules.cards.append(cyberware_definition(id).duplicate(true))
 	return rules
+
+func equipped_cyberware_ids() -> Array:
+	return state.get("equippedCyberwareIds", player_definition().get("cyberwareIds", [])).duplicate()
+
+func owned_cyberware_ids() -> Array:
+	return state.get("ownedCyberwareIds", player_definition().get("cyberwareIds", [])).duplicate()
+
+func valid_owned_technologies(ids) -> bool:
+	if not ids is Array: return false
+	var seen := []
+	for id in ids:
+		if not id is String or id in seen: return false
+		var definition := cyberware_definition(id)
+		if definition.is_empty() or not CombatModel.valid_cyberware_definition(definition): return false
+		seen.append(id)
+	return true
+
+func valid_equipped_technologies(ids, owned) -> bool:
+	if not ids is Array or ids.size() > CombatModel.CYBERWARE_LIMIT or not valid_owned_technologies(owned): return false
+	var seen := []
+	for id in ids:
+		if not id is String or id in seen or not id in owned: return false
+		seen.append(id)
+	return true
+
+func valid_technology_loadout(ids, player_id: String) -> bool:
+	return valid_player_character(player_id) and valid_equipped_technologies(ids, player_characters[player_id].get("cyberwareIds", []))
+
+func open_technology_loadout() -> void:
+	if state.is_empty() or page != "map" or state.get("currentScene") != "map" or training_mode or transition_locked or battle_busy: return
+	technology_loadout_requested.emit()
+
+func set_technology_loadout(ids: Array, expected_revision: int) -> bool:
+	if state.is_empty() or page != "map" or state.get("currentScene") != "map" or training_mode or transition_locked or battle_busy or expected_revision != revision: return false
+	if not valid_equipped_technologies(ids, owned_cyberware_ids()): return false
+	var previous: Array = equipped_cyberware_ids()
+	state.equippedCyberwareIds = ids.duplicate()
+	if save_enabled and not save_game():
+		state.equippedCyberwareIds = previous
+		return false
+	revision += 1
+	status_changed.emit()
+	return true
 
 func valid_player_character(id) -> bool:
 	if not id is String or not player_characters.has(id) or not characters.has(id): return false
@@ -145,7 +190,7 @@ func initial_state(player_id: String = "") -> Dictionary:
 	if player_id.is_empty(): player_id = config.defaultPlayerCharacterId
 	if not valid_player_character(player_id): return {}
 	var hp := int(player_characters[player_id].attributes.maxHp)
-	return {"schemaVersion":2, "playerCharacterId":player_id, "currentWeek":1, "currentDay":int(config.initialDay), "currentHp":hp, "maxHp":hp, "combat":{}, "battleStart":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "dialogueHistory":[], "battleId":"", "result":"", "battleHistory":[], "deck":[], "battleReward":{}, "portraits":{"left":PLAYER_REFERENCE, "right":"bartender"}}
+	return {"schemaVersion":2, "playerCharacterId":player_id, "ownedCyberwareIds":player_characters[player_id].get("cyberwareIds", []).duplicate(), "equippedCyberwareIds":player_characters[player_id].get("cyberwareIds", []).duplicate(), "currentWeek":1, "currentDay":int(config.initialDay), "currentHp":hp, "maxHp":hp, "combat":{}, "battleStart":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "dialogueHistory":[], "battleId":"", "result":"", "battleHistory":[], "deck":[], "battleReward":{}, "portraits":{"left":PLAYER_REFERENCE, "right":"bartender"}}
 
 func new_game(player_id: String = "") -> void:
 	if transition_locked or battle_busy: return
@@ -524,6 +569,7 @@ func valid_save(s) -> bool:
 	if not s is Dictionary or s.get("schemaVersion", 0) != 2: return false
 	if s.has("faction"): return false # Legacy fields must pass through migration first.
 	if not valid_player_character(s.get("playerCharacterId")): return false
+	if not valid_equipped_technologies(s.get("equippedCyberwareIds"), s.get("ownedCyberwareIds")): return false
 	for k in initial_state(s.playerCharacterId):
 		if not s.has(k): return false
 	for key in ["currentScene", "currentPlaceId", "activeEventId", "activeNodeId", "targetId", "battleId", "result"]:
@@ -632,7 +678,7 @@ func initialize_combat() -> void:
 	rules.playerCharacterId = player_character_id()
 	rules.playerAttributes = player.attributes.duplicate(true)
 	rules.playerSkills = player.skills.duplicate(true)
-	rules.playerCyberwareIds = player.get("cyberwareIds", []).duplicate()
+	rules.playerCyberwareIds = equipped_cyberware_ids()
 	rules.cyberware = player_cyberware()
 	rules.deck = player.startingDeck.duplicate()
 	rules.cards.merge(reward_rules.cards, false)
@@ -685,6 +731,8 @@ func start_training(battle_id: String = "B12") -> void:
 	var fresh := initial_state(player_character_id())
 	if fresh.is_empty(): return
 	fresh.deck = state.get("deck", []).duplicate()
+	if valid_technology_loadout(state.get("equippedCyberwareIds"), player_character_id()):
+		fresh.equippedCyberwareIds = equipped_cyberware_ids()
 	training_backup = state.duplicate(true)
 	training_scenery_place_id = ""
 	if battle_id == "B04":
@@ -775,6 +823,10 @@ func migrate_save(data):
 	if not data.has("battleReward"): data.battleReward = {}
 	if not data.has("dialogueHistory"): data.dialogueHistory = []
 	if not data.has("battleStart"): data.battleStart = {}
+	if not data.has("equippedCyberwareIds") and valid_player_character(data.get("playerCharacterId")):
+		data.equippedCyberwareIds = player_characters[data.playerCharacterId].get("cyberwareIds", []).duplicate()
+	if not data.has("ownedCyberwareIds") and valid_player_character(data.get("playerCharacterId")):
+		data.ownedCyberwareIds = player_characters[data.playerCharacterId].get("cyberwareIds", []).duplicate()
 	if data.get("schemaVersion",0) == 1:
 		data = data.duplicate(true)
 		data.schemaVersion = 2
