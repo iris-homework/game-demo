@@ -20,6 +20,7 @@
 | B04 阶段切换 | 小弟先行动、老大最后行动；全部敌方行动结束、下一玩家回合开始前检查小弟死亡并切换意图。玩家阶段击杀小弟不会把当轮已显示的老大意图立即改成攻击 | [CombatModel.end_turn / begin_round_intents](../scripts/combat/combat_model.gd)、[游戏规则](游戏规则.md) |
 | 战斗与存档 | 当前有 40 种诺伦卡牌；诺伦开场五张；新快照使用 `openingDrawDone`。新正式战斗保存 `battleStart`，未结束时退出／重启继续回到固定开局；已结算胜败不重开。缺少开局快照的旧战斗保留原进度与冻结规则；冒险 schema 2 内兼容迁移 | [卡牌目录](../data/cards/cards.json)、[诺伦配置](../data/combat/noren.json)、[CombatModel](../scripts/combat/combat_model.gd)、[Game](../scripts/game.gd) |
 | 诺伦卡面 | 40 张 v7 Q 版方向的新独立插画已按固定模板套版并接入；全定义匹配才显示对应 PNG，旧定义回退文字卡；含动态费用／规则与悬停大图。最终用户认可及实际游戏画面验收仍待完成 | [展示绑定](../data/cards/card_faces.json)、[资源](../assets/cards/noren_fixed_v1/)、[制作批次](../../卡牌游戏美术资源/卡牌/固定排版模板_v1/production_20261022/README.md)、[接入说明](开发接入说明.md#固定卡面资源2026-10-22) |
+| 牌库分类 | 主菜单牌库及当前卡组支持品级、基础费用、类型的组合筛选；范围和分类持续高亮，显示命中数量并支持清除。战斗内按冻结定义分类，不改牌组或存档 | [牌库视图](../scripts/card_library.gd)、[玩家用法](诺伦卡牌与控制台.md#拥有牌与初始牌)、[本轮验证](../artifacts/qa/library-filters-2026-10-22/verification.json) |
 | 本机工具 | 当前工作环境为 macOS；旧 Windows 路径和 `midnight-map-art` 安装记录不是本机可用性的证明。工具与技能按当前会话及本机实际发现结果选择 | [开发工具与工作流](开发工具与工作流.md) |
 
 ## 从哪里开始
