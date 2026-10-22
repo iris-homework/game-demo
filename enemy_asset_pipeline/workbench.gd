@@ -6,6 +6,7 @@ var editor_request: HTTPRequest
 var pipeline_label: Label
 var owned_server := -1
 var editor_opening := false
+var server_conflict := false
 
 func _ready() -> void:
 	profile_path = "res://enemy_asset_pipeline/test/background_profiles.json" if test_mode else "res://enemy_asset_pipeline/background_profiles.json"
@@ -86,6 +87,10 @@ func open_editor() -> void:
 	if editor_opening: return
 	editor_opening = true
 	var started := await _server_alive()
+	if server_conflict:
+		pipeline_label.text = "制作端口已被另一工程或旧版服务占用。请关闭原制作台服务后重试。"
+		editor_opening = false
+		return
 	if not started:
 		var node := "node"
 		var config_path := "res://tools/local_paths.json"
@@ -107,16 +112,30 @@ func open_editor() -> void:
 	if started:
 		OS.shell_open(_editor_url())
 		pipeline_label.text = "制作工具已打开 · 保存后送入预览，再刷新草稿"
+	elif server_conflict: pipeline_label.text = "端口上的制作服务不属于当前工程。请关闭原服务后重试。"
 	else: pipeline_label.text = "制作服务未启动，请检查端口5191—5194和Node输出。"
 	editor_opening = false
 
+func _matches_server(data: Variant) -> bool:
+	# Old servers have no identity and must not be reused across project copies.
+	var project_root := ProjectSettings.globalize_path("res://").replace("\\", "/").trim_suffix("/")
+	return data is Dictionary and data.get("service", "") == "midnight-enemy-pipeline" \
+		and data.get("projectRoot", "") == project_root and data.get("test") == test_mode
+
 func _server_alive() -> bool:
+	server_conflict = false
 	var error := editor_request.request(_editor_url()+"/pipeline/status")
-	if error != OK: return false
+	if error != OK:
+		server_conflict = true
+		return false
 	var response: Array = await editor_request.request_completed
-	if int(response[1]) != 200: return false
+	if int(response[0]) == HTTPRequest.RESULT_CANT_CONNECT: return false
+	server_conflict = true
+	if int(response[0]) != HTTPRequest.RESULT_SUCCESS or int(response[1]) != 200: return false
 	var data = JSON.parse_string(response[3].get_string_from_utf8())
-	return data is Dictionary and data.get("service","") == "midnight-enemy-pipeline"
+	var matches := _matches_server(data)
+	server_conflict = not matches
+	return matches
 
 func _exit_tree() -> void:
 	Pipeline.clear_preview()

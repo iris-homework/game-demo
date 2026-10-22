@@ -18,7 +18,7 @@ const server=http.createServer(async(req,res)=>{
   try{
     const url=new URL(req.url,`http://127.0.0.1:${port}`);
     if(req.method==="POST"&&req.headers.origin&&!new Set([`http://127.0.0.1:${port}`,`http://localhost:${port}`]).has(req.headers.origin))return send(res,403,{error:"来源不允许"});
-    if(url.pathname==="/pipeline/status")return send(res,200,{...pipeline.status(),port,upstream:read(path.join(ROOT,"upstream.json")),service:"midnight-enemy-pipeline"});
+    if(url.pathname==="/pipeline/status")return send(res,200,{...pipeline.status(),port,projectRoot:GAME.replaceAll("\\","/"),upstream:read(path.join(ROOT,"upstream.json")),service:"midnight-enemy-pipeline"});
     if(req.method==="GET"&&url.pathname==="/pipeline/noren-reference")return send(res,200,pipeline.norenReference());
     if(url.pathname==="/pipeline/frames"){
       const s=pipeline.load(),p=s.manifest.profiles.find(p=>p.id===url.searchParams.get("id"));

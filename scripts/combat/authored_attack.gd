@@ -73,7 +73,8 @@ static func play(stage, attacker, defender, style: String, config: Dictionary, h
 		elif config.type == "bite":
 			_spawn(stage, point, "bite", null, 0.27, defender, attacker)
 		elif style in ["slash", "pierce"]:
-			stage.show_strike(point, direction, style, blocked)
+			# contact_point() already includes the authored effect offset.
+			stage.show_strike(point, direction, style, blocked, false)
 		else:
 			var effect = _spawn(stage, point, "hit", null, 0.24, defender, attacker)
 			effect.blocked = blocked

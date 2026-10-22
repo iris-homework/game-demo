@@ -408,3 +408,14 @@ test("current character assets discover warden actions and mirror draft without 
   assert.ok(actionIds(mirror).includes("damaged"));
 	assert.ok(!pipeline.status().autoImport.missingIdle.includes("mirror_inspector"));
 });
+
+test("luggage lurker's actual VFX PNG is discovered as an effect and not an actor pose",t=>{
+  const {pipeline}=makePipeline(t,{sourceRoot:path.join(GAME,"assets/combat_test")});
+  const state=pipeline.load(),meta=state.metadata.profiles.luggage_lurker;
+  assert.ok(meta.visual.hitEffectTexture,"real luggage VFX must be registered by seed/scan");
+  const expected=fs.readFileSync(path.join(GAME,"assets/combat_test/06b_luggage_lurker/luggage_lurker_VFX.png"));
+  assert.deepEqual(fs.readFileSync(pipeline.asset(meta.visual.hitEffectTexture)),expected);
+  assert.ok(!profileOf(pipeline,"luggage_lurker").animations.some(a=>/vfx/i.test(a.id)));
+  assert.equal(meta.attacks.bite.impactTexture,"","a composite VFX is not automatically published as a single hit texture");
+  assert.equal(pipeline.scanAssets().addedEffects.length,0,"rescanning retains the registered effect");
+});
