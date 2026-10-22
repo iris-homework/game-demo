@@ -2,6 +2,9 @@ extends Node
 ## Real shared stage + isolated catalogs. Synthetic profiles do not publish user art.
 const Catalog := preload("res://enemy_asset_pipeline/runtime/pipeline_catalog.gd")
 const Runtime := preload("res://enemy_asset_pipeline/runtime/pipeline_runtime_profile.gd")
+const AttackConfig := preload("res://enemy_asset_pipeline/runtime/pipeline_attack_config.gd")
+const NorenStrike := preload("res://scripts/combat/noren_slash_fx.gd")
+const EnemyStrike := preload("res://scripts/combat/prismatic_slash_fx.gd")
 const Bench := preload("res://tests/combat/workbench/battle_background_preview.gd")
 const OUTPUT := "res://enemy_asset_pipeline/test/evidence/attack-templates"
 var bench: Control
@@ -114,6 +117,10 @@ func _ready() -> void:
 		var stage: Control = bench.view.stage
 		var actor: Node2D = stage.enemies[0]
 		check(actor.kind == key and not actor.pipeline_attacks.is_empty(), "published template reaches actor: " + key)
+		if key == "qa_hit":
+			var before_offsets: Dictionary = bench.view.model.snapshot()
+			await _test_strike_effect_offsets(stage)
+			check(bench.view.model.snapshot() == before_offsets, "effect coordinate checks never mutate the model")
 		var style: String = actor.attack_style_override
 		var snapshot: Dictionary = bench.view.model.snapshot()
 		var home: Vector2 = actor.position
@@ -192,6 +199,60 @@ func _ready() -> void:
 	await get_tree().process_frame
 	Catalog.clear_published_path()
 	finish()
+
+func _test_strike_effect_offsets(stage: Control) -> void:
+	# Check actual spawned effects at impact, independently of contact_point().
+	# Both renderers must agree at near/far depths and retain the zero-offset default.
+	for actor_value in [stage.player, stage.enemies[0]]:
+		var actor: Node2D = actor_value
+		var defender: Node2D = stage.enemies[0] if actor == stage.player else stage.player
+		var effect_script: Script = NorenStrike if actor == stage.player else EnemyStrike
+		var saved_attacks: Dictionary = actor.pipeline_attacks
+		var saved_effects: Dictionary = actor.pipeline_effects
+		for style in ["slash", "pierce"]:
+			var attack := config("hit")
+			attack.movement = "stationary"
+			attack.strikePose = style if actor.poses.has(style) else "hit"
+			attack.muzzle = [0, 0]
+			attack.contact = [13, -62]
+			attack.windup = 0.0
+			attack.impactDelay = 0.0
+			attack.recovery = 0.0
+			var problems: Array[String] = []
+			actor.pipeline_attacks = AttackConfig.parse({style: attack}, actor.poses, actor.pose_aliases, problems)
+			check(problems.is_empty() and actor.pipeline_attacks.has(style), "offset fixture validates: " + style)
+			for depth in [-110.0, 45.0]:
+				actor.position = actor.home
+				defender.position = Vector2(defender.home.x, stage.floor_y + depth)
+				stage.update_depth()
+				var defender_scale: float = stage.depth_scale(defender.position)
+				for offset in [Vector2.ZERO, Vector2(23, -17)]:
+					actor.pipeline_effects = {"offset": offset, "hitStop": 0.0, "shake": false}
+					var expected: Vector2 = defender.position + (Vector2(13, -62) + offset) * defender_scale
+					var label := "%s/%s/depth=%s/offset=%s" % [actor.kind, style, depth, offset]
+					var callbacks := [0]
+					await stage.attack(actor, defender, style, [{"damage":0,"blocked":0,"killed":false}], func(_hit, _index):
+						callbacks[0] += 1
+						_check_strike_position(stage, effect_script, expected, "authored " + label))
+					check(callbacks[0] == 1, "one impact callback: " + label)
+					# Existing four-argument callers still provide an unshifted world point.
+					var legacy_point := Vector2(351, 218)
+					stage.show_strike(legacy_point, 1.0, style, false)
+					_check_strike_position(stage, effect_script, legacy_point + offset * defender_scale, "legacy " + label)
+		actor.pipeline_attacks = saved_attacks
+		actor.pipeline_effects = saved_effects
+	await stage.return_home()
+
+func _check_strike_position(stage: Control, effect_script: Script, expected: Vector2, label: String) -> void:
+	var effects: Array[Node2D] = []
+	for child in stage.world.get_children():
+		if child is Node2D and child.get_script() == effect_script:
+			effects.append(child)
+	check(effects.size() == 1, "one strike effect: " + label)
+	for effect in effects:
+		check(effect.position.is_equal_approx(expected), "effect has one depth-scaled offset: " + label)
+		# Remove the inspected effect so it cannot satisfy a subsequent case.
+		effect.free()
 
 func _preview_async(completed: Array) -> void:
 	completed[0] = await bench.view.preview_action(1,"shoot",0)

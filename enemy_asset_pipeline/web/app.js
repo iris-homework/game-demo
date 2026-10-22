@@ -1,5 +1,7 @@
 "use strict";
 const $=s=>document.querySelector(s);let state,profile,profileData,metaDirty=false,anchorDirty=false,shownAction="",shownFrame=0,pendingFiles=[],lastBackup=localStorage.getItem("midnightBackup")||"";
+let profileRequest=0,profileLoading=false;
+function setProfileLoading(loading){profileLoading=loading;for(const id of ["calibration","import","tuner"])$("#"+id).inert=loading;for(const id of ["preview","apply","rollback","scan-assets"])$("#"+id).disabled=loading;}
 const labels={hit:"打击",idle:"待机",move:"移动",slash:"挥砍",pierce:"突刺／拳踢",block:"格挡",damaged:"受伤",shoot:"射击",laser:"掌心射线",bite:"张嘴",bite_close:"咬合",retreat:"后撤",gun_idle:"持枪待机",gun_block:"持枪格挡",gun_damaged:"持枪受伤",evade:"闪避",blunt:"钝击"};
 const msg=t=>$("#message").textContent=t;
 const characterName=id=>state?.characterNames?.[String(id).replace(/^visual:/,"").toLowerCase()]||String(id).replace(/^visual:/,"").toLowerCase();
@@ -28,19 +30,33 @@ function value(id,x){$("#"+id).value=x;}const num=id=>Number($("#"+id).value);
 function dirty(){return $("#tuner").contentDocument?.body.classList.contains("hasUnsavedChanges");}
 function requireSaved(allowAnchor=false){if(anchorDirty&&!allowAnchor)throw Error("脚底锚点尚未保存，请先点击保存本帧脚底。");if(metaDirty)throw Error("左侧参数尚未保存，请先点击保存演出草稿。");if(dirty())throw Error("右侧还有未保存的帧调整，请先点击右侧保存调参。");}
 function syncCanvasShadow(){const api=$("#tuner").contentWindow.midnightCanvasPreview;if(!api||!profile)return;api.setShadow({enabled:$("#shadow-enabled").checked,size:[num("shadowW"),num("shadowH")],offset:[num("shadowX"),num("shadowY")],opacity:num("opacity")});}
-function chooseNative(){const win=$("#tuner").contentWindow,select=win.document.querySelector("#profileSelect");if(!select||!profile)return;const apply=()=>{if(![...select.options].some(o=>o.value===profile.id))return false;if(select.value!==profile.id){select.value=profile.id;select.dispatchEvent(new win.Event("change",{bubbles:true}));}syncCanvasShadow();win.midnightSelectAction?.(profile.id,$("#action").value,num("frame"));return true;};if(!apply()){const observer=new MutationObserver(()=>{if(apply())observer.disconnect();});observer.observe(select,{childList:true,subtree:true});}}
+function chooseNative(){if(profileLoading)return;const win=$("#tuner").contentWindow,select=win.document.querySelector("#profileSelect");if(!select||!profile)return;const apply=()=>{if(![...select.options].some(o=>o.value===profile.id))return false;if(select.value!==profile.id){select.value=profile.id;select.dispatchEvent(new win.Event("change",{bubbles:true}));}syncCanvasShadow();win.midnightSelectAction?.(profile.id,$("#action").value,num("frame"));return true;};if(!apply()){const observer=new MutationObserver(()=>{if(apply())observer.disconnect();});observer.observe(select,{childList:true,subtree:true});}}
 async function refresh(preferred){state=await api("status");const pick=$("#profile");pick.replaceChildren(...state.profiles.map(p=>new Option(p.label,p.id)));pick.value=preferred||profile?.id||"gang_henchman";if(!pick.value)pick.selectedIndex=0;$("#mode").textContent=state.test?"测试版 · 应用到隔离目录":"正式版";await selectProfile();}
-async function selectProfile(){profile=state.profiles.find(p=>p.id===$("#profile").value);if(!profile)return;profileData=await api("frames?id="+encodeURIComponent(profile.id));
-// The frames response owns the latest saved metadata. The status list may
-// predate a save; merge here before filling controls, without reloading the tuner.
-Object.assign(profile,profileData.metadata);
-$("#action").replaceChildren(...profileData.profile.animations.map(a=>new Option(actionLabel(a),a.id)));$("#targets").replaceChildren(...state.enemies.map(e=>{const option=new Option(e.label,e.id);option.title=e.id;option.selected=(profile.targetEnemyIds||[]).includes(e.id);return option;}));$("#targets").disabled=profile.id==="noren";metaDirty=false;value("import-id",profile.id);value("import-label",characterName(profile.id));value("facing",profile.visual.sourceFacing||"left");value("attack",profile.visual.attackStyleOverride||"");value("muzzleX",profile.visual.laserMuzzle?.[0]||0);value("muzzleY",profile.visual.laserMuzzle?.[1]||0);value("palm",profile.visual.laserPalmWidth||70);$("#shadow-enabled").checked=profile.shadow.enabled;for(const [id,x]of Object.entries({targetX:profile.visual.targetRect[0],targetY:profile.visual.targetRect[1],targetW:profile.visual.targetRect[2],targetH:profile.visual.targetRect[3],shadowW:profile.shadow.size[0],shadowH:profile.shadow.size[1],shadowX:profile.shadow.offset[0],shadowY:profile.shadow.offset[1],opacity:profile.shadow.opacity,...profile.motion,"effect-scale":profile.effects.scale,effectX:profile.effects.offset[0],effectY:profile.effects.offset[1]}))value(id,x);$("#effect-file-name").textContent=profile.visual.hitEffectTexture?"已绑定命中特效PNG":"尚未绑定图片（模板可使用程序特效）";attackPointPicking=false;attackEditor.load(profile,profileData.profile.animations);$("#attack").disabled=profile.id==="noren";selectAction();chooseNative();syncCanvasShadow();msg("已载入 "+profile.label+"。帧编辑保存在右侧，战场参数保存在左侧。");}
+async function selectProfile(){
+ const selected=state.profiles.find(p=>p.id===$("#profile").value);
+ if(!selected)return;
+ const request=++profileRequest;
+ setProfileLoading(true);msg("正在载入 "+selected.label+"…");
+ try{
+  const loaded=await api("frames?id="+encodeURIComponent(selected.id));
+  if(request!==profileRequest)return;
+  if(loaded.profile?.id!==selected.id||!loaded.metadata)throw Error("角色加载结果不匹配，请重新选择角色。");
+  // Commit the profile and its frames together only for the latest selection.
+  profile=selected;profileData=loaded;Object.assign(profile,loaded.metadata);
+  setProfileLoading(false);
+$("#action").replaceChildren(...profileData.profile.animations.map(a=>new Option(actionLabel(a),a.id)));$("#targets").replaceChildren(...state.enemies.map(e=>{const option=new Option(e.label,e.id);option.title=e.id;option.selected=(profile.targetEnemyIds||[]).includes(e.id);return option;}));$("#targets").disabled=profile.id==="noren";metaDirty=false;value("import-id",profile.id);value("import-label",characterName(profile.id));value("facing",profile.visual.sourceFacing||"left");value("attack",profile.visual.attackStyleOverride||"");value("muzzleX",profile.visual.laserMuzzle?.[0]||0);value("muzzleY",profile.visual.laserMuzzle?.[1]||0);value("palm",profile.visual.laserPalmWidth||70);$("#shadow-enabled").checked=profile.shadow.enabled;for(const [id,x]of Object.entries({targetX:profile.visual.targetRect[0],targetY:profile.visual.targetRect[1],targetW:profile.visual.targetRect[2],targetH:profile.visual.targetRect[3],shadowW:profile.shadow.size[0],shadowH:profile.shadow.size[1],shadowX:profile.shadow.offset[0],shadowY:profile.shadow.offset[1],opacity:profile.shadow.opacity,...profile.motion,"effect-scale":profile.effects.scale,effectX:profile.effects.offset[0],effectY:profile.effects.offset[1]}))value(id,x);$("#effect-file-name").textContent=profile.visual.hitEffectTexture?"已绑定命中特效PNG":"尚未绑定图片（模板可使用程序特效）";attackPointPicking=false;attackEditor.load(profile,profileData.profile.animations);$("#attack").disabled=profile.id==="noren";selectAction();chooseNative();syncCanvasShadow();msg("已载入 "+profile.label+"。帧编辑保存在右侧，战场参数保存在左侧。");
+ }catch(error){
+  if(request!==profileRequest)return;
+  $("#profile").value=profile?.id||"";
+  throw error;
+ }finally{if(request===profileRequest)setProfileLoading(false);}
+}
 function selectAction(sync=true){renderProfileNotes();const a=profileData.profile.animations.find(a=>a.id===$("#action").value);$("#frame").replaceChildren(...a.frames.map((f,i)=>new Option(`${i+1} · ${f.name}`,i)));selectFrame(sync);}
 function selectFrame(sync=true){anchorDirty=false;shownAction=$("#action").value;shownFrame=num("frame");const a=profileData.profile.animations.find(a=>a.id===$("#action").value),i=num("frame"),f=a.frames[i];const anchor=f.anchor?[f.anchor.x,f.anchor.y]:[a.sourceAnchor?.x??f.width/2,a.sourceAnchor?.y??f.height];$("#foot-image").src="/asset?path="+encodeURIComponent(f.path);value("anchorX",anchor[0]);value("anchorY",anchor[1]);drawCross();if(sync)$("#tuner").contentWindow.midnightSelectAction?.(profile.id,a.id,i);}
 function drawCross(){const img=$("#foot-image"),box=img.getBoundingClientRect();if(!img.naturalWidth)return;const scale=Math.min(box.width/img.naturalWidth,box.height/img.naturalHeight);const left=(box.width-img.naturalWidth*scale)/2,top=(box.height-img.naturalHeight*scale)/2;$("#cross").style.left=left+num("anchorX")*scale+"px";$("#cross").style.top=top+num("anchorY")*scale+"px";}
 $("#foot-image").onload=drawCross;$("#foot-editor").onclick=e=>{const img=$("#foot-image"),rect=img.getBoundingClientRect(),scale=Math.min(rect.width/img.naturalWidth,rect.height/img.naturalHeight);const x=(e.clientX-rect.left-(rect.width-img.naturalWidth*scale)/2)/scale,y=(e.clientY-rect.top-(rect.height-img.naturalHeight*scale)/2)/scale;if(attackPointPicking){attackPointPicking=false;attackEditor.setMuzzle(Math.round(x),Math.round(y));msg("攻击点已标记，请保存演出草稿。脚底锚点未改变。");return;}value("anchorX",Math.round(Math.max(0,Math.min(img.naturalWidth,x))));value("anchorY",Math.round(Math.max(0,Math.min(img.naturalHeight,y))));anchorDirty=true;drawCross();};
-$("#profile").onchange=()=>run(async()=>{try{requireSaved();}catch(e){$("#profile").value=profile.id;throw e;}await selectProfile();});$("#action").onchange=()=>run(async()=>{if(anchorDirty){$("#action").value=shownAction;throw Error("先保存本帧脚底，再切换动作。");}selectAction();});$("#frame").onchange=()=>run(async()=>{if(anchorDirty){$("#frame").value=shownFrame;throw Error("先保存本帧脚底，再切换帧。");}selectFrame();});$("#anchorX").oninput=$("#anchorY").oninput=()=>{anchorDirty=true;drawCross();};
-async function run(fn){try{await fn();}catch(e){msg(e.message);}}
+$("#profile").onchange=()=>run(async()=>{try{requireSaved();}catch(e){$("#profile").value=profile.id;throw e;}await selectProfile();},true);$("#action").onchange=()=>run(async()=>{if(anchorDirty){$("#action").value=shownAction;throw Error("先保存本帧脚底，再切换动作。");}selectAction();});$("#frame").onchange=()=>run(async()=>{if(anchorDirty){$("#frame").value=shownFrame;throw Error("先保存本帧脚底，再切换帧。");}selectFrame();});$("#anchorX").oninput=$("#anchorY").oninput=()=>{anchorDirty=true;drawCross();};
+async function run(fn,allowLoading=false){try{if(profileLoading&&!allowLoading)throw Error("角色正在载入，请稍候再操作。");await fn();}catch(e){msg(e.message);}}
 function reloadNative(){ $("#tuner").src="/tuner/?rev="+Date.now(); }
 $("#scan-assets").onclick=()=>run(async()=>{
  requireSaved();const button=$("#scan-assets"),selected=profile?.id;button.disabled=true;button.textContent="正在扫描…";
@@ -70,7 +86,7 @@ $("#calibration").addEventListener("change",e=>{if(!["action","frame","anchorX",
 $("#import-hit-effect").onclick=()=>run(async()=>{requireSaved();const file=$("#hit-effect-file").files[0];if(!file)throw Error("请选择命中特效PNG");const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file);});const result=await api("hit-effect",{profileId:profile.id,data});profile.visual.hitEffectTexture=result.texture;msg("命中特效PNG已保存，送入预览可检查大小与位置。");$("#effect-file-name").textContent=file.name;});
 
 window.addEventListener("message",event=>{
- if(event.source!==$("#tuner").contentWindow||event.origin!==window.location.origin||!profile)return;
+ if(event.source!==$("#tuner").contentWindow||event.origin!==window.location.origin||!profile||profileLoading)return;
  const data=event.data;
  if(data?.type==="midnight-selection"&&data.profileId===profile.id){
    if(anchorDirty){msg("脚底锚点尚未保存；先保存后再切换帧。");return;}
@@ -79,8 +95,10 @@ window.addEventListener("message",event=>{
    if([...$("#frame").options].some(o=>Number(o.value)===data.frameIndex)){$("#frame").value=data.frameIndex;selectFrame(false);}
  }
  if(data?.type==="midnight-saved"&&!anchorDirty)run(async()=>{
-   const selectedAction=$("#action").value,selectedIndex=num("frame");
-   profileData=await api("frames?id="+encodeURIComponent(profile.id));
+   const selectedAction=$("#action").value,selectedIndex=num("frame"),request=profileRequest,id=profile.id;
+   const loaded=await api("frames?id="+encodeURIComponent(id));
+   if(request!==profileRequest||profileLoading||profile.id!==id)return;
+   profileData=loaded;
    $("#action").replaceChildren(...profileData.profile.animations.map(a=>new Option(actionLabel(a),a.id)));
    if([...$("#action").options].some(o=>o.value===selectedAction))$("#action").value=selectedAction;
    attackEditor.animations=profileData.profile.animations;attackEditor.render();selectAction(false);$("#frame").selectedIndex=Math.min(selectedIndex,$("#frame").options.length-1);selectFrame(false);

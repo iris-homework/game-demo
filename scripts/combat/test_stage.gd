@@ -411,9 +411,10 @@ func neon_fx(point: Vector2, kind: String, direction: float = 1.0) -> Node2D:
 	world.add_child(fx)
 	return fx
 
-func show_strike(point: Vector2, direction: float, style: String, blocked: bool) -> void:
+func show_strike(point: Vector2, direction: float, style: String, blocked: bool, apply_effect_offset: bool = true) -> void:
 	var effect_scale := _effect_scale(active_attacker)
-	point += _effect_offset(active_attacker)*depth_scale(active_defender.position)
+	if apply_effect_offset:
+		point += _effect_offset(active_attacker)*depth_scale(active_defender.position)
 	if style in ["slash", "pierce"] and active_attacker == player and player.kind == "noren":
 		var slash := NorenSlash.new()
 		slash.mode = style
