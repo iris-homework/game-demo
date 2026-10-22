@@ -1,0 +1,17 @@
+Beacon Jellyfish 13B — isolated attack VFX clusters
+Generated: 2026-10-22 (Asia/Shanghai)
+Mode: built-in image_gen; transparent_background=true
+Output: beacon_jellyfish_VFX.png
+Art context: existing beacon_jellyfish_attack.png inspected for palette and liquid appearance; no image input supplied to generator.
+Generated source: C:\Users\22141\.codex\generated_images\01a15a84-3781-7da1-9dbe-ee5d4eb41bd9\exec-4fb1d1c3-52e8-4e2d-96ba-0b624a9f26b7.png
+
+Exact prompt:
+Use case: stylized-concept.
+Asset type: transparent PNG VFX cutout sheet for Beacon Jellyfish 13B attacks in the 2D illustrated combat game Midnight Commission. ONLY attack effects; no creature, lantern, tentacle, limbs, equipment, scenery or UI.
+Art direction: hand-painted 2D cel-shaped water and speed effects coordinated with the existing jellyfish's pale cloudy blue-gray, dark cool violet and restrained amber palette. Thin delicate silhouettes, crisp designed contour fragments, soft translucent interiors, sparse pale white highlights. This is lightweight transparent liquid, not solid weapons. Keep effects modest in scale and simple, readable when reduced in game.
+Arrange THREE separate isolated effect clusters in a spacious landscape canvas, with very large fully transparent gaps between them for clean individual cropping. No grid, no labels.
+1. Upper left: one slender horizontal right-to-left liquid thrust trail, about five times as long as it is tall. Two narrow transparent water ripple ribbons with lots of open space, tapering at their LEFT tip, accompanied by only two very thin cool violet speed lines. No thick filled blade, no large crescent, no claw marks. No tentacle body; only its watery wake.
+2. Upper right: one SMALL contact effect. A tiny loose burst of just 5–7 semitransparent rounded blue-gray water beads and minute pale white watery glints, surrounding exactly ONE small warm amber afterglow dot. The amber point is a subdued ember-sized residual glimmer, not a fireball, explosion or bright star. Fine discrete droplets, with clear transparent space among them.
+3. Lower center: one broad but shallow FLATTENED pale blue brine spray cluster, wispy thin lateral liquid tongues and a few rounded droplets, with only 3–4 tiny soft off-white salt glints. About four times as wide as tall. Gradually diminishing coverage and opacity outward so it suggests quickly dispersing into transparency. Keep it airy and minimal, no opaque puddle, no big splash crown. Salt glints are tiny dots or short soft dashes, NOT ice shards, snowflakes or crystalline spikes.
+All effects should remain independent and not overlap. Narrow streaks and sparse droplets, no dense particle cloud. Absolute avoidance: hard metallic scratches, steel claws, ice crystals, crystalline explosions, giant impact stars, shockwave rings, thunderbolts, fire, blood, debris, thick black borders, huge glow bloom, fog bank, gradient background, shadow or floor.
+Output actual transparent alpha PNG with empty areas completely transparent, not a black background, not a checkerboard drawing. Preserve semitransparent liquid and edge fades. All effects fully inside the canvas with generous margins. No words, captions, arrows, watermark, frames, duplicated creature or multiple animation frames.

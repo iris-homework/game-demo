@@ -6,6 +6,12 @@
 
 新开始的正式战斗会固定保存本场开局。中途返回菜单或关闭程序后再继续，恢复开战时的血量、双方状态、资源与初始牌序，不重新洗牌；已结算胜败时继续战后剧情。演练仍不保存。没有开局快照的旧战斗保留原进度，从下一场开始使用新规则。详情见[存档规则](docs/游戏规则.md#存档)。
 
+## 敌人动作制作台
+
+敌人 PNG 动作制作与战斗校准见[敌人制作台](enemy_asset_pipeline/README.md)。
+试用：Godot 打开 `enemy_asset_pipeline/test/test_workbench.tscn`，按 F6；
+正式入口为 `enemy_asset_pipeline/workbench.tscn`。
+
 ## 2026-10-20 故障机器人与动态掌心射线
 
 垃圾场B02接入故障机器人站姿、掌心发射和受击素材，意图为每回合单次攻击10。射线从细到粗扩张，按反馈加粗约三成，最粗仍不超过掌宽；穿过对手后延伸出屏幕，再收细消失。主菜单“演练 展开 → 机器人测试”可直接查看，演练敌人100 HP且退出恢复冒险。正式生命值未另行指定，旧进行中战斗保留冻结意图。
@@ -247,23 +253,25 @@ B11 为两只变异鱼，各30 HP。第一只循环「攻击6 → 攻击2×2 →
 
 ## 验证命令
 
+测试按功能整理在六个目录中，完整入口和存档隔离要求见[测试目录索引](tests/README.md)。
+
 ```sh
 godot --headless --path . --editor --import --quit
-godot --headless --path . res://tests/run.tscn
-godot --headless --path . res://tests/player_character_tests.tscn
-godot --headless --path . res://tests/character_cyberware_tests.tscn
-godot --path . --fixed-fps 60 res://tests/character_cyberware_visual.tscn
-godot --path . res://tests/player_character_visual.tscn
-godot --headless --path . res://tests/combat_tests.tscn
-godot --headless --path . res://tests/cyberware_tests.tscn
-godot --path . res://tests/cyberware_visual.tscn
-godot --path . res://tests/r1_visual.tscn
-godot --path . res://tests/interaction_visual.tscn
-godot --path . res://tests/pile_visual.tscn
-godot --path . res://tests/pile_count_visual.tscn
-godot --path . res://tests/drag_visual.tscn
-godot --path . res://tests/hand_fan_visual.tscn
-godot --path . res://tests/turn_banner_visual.tscn
+godot --headless --path . res://tests/story/run.tscn
+godot --headless --path . res://tests/characters/player_character_tests.tscn
+godot --headless --path . res://tests/characters/character_cyberware_tests.tscn
+godot --path . --fixed-fps 60 res://tests/characters/character_cyberware_visual.tscn
+godot --path . res://tests/characters/player_character_visual.tscn
+godot --headless --path . res://tests/combat/rules/combat_tests.tscn
+godot --headless --path . res://tests/characters/cyberware_tests.tscn
+godot --path . res://tests/characters/cyberware_visual.tscn
+godot --path . res://tests/integration/r1_visual.tscn
+godot --path . res://tests/combat/interaction/interaction_visual.tscn
+godot --path . res://tests/combat/interaction/pile_visual.tscn
+godot --path . res://tests/combat/presentation/pile_count_visual.tscn
+godot --path . res://tests/combat/interaction/drag_visual.tscn
+godot --path . res://tests/combat/presentation/hand_fan_visual.tscn
+godot --path . res://tests/combat/presentation/turn_banner_visual.tscn
 ```
 
 R1 历史验收包含原剧情 **690** 项检查与战斗／血量／存档 **191** 项检查；图形集成验证覆盖抽弃牌、重复点击、自然胜负、双向转场、缺图、治疗与演练隔离。实际窗口也验证了鼠标选牌、指定目标和结束回合。

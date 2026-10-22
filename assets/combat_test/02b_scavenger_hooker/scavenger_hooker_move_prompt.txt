@@ -1,0 +1,18 @@
+生成日期：2026-10-22（Asia/Shanghai）
+工具：内置 imagegen，transparent_background=true
+用途：02B 拾荒钩客移动姿态；面向左，尚未接入运行时。
+造型参考：同目录 scavenger_hooker_idle.png（唯一造型、服装、装备、比例与画风参考）。
+对应图片：scavenger_hooker_move.png
+生成原图：C:/Users/22141/.codex/generated_images/01a16328-cd94-77d3-a005-18dcec0822e4/exec-b00039bf-0692-4f31-93bc-3bbf65f14781.png
+最终图片 SHA256：04dfd4c0146832453d75bde64e0575fc5515a1bfc825fb3c0993c12710f37839
+
+【实际调用提示词】
+Use case: stylized-concept
+Asset type: enemy movement sprite for a 2D Godot combat scene, matching an existing idle sprite set
+Primary request: Create the MOVE pose for this exact 拾荒钩客 (human salvage hook raider). Use Image 1 as the sole identity, costume, equipment, rendering, and proportion reference. This is a new pose, not a redesign.
+Pose and motion: Facing LEFT in the same three-quarter side combat camera. A forward-leaning jog caught at a clear moving instant: torso pitched forward, one boot pushing off behind, the other foot planted forward in a compact short stride as if stepping around an obstacle. The entire body should read as actively moving, with a low center of gravity and brisk small-step energy. The tall back rack and its exactly three bent pipes plus small old circular fan guard visibly lag behind the body's forward motion, tilted backward relative to the shoulders. Scarf end and ochre jacket hem trail slightly backward. His anatomical RIGHT hand still grips the thin long iron salvage hook pole, keeping the single curved hook visible and fully in frame; the pole can angle back and down with the running motion. His anatomical LEFT forearm keeps the compact cable reel; the left hand can be tucked near the chest/strap to keep balance. Exactly two arms and two legs, both hands visible and anatomically connected.
+Subject identity constraints: preserve the same scruffy compact anime adult male, large angular head, short messy black hair, broad squared industrial goggles over narrowed alert eyes, ochre scarf covering mouth and nose tip, ochre/mustard patchwork work jacket, charcoal trousers and worn dark boots, mismatched elbow guards, narrow scrap basket, three thin bent pipes, old fan guard, left-arm cable reel, and long thin utility hook. No red/pink glow or neon rim light. Ordinary neutral daylight and dark-plum/charcoal cel-shaded shadows with warm ivory metal highlights, matching Image 1.
+Style/medium: polished 2D anime game character illustration, same sharp dark ink outlines, hand-painted angular hard-edged cel shading, restrained detail density, ordinary low-tier human enemy. Not photorealistic, not 3D, not a hero, not heavier armor.
+Composition/framing: Single full-body character only, facing LEFT, full hook pole, hook blade, three pipe tips, fan guard, backpack and both feet entirely inside a generous transparent margin. Keep a consistent silhouette scale with the idle image.
+Scene/backdrop: true transparent RGBA background only. No ground, no cast shadow, no floor line, no glow, no checkerboard, no background color, no text, no UI, no labels, no watermark.
+Constraints: preserve exact character identity and all listed equipment; create only the running movement pose; no extra limbs, no missing equipment, no duplicated hook, no scythe or axe; full hook must remain completely inside frame.

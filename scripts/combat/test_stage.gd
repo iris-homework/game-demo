@@ -10,6 +10,8 @@ const PalmLaser = preload("res://scripts/combat/palm_laser_fx.gd")
 const BiteHit = preload("res://scripts/combat/bite_hit_fx.gd")
 const PollutionSpit = preload("res://scripts/combat/pollution_spit_fx.gd")
 const FishDeathBurst = preload("res://scripts/combat/fish_death_burst_fx.gd")
+const AuthoredAttack := preload("res://scripts/combat/authored_attack.gd")
+const PipelineCatalogScript := preload("res://enemy_asset_pipeline/runtime/pipeline_catalog.gd")
 const ACTOR_SCALE := 1.2544
 const ATTACK_ZOOM_FACTOR := 0.9
 const RANGED_RETREAT_DISTANCE := 280.0
@@ -26,6 +28,7 @@ var focus_x := 720.0
 var focus_y := 272.0
 var active_attacker: Node2D
 var active_defender: Node2D
+var active_attack_config: Dictionary = {}
 var shake := Vector2.ZERO
 var phase := "idle"
 var shake_time := 0.0
@@ -42,6 +45,10 @@ var scenery: TextureRect
 var scenery_base_rect := Rect2()
 
 func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual], scenery_texture: Texture2D = null, ground_start: float = 0.5) -> void:
+	# This is the new-battle boundary. Refresh before the player is created so
+	# Noren and any lazily resolved actors use the just-applied catalog. Existing
+	# Visual instances already owned by a running battle are not touched.
+	PipelineCatalogScript.refresh()
 	var count := enemy_visuals.size()
 	position = Vector2(0,270)
 	size = Vector2(1440,420)
@@ -134,9 +141,9 @@ func _process(delta: float) -> void:
 		impact_zoom = 1.0
 	_update_camera()
 
-func kick_camera(direction: float, strength: float) -> void:
+func kick_camera(direction: float, strength: float, duration: float = 0.20) -> void:
 	shake_time = 0.0
-	shake_duration = 0.20
+	shake_duration = maxf(0.01,duration)
 	shake_strength = strength
 	shake_direction = direction
 	shake = Vector2(-direction*strength,0)
@@ -229,7 +236,7 @@ func approach(attacker: Node2D, defender: Node2D, destination: Vector2) -> void:
 	var points := approach_path(attacker,defender,destination)
 	var total := 0.0
 	for i in points.size()-1: total += points[i].distance_to(points[i+1])
-	var duration := clampf(total/2300.0,0.15,0.34)
+	var duration := travel_duration(attacker,total)
 	for i in points.size()-1:
 		await move_actor(attacker,points[i+1],maxf(0.01,duration*points[i].distance_to(points[i+1])/maxf(total,1)))
 
@@ -251,7 +258,14 @@ func frame_attack(attacker: Node2D, defender: Node2D, destination: Vector2) -> v
 
 func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_hit: Callable) -> void:
 	# Visual profiles select presentation only; supplied model hits remain authoritative.
-	if not attacker.attack_style_override.is_empty(): style = attacker.attack_style_override
+	# An explicitly selected authored action wins. The profile override is the
+	# default for intents without their own animation, not a lock on all attacks.
+	if not attacker.pipeline_attacks.has(style) and not attacker.attack_style_override.is_empty():
+		style = attacker.attack_style_override
+	active_attack_config = {}
+	if attacker.pipeline_attacks.has(style):
+		await AuthoredAttack.play(self, attacker, defender, style, attacker.pipeline_attacks[style], hits, on_hit)
+		return
 	if style == "laser":
 		await laser_attack(attacker, defender, hits, on_hit)
 		return
@@ -267,6 +281,7 @@ func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_h
 	defender.face_toward(attacker.position)
 	var reach := 105.0 if style == "pierce" else 86.0
 	if style == "bite": reach = 92.0
+	reach = _motion_value(attacker,"reach",reach)
 	var destination := attack_destination(attacker,defender,reach)
 	direction = 1.0 if defender.position.x >= destination.x else -1.0
 	set_phase("prepare")
@@ -291,7 +306,8 @@ func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_h
 		if blocked: defender.set_pose("block")
 		# Telegraph, compress, then release quickly for both sides (enemy gets a clearer tell).
 		await move_actor(attacker,destination-Vector2(direction*10,0),0.10 if enemy_attack else 0.075)
-		await get_tree().create_timer(0.12 if style == "bite" else (0.045 if enemy_attack else 0.025)).timeout
+		var default_windup := 0.12 if style == "bite" else (0.045 if enemy_attack else 0.025)
+		await get_tree().create_timer(_motion_value(attacker,"windup",default_windup)).timeout
 		attacker.set_pose("bite_close" if style == "bite" else style)
 		if style == "slash" or style == "pierce": combat_audio.play_cue("slash")
 		await move_actor(attacker,destination+Vector2(direction*10,0),0.035)
@@ -300,8 +316,8 @@ func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_h
 		play_hit_sound(blocked)
 		if not blocked and damage > 0: defender.set_pose("damaged")
 		on_hit.call(hit,i)
-		last_hit_stop = 0.095 if enemy_attack else (0.075 if style == "pierce" else 0.085)
-		kick_camera(direction,8.0 if damage > 0 else 4.5)
+		last_hit_stop = _hit_stop(attacker,0.095 if enemy_attack else (0.075 if style == "pierce" else 0.085))
+		_pipeline_camera(attacker,direction,8.0 if damage > 0 else 4.5)
 		defender.sprite.modulate = Color(1.65,1.3,1.65,1)
 		set_phase("impact")
 		# Actor poses and positions hold; camera impulse decays independently of HUD.
@@ -312,10 +328,15 @@ func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_h
 		var recoil := 4.0 if damage == 0 else (17.0 if blocked else 12.0)
 		await move_actor(defender,origin+Vector2(direction*recoil,0),0.065)
 		set_phase("recover")
+		var recovery := _motion_value(attacker,"recovery",0.12)
 		var settle := create_tween().set_parallel(true)
-		settle.tween_property(defender,"position",origin,0.12)
-		settle.tween_property(attacker,"position",destination,0.12)
+		settle.tween_property(defender,"position",origin,recovery)
+		settle.tween_property(attacker,"position",destination,recovery)
 		await settle.finished
+		# The authored attack sequence owns its presentation length. Damage was
+		# already applied once by CombatModel; this only stops the next pose
+		# from cutting a multi-frame attack short.
+		await _await_pipeline_pose(attacker)
 		if bool(hit.get("killed",false)):
 			await retire_actor(defender)
 			break
@@ -391,13 +412,15 @@ func neon_fx(point: Vector2, kind: String, direction: float = 1.0) -> Node2D:
 	return fx
 
 func show_strike(point: Vector2, direction: float, style: String, blocked: bool) -> void:
+	var effect_scale := _effect_scale(active_attacker)
+	point += _effect_offset(active_attacker)*depth_scale(active_defender.position)
 	if style in ["slash", "pierce"] and active_attacker == player and player.kind == "noren":
 		var slash := NorenSlash.new()
 		slash.mode = style
 		slash.position = point
 		slash.direction = direction
 		slash.blocked = blocked
-		slash.scale = Vector2.ONE * depth_scale(active_defender.position)
+		slash.scale = Vector2.ONE * depth_scale(active_defender.position) * effect_scale
 		if blocked: slash.duration = 0.28
 		world.add_child(slash)
 		return
@@ -405,11 +428,13 @@ func show_strike(point: Vector2, direction: float, style: String, blocked: bool)
 		var bite := BiteHit.new()
 		bite.texture = active_attacker.hit_effect_texture
 		bite.position = point
-		bite.scale = Vector2(-direction,1)*depth_scale(active_defender.position)
+		bite.scale = Vector2(-direction,1)*depth_scale(active_defender.position)*effect_scale
 		bite.blocked = blocked
 		world.add_child(bite)
 		return
 	var fx := neon_fx(point,style,direction)
+	if effect_scale != 1.0:
+		fx.scale *= effect_scale
 	fx.blocked = blocked
 	if blocked: fx.duration = 0.24
 
@@ -503,7 +528,7 @@ func ranged_attack(attacker: Node2D, defender: Node2D, hits: Array, on_hit: Call
 		var destination := origin - Vector2(direction * RANGED_RETREAT_DISTANCE, 0)
 		destination.x = clampf(destination.x, 100, 1310)
 		# Match the attack approach: switch pose, then glide along the ground in one tween.
-		var duration := clampf(origin.distance_to(destination)/2300.0,0.15,0.34)
+		var duration := travel_duration(attacker,origin.distance_to(destination))
 		await move_actor(attacker, destination, duration)
 	for i in hits.size():
 		var hit: Dictionary = hits[i]
@@ -512,18 +537,19 @@ func ranged_attack(attacker: Node2D, defender: Node2D, hits: Array, on_hit: Call
 		await get_tree().create_timer(0.10).timeout
 		attacker.set_pose("shoot")
 		combat_audio.play_cue("shoot")
-		last_hit_stop = RANGED_HIT_STOP if int(hit.damage)>0 else RANGED_BLOCK_STOP
+		last_hit_stop = _hit_stop(attacker,RANGED_HIT_STOP if int(hit.damage)>0 else RANGED_BLOCK_STOP)
 		show_gun_bursts(attacker,defender,direction,int(hit.blocked)>0,i)
 		defender.set_pose("block" if hit.blocked > 0 else "damaged")
 		defender.sprite.modulate = Color(1.55,1.8,2.1) if int(hit.damage)==0 else Color(2.1,0.38,0.55)
 		play_hit_sound(hit.blocked > 0)
-		kick_camera(direction,16.0 if int(hit.damage)>0 else 10.0)
+		_pipeline_camera(attacker,direction,16.0 if int(hit.damage)>0 else 10.0)
 		on_hit.call(hit,i)
 		set_phase("shoot")
 		# Hold both contact poses and local flashes; the camera impulse keeps decaying.
 		await get_tree().create_timer(last_hit_stop).timeout
 		if int(hit.blocked)>0 and int(hit.damage)>0: defender.set_pose("damaged")
 		await create_tween().tween_property(defender.sprite,"modulate",Color.WHITE,0.12).finished
+		await _await_pipeline_pose(attacker)
 		if hit.killed:
 			await retire_actor(defender)
 			break
@@ -532,22 +558,24 @@ func ranged_attack(attacker: Node2D, defender: Node2D, hits: Array, on_hit: Call
 	set_phase("idle")
 
 func show_gun_bursts(attacker: Node2D, defender: Node2D, direction: float, blocked: bool, round_index: int) -> void:
+	var effect_scale := _effect_scale(attacker)
+	var effect_offset := _effect_offset(attacker)
 	var muzzle := GunBurst.new()
 	muzzle.mode = "muzzle"
 	muzzle.duration = 0.19
 	muzzle.hold_remaining = last_hit_stop
 	muzzle.variation = round_index
 	# Barrel opening in the authored shooting texture, through its calibrated mirror/scale.
-	muzzle.position = world.to_local(attacker.sprite.to_global(Vector2(54,385))) if attacker.is_player else attacker.position+Vector2(direction*75,-65)*depth_scale(attacker.position)
-	muzzle.scale = Vector2(direction,1)*depth_scale(attacker.position)
+	muzzle.position = (world.to_local(attacker.sprite.to_global(Vector2(54,385))) if attacker.is_player else attacker.position+Vector2(direction*75,-65)*depth_scale(attacker.position))+effect_offset*depth_scale(attacker.position)
+	muzzle.scale = Vector2(direction,1)*depth_scale(attacker.position)*effect_scale
 	world.add_child(muzzle)
 	var impact := GunBurst.new()
 	impact.mode = "impact"
 	impact.hold_remaining = last_hit_stop
 	impact.blocked = blocked
 	impact.variation = round_index
-	impact.position = defender.position+Vector2(-direction*8,-62)*depth_scale(defender.position)
-	impact.scale = Vector2(direction,1)*depth_scale(defender.position)
+	impact.position = defender.position+Vector2(-direction*8,-62)*depth_scale(defender.position)+effect_offset*depth_scale(defender.position)
+	impact.scale = Vector2(direction,1)*depth_scale(defender.position)*effect_scale
 	world.add_child(impact)
 
 
@@ -565,25 +593,92 @@ func laser_attack(attacker: Node2D, defender: Node2D, hits: Array, on_hit: Calla
 		var fx := PalmLaser.new()
 		fx.start = world.to_local(attacker.sprite.to_global(attacker.laser_muzzle))
 		fx.target = world.to_local(defender.to_global(Vector2(0, -62)))
-		fx.max_width = 0.96 * attacker.laser_palm_width * absf(attacker.sprite.scale.y) * absf(attacker.scale.y)
+		fx.start += _effect_offset(attacker)*depth_scale(attacker.position)
+		fx.target += _effect_offset(attacker)*depth_scale(defender.position)
+		fx.max_width = 0.96 * attacker.laser_palm_width * absf(attacker.sprite.scale.y) * absf(attacker.scale.y) * _effect_scale(attacker)
 		fx.blocked = int(hit.get("blocked", 0)) > 0
 		world.add_child(fx)
 		set_phase("laser_charge")
 		await get_tree().create_timer(PalmLaser.CHARGE_TIME).timeout
 		set_phase("laser_grow")
 		await get_tree().create_timer(PalmLaser.GROW_TIME).timeout
-		last_hit_stop = 0.10
+		last_hit_stop = _hit_stop(attacker,0.10)
 		defender.set_pose("block" if fx.blocked else "damaged")
 		defender.sprite.modulate = Color(1.6, 1.1, 1.6)
 		play_hit_sound(fx.blocked)
-		kick_camera(signf(defender.position.x - attacker.position.x), 6.0 if int(hit.get("damage", 0)) > 0 else 3.0)
+		_pipeline_camera(attacker,signf(defender.position.x - attacker.position.x), 6.0 if int(hit.get("damage", 0)) > 0 else 3.0)
 		on_hit.call(hit, i)
 		set_phase("laser_impact")
 		await fx.finished
 		defender.sprite.modulate = Color.WHITE
+		await _await_pipeline_pose(attacker)
 		if bool(hit.get("killed", false)):
 			await retire_actor(defender)
 			break
 		defender.set_pose("idle")
 	attacker.set_pose("idle")
 	set_phase("idle")
+
+func _motion_value(actor: Node2D, key: String, fallback: float) -> float:
+	var motion = actor.get("pipeline_motion")
+	if motion is Dictionary and motion.has(key):
+		var value = motion[key]
+		if value is int or value is float:
+			return float(value)
+	return fallback
+
+func travel_duration(actor: Node2D, distance: float) -> float:
+	var motion = actor.get("pipeline_motion")
+	if motion is Dictionary and motion.has("speed"):
+		return clampf(distance/maxf(1.0,float(motion.speed)),0.03,10.0)
+	return clampf(distance/2300.0,0.15,0.34)
+
+
+func _await_pipeline_pose(actor: Node2D) -> void:
+	if actor == null or not actor.has_method("pipeline_pose_remaining"):
+		return
+	var remaining := maxf(0.0,float(actor.call("pipeline_pose_remaining")))
+	if remaining > 0.001:
+		await get_tree().create_timer(remaining).timeout
+
+func _effect_scale(actor: Node2D) -> float:
+	var effects = actor.get("pipeline_effects")
+	if effects is Dictionary and effects.has("scale"):
+		var value = effects.scale
+		if value is int or value is float:
+			return maxf(0.0,float(value))
+	return 1.0
+
+func _effect_offset(actor: Node2D) -> Vector2:
+	var effects = actor.get("pipeline_effects")
+	if effects is Dictionary:
+		var value = effects.get("offset")
+		if value is Vector2: return value
+		if value is Array and value.size() == 2:
+			return Vector2(float(value[0]),float(value[1]))
+	return Vector2.ZERO
+
+func _hit_stop(actor: Node2D, fallback: float) -> float:
+	var effects = actor.get("pipeline_effects")
+	if effects is Dictionary and effects.has("hitStop"):
+		var value = effects.hitStop
+		if value is int or value is float:
+			return maxf(0.0,float(value))
+	return fallback
+
+func _pipeline_camera(actor: Node2D, direction: float, fallback_strength: float) -> void:
+	var effects = actor.get("pipeline_effects")
+	if not effects is Dictionary or not effects.has("shake"):
+		kick_camera(direction,fallback_strength)
+		return
+	var shake = effects.shake
+	if shake is bool:
+		if shake: kick_camera(direction,fallback_strength)
+		return
+	if shake is int or shake is float:
+		kick_camera(direction,maxf(0.0,float(shake)))
+		return
+	if shake is Dictionary:
+		kick_camera(direction,float(shake.get("strength",fallback_strength)),float(shake.get("duration",0.20)))
+		return
+	kick_camera(direction,fallback_strength)

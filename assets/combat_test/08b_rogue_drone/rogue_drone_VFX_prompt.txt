@@ -1,0 +1,43 @@
+08B 失控配送蜂攻击特效素材
+日期：2026-10-22
+方式：内置 imagegen，transparent_background=true。
+参考：assets/combat_test/08b_rogue_drone/rogue_drone_attack.png，仅用于风格和配色。
+输出：assets/combat_test/08b_rogue_drone/rogue_drone_VFX.png
+初稿：C:/Users/22141/.codex/generated_images/01a1624e-f8f3-7522-95e7-7f03cd473407/exec-e623aa33-709e-4563-9fba-8da528d19fc8.png
+最终原图：C:/Users/22141/.codex/generated_images/01a1624e-f8f3-7522-95e7-7f03cd473407/exec-38c86cb7-7976-43e0-842d-722e448baa6c.png
+构图：上排自左向右为黄色楔形撞击火花与水平气浪、双层半透明方形残影、
+两道冷青灰短风切线；下排为橙白三角火花与向下撞击刻痕、
+两道向下收敛的冷白／淡青轨迹。未包含无人机、货箱实体、夹爪实体或子弹。
+修订：缩短并简化风切线、夹爪轨迹，移除轨迹旁散碎亮片；
+最终仍有局部半透明光晕，残影中心保留半透明填色，不描述为纯空心。
+验证：1536×1024 RGBA PNG，四角 alpha=0；alpha≥128 的边界为
+(95,147)—(1420,895)，未触边。目标文件与生成原图 SHA256 一致：
+68FF9A6C2B2A8C0B9BB344823F7221DB07D4008DD749E8357E5BFEE94EA1BCBC
+仅交付单张独立特效部件图，未拆帧、未配置1～2帧残影时序、未接入运行时，
+未运行游戏测试。
+
+第一次实际提示词：
+Use case: stylized-concept
+Asset type: independent transparent 2D game attack VFX texture PNG for rogue delivery drone 08B, rogue_drone_VFX.png.
+Reference image is ONLY for matching the hand-painted cel-shaded industrial cyberpunk style and cold blue-gray / ivory / yellow palette. DO NOT draw the drone, fans, claws, cargo, enemies, or other solid objects.
+Primary request: a compact VFX parts sheet with TWO separated attack effect groups on ONE transparent landscape 1536x1024 canvas. No labels or borders. Large clean transparent gutters between components and generous outside margins. Effects should be concise small mechanical collision marks, not spectacular magic attacks.
+UPPER HALF: cargo ram / airborne powered collision, direction RIGHT TO LEFT.
+At upper-right: exactly TWO short cold cyan-gray wind shear strokes, slender slightly swept horizontal tapered lines for placing near the propulsion fans. Muted cold teal-gray with pale edges.
+At upper-middle: exactly TWO offset translucent SQUARE afterimage planes, slightly skewed in matching three-quarter perspective, forming a brief double-layer geometric box motion echo trailing to the right. They are empty semi-transparent flat ghost shapes with only simple edge/corner emphasis, NO actual cargo drawing, NO latch, armor, handle or mechanical detail. One layer 25 percent opacity and one 12 percent opacity; keep centers transparent and outlines very light. This represents only 1-2 frames of cargo forward movement. No long train of copies.
+At upper-left: a SMALL tight cluster of angular yellow hazard-marker colored wedge sparks directed LEFT, with a low flat HORIZONTAL air-pressure ripple spreading sideways through the contact point. Yellow / warm ivory cores, muted gray-blue air wave. No projectile or bullet shape. Keep the horizontal ripple compact and thin, not a huge explosion or shockwave ball. Separate the hit cluster from the square afterimages by a transparent gap.
+LOWER HALF: downward sorting-claw contact.
+At lower-middle-right: exactly TWO short cold-white / pale-cyan straight tapered motion lines slanting DOWNWARD toward each other, converging at their lower ends with an open narrow gap, as two mechanical gripper-tip trajectories. Thin planar kinetic strokes, not claws or teeth, no organic curves, no drawn metal pincers.
+At lower-middle-left: a SMALL compact orange-white TRIANGULAR spark burst and ONE short downward impact nick at its base. Strong orange outer shards, ivory-white interior, a small sharp V-shaped downward impact mark. Keep localized and minimal, no ground debris or dust. Separate this contact burst from the converging lines with a transparent gap so elements can be cropped.
+Style: crisp angular silhouettes, restrained dark plum edge accents around the bright sparks only, hand-painted cel-shaded 2D effects matching reference, readable at game scale. Translucent wind and afterimages should stay airy with subtle edges. Restrained local glow only, no broad smoky halo.
+Strict exclusions: NO drone, cargo body, claw body, physical projectile, bullets, missiles, lasers, teeth, monster fangs, characters, ground, scenery, large fire explosion, HUD, captions, text, arrows, panel borders, watermark or background. TRUE transparent alpha, not a black/white background or checkerboard painted into the image. All five components isolated and fully within canvas.
+
+局部修订实际提示词：
+Use case: precise-object-edit. Edit this VFX sheet ONLY for tighter, cleaner production-ready transparency. Keep all FIVE existing effect groups in their same positions, preserve the angular painted style and palette.
+REMOVE the large diffuse fog and ambient glow surrounding every group, especially between the square afterimages and wind streaks. Outside the crisp effect strokes the pixels must be fully transparent; local glow may extend only a very few pixels from bright strokes. Make generous genuinely clear transparent gutters. No dark backdrop.
+Keep exactly TWO overlapping square motion afterimage planes, make their interior almost invisible transparent, emphasize only faint semi-transparent outlines and corners; no large luminous rectangular fill.
+Upper-right two wind streaks: simplify each into a SHORT slender cold cyan-gray tapered slash, substantially reduce their length and thickness, no particle cloud, no shards scattered around these two wind lines.
+Lower-right pair: shorten BOTH straight pale-cyan / cold-white converging claw-trajectory lines by about one third and reduce thickness, keep a clear open gap between lower tips. They must read as mechanical motion strokes, not teeth, claws, icicles or physical blades. Remove the little side shards along them.
+Upper-left yellow contact spark and flat horizontal ripple: reduce the spark cluster size slightly and keep local crisp yellow hazard-color wedge sparks, the ripple narrow and horizontal.
+Lower-left orange-white contact spark: compact orange-white triangular collision flick with ONE downward V nick, reduce size slightly.
+Do not add machine, claws, ground, text, borders, projectiles, bullets, background or any extra components. Preserve full landscape canvas and transparent alpha.
+

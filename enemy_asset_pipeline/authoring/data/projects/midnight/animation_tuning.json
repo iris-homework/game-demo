@@ -1,0 +1,954 @@
+{
+  "schemaVersion": 1,
+  "values": {
+    "profiles.warden_shield.groups.idle.visual_size": 0.1132,
+    "profiles.warden_shield.groups.idle.visual_scale": {
+      "x": 0.1132,
+      "y": 0.1132
+    },
+    "profiles.warden_shield.groups.idle.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.warden_shield.groups.idle.rotation": 0,
+    "profiles.warden_shield.groups.move.visual_size": 0.1129,
+    "profiles.warden_shield.groups.move.visual_scale": {
+      "x": 0.1129,
+      "y": 0.1129
+    },
+    "profiles.warden_shield.groups.move.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.warden_shield.groups.move.rotation": 0,
+    "profiles.warden_shield.groups.pierce.visual_size": 0.1186,
+    "profiles.warden_shield.groups.pierce.visual_scale": {
+      "x": 0.1186,
+      "y": 0.1186
+    },
+    "profiles.warden_shield.groups.pierce.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.warden_shield.groups.pierce.rotation": 0,
+    "profiles.warden_shield.groups.damaged.visual_size": 0.1257,
+    "profiles.warden_shield.groups.damaged.visual_scale": {
+      "x": 0.1257,
+      "y": 0.1257
+    },
+    "profiles.warden_shield.groups.damaged.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.warden_shield.groups.damaged.rotation": 0,
+    "profiles.scavenger_hooker.character.visual_size": 0.984,
+    "profiles.scavenger_hooker.character.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.scavenger_hooker.character.rotation": 0,
+    "profiles.scavenger_hooker.groups.idle.visual_size": 0.126,
+    "profiles.scavenger_hooker.groups.idle.visual_scale": {
+      "x": 0.126,
+      "y": 0.126
+    },
+    "profiles.scavenger_hooker.groups.idle.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.scavenger_hooker.groups.idle.rotation": 0,
+    "profiles.chip_broker.groups.idle.visual_size": 0.096,
+    "profiles.chip_broker.groups.idle.visual_scale": {
+      "x": 0.096,
+      "y": 0.096
+    },
+    "profiles.chip_broker.groups.idle.offset": {
+      "x": -9,
+      "y": 0
+    },
+    "profiles.chip_broker.groups.idle.rotation": 0,
+    "profiles.chip_broker.groups.move.visual_size": 0.0996,
+    "profiles.chip_broker.groups.move.visual_scale": {
+      "x": 0.0996,
+      "y": 0.0996
+    },
+    "profiles.chip_broker.groups.move.offset": {
+      "x": -8,
+      "y": 0
+    },
+    "profiles.chip_broker.groups.move.rotation": 0,
+    "profiles.chip_broker.groups.pierce.visual_size": 0.1036,
+    "profiles.chip_broker.groups.pierce.visual_scale": {
+      "x": 0.1036,
+      "y": 0.1036
+    },
+    "profiles.chip_broker.groups.pierce.offset": {
+      "x": -14,
+      "y": 0
+    },
+    "profiles.chip_broker.groups.pierce.rotation": 0,
+    "profiles.chip_broker.groups.damaged.visual_size": 0.0985,
+    "profiles.chip_broker.groups.damaged.visual_scale": {
+      "x": 0.0985,
+      "y": 0.0985
+    },
+    "profiles.chip_broker.groups.damaged.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.chip_broker.groups.damaged.rotation": 0,
+    "profiles.mutant_mouse.character.visual_size": 0.5,
+    "profiles.mutant_mouse.character.offset": {
+      "x": 0,
+      "y": 6
+    },
+    "profiles.mutant_mouse.character.rotation": 0,
+    "profiles.mutant_mouse.groups.move.visual_size": 0.2151,
+    "profiles.mutant_mouse.groups.move.visual_scale": {
+      "x": 0.2151,
+      "y": 0.2151
+    },
+    "profiles.mutant_mouse.groups.move.offset": {
+      "x": 13,
+      "y": -55
+    },
+    "profiles.mutant_mouse.groups.move.rotation": 0,
+    "profiles.mutant_mouse.groups.pierce.visual_size": 0.1748,
+    "profiles.mutant_mouse.groups.pierce.visual_scale": {
+      "x": 0.1748,
+      "y": 0.1748
+    },
+    "profiles.mutant_mouse.groups.pierce.offset": {
+      "x": -23,
+      "y": 0
+    },
+    "profiles.mutant_mouse.groups.pierce.rotation": 0,
+    "profiles.mutant_mouse.groups.damaged.visual_size": 0.1823,
+    "profiles.mutant_mouse.groups.damaged.visual_scale": {
+      "x": 0.1823,
+      "y": 0.1823
+    },
+    "profiles.mutant_mouse.groups.damaged.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.mutant_mouse.groups.damaged.rotation": 0,
+    "profiles.luggage_lurker.character.visual_size": 0.6,
+    "profiles.luggage_lurker.character.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.luggage_lurker.character.rotation": 0,
+    "profiles.luggage_lurker.groups.idle.visual_size": 0.0733,
+    "profiles.luggage_lurker.groups.idle.visual_scale": {
+      "x": 0.0733,
+      "y": 0.0733
+    },
+    "profiles.luggage_lurker.groups.idle.offset": {
+      "x": 0,
+      "y": 11
+    },
+    "profiles.luggage_lurker.groups.idle.rotation": 0,
+    "profiles.luggage_lurker.groups.move.visual_size": 0.0738,
+    "profiles.luggage_lurker.groups.move.visual_scale": {
+      "x": 0.0738,
+      "y": 0.0738
+    },
+    "profiles.luggage_lurker.groups.move.offset": {
+      "x": 0,
+      "y": 15
+    },
+    "profiles.luggage_lurker.groups.move.rotation": 0,
+    "profiles.luggage_lurker.groups.pierce.visual_size": 0.0733,
+    "profiles.luggage_lurker.groups.pierce.visual_scale": {
+      "x": 0.0733,
+      "y": 0.0733
+    },
+    "profiles.luggage_lurker.groups.pierce.offset": {
+      "x": 0,
+      "y": 11
+    },
+    "profiles.luggage_lurker.groups.pierce.rotation": 0,
+    "profiles.luggage_lurker.groups.damaged.visual_size": 0.0736,
+    "profiles.luggage_lurker.groups.damaged.visual_scale": {
+      "x": 0.0736,
+      "y": 0.0736
+    },
+    "profiles.luggage_lurker.groups.damaged.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.luggage_lurker.groups.damaged.rotation": 30,
+    "profiles.luggage_lurker.groups.bite.visual_size": 0.0703,
+    "profiles.luggage_lurker.groups.bite.visual_scale": {
+      "x": 0.0703,
+      "y": 0.0703
+    },
+    "profiles.luggage_lurker.groups.bite.offset": {
+      "x": 0,
+      "y": 9
+    },
+    "profiles.luggage_lurker.groups.bite.rotation": 0,
+    "profiles.penitent_ascetic.groups.idle.visual_size": 0.12,
+    "profiles.penitent_ascetic.groups.idle.visual_scale": {
+      "x": 0.12,
+      "y": 0.12
+    },
+    "profiles.penitent_ascetic.groups.idle.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.penitent_ascetic.groups.idle.rotation": 0,
+    "profiles.penitent_ascetic.groups.move.visual_size": 0.1485,
+    "profiles.penitent_ascetic.groups.move.visual_scale": {
+      "x": 0.1485,
+      "y": 0.1485
+    },
+    "profiles.penitent_ascetic.groups.move.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.penitent_ascetic.groups.move.rotation": 0,
+    "profiles.penitent_ascetic.groups.pierce.visual_size": 0.12,
+    "profiles.penitent_ascetic.groups.pierce.visual_scale": {
+      "x": 0.12,
+      "y": 0.12
+    },
+    "profiles.penitent_ascetic.groups.pierce.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.penitent_ascetic.groups.pierce.rotation": 0,
+    "profiles.penitent_ascetic.groups.damaged.visual_size": 0.1202,
+    "profiles.penitent_ascetic.groups.damaged.visual_scale": {
+      "x": 0.1202,
+      "y": 0.1202
+    },
+    "profiles.penitent_ascetic.groups.damaged.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.penitent_ascetic.groups.damaged.rotation": 0,
+    "profiles.rogue_drone.groups.idle.visual_size": 0.05,
+    "profiles.rogue_drone.groups.idle.visual_scale": {
+      "x": 0.05,
+      "y": 0.05
+    },
+    "profiles.rogue_drone.groups.idle.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.rogue_drone.groups.idle.rotation": 0,
+    "profiles.rogue_drone.groups.move.visual_size": 0.05,
+    "profiles.rogue_drone.groups.move.visual_scale": {
+      "x": 0.05,
+      "y": 0.05
+    },
+    "profiles.rogue_drone.groups.move.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.rogue_drone.groups.move.rotation": 0,
+    "profiles.rogue_drone.groups.pierce.visual_size": 0.05,
+    "profiles.rogue_drone.groups.pierce.visual_scale": {
+      "x": 0.05,
+      "y": 0.05
+    },
+    "profiles.rogue_drone.groups.pierce.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.rogue_drone.groups.pierce.rotation": 0,
+    "profiles.rogue_drone.groups.damaged.visual_size": 0.05,
+    "profiles.rogue_drone.groups.damaged.visual_scale": {
+      "x": 0.05,
+      "y": 0.05
+    },
+    "profiles.rogue_drone.groups.damaged.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.rogue_drone.groups.damaged.rotation": -50,
+    "profiles.pruning_hound.character.visual_size": 0.5,
+    "profiles.pruning_hound.character.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.pruning_hound.character.rotation": 0,
+    "profiles.pruning_hound.groups.idle.visual_size": 0.183,
+    "profiles.pruning_hound.groups.idle.visual_scale": {
+      "x": 0.183,
+      "y": 0.183
+    },
+    "profiles.pruning_hound.groups.idle.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.pruning_hound.groups.idle.rotation": 0,
+    "profiles.pruning_hound.groups.pierce.visual_size": 0.1797,
+    "profiles.pruning_hound.groups.pierce.visual_scale": {
+      "x": 0.1797,
+      "y": 0.1797
+    },
+    "profiles.pruning_hound.groups.pierce.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.pruning_hound.groups.pierce.rotation": 0,
+    "profiles.pruning_hound.groups.damaged.visual_size": 0.184,
+    "profiles.pruning_hound.groups.damaged.visual_scale": {
+      "x": 0.184,
+      "y": 0.184
+    },
+    "profiles.pruning_hound.groups.damaged.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.pruning_hound.groups.damaged.rotation": 0,
+    "profiles.powerline_repairman.groups.move.visual_size": 0.1134,
+    "profiles.powerline_repairman.groups.move.visual_scale": {
+      "x": 0.1084,
+      "y": 0.1134
+    },
+    "profiles.powerline_repairman.groups.move.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.powerline_repairman.groups.move.rotation": 0,
+    "profiles.powerline_repairman.groups.damaged.visual_size": 0.1165,
+    "profiles.powerline_repairman.groups.damaged.visual_scale": {
+      "x": 0.1165,
+      "y": 0.1165
+    },
+    "profiles.powerline_repairman.groups.damaged.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.powerline_repairman.groups.damaged.rotation": 0,
+    "profiles.beacon_jellyfish.character.visual_size": 0.6,
+    "profiles.beacon_jellyfish.character.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.beacon_jellyfish.character.rotation": 0,
+    "profiles.beacon_jellyfish.groups.pierce.visual_size": 0.1889,
+    "profiles.beacon_jellyfish.groups.pierce.visual_scale": {
+      "x": 0.1889,
+      "y": 0.1889
+    },
+    "profiles.beacon_jellyfish.groups.pierce.offset": {
+      "x": 0,
+      "y": 40
+    },
+    "profiles.beacon_jellyfish.groups.pierce.rotation": 0,
+    "profiles.beacon_jellyfish.groups.damaged.visual_size": 0.1643,
+    "profiles.beacon_jellyfish.groups.damaged.visual_scale": {
+      "x": 0.1643,
+      "y": 0.1643
+    },
+    "profiles.beacon_jellyfish.groups.damaged.offset": {
+      "x": 28,
+      "y": 0
+    },
+    "profiles.beacon_jellyfish.groups.damaged.rotation": 0,
+    "profiles.mirror_inspector.character.visual_size": 0.9,
+    "profiles.mirror_inspector.character.offset": {
+      "x": 0,
+      "y": 0
+    },
+    "profiles.mirror_inspector.character.rotation": 0
+  },
+  "scene_settings": {},
+  "frame_visual_overrides": {},
+  "frame_playback_overrides": {},
+  "frame_box_overrides": {
+    "warden_shield/idle:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 40.5,
+          "y": -494.5
+        },
+        "size": {
+          "x": 428,
+          "y": 989
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "warden_shield/move:0": {
+      "collisionbox": {
+        "offset": {
+          "x": -8,
+          "y": -488.5
+        },
+        "size": {
+          "x": 462,
+          "y": 977
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "warden_shield/pierce:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 9,
+          "y": -454.5
+        },
+        "size": {
+          "x": 485,
+          "y": 909
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "warden_shield/damaged:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 2,
+          "y": -453.5
+        },
+        "size": {
+          "x": 481,
+          "y": 907
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "scavenger_hooker/idle:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 19,
+          "y": -486.5
+        },
+        "size": {
+          "x": 365,
+          "y": 973
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "chip_broker/idle:0": {
+      "collisionbox": {
+        "offset": {
+          "x": -0.5,
+          "y": -549.5
+        },
+        "size": {
+          "x": 325,
+          "y": 1099
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "chip_broker/move:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 1.5,
+          "y": -548
+        },
+        "size": {
+          "x": 358,
+          "y": 1096
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "chip_broker/pierce:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 70.5,
+          "y": -504
+        },
+        "size": {
+          "x": 473,
+          "y": 1008
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "chip_broker/damaged:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 147,
+          "y": -538
+        },
+        "size": {
+          "x": 301,
+          "y": 1076
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "luggage_lurker/idle:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 6.5,
+          "y": -360.5
+        },
+        "size": {
+          "x": 601,
+          "y": 721
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "luggage_lurker/move:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 14,
+          "y": -358.5
+        },
+        "size": {
+          "x": 594,
+          "y": 717
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "luggage_lurker/pierce:0": {
+      "collisionbox": {
+        "offset": {
+          "x": -4,
+          "y": -432.5
+        },
+        "size": {
+          "x": 612,
+          "y": 865
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "luggage_lurker/damaged:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 12.5,
+          "y": -398
+        },
+        "size": {
+          "x": 615,
+          "y": 796
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "penitent_ascetic/idle:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 1.5,
+          "y": -565.5
+        },
+        "size": {
+          "x": 478,
+          "y": 1131
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "penitent_ascetic/move:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 24,
+          "y": -438.5
+        },
+        "size": {
+          "x": 599,
+          "y": 877
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "penitent_ascetic/pierce:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 3.5,
+          "y": -485.5
+        },
+        "size": {
+          "x": 537,
+          "y": 971
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "penitent_ascetic/damaged:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 1,
+          "y": -545
+        },
+        "size": {
+          "x": 477,
+          "y": 1090
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "rogue_drone/idle:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 12,
+          "y": -379
+        },
+        "size": {
+          "x": 612,
+          "y": 758
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "rogue_drone/move:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 1.5,
+          "y": -361
+        },
+        "size": {
+          "x": 627,
+          "y": 722
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "rogue_drone/pierce:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 6,
+          "y": -417.5
+        },
+        "size": {
+          "x": 625,
+          "y": 835
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "rogue_drone/damaged:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 12,
+          "y": -405.5
+        },
+        "size": {
+          "x": 592,
+          "y": 811
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "pruning_hound/idle:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 19,
+          "y": -364
+        },
+        "size": {
+          "x": 600,
+          "y": 728
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "pruning_hound/move:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 5,
+          "y": -350.5
+        },
+        "size": {
+          "x": 616,
+          "y": 701
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "pruning_hound/pierce:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 6.5,
+          "y": -425
+        },
+        "size": {
+          "x": 614,
+          "y": 850
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "pruning_hound/damaged:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 10.5,
+          "y": -347.5
+        },
+        "size": {
+          "x": 605,
+          "y": 695
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "powerline_repairman/move:0": {
+      "collisionbox": {
+        "offset": {
+          "x": -45.5,
+          "y": -567
+        },
+        "size": {
+          "x": 422,
+          "y": 1134
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "powerline_repairman/damaged:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 4.5,
+          "y": -493.5
+        },
+        "size": {
+          "x": 499,
+          "y": 987
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "beacon_jellyfish/idle:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 6,
+          "y": -503.5
+        },
+        "size": {
+          "x": 504,
+          "y": 1007
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "beacon_jellyfish/move:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 9,
+          "y": -467
+        },
+        "size": {
+          "x": 516,
+          "y": 934
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "beacon_jellyfish/pierce:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 1.5,
+          "y": -345
+        },
+        "size": {
+          "x": 629,
+          "y": 690
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "beacon_jellyfish/damaged:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 5,
+          "y": -396
+        },
+        "size": {
+          "x": 518,
+          "y": 792
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "scavenger_hooker/move:0": {
+      "collisionbox": {
+        "offset": {
+          "x": -25.5,
+          "y": -483
+        },
+        "size": {
+          "x": 495,
+          "y": 966
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "scavenger_hooker/pierce:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 10.5,
+          "y": -486
+        },
+        "size": {
+          "x": 552,
+          "y": 972
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "scavenger_hooker/damaged:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 9.5,
+          "y": -473.5
+        },
+        "size": {
+          "x": 550,
+          "y": 947
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "mutant_mouse/idle:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 12.5,
+          "y": -297
+        },
+        "size": {
+          "x": 578,
+          "y": 594
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "mutant_mouse/move:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 17,
+          "y": -314.5
+        },
+        "size": {
+          "x": 609,
+          "y": 629
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "mutant_mouse/pierce:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 30.5,
+          "y": -370.5
+        },
+        "size": {
+          "x": 551,
+          "y": 741
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "mutant_mouse/damaged:0": {
+      "collisionbox": {
+        "offset": {
+          "x": -2,
+          "y": -303
+        },
+        "size": {
+          "x": 609,
+          "y": 606
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "luggage_lurker/bite:0": {
+      "collisionbox": {
+        "offset": {
+          "x": -4,
+          "y": -432.5
+        },
+        "size": {
+          "x": 612,
+          "y": 865
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "mirror_inspector/pierce:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 28,
+          "y": -508
+        },
+        "size": {
+          "x": 418,
+          "y": 1016
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "mirror_inspector/damaged:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 7,
+          "y": -626.5
+        },
+        "size": {
+          "x": 410,
+          "y": 1253
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    },
+    "mirror_inspector/idle:0": {
+      "collisionbox": {
+        "offset": {
+          "x": 24,
+          "y": -661
+        },
+        "size": {
+          "x": 255,
+          "y": 1322
+        },
+        "rotation": 0,
+        "enabled": true
+      }
+    }
+  }
+}

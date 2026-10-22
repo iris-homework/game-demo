@@ -1,0 +1,26 @@
+生成日期：2026-10-22（Asia/Shanghai）
+工具：内置 imagegen，transparent_background=true
+对应图片：mutant_mouse_damaged.png
+图片 SHA256：02624E19DC078ECD1C64C991486D72A5396282C20160805E9F099D6F09574F5E
+参考图：mutant_mouse.png（同一角色身份、比例、材质与配色）
+生成原图：
+C:/Users/22141/.codex/generated_images/01a1632d-458d-7711-a822-963a6a4db26d/exec-2df0441f-43f0-4510-9709-ef00477a0bd7.png
+
+说明：采用受击与败退衔接的融合姿态；弓背回缩、耳朵后压、
+尾部低垂收拢。连续退场动画未包含。下方逐字保留实际提示词。
+
+Use case: identity-preserve.
+Asset type: one transparent PNG damaged / hit-reaction key-pose sprite for the existing 2D side-view combat enemy 05A, 爬墙线鼠 / mutant mouse.
+Input image: the supplied idle sprite is the exact character, anatomical identity, palette, rendering style, scale and camera reference.
+
+Primary request: transform the same mutant mouse into ONE damaged pose that fuses a violent spring-like hit recoil with the beginning of a shrinking retreat. The blow comes from SCREEN LEFT. Compress the whole creature low and pull its shoulders back, while the spine arches sharply upward in a tense spring-like crescent. Duck and slightly turn the head away from the impact, with a pained squint, flattened ears pressed tightly back against the skull, muzzle pulled back around the clenched copper wire, and fur bristling unevenly. Keep the front paws planted wide but beginning to skid, and tuck the hind paws close under the lowered rump; all four paws remain visible and grounded, with one rear heel just lifting. The body should look ready to shrink into a compact ball and scramble away, not leap, bite, lunge or counterattack.
+
+Tail for this hit pose: let the heavy tail drop low and drag behind the body, curling defensively back toward the rear paws in a loose low hook. The cable wraps, loose copper strands and small metal plate hang with gravity and trail the body; they must NOT rise like the attack sweep. One continuous tail only.
+
+Preserve the exact character identity and visual language: same angular near-black ink outlines, faceted hand-painted cel shading, warm gray-brown matted fur with plum shadows and sharp pink-magenta rim highlights, small sickly teal-green eye, huge torn ears, protruding rodent incisors, copper wire held in the mouth, black cable scraps tangled across the back, and the same thick naked cable-wrapped tail with copper strands and a small metal plate. Same side three-quarter combat view facing LEFT and same compact rat proportions. Exactly FOUR legs, TWO large ears, ONE head and ONE continuous tail; no extra limbs, tails or detached body parts.
+
+Damage treatment: the pain and impact should be expressed through recoil, squint, bristled fur, bent posture and slipping feet. Do not add open wounds, blood, gore, missing limbs, broken bones, burns, smoke or exposed organs. No target and no visible impact source.
+
+Composition: one complete creature, landscape 1536x1024 framing, centered with generous transparent padding on every side. All ear tips, incisors, four paws, the full low tail and curled tail tip must remain comfortably inside the canvas. Keep the creature large and readable, comparable to the supplied idle. One coherent pose only.
+
+Output: genuinely transparent alpha background with preserved transparent edges. No floor, cast shadow, impact lines, speed lines, motion blur, trails, dust, sparks, debris cloud, checkerboard, black backdrop, glow, text, UI, border or watermark. Not a sprite sheet and not an animation strip.

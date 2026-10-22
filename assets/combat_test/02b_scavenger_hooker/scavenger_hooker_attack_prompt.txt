@@ -1,0 +1,27 @@
+生成日期：2026-10-22（Asia/Shanghai）
+工具：内置 imagegen，transparent_background=true
+用途：02B 拾荒钩客钩挑攻击；面向左，尚未接入运行时。
+造型参考：同目录 scavenger_hooker_idle.png、scavenger_hooker_move.png。
+对应图片：scavenger_hooker_attack.png
+首版生成原图：C:/Users/22141/.codex/generated_images/01a16328-cd94-77d3-a005-18dcec0822e4/exec-f9efaf0e-ccc8-4bdd-b3cf-f5d9c42b37da.png
+最终生成原图：C:/Users/22141/.codex/generated_images/01a16328-cd94-77d3-a005-18dcec0822e4/exec-b4432ab4-7f3f-44bd-b016-bc67c77305ba.png
+最终图片 SHA256：5ebaafbc8652cc89c5068011a1e9d1e712e9b205142feeacf7c7a41e82b3cc5b
+说明：首版动作力量成立，但钩尖偏低；第二步仅抬高钩挑弧线并强化卷线器回拉缆线。
+
+【第一步：实际调用提示词】
+Use case: stylized-concept
+Asset type: enemy attack sprite for a 2D Godot combat scene, matching an existing idle sprite set
+Primary request: Create the ATTACK pose for this exact 拾荒钩客 (human salvage hook raider). Image 1 is the sole identity, costume, equipment, colors, rendering, and proportion reference. Image 2 is a pose/style continuity reference for the same character. Do not redesign the character.
+Attack action: a one-handed hooked upward tear. Show the decisive mid-to-late strike after the hook tip has been pressed to the ground and ripped diagonally upward: a wide braced stance, hips twisted toward the left, torso leaning into the follow-through, anatomical RIGHT arm pulling the thin long iron hook pole diagonally upward across the body, with the single curved hook blade low on the LEFT side of the image and clearly angled upward from the implied ground. The hook pole and curved blade must stay fully visible. The anatomical LEFT forearm keeps the compact cable reel; keep the left arm braced near the chest with the reel's cable visibly taut and being reeled back, so the pose reads as the weapon being retracted after the upward hook. Scarf and jacket hem snap backward from the attack recoil. The tall back rack with exactly three bent pipes and old circular fan guard twists slightly opposite the body but remains strapped on. Exactly two arms, two legs, two hands; anatomically connected limbs.
+Subject identity constraints: preserve the same scruffy compact anime adult male, large angular head, short messy black hair, broad squared industrial goggles over narrowed alert eyes, ochre scarf covering mouth and nose tip, ochre/mustard patchwork work jacket, charcoal trousers and worn dark boots, mismatched elbow guards, narrow scrap basket, exactly three thin bent pipes, one old fan guard, left-arm cable reel, and one long thin utility hook. Ordinary neutral daylight, dark-plum/charcoal cel-shaded shadows, warm ivory metal highlights. No red or pink glow, no neon rim light.
+Style/medium: polished 2D anime game character illustration, same sharp dark ink outlines, hand-painted angular hard-edged cel shading, restrained detail density, ordinary low-tier human enemy. Not photorealistic, not 3D, not a hero.
+Composition/framing: single full-body character only, facing LEFT in the same three-quarter side combat camera. Dynamic offensive pose, full hook pole, curved hook blade, cable, three pipe tips, fan guard, backpack and both feet entirely within a generous transparent margin. Keep a silhouette scale consistent with the idle sprite.
+Scene/backdrop: true transparent RGBA background only. No ground plane, no cast shadow, no dust cloud, no speed lines, no glow, no checkerboard, no background color, no text, no UI, no labels, no watermark.
+Constraints: clearly read as an upward hook attack with reel tension and retraction; preserve exact identity and all listed equipment; no extra limbs, no missing equipment, no duplicated weapon, no scythe or axe, no heavy armor; full weapon inside frame.
+
+【第二步：实际调用提示词】
+Use case: precise-object-edit
+Asset type: enemy attack sprite for a 2D Godot combat scene
+Primary request: Edit ONLY the attack arc and cable tension in Image 1 so the action unmistakably reads as a hooked upward tear after the hook tip was dragged along the ground. Preserve the character's identity, face, goggles, scarf, costume, compact proportions, palette, ink outlines, cel shading, back rack, three bent pipes, fan guard, scrap basket, cable reel, boots, scarf and jacket flow, and dynamic full-body stance exactly.
+Change: Rotate and raise the long hook pole so his anatomical RIGHT hand has just ripped it diagonally upward toward the LEFT. The single curved hook blade should now be at roughly his shoulder-to-head height on the far LEFT, with the point flicking upward, fully visible and clearly above the implied ground. Keep the entire pole connected naturally through his right grip. Make the narrow reel cable clearly visible as a short taut line running from the pole near his right hand back to the compact reel on his anatomical LEFT forearm; the cable should visibly tighten and spool back, selling the retraction. His left hand may brace the cable/reel, but there must still be exactly two arms and two hands. Keep the body torque, braced wide stance, backward-snapping scarf and jacket, and slight opposite twist of the tall rack.
+Constraints: modify only the weapon arc, right-arm orientation needed to support it, and visible reel cable; everything else must remain the same. No ground, no shadow, no speed lines, no dust, no glow, no red or pink light, no text, no UI, no watermark. One full-body character only. Full hook blade, pole, cable, three pipe tips, fan guard, backpack, and both feet must remain entirely inside a generous transparent margin. True RGBA transparent background.

@@ -1,0 +1,16 @@
+生成日期：2026-10-22（Asia/Shanghai）
+工具：内置 imagegen，transparent_background=true
+用途：02B 拾荒钩客钩挑攻击特效；仅特效部件，不含角色与长钩实体。
+对应图片：scavenger_hooker_VFX.png
+生成原图：C:/Users/22141/.codex/generated_images/01a16328-cd94-77d3-a005-18dcec0822e4/exec-47dfb70b-f946-474e-b36d-31022f00799b.png
+最终图片 SHA256：96b1297b19f150eb9052311c33b36f6d6c3a171428e2e04a801afd68c4fe0ecd
+
+【实际调用提示词】
+Use case: stylized-concept
+Asset type: isolated transparent PNG attack VFX for a 2D Godot combat scene
+Primary request: Create ONE readable hook-lift slash trail effect for the 拾荒钩客's hook attack. This is an effects-only texture, not a character sprite and not an animation sheet.
+Shape: a single slender hooked crescent line tracing the path of a narrow long hook tip ripped from the ground diagonally upward toward SCREEN LEFT. Long shallow C / sickle curvature, about five times as wide as its visible height, with a recognizable small inward hook curl at the leading LEFT end. The trail should be a thin designed blade line, not a broad filled blade, not a solid swoosh, and not a projectile. Both ends taper, naturally toward transparency.
+Color and rendering: hand-painted 2D game VFX matching a scruffy salvage character. Muted rust ochre / dirty mustard along the outer moving edge, worn pale gray-white along the inner edge, a narrow dusty neutral-gray transitional stroke, and slightly translucent faded ends. Keep the interior mostly transparent. Crisp angular painted edges, restrained cel-shaded highlights, modest contrast, readable at reduced game size. At the front LEFT tip add only ONE short sharp cold-white scrape, a very narrow clean sliver or tiny two-line nick that suggests hooked metal biting through. No warm spark, no blood, no explosion.
+Framing: one isolated effect cluster centered in a spacious landscape canvas, occupying roughly 70% of the width, fully inside the canvas with generous transparent margins on every side. No duplicate slash, no multiple stages, no VFX sheet with separate effects.
+Scene/backdrop: true transparent RGBA only. Surrounding pixels completely transparent all the way to anti-aliased effect edges. No black background, no white backdrop, no checkerboard drawing, no ground, no floor line, no shadow, no scenery.
+Absolute avoidance: no character, no human body, no hands, no hook pole, no curved metal hook object, no weapon handle, no creature, no text, no UI, no numbers, no labels, no arrows, no frame, no watermark, no big glow bloom, no lens flare, no smoke cloud, no dust cloud, no fire, no electricity, no blood, no thick black outline, no heavy opaque fill, no generic magic crescent, no extra sparks or debris.

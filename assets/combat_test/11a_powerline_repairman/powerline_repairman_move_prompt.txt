@@ -1,0 +1,16 @@
+Intended output: powerline_repairman_move.png
+Generated: 2026-10-22 (Asia/Shanghai)
+Tool: built-in image_gen
+Status: generated.
+Edit target: assets/combat_test/11a_powerline_repairman/powerline_repairman_idle.png
+Final source: C:/Users/22141/.codex/generated_images/01a15a90-c4f3-7ab2-9a5a-a1de9bfc48aa/exec-261824f8-3909-4397-b41e-4546a3c93f3c.png
+
+Actual requested prompt:
+Use case: identity-preserve
+Asset type: single full-body transparent PNG movement key pose for the 2D anime cyberpunk battle enemy 11A 输电抢修工.
+Edit target: the supplied character image only. Preserve the SAME adult male character, helmet, lowered dark opaque arc-flash visor, broad square insulated shoulder silhouette, dirty ash-gray protective suit, exactly TWO faded yellow warning strips (one on each upper sleeve), thick gauntlets, one short belt grounding cable with clamp, heavy layered work boots, and the SAME single straight insulated operating pole with a clearly open U-shaped metal head. Preserve the existing large-head compact-body proportions, bold dark outlines, faceted cel shading, muted gray/brown/charcoal palette, front-left three-quarter facing direction, and polished hand-drawn sprite style.
+Primary request: change only the pose from the planted idle stance into a slow heavy mid-walk movement key pose. Make the character read as stepping forward and beginning to turn: the support leg is planted while the other foot is COMPLETELY LIFTED OFF THE GROUND, with its whole layered sole visibly clear; the footpad should look as if it has just risen and is about to come down. Let the insulated suit and torso rise slightly with the step, with compact hunched weight transfer and broad cloth folds compressing naturally. The pole leads the turn before the waist: BOTH gloved hands still visibly grip the SAME single pole, but it is swung gently forward in the direction of travel and rotation, with the U-shaped head leading on screen LEFT and the shaft diagonal across the front. Waist, hips, and shoulders follow behind the pole, rotated slightly in the same direction.
+Motion character: deliberate, cumbersome, steady heavy gait; not running, not lunging, not a combat attack, no airborne jump, no exaggerated wide splits.
+Composition: ONE character only, whole helmet, both boots, the entire pole and both pole ends in frame with transparent margin. Keep the figure approximately the same scale and canvas placement as the edit target. Single key pose, not a sheet, not multiple views.
+Background: genuinely transparent alpha, clean isolated cutout. No floor, cast shadow, contact shadow, dust cloud, speed lines, motion blur, scenery, or gradient.
+Constraints: preserve identity and equipment exactly; exactly one pole and one U head; exactly two yellow strips; natural two-handed grip at separate points; keep U opening unmistakable; no face visible through visor, no extra limbs, tools, armor plates, weapons, neon accents, electrical arcs, text, logos, UI, border, or watermark.

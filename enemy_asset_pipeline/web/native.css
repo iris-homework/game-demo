@@ -1,0 +1,38 @@
+/* Midnight-specific layout; canvas between the calibration and frame controls. */
+:root{--bg:#0b1018;--panel:#101923;--panel-2:#182a37;--control-bg:#132331;--control-ink:#deedf5;--line:#345260;--accent:#63ccb0;--hard-shadow:none;--soft-shadow:none;--ink:#d9e4ed;--ui-font:"Microsoft YaHei",sans-serif}
+body{overflow:hidden!important;background:var(--bg)}
+.app{grid-template-columns:minmax(0,1fr) 280px!important;height:100vh!important;min-height:0!important;overflow:hidden!important}
+.sidebar{grid-column:2;grid-row:1;height:100vh!important;max-height:none!important;padding:12px;border:0;border-left:1px solid #345260;box-shadow:none}
+.workspace{grid-column:1;grid-row:1;height:100vh;min-width:0;padding:10px}
+.brand,.languageButtons,.field:has(#projectSelect),.languageField,.projectActions,#projectBinding,[data-panel="scene-scale"],[data-panel="boxes"]{display:none!important}
+.characterGroupGrid{grid-template-columns:1fr!important}
+input,select,button{border-width:1px!important;box-shadow:none!important;font-size:12px!important;border-radius:4px!important}
+.toolbar{display:flex!important;flex-wrap:wrap;padding:8px!important;border-width:1px!important;box-shadow:none!important}
+.toolbarActions{justify-content:flex-start!important;flex-wrap:wrap}
+.panel{border-width:1px!important;box-shadow:none!important;padding:8px!important}
+h2{font-size:13px!important}.field{margin-bottom:9px!important}.field span{font-size:12px!important}
+
+.field:has(#profileSelect){display:none!important}
+input,input[readonly],input:read-only,select{background:#132331!important;color:#deedf5!important;-webkit-text-fill-color:#deedf5!important;opacity:1!important}
+
+/* Keep both characters and their ground shadows in the visible canvas area. */
+.workspace{grid-template-rows:auto auto minmax(100px,1fr) 145px;gap:8px}
+#stage{min-height:0;border-width:1px;border-radius:5px;box-shadow:none}
+.toolbarMain{min-width:0}.toolbarMain #hint{display:none}.toolbar{gap:8px}
+.midnightCompareControls{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;font-size:12px;color:#a7c0d0;padding:0 4px}
+.midnightCompareControls label{display:flex;align-items:center;gap:6px;margin:0;font-size:12px}
+.midnightCompareControls input[type=checkbox]{width:auto;min-height:0}
+.midnightCompareControls input[type=range]{width:82px;min-height:0;padding:0;accent-color:#63ccb0}
+.midnightCompareControls output{flex-basis:100%;font-size:11px;color:#8fc8bb}
+.filmstrip{border-width:1px;padding:8px;box-shadow:none}.frameStack{flex-basis:88px}.frameStack img{max-height:75px;object-fit:contain}
+
+#midnightPoseHold{width:65px;min-height:24px;padding:3px 5px}#midnightPoseStatus{color:#9ed6c5;font-size:11px}
+
+/* A narrow calibration rail needs room for both step buttons and the value. */
+.adjustGrid{grid-template-columns:minmax(0,1fr);gap:6px}
+.adjustGrid .number{grid-template-columns:56px minmax(0,1fr);align-items:center;gap:8px;padding:6px}
+.adjustGrid .numberStepper{grid-template-columns:28px minmax(0,1fr) 28px;gap:4px;overflow:visible}
+.adjustGrid .numberStep{min-width:0;width:100%;padding:0}
+.adjustGrid .numberStepper input{width:100%;min-width:0;padding:4px 2px;font-size:12px;}
+#groupTimeField{grid-template-columns:76px minmax(0,1fr);min-width:0}
+#groupTimeMs{width:100%;min-width:0}

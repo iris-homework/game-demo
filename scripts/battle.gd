@@ -662,7 +662,9 @@ func end_turn_pressed() -> void:
 		if attacker_index < 0: continue
 		shown_enemies[attacker_index].block = 0
 		refresh_enemy_hud()
-		var style: String = shown_enemies[attacker_index].intent.get("animation","pierce")
+		var default_style: String = stage.enemies[attacker_index].attack_style_override
+		if default_style.is_empty(): default_style = "pierce"
+		var style: String = shown_enemies[attacker_index].intent.get("animation",default_style)
 		await stage.attack(stage.enemies[attacker_index],stage.player,style,attack.hits,func(hit: Dictionary, _index: int):
 			shown_player_hp = int(hit.hpAfter)
 			shown_player_block = maxi(0,shown_player_block-int(hit.get("blocked",0)))

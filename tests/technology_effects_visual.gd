@@ -1,4 +1,4 @@
-extends "res://tests/interaction_visual.gd"
+extends "res://tests/combat/interaction/interaction_visual.gd"
 
 func verify(ok: bool, message: String) -> void:
 	print("CHECK: ", message)

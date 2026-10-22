@@ -1,0 +1,26 @@
+08B 失控配送蜂移动素材
+日期：2026-10-22
+方式：内置 imagegen，transparent_background=true。
+来源：assets/combat_test/08b_rogue_drone/rogue_drone_idle.png
+（SHA256 8FD42C2093A6573E9FCA5F042C934CA3D322B0FA7622FDCF78EE7A0864970048）
+表现：向左前倾约 12–16 度的短滑起势；尾部略抬，货箱随惯性后摆但仍固定，
+底部机械爪收拢；保持悬停高度和双护罩风扇的宽扁轮廓。
+输出：assets/combat_test/08b_rogue_drone/rogue_drone_move.png
+生成原图：C:/Users/22141/.codex/generated_images/01a15a65-14d7-7820-bb67-b6da7f866826/exec-ab4ecbec-54d1-41a2-afd9-9d123b5964c9.png
+验证：1536×1024 RGBA；四角 alpha=0；alpha≥128 的主体范围
+(24,110)—(1514,928)，主体未触边；目标文件与生成原图 SHA256 一致。
+SHA256：57D9B1904EBB4CF4EE3D94CCC714BC7C21810AD6BCC1BB0ECAB31670A4D4A624
+本轮只交付单张静态动作 PNG；未接入移动时长、锚点、缩放或战斗动画配置，
+未运行游戏测试。
+
+实际提示词：
+Use case: precise-object-edit
+Asset type: one static "move" action sprite for the existing 2D cyberpunk RPG enemy 08B 失控配送蜂.
+Input image: the existing idle sprite is the exact character, geometry, palette and rendering target.
+Primary request: create the forward short-slide movement pose. The drone should pitch nose-down toward its left-facing direction by about 12–16 degrees as it begins sliding forward, while its rear lifting-fan side rises slightly. The hanging cargo box swings backward a small amount from momentum but remains securely attached and visually level enough to read as cargo. Tuck both short lower mechanical gripper claws close to the box during the slide. Both large guarded side fans remain intact and clearly readable; keep their solid form and show only very subtle blade motion through slightly offset blades, not translucent motion trails.
+Motion intent: body first tilts, then short horizontal slide; this frame captures the committed low forward lean while maintaining the same hovering height. No upward takeoff, no swooping flight, no vertical leap.
+Strict identity invariants: exactly the SAME one low, wide drone; same two circular guarded fans, same central teal-gray chassis, deep graphite frame, one closed shallow blue-gray cargo box with old-white bumper rails and corner scuffs, same corner seals and lock, same front-facing left yellow addressing lamp as the ONLY yellow emissive element. Preserve the existing dark plum outlines, hand-painted cel shading, angular facets, worn industrial look and proportion. Keep the silhouette full and readable.
+Composition: one single frame, centered with generous transparent margin, landscape 1536x1024, isolated full body, same three-quarter front-left camera angle, facing LEFT. Keep the drone within the same waist-to-chest enemy scale. No extra objects or characters.
+Backdrop: fully transparent alpha background. No ground, no floor, no shadow, no aura, no halo, no motion streak behind the body, no checkerboard, no text, watermark or UI.
+Avoid: change to another vehicle design, extra rotors, extra claws, opened cargo box, cream/rust-red dominant palette, facial features, weapons, 3D render, photorealism, cropped parts, vertical liftoff.
+

@@ -75,7 +75,11 @@ func return_point(t: float) -> Vector2:
 	return start.lerp(end,t)-Vector2(0,sin(t*PI)*30)
 
 func star(point: Vector2, radius: float, alpha: float) -> void:
-	var outline := PackedVector2Array([point+Vector2(-radius,0),point+Vector2(-3,-3),point+Vector2(0,-radius*0.65),point+Vector2(3,-3),point+Vector2(radius,0),point+Vector2(3,3),point+Vector2(0,radius*0.65),point+Vector2(-3,3)])
+	if radius <= 0.01 or alpha <= 0.001: return
+	# Keep the inner corners inside the tips as the return spark shrinks.
+	# Fixed 3px corners self-intersected near the end of the fade.
+	var inset := minf(3.0, radius * 0.25)
+	var outline := PackedVector2Array([point+Vector2(-radius,0),point+Vector2(-inset,-inset),point+Vector2(0,-radius*0.65),point+Vector2(inset,-inset),point+Vector2(radius,0),point+Vector2(inset,inset),point+Vector2(0,radius*0.65),point+Vector2(-inset,inset)])
 	draw_colored_polygon(outline,Color(0.85,1,1,alpha))
 	for r in [radius*0.8,radius*0.45]: draw_circle(point,r,Color(0.55,0.35,1,alpha*0.05))
 

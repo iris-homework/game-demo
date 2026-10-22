@@ -1,0 +1,61 @@
+生成日期：2026-10-21（Asia/Shanghai）
+工具：内置 imagegen，transparent_background=true
+对应图片：pruning_hound_idle.png
+图片 SHA256：8223A82C158DDC0EDA93831C1118F362756D865BEB9F7438FA96DD20C0F9039F
+参考图：
+- ../reference_idle/fish_idle.png（普通怪层级、紧凑可读轮廓与完成度）
+- ../reference_idle/luggage_lurker_idle.png（干净硬表面机械结构、面板与暖色指示灯）
+- ../reference_idle/mutant_mouse.png（四足生物站姿与深色描边体块）
+- ../reference_idle/robot_idle.png（分面赛璐璐着色、骨白与炭黑配色）
+
+说明：共生成三版。第一版风格成立但可见腿数偏多、剪刃像四片；第二版改为严格四足与两片弧形剪刃，并收束背甲轮廓；第三版按用户要求去除全部洋红色点缀，最终采用第三版。下方逐字保留三次实际提示词。
+
+--- 第一次提示词 ---
+
+Use case: stylized-concept
+Asset type: 2D game enemy idle portrait PNG for Godot combat scene (10A Pruning Hound)
+Primary request: Generate a brand-new full-body idle illustration of "10A Pruning Hound", a garden-maintenance security robot that is a slender-waisted quadruped with an oversized garden-shear head.
+
+Input images: Image 1 fish_idle = ordinary-enemy tier, compact readable silhouette and finished illustration quality; Image 2 luggage_lurker = clean hard-surface mechanical construction, paneling and warm amber indicator light; Image 3 mutant_mouse = creature four-legged body language and stance; Image 4 robot_idle = faceted cel shading, bone-white armor accents against dark charcoal, and overall palette. Use these ONLY as style, tier and material references. Do NOT copy their anatomy, fins, fur, luggage shape, cable hair, or humanoid robot pose.
+
+Scene/backdrop: none. True transparent background, no environment, no floor, no cast shadow.
+
+Subject: a clean, well-maintained private-security garden robot. Slender narrow mechanical waist. Back carapace sculpted like a neatly trimmed oval topiary tree canopy: layered deep-green faceted leaf plates with crisp clipped edges, forming an armored shell over the body. Long thin metal legs tucked under the shell, bone-white joints, small dark hoof-like feet. The head is a pair of large curved garden-shear blades forming a scissor beak, blades slightly parted; one warm yellow eye lamp recessed in the dark head housing. A dark green mesh collection bag for clippings hangs under the belly/hip. Painted metal with fine panel seams, clean edges, no rust, no garbage, no exposed organs.
+
+Pose: alert standing idle, facing left in side three-quarter view, head lowered slightly toward the ground, shear blades beginning to close; front legs planted, hind legs angled and coiled ready to pounce. Stable pose, not mid-swing, not lunging, not attacking.
+
+Style/medium: 2D game illustration matching the reference set: bold dark ink outlines of varying weight, angular faceted cel shading, hard-edged shadow planes, crisp readable silhouette, stylized cyberpunk-fantasy creature design, restrained detail so it reads at small scale.
+
+Color palette: deep forest green shell, charcoal and bone-white metal joints, steel gray shear blades, single warm amber-yellow eye. Tiny magenta-pink edge accent only where the reference set uses it.
+
+Composition/framing: single creature centered, full body including all four legs and the entire shear head, generous transparent padding on every side, roughly 1.4 times as wide as tall. Nothing cropped.
+
+Constraints: true RGBA transparent background; no checkerboard drawn into the image; no background, no ground, no shadow, no text, no UI, no watermark; not a sprite sheet, not an animation strip; exactly one creature; not humanoid, not a furry dog, no gore.
+
+--- 第二次提示词 ---
+
+Use case: precise-object-edit
+Asset type: 2D game enemy idle portrait PNG for Godot (10A Pruning Hound)
+Primary request: Revise image 1 (the green mechanical pruning hound) to correct its anatomy and shell shape while preserving its exact style, palette, pose, lighting and framing.
+
+CHANGE ONLY these things:
+1) Legs: the creature must have EXACTLY FOUR legs — two front legs and two hind legs. Remove every extra limb visible along the belly and flanks. The four legs attach at shoulder and hip, stay clearly separated in the side three-quarter view, and end in small dark hoof-like feet. Hind legs angled and coiled ready to pounce.
+2) Head: exactly TWO large curved garden-shear blades, one upper blade and one lower blade, meeting like a single pair of pruning shears, slightly parted. Remove the extra split blades / mandible-like blades so the head reads as one clean pair of scissors, not four blades or crab pincers. Keep the single warm yellow eye lamp in the dark head housing between the blade hinges.
+3) Back carapace: a neatly trimmed OVAL topiary canopy, not a round artichoke or ball of loose leaves. Clean smooth oval outer silhouette with crisp clipped edges, layered shingled leaf plates lying flat along the shell, deep forest green with restrained lighter green facets. It should look deliberately pruned and maintained, with the narrow mechanical waist clearly visible beneath it.
+Keep the dark green mesh clipping bag under the belly, the bone-white joints, charcoal mechanics, steel shear blades, subtle magenta-pink edge accents, bold dark ink outlines and hard-edged faceted cel shading.
+
+Keep the alert idle pose facing left, head slightly lowered, both front feet planted. Single creature, full body inside frame, transparent padding.
+
+Constraints: exactly four legs, exactly two shear blades; true RGBA transparent background; no background, no checkerboard, no floor, no cast shadow, no text, no UI, no watermark; not a sprite sheet; no extra limbs or props.
+
+--- 第三次提示词 ---
+
+Use case: precise-object-edit
+Asset type: 2D game enemy idle portrait PNG (10A Pruning Hound)
+Primary request: Remove ALL hot pink and magenta accents from image 1.
+
+CHANGE ONLY the color accents: every magenta-pink edge highlight and rim line must be gone — no pink on the green leaf plates, no pink outline on the bone-white legs, joints, hooves or shear blades, no pink anywhere in the illustration. Replace pink highlights on green foliage edges with darker desaturated forest-green edge shading (or a restrained pale sage highlight). Replace pink rim lines on metal with neutral charcoal, gunmetal or bone-white edge shading.
+
+Keep everything else exactly the same: the four-legged pose, the two large curved garden-shear blades and single warm amber-yellow eye lamp, the neatly clipped oval green topiary carapace, the dark green mesh clipping bag, bone-white joints, charcoal mechanics, steel blades, bold dark ink outlines, hard-edged faceted cel shading, facing left, transparent background, framing and padding.
+
+Constraints: absolutely no magenta, hot pink, fuchsia or pink glow; true RGBA transparent background; no background, no checkerboard, no floor, no shadow, no text, no UI, no watermark; single creature; not a sprite sheet.

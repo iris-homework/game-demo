@@ -1,0 +1,30 @@
+生成日期：2026-10-22（Asia/Shanghai）
+工具：内置 imagegen，transparent_background=true
+对应图片：pruning_hound_move.png
+图片 SHA256：CA1426738919A2BE369B9DF030715BFAB8BEF14BEF1B41262BA3A1D910934294
+参考图：pruning_hound_idle.png（同一角色身份、比例、材质与配色）
+
+说明：采用轻快四足小跑的中间步态，身体前倾压低，后足略外撑；本轮只交付单张移动帧。
+下方逐字保留实际提示词。
+
+Use case: precise-object-edit
+Asset type: 2D game enemy movement sprite PNG for Godot (10A Pruning Hound)
+Primary request: Turn image 1 (the green mechanical pruning hound idle) into a light four-legged trot pose for its move frame.
+
+Keep the character's identity EXACTLY: same four-legged mechanical body, slender waist, neatly clipped oval deep-green topiary carapace with layered leaf plates, same pair of large curved garden-shear blades and single warm amber-yellow eye lamp, bone-white joints, charcoal mechanics, steel blades, dark green mesh clipping bag under the belly, same bold dark ink outlines, faceted cel shading, materials, palette, proportions, camera and scale. NO magenta or pink anywhere.
+
+Pose (one frozen mid-trot frame):
+- Light, brisk four-legged trot, facing left in side three-quarter view.
+- Body pitched forward and lowered: back line and topiary shell dip toward the front, head carried low in a purposeful approach.
+- Diagonal trot support: the near front leg reaches forward and plants, the opposite hind leg drives back; the other front leg folds under the chest and the other hind leg lifts forward. Exactly four legs, no extra limbs.
+- Hind legs and hooves turned slightly outward (splayed, wide springy base), not a leap and not an attack lunge.
+- Shear blades part only slightly while moving; the eye lamp stays bright warm amber.
+- The mesh clipping bag swings outward a little with the stride, still attached.
+
+Framing: single creature, entire body and all four legs plus the full shear head inside frame, generous transparent padding, similar framing to image 1.
+
+Constraints: exactly four legs and exactly two main shear blades; no magenta or pink; true RGBA transparent background; no background, no checkerboard, no floor, no cast shadow, no motion lines, no dust, no text, no UI, no watermark; not a sprite sheet; not a sequence strip.
+
+最终图：1484×1060 RGBA，四角完全透明；alpha≥128 的主体范围为
+`(17,183)—(1480,974)`。已核对四足、双剪刃、无洋红。
+未接入敌人配置、移动时间轴或地形寻路，未运行游戏测试。

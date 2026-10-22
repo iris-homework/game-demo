@@ -26,11 +26,11 @@ $mapQaStderr = Join-Path $mapQaOutput 'stderr.log'
 $mapQaArgs = @('--path',$mapQaRoot,'--log-file',$mapQaLog)
 switch ($Suite) {
     'import' { $mapQaArgs += @('--headless','--editor','--import','--quit') }
-    'logic' { $mapQaArgs += @('--headless','res://tests/map_model_tests.tscn') }
-    'story' { $mapQaArgs += @('--headless','res://tests/run.tscn') }
-    'combat' { $mapQaArgs += @('--headless','res://tests/combat_tests.tscn') }
-    'input' { $mapQaArgs += @('--windowed','--position','40,40','--resolution',$Resolution,'--always-on-top','res://tests/map_visual.tscn','--','--output-dir',$mapQaOutput) }
-    'capture' { $mapQaArgs += @('--windowed','--resolution',$Resolution,'res://tests/map_visual.tscn','--','--output-dir',$mapQaOutput,'--capture-only') }
+    'logic' { $mapQaArgs += @('--headless','res://tests/map/map_model_tests.tscn') }
+    'story' { $mapQaArgs += @('--headless','res://tests/story/run.tscn') }
+    'combat' { $mapQaArgs += @('--headless','res://tests/combat/rules/combat_tests.tscn') }
+    'input' { $mapQaArgs += @('--windowed','--position','40,40','--resolution',$Resolution,'--always-on-top','res://tests/map/map_visual.tscn','--','--output-dir',$mapQaOutput) }
+    'capture' { $mapQaArgs += @('--windowed','--resolution',$Resolution,'res://tests/map/map_visual.tscn','--','--output-dir',$mapQaOutput,'--capture-only') }
 }
 foreach ($mapQaArg in $mapQaArgs) {
     if ($mapQaArg -match '["\r\n]') { throw 'Unsafe command-line path.' }

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "activeProjectId": "midnight",
+  "projects": [
+    {
+      "id": "midnight",
+      "label": "午夜委托 · 怪物制作",
+      "kind": "frame_lite",
+      "projectRoot": "",
+      "petRoot": "",
+      "dataDir": "data/projects/midnight",
+      "workspaceDir": "workspace/projects/midnight"
+    }
+  ]
+}

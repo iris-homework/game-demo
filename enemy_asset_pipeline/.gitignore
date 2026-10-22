@@ -1,0 +1,10 @@
+test/session/
+test/evidence/
+test/runtime/
+test/preview_catalog.json
+test/selection.json
+authoring/data/*.tmp
+authoring/preview_catalog.json
+authoring/selection.json
+authoring/data/projects/*/asset_scan_report.json
+published/backups/

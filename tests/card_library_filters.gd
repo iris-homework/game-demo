@@ -56,6 +56,7 @@ func remove_view() -> void:
 
 func _ready() -> void:
 	visual = DisplayServer.get_name() != "headless"
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output))
 	Game.save_enabled = false
 	Game.save_path = output.path_join("isolated-checkpoint.json")
 	Game.meta_path = output.path_join("isolated-meta.json")

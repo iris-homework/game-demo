@@ -1,0 +1,25 @@
+生成日期：2026-10-22（Asia/Shanghai）
+对应图片：pruning_hound_VFX.png
+图片 SHA256：CB1880DE3C5E24B8405A0A1E755F07294A9E71D263B6027D8A8BA0108557CF04
+生成方式：Python + Pillow 矢量式程序绘制，未使用 imagegen 出图。
+原因：内置 imagegen 返回 429（主账户用量上限、未启用 credits），CLI 备用路径也缺少 OPENAI_API_KEY。
+生成脚本：artifacts/design/pruning-hound-vfx-2026-10-22/generate_vfx.py
+试装预览：artifacts/design/pruning-hound-vfx-2026-10-22/preview_garden.png
+
+用户需求原文：
+攻击特效：剪口扑击｜园艺剪刃：两片剪刃张开时各带一道浅薄荷绿／骨白硬边弧，
+合剪瞬间出现交叉X形冷白锋点并散出一两片小叶形绿色碎屑。
+
+实现要点：
+- 画布 1774×887，2 倍超采样后缩小，最终为 RGBA。
+- 两条剪刃弧从左侧展开，在中右部收束到锋点；主体为浅薄荷绿，内缘为骨白硬边，
+  外缘为深墨绿极细描边，弧外带低透明度薄荷辉光与深绿投影。
+- 锋点为冷白长 X 形尖刺，角度对齐两条弧在交点的真实切线，中心叠加四角星芒。
+- 两片深绿小叶形碎屑向画面右侧散开，带叶脉与浅绿细边。
+- 不使用洋红／粉紫；无角色本体、无地面、无文字。
+
+参考：
+- assets/combat_test/10a_pruning_hound/pruning_hound_idle.png：确认同一套深绿与骨白配色。
+- assets/combat_fx/noren_red_slash.png：仅对照横向弧线加锋点的构图与战斗可读性，未复制像素。
+
+说明：这是独立攻击特效素材，尚未接入战斗场景或动画时间轴；本轮未运行游戏测试。

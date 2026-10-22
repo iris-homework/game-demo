@@ -1,0 +1,45 @@
+Beacon Jellyfish 13B — move key pose (current imagegen version)
+Generated: 2026-10-22 (Asia/Shanghai)
+Mode: built-in image_gen; transparent_background=true
+Output: beacon_jellyfish_move.png
+Reference: user-attached idle sprite
+Generated source: C:\Users\22141\.codex\generated_images\01a15a84-3781-7da1-9dbe-ee5d4eb41bd9\exec-e4ea38fe-77de-417a-bb89-bc82f4dbc518.png
+SHA256: D1113DD187261840FE0BD8FF77B2CBE90787A097235E0513735F4F725425D1BC
+Prior image and prompt: artifacts/design/beacon-jellyfish-2026-10-22/before-imagegen/
+
+Exact prompt for current PNG:
+Use case: identity-preserve.
+Edit the supplied Beacon Jellyfish idle sprite into ONE distinct MOVE key pose for the same 2D combat enemy. Preserve the exact creature design, bold near-black contour weight, angular painted cel shading, cloudy pale blue-gray ragged bell membrane, dark navy-violet underside, weathered metal navigation beacon cage and handle, central amber light, and exactly THREE thick folded tentacle bundles. The supplied image is the identity and style master.
+Action: low-altitude short drift toward SCREEN LEFT. Show the active compression phase of the float: the umbrella bell contracts inward at its rim, becoming visibly narrower and more domed than idle, leaning modestly left into its motion. Keep the lantern visibly enclosed by the membrane and warm center light unobscured. Make this a clearly readable locomotion silhouette different from the idle. The three tentacle bundles react to leftward movement: one forward/central thick bundle extends downward and curls its tip gently onto an implied horizontal contact plane for a brief pulling contact; the other two lift and sweep back toward SCREEN RIGHT in relaxed trailing S curves. All three roots connect visibly to the underside and remain separated by clear negative space. They remain thick folded fleshy ribbons, not many fine noodles; no additional limbs or tentacle bundles. Maintain roughly the idle's body size, view angle, and low hover height; do not depict a jump, dive, attack, or flying ascent.
+Composition: one complete creature, square canvas, whole bell and all three tentacle tips inside frame with at least 5 percent transparent margins; same front three-quarter side-view presentation as reference. Center its full silhouette and keep its body mass at approximately the reference vertical level. Pose change only; retain character proportions, colors and all identifying structural features. No motion streaks, duplicates, ghost images or multiple frames.
+Output genuinely transparent PNG background with preserved alpha. NO black rectangle, checkerboard drawing, deck, floor, cast shadow, background, fog, splashes, scenery, text, UI, border or watermark. Single isolated full-body MOVE sprite.
+
+----- Historical deformation version; no longer used for current PNG -----
+
+信标水母 13B — move key pose
+
+Final asset: beacon_jellyfish_move.png
+Created: 2026-10-22 (Asia/Shanghai)
+Source: beacon_jellyfish_idle.png
+Final method: deterministic local deformed key pose from the idle sprite, because
+the built-in image generator returned HTTP 429 rate_limit_exceeded and no CLI API
+key is configured. The source art and palette are preserved byte-for-byte apart
+from the deformation.
+
+Motion intent: compressed and slightly leaned float; the bell sinks toward the
+rim; the center bundle reaches the original idle contact line while the outward
+bundles lag and lift. No separate ground shadow is included in the transparent
+sprite.
+
+Attempted built-in prompt (not used for the delivered pixels):
+
+Use case: stylized-concept.
+Asset type: one transparent PNG move key-pose sprite for the 2D side-view combat game Midnight Commission.
+Character edit: preserve the creature identity, scale, palette, three tentacle-bundle topology and art style of the supplied beacon jellyfish idle image. This is the SAME small enemy: a cloudy translucent blue-gray jellyfish bell fused around a salvaged old maritime navigation lamp. It must remain instantly recognizable and interchangeable with the idle sprite.
+Primary request: depict its movement pose, conveying a low short drift driven by the bell compressing and expanding, with one tentacle tip lightly touching the deck to pull it.
+Composition and motion: whole creature is suspended low above an implied horizontal deck. Bell is in a strongly compressed / partially deflated phase, wider at the rim and flattened at the crown, with a slight forward lean toward the left. The whole mass is shifted subtly toward the left relative to the idle pose. Keep the visible cutout at exactly the same apparent ground level and overall framing as the idle image, so the sprite does not jump vertically in game.
+Tentacles: exactly three separate, broad, fleshy rope-like bundles under the bell. The left-most bundle is swept backward by forward drift, the center bundle hangs deepest and curves forward so only a small rounded upper tip gently touches the deck, and the right-most bundle trails with a distinct forward curl. The touching tentacle is compressed against the deck at a single tiny contact point, signaling light traction; the other two remain clearly airborne. Do not draw a ground plane, shadow, or footprint.
+Old beacon: the same compact corroded metal lamp housing and central warm amber lens is enclosed within the bell; its orientation shifts with the bell, but the glowing lens remains centered and readable. The glow is contained inside the organism.
+Style: match the supplied idle image closely: bold near-black contour, angular cel-painted facets, clean strong silhouette, modest pale-gray translucent highlights, deep navy and blue-violet interior tissue, restrained rusty metal, one warm amber focal light. The same illustrated game-asset finish as the reference.
+Output: genuinely transparent background with preserved alpha; no white square, no checkerboard, no horizon. Exactly ONE complete creature, with all extremities inside the square canvas and generous clear margins. Scale it to fill roughly the same 80 percent area as the idle sprite. Keep the silhouette broad but clearly distinct in pose from idle. No motion lines, speed streaks, dust, splash, water surface, scenery, labels, UI, border, watermark, extra enemies, or animation sheet.
+

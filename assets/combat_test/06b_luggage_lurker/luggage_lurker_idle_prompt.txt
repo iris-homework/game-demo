@@ -1,0 +1,32 @@
+Luggage Lurker idle sprite
+Date: 2026-10-21 (Asia/Shanghai)
+Mode: built-in image_gen
+Output: assets/combat_test/luggage_lurker/luggage_lurker_idle.png
+Final source: C:/Users/22141/.codex/generated_images/01a15a50-b11a-7540-869a-a8adee9ab319/exec-3691b1d0-5dd3-4eac-bfa8-488b2474823a.png
+SHA256: 12CE150391E9AFA6197332A1983DFBE5C1494C0F9A6800189815E0FE13059F63
+Validation: 1536x1024 RGBA PNG; all four corners alpha 0; 732110 fully transparent pixels; alpha >=128 bounds (59,97)-(1488,914).
+This is one static idle image, not an animation or runtime integration.
+The final image retains a faint translucent exterior fringe from generation.
+
+Initial generation prompt (verbatim):
+Use case: stylized-concept
+Asset type: single static idle PNG sprite for the 2D cyberpunk RPG Midnight Commission.
+Input images: all five supplied images are STYLE REFERENCES ONLY, not edit targets. Match the angular hand-painted cel-shaded shapes, confident dark outlines, compact exaggerated game-character proportions and readable silhouettes. The robot reference supplies worn mechanical material treatment; the scavenger and gangster references supply restrained natural material shading. Do not reproduce any of their characters.
+Primary request: enemy 06B, Luggage Lurker, an abandoned illegal theft/carrying robot disguised as an old travel suitcase, waiting quietly for its owner.
+Subject: ONE squat deep-brown hard-shell travel suitcase, boxy and clearly recognizable as luggage, with worn corners, dark metal reinforcing corners, scratches, faded old station travel stickers in muted cream, desaturated teal and ochre. Folded telescopic luggage handle forms a compact antenna along its back. Four short FLAT mechanical support legs are folded close under the bottom, subtly visible around the base, keeping its stance extremely low; preserve a suitcase silhouette rather than a tall spider robot. Small luggage wheels remain visible, one slightly turned. The lid is almost closed and offset only a narrow crack, enough to glimpse a few dull metal luggage-fastening buckles lining its inside edge. These are ordinary blunt rectangular luggage buckles, never teeth. Exactly ONE small dim orange indicator light sits just within the left/front lid seam; no eyeball, no face.
+Pose/composition: quiet resting idle moment, not attacking, not walking. Entire object visible in a three-quarter side view facing screen-left, near eye-level with slightly visible top plane, matching a side-view battle sprite. Body wider than tall. Centered isolated subject with a generous clean transparent margin around all extremities. One coherent illustration only, no sheet, no alternate poses or motion trail.
+Style/medium: finished 2D anime game enemy illustration, bold near-black outlines, sharp irregular planes of flat paint and angular hard-edged shadows, tactile chipped hardware but no photorealism, no 3D render. Readable at small battle scale. Lighting uses warm neutral highlights and muted gray-purple mechanical shadows; brown shell remains readable, dark but not crushed black. Restrain detail density to match the references.
+Background: genuine transparent alpha, absolutely no environment, floor, shadow puddle, fog, halo, glow cloud, background gradient or checkerboard drawn into the image.
+Constraints: no biological parts, no flesh, no tongue, no fangs or teeth, no monster mouth, no human arms, no extra weapons or baggage, no bright red/pink rim glow, no electric effects. Only the single dim orange indicator emits light. Stickers can contain simple worn transit pictograms and abstract tiny marks, but no prominent lettering, no title, caption, labels, UI or watermark.
+Deliverable: a single high-resolution transparent PNG idle illustration.
+
+Correction prompt (verbatim):
+Edit the supplied Luggage Lurker image, preserving the suitcase design, worn brown material, old transit stickers, single orange indicator, mechanical feet, wheels, nearly closed lid, three-quarter left-facing pose, outline and angular cel shading.
+Make only these corrections:
+1. Fold the tall upright telescopic luggage handle DOWN against the top/back of the suitcase into a compact bent-back antenna-like folded handle. It must not rise as an extended rectangular carrying handle.
+2. Remove ALL soft gray/brown exterior glow, fog, halo, ground shadow or backdrop outside the solid illustrated subject. Produce a clean isolated game sprite with GENUINE fully transparent alpha everywhere outside the silhouette, including under the feet and in the negative spaces. Preserve clean antialiased edges, without a fringe. No black background and no checkerboard drawn in.
+Keep all four short flat mechanical support legs folded low close to the bottom. Do not add teeth, biology, extra lights, weapons, objects, text or additional poses. Exactly one small dim orange indicator. Keep entire subject within frame with clear transparent margins. Single transparent PNG sprite.
+
+Correction reference: initial generated image exec-f7adc61b-125b-4b84-b484-3dd0f31f03c6.png.
+The first correction call could not read the workspace reference path and produced no image; the successful call used the original generated image path.
+

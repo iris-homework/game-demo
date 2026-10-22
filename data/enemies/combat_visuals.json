@@ -13,7 +13,7 @@
     "hitEffectTexture": "",
     "poses": {
       "idle": {
-        "texture": "res://assets/combat_test/finn_idle.webp",
+        "texture": "res://assets/combat_test/finn/finn_idle.webp",
         "anchor": [
           150,
           237
@@ -21,7 +21,7 @@
         "scale": 0.495
       },
       "move": {
-        "texture": "res://assets/combat_test/finn_move.webp",
+        "texture": "res://assets/combat_test/finn/finn_move.webp",
         "anchor": [
           132,
           222
@@ -29,7 +29,7 @@
         "scale": 0.495
       },
       "slash": {
-        "texture": "res://assets/combat_test/finn_slash.webp",
+        "texture": "res://assets/combat_test/finn/finn_slash.webp",
         "anchor": [
           70,
           196
@@ -37,7 +37,7 @@
         "scale": 0.495
       },
       "pierce": {
-        "texture": "res://assets/combat_test/finn_pierce.webp",
+        "texture": "res://assets/combat_test/finn/finn_pierce.webp",
         "anchor": [
           190,
           184
@@ -45,7 +45,7 @@
         "scale": 0.495
       },
       "block": {
-        "texture": "res://assets/combat_test/finn_block.webp",
+        "texture": "res://assets/combat_test/finn/finn_block.webp",
         "anchor": [
           80,
           237
@@ -53,7 +53,7 @@
         "scale": 0.495
       },
       "damaged": {
-        "texture": "res://assets/combat_test/finn_damaged.webp",
+        "texture": "res://assets/combat_test/finn/finn_damaged.webp",
         "anchor": [
           74,
           230
@@ -75,10 +75,10 @@
     "poseAliases": {
       "block": "idle"
     },
-    "hitEffectTexture": "res://assets/combat_test/fish_bite_hit_fx.png",
+    "hitEffectTexture": "res://assets/combat_test/fish/fish_bite_hit_fx.png",
     "poses": {
       "idle": {
-        "texture": "res://assets/combat_test/fish_idle.png",
+        "texture": "res://assets/combat_test/fish/fish_idle.png",
         "anchor": [
           650,
           1100
@@ -86,7 +86,7 @@
         "scale": 0.12
       },
       "move": {
-        "texture": "res://assets/combat_test/fish_move.png",
+        "texture": "res://assets/combat_test/fish/fish_move.png",
         "anchor": [
           650,
           1100
@@ -94,7 +94,7 @@
         "scale": 0.12
       },
       "bite": {
-        "texture": "res://assets/combat_test/fish_bite.png",
+        "texture": "res://assets/combat_test/fish/fish_bite.png",
         "anchor": [
           650,
           1100
@@ -102,7 +102,7 @@
         "scale": 0.12
       },
       "bite_close": {
-        "texture": "res://assets/combat_test/fish_bite_close.png",
+        "texture": "res://assets/combat_test/fish/fish_bite_close.png",
         "anchor": [
           650,
           1100
@@ -110,7 +110,7 @@
         "scale": 0.12
       },
       "damaged": {
-        "texture": "res://assets/combat_test/fish_damaged.png",
+        "texture": "res://assets/combat_test/fish/fish_damaged.png",
         "anchor": [
           650,
           1140
@@ -137,7 +137,7 @@
     "hitEffectTexture": "",
     "poses": {
       "idle": {
-        "texture": "res://assets/combat_test/gang_boss_idle.png",
+        "texture": "res://assets/combat_test/gang_boss/gang_boss_idle.png",
         "anchor": [
           750,
           1109
@@ -146,7 +146,7 @@
         "whiteKey": false
       },
       "move": {
-        "texture": "res://assets/combat_test/gang_boss_move.png",
+        "texture": "res://assets/combat_test/gang_boss/gang_boss_move.png",
         "anchor": [
           840,
           1138
@@ -155,7 +155,7 @@
         "whiteKey": false
       },
       "pierce": {
-        "texture": "res://assets/combat_test/gang_boss_pierce.png",
+        "texture": "res://assets/combat_test/gang_boss/gang_boss_pierce.png",
         "anchor": [
           600,
           1112
@@ -164,7 +164,7 @@
         "whiteKey": false
       },
       "damaged": {
-        "texture": "res://assets/combat_test/gang_boss_damaged.png",
+        "texture": "res://assets/combat_test/gang_boss/gang_boss_damaged.png",
         "anchor": [
           840,
           1126
@@ -192,7 +192,7 @@
     "hitEffectTexture": "",
     "poses": {
       "idle": {
-        "texture": "res://assets/combat_test/gang_henchman_idle.png",
+        "texture": "res://assets/combat_test/gang_henchman/gang_henchman_idle.png",
         "anchor": [
           735,
           1103
@@ -201,7 +201,7 @@
         "whiteKey": false
       },
       "move": {
-        "texture": "res://assets/combat_test/gang_henchman_move.png",
+        "texture": "res://assets/combat_test/gang_henchman/gang_henchman_move.png",
         "anchor": [
           735,
           1116
@@ -210,7 +210,7 @@
         "whiteKey": false
       },
       "pierce": {
-        "texture": "res://assets/combat_test/gang_henchman_pierce.png",
+        "texture": "res://assets/combat_test/gang_henchman/gang_henchman_pierce.png",
         "anchor": [
           720,
           1111
@@ -219,7 +219,7 @@
         "whiteKey": false
       },
       "damaged": {
-        "texture": "res://assets/combat_test/gang_henchman_damaged.png",
+        "texture": "res://assets/combat_test/gang_henchman/gang_henchman_damaged.png",
         "anchor": [
           790,
           1113
@@ -252,7 +252,7 @@
     "hitEffectTexture": "",
     "poses": {
       "idle": {
-        "texture": "res://assets/combat_test/robot_idle.png",
+        "texture": "res://assets/combat_test/robot/robot_idle.png",
         "anchor": [
           690,
           1124
@@ -260,7 +260,7 @@
         "scale": 0.125
       },
       "laser": {
-        "texture": "res://assets/combat_test/robot_laser_emitter_v2.png",
+        "texture": "res://assets/combat_test/robot/robot_laser_emitter_v2.png",
         "anchor": [
           1090,
           934
@@ -268,7 +268,7 @@
         "scale": 0.15
       },
       "damaged": {
-        "texture": "res://assets/combat_test/robot_damaged.png",
+        "texture": "res://assets/combat_test/robot/robot_damaged.png",
         "anchor": [
           738,
           1114
