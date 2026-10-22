@@ -55,6 +55,10 @@ func resolve(enemy: Dictionary, enemies: Dictionary) -> Visual:
 	var candidates: Array = []
 	var current = enemies.get(enemy.get("id", ""), {})
 	var explicit_id = enemy.get("combatVisualId", "")
+	var valid_explicit: bool = explicit_id is String and not explicit_id.is_empty()
+	if enemy.has("combatVisualId") and not valid_explicit:
+		# Record malformed saved references even if the current binding resolves first.
+		problems.append("combatVisualId must be a non-empty string")
 	var current_id = current.get("combatVisualId", "") if current is Dictionary else ""
 	var fallback_id := "finn"
 	if explicit_id is String and not explicit_id.is_empty():
@@ -68,7 +72,7 @@ func resolve(enemy: Dictionary, enemies: Dictionary) -> Visual:
 	var preview_row := enemy_id.begins_with("preview_")
 	if not preview_row and (enemy_id.is_empty() or enemies.has(enemy_id)):
 		candidates.append(PipelineCatalogScript.get_bound_profile_id(enemy_id,fallback_id))
-	if enemy.has("combatVisualId"): candidates.append(enemy.combatVisualId)
+	if valid_explicit: candidates.append(explicit_id)
 	if current is Dictionary and current.has("combatVisualId"):
 		candidates.append(current.combatVisualId)
 	candidates.append("finn")
