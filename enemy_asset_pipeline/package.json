@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node server.cjs",
-    "test": "node --test test/pipeline.test.cjs test/noren_reference.test.cjs test/reference_geometry.test.cjs test/pose_preview.test.cjs test/asset_discovery.test.cjs test/character_names.test.cjs test/attack_templates.test.cjs"
+    "test": "node --test test/pipeline.test.cjs test/noren_reference.test.cjs test/reference_geometry.test.cjs test/pose_preview.test.cjs test/asset_discovery.test.cjs test/character_names.test.cjs test/attack_templates.test.cjs test/web_metadata.test.cjs"
   },
   "engines": {
     "node": ">=18"
