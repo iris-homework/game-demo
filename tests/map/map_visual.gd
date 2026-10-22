@@ -267,9 +267,11 @@ func _ready() -> void:
 	check(app.view.selected_id == "bar", "click B replaces fixed A")
 	check(app.view.map_rect == rect_before, "detail replacement does not move map")
 	check(Game.state.currentPlaceId == start_place, "selection preserves actual current place")
-	await click(button_center(text_button("周次")))
+	check(text_button("周次") == null, "map HUD no longer exposes the week button")
+	# Keep modal input coverage through an internal fixture after removing its HUD entry.
+	app.view.show_weeks()
 	await settle()
-	check(is_instance_valid(app.view.find_child("week_dialog", true, false)), "actual HUD click opens week modal")
+	check(is_instance_valid(app.view.find_child("week_dialog", true, false)), "internal week fixture opens modal")
 	await press_escape()
 	check(Game.page == "map" and is_instance_valid(app.view.detail), "Escape closes week modal before fixed detail")
 	await press_escape()

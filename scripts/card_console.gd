@@ -57,6 +57,8 @@ func build_card_list() -> void:
 		var rarity := str(definition.get("rarity", "")).to_upper()
 		var color: Color = CombatCard.RARITY_COLORS.get(rarity, CYAN)
 		var item := Button.new()
+		item.set_script(preload("res://scripts/combat/card_tooltip_button.gd"))
+		item.definition = definition
 		item.name = "add_" + id
 		item.custom_minimum_size = Vector2(282,40)
 		item.size_flags_horizontal = Control.SIZE_EXPAND_FILL

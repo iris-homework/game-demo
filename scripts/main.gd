@@ -25,11 +25,19 @@ var deck_browser: Control
 var deck_background_buttons: Array = []
 var deck_background_process_mode := Node.PROCESS_MODE_INHERIT
 var deck_previous_focus: Control
+var exit_dialog: Control
+var exit_cancel: Button
+var exit_ok: Button
+var exit_action := ""
+var exit_background_buttons: Array = []
+var exit_background_process_mode := Node.PROCESS_MODE_INHERIT
 
 func _ready() -> void:
 	Game.changed.connect(show_page)
 	Game.notice.connect(show_notice)
 	Game.current_deck_requested.connect(open_current_deck)
+	Game.menu_requested.connect(open_exit_confirmation.bind("menu"))
+	Game.quit_requested.connect(open_exit_confirmation.bind("quit"))
 	show_page()
 
 func show_page() -> void:
@@ -39,6 +47,7 @@ func show_page() -> void:
 	else: swap_view()
 
 func swap_view() -> void:
+	if is_instance_valid(exit_dialog): close_exit_confirmation()
 	if is_instance_valid(deck_browser): close_current_deck()
 	if is_instance_valid(card_console): close_card_console()
 	if is_instance_valid(debug_panel): close_debug()
@@ -87,6 +96,17 @@ func show_notice(message: String) -> void:
 		if is_instance_valid(notice_ui): notice_ui.queue_free())
 
 func _input(event: InputEvent) -> void:
+	if is_instance_valid(exit_dialog):
+		if event.is_action_pressed("ui_cancel"):
+			get_viewport().set_input_as_handled()
+			close_exit_confirmation()
+		elif event.is_action_pressed("ui_focus_next") or event.is_action_pressed("ui_focus_prev"):
+			if get_viewport().gui_get_focus_owner() == null:
+				exit_cancel.grab_focus()
+				get_viewport().set_input_as_handled()
+		elif event is InputEventKey and not (event.is_action("ui_accept") or event.is_action("ui_left") or event.is_action("ui_right") or event.is_action("ui_up") or event.is_action("ui_down")):
+			get_viewport().set_input_as_handled()
+		return
 	if is_instance_valid(deck_browser):
 		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 			get_viewport().set_input_as_handled()
@@ -115,8 +135,86 @@ func _input(event: InputEvent) -> void:
 		elif Game.page in ["map", "menu", "result", "dialogue"] and view.has_method("handle_escape") and view.handle_escape():
 			pass
 		elif Game.page == "menu" and not Game.state.is_empty(): Game.resume()
-		else: Game.menu()
+		else: Game.request_menu()
 	elif is_instance_valid(debug_panel): get_viewport().set_input_as_handled()
+
+func open_exit_confirmation(action: String) -> void:
+	if action not in ["menu", "quit"] or Game.battle_busy or Game.transition_locked: return
+	if not is_instance_valid(view) or is_instance_valid(exit_dialog): return
+	if is_instance_valid(deck_browser) or is_instance_valid(card_console) or is_instance_valid(debug_panel): return
+	if "pile_overlay" in view and is_instance_valid(view.pile_overlay): return
+	if action == "quit":
+		if Game.page != "menu": return
+		if is_instance_valid(view.confirm_dialog) and view.confirm_dialog.visible: return
+		if is_instance_valid(view.scenery_dialog): return
+	elif Game.page == "menu": return
+	if view.has_method("cancel_selection"): view.cancel_selection()
+	exit_action = action
+	exit_background_process_mode = view.process_mode
+	view.process_mode = Node.PROCESS_MODE_DISABLED
+	exit_background_buttons.clear()
+	get_viewport().gui_release_focus()
+	for node in view.find_children("*", "BaseButton", true, false):
+		exit_background_buttons.append([node, node.disabled, node.focus_mode])
+		node.disabled = true
+		node.focus_mode = Control.FOCUS_NONE
+	var ui := DemoUI.new()
+	exit_dialog = ui
+	ui.name = "exit_confirmation"
+	ui.z_index = 120
+	ui.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(ui)
+	var shade := ui.rect(ui, Vector2.ZERO, Vector2(1440, 900), Color(0, 0, 0, 0.64))
+	shade.mouse_filter = Control.MOUSE_FILTER_STOP
+	ui.panel(ui, Vector2(400, 300), Vector2(640, 300), DemoUI.PANEL, DemoUI.CYAN)
+	var title := "退出游戏" if action == "quit" else "返回主菜单"
+	var message := "确定要退出游戏吗？" if action == "quit" else "确定要返回主菜单吗？"
+	if action == "menu":
+		if Game.training_mode:
+			message += "\n本次演练将结束，不影响冒险进度。"
+		elif Game.state.get("currentScene") == "battle" and not Game.state.get("battleStart", {}).is_empty() and Game.state.get("combat", {}).get("outcome", "").is_empty():
+			message += "\n再次继续委托时，将从本场战斗开局重来。"
+	ui.label(ui, title, Vector2(432, 326), Vector2(576, 44), 29)
+	ui.label(ui, message, Vector2(432, 391), Vector2(576, 90), 19, DemoUI.MUTED)
+	exit_cancel = ui.button(ui, "取消", Vector2(432, 520), Vector2(176, 48), close_exit_confirmation)
+	exit_cancel.name = "exit_cancel"
+	exit_ok = ui.button(ui, title, Vector2(630, 520), Vector2(378, 48), confirm_exit, true)
+	exit_ok.name = "exit_ok"
+	for pair in [[exit_cancel, exit_ok], [exit_ok, exit_cancel]]:
+		var current: Button = pair[0]
+		var neighbor: NodePath = current.get_path_to(pair[1])
+		current.focus_mode = Control.FOCUS_ALL
+		current.focus_next = neighbor
+		current.focus_previous = neighbor
+		current.focus_neighbor_left = neighbor
+		current.focus_neighbor_right = neighbor
+		current.focus_neighbor_top = neighbor
+		current.focus_neighbor_bottom = neighbor
+	exit_cancel.grab_focus()
+
+func close_exit_confirmation() -> void:
+	if not is_instance_valid(exit_dialog): return
+	get_viewport().gui_release_focus()
+	remove_child(exit_dialog)
+	exit_dialog.queue_free()
+	exit_dialog = null
+	exit_cancel = null
+	exit_ok = null
+	exit_action = ""
+	if is_instance_valid(view): view.process_mode = exit_background_process_mode
+	for item in exit_background_buttons:
+		if is_instance_valid(item[0]):
+			item[0].disabled = item[1]
+			item[0].focus_mode = item[2]
+			if item[0].has_method("refresh_feedback"): item[0].refresh_feedback()
+	exit_background_buttons.clear()
+
+func confirm_exit() -> void:
+	if not is_instance_valid(exit_dialog) or Game.battle_busy or Game.transition_locked: return
+	var action := exit_action
+	close_exit_confirmation()
+	if action == "menu": Game.menu()
+	elif action == "quit": get_tree().quit()
 
 func toggle_debug() -> void:
 	if is_instance_valid(debug_panel):
@@ -178,6 +276,7 @@ func debug_change(kind: String, value: int) -> void:
 	show_notice("测试状态已更新。")
 
 func open_card_console() -> void:
+	if is_instance_valid(exit_dialog): return
 	if is_instance_valid(card_console) or is_instance_valid(debug_panel) or is_instance_valid(deck_browser): return
 	if "pile_overlay" in view and is_instance_valid(view.pile_overlay): return
 	if view.has_method("cancel_selection"): view.cancel_selection()
@@ -207,6 +306,7 @@ func close_card_console() -> void:
 	if is_instance_valid(view) and view.has_method("refresh_library"): view.refresh_library()
 
 func open_current_deck() -> void:
+	if is_instance_valid(exit_dialog): return
 	if Game.state.is_empty() or Game.battle_busy or Game.transition_locked: return
 	if is_instance_valid(deck_browser) or is_instance_valid(card_console) or is_instance_valid(debug_panel): return
 	if "pile_overlay" in view and is_instance_valid(view.pile_overlay): return

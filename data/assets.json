@@ -282,5 +282,16 @@
       0
     ],
     "trainingSelectable": true
+  },
+  "city_map_expanded": {
+    "path": "res://assets/map/map-expanded-v1.png",
+    "kind": "city_map",
+    "mapContentRect": [
+      0.08649753753014926,
+      0.0860295305373958,
+      0.8272073768575842,
+      0.8277024141866431
+    ],
+    "note": "2026-10-21 原城市底图四周扩绘；mapContentRect 为原城市锚点区域，原图保留。"
   }
 }

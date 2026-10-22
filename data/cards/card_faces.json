@@ -1,0 +1,1043 @@
+{
+  "schemaVersion": 1,
+  "templateId": "noren-fixed-card-v1",
+  "canvas": [
+    1086,
+    1448
+  ],
+  "font": "res://assets/fonts/NotoSerifCJKsc-Bold.otf",
+  "cards": {
+    "noren_01": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_01.png",
+      "definition": {
+        "id": "noren_01",
+        "number": "01",
+        "name": "直击",
+        "rarity": "C",
+        "cost": 1,
+        "type": "attack",
+        "archetype": "通用",
+        "description": "造成 6 点伤害。",
+        "target": "enemy",
+        "sortOrder": 1,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 6
+          }
+        ],
+        "cardText": "造成6点伤害。"
+      }
+    },
+    "noren_02": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_02.png",
+      "definition": {
+        "id": "noren_02",
+        "number": "02",
+        "name": "护身",
+        "rarity": "C",
+        "cost": 1,
+        "type": "skill",
+        "archetype": "通用",
+        "description": "获得 5 点格挡。",
+        "target": "self",
+        "sortOrder": 2,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "block",
+            "amount": 5
+          }
+        ],
+        "cardText": "获得5点格挡。"
+      }
+    },
+    "noren_03": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_03.png",
+      "definition": {
+        "id": "noren_03",
+        "number": "03",
+        "name": "贴近",
+        "rarity": "C",
+        "cost": 1,
+        "type": "skill",
+        "archetype": "通用",
+        "description": "获得 1 层弹反，进入近战形态。",
+        "target": "self",
+        "sortOrder": 3,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "parry",
+            "amount": 1
+          },
+          {
+            "type": "stance",
+            "value": "melee"
+          }
+        ],
+        "cardText": "获得1层弹反，进入近战形态。"
+      }
+    },
+    "noren_04": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_04.png",
+      "definition": {
+        "id": "noren_04",
+        "number": "04",
+        "name": "拉开距离",
+        "rarity": "C",
+        "cost": 1,
+        "type": "skill",
+        "archetype": "通用",
+        "description": "获得 6 点格挡，进入远程形态。",
+        "target": "self",
+        "sortOrder": 4,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "block",
+            "amount": 6
+          },
+          {
+            "type": "stance",
+            "value": "ranged"
+          }
+        ],
+        "cardText": "获得6点格挡，进入远程形态。"
+      }
+    },
+    "noren_05": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_05.png",
+      "definition": {
+        "id": "noren_05",
+        "number": "05",
+        "name": "备用弹匣",
+        "rarity": "B",
+        "cost": 0,
+        "type": "skill",
+        "archetype": "通用",
+        "description": "获得 1 颗弹药。消耗。",
+        "target": "self",
+        "sortOrder": 5,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "ammo",
+            "amount": 1
+          }
+        ],
+        "exhaust": true,
+        "cardText": "获得1颗弹药。消耗。"
+      }
+    },
+    "noren_06": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_06.png",
+      "definition": {
+        "id": "noren_06",
+        "number": "06",
+        "name": "战术补弹",
+        "rarity": "B",
+        "cost": 1,
+        "type": "skill",
+        "archetype": "通用",
+        "description": "获得 2 颗弹药和 4 点格挡。",
+        "target": "self",
+        "sortOrder": 6,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "ammo",
+            "amount": 2
+          },
+          {
+            "type": "block",
+            "amount": 4
+          }
+        ],
+        "cardText": "获得2颗弹药和4点格挡。"
+      }
+    },
+    "noren_07": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_07.png",
+      "definition": {
+        "id": "noren_07",
+        "number": "07",
+        "name": "快速判断",
+        "rarity": "B",
+        "cost": 1,
+        "type": "skill",
+        "archetype": "通用",
+        "description": "抽 2 张牌。",
+        "target": "self",
+        "sortOrder": 7,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "draw",
+            "amount": 2
+          }
+        ],
+        "cardText": "抽2张牌。"
+      }
+    },
+    "noren_08": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_08.png",
+      "definition": {
+        "id": "noren_08",
+        "number": "08",
+        "name": "应急变式",
+        "rarity": "B",
+        "cost": 0,
+        "type": "skill",
+        "archetype": "通用",
+        "description": "切换至另一种形态。消耗。",
+        "target": "self",
+        "sortOrder": 8,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "stance",
+            "value": "toggle"
+          }
+        ],
+        "exhaust": true,
+        "cardText": "切换至另一种形态。消耗。"
+      }
+    },
+    "noren_09": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_09.png",
+      "definition": {
+        "id": "noren_09",
+        "number": "09",
+        "name": "切入斩",
+        "rarity": "B",
+        "cost": 1,
+        "type": "attack",
+        "archetype": "通用",
+        "description": "造成 4 点伤害，共 2 次，然后进入近战形态。",
+        "target": "enemy",
+        "sortOrder": 9,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 4,
+            "hits": 2
+          },
+          {
+            "type": "stance",
+            "value": "melee"
+          }
+        ],
+        "cardText": "造成 4 点伤害，共 2 次，然后进入近战形态。"
+      }
+    },
+    "noren_10": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_10.png",
+      "definition": {
+        "id": "noren_10",
+        "number": "10",
+        "name": "快速装填",
+        "rarity": "B",
+        "cost": 1,
+        "type": "skill",
+        "archetype": "通用",
+        "description": "获得 2 颗弹药，然后进入远程形态。",
+        "target": "self",
+        "sortOrder": 10,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "ammo",
+            "amount": 2
+          },
+          {
+            "type": "stance",
+            "value": "ranged"
+          }
+        ],
+        "cardText": "获得 2 颗弹药，然后进入远程形态。"
+      }
+    },
+    "noren_11": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_11.png",
+      "definition": {
+        "id": "noren_11",
+        "number": "11",
+        "name": "稳住阵脚",
+        "rarity": "B",
+        "cost": 1,
+        "type": "skill",
+        "archetype": "通用",
+        "description": "获得 8 点格挡。近身技：获得 1 颗弹药。远程技：对一名敌人施加 1 层虚弱。",
+        "target": "stance",
+        "sortOrder": 11,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "block",
+            "amount": 8
+          },
+          {
+            "type": "ammo",
+            "amount": 1,
+            "when": "melee"
+          },
+          {
+            "type": "weak",
+            "amount": 1,
+            "when": "ranged"
+          }
+        ],
+        "cardText": "获得8点格挡。近身技：获得1颗弹药。远程技：对一名敌人施加1层虚弱。"
+      }
+    },
+    "noren_12": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_12.png",
+      "definition": {
+        "id": "noren_12",
+        "number": "12",
+        "name": "拆卸弹药",
+        "rarity": "B",
+        "cost": 0,
+        "type": "skill",
+        "archetype": "通用",
+        "description": "消耗手中的另一张牌，获得 2 颗弹药。本牌进入弃牌堆。没有其他手牌时无法打出。",
+        "target": "self",
+        "sortOrder": 12,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "exhaust_hand"
+          },
+          {
+            "type": "ammo",
+            "amount": 2
+          }
+        ],
+        "cardText": "消耗另一张手牌，获得2颗弹药。"
+      }
+    },
+    "noren_13": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_13.png",
+      "definition": {
+        "id": "noren_13",
+        "number": "13",
+        "name": "重弹射击",
+        "rarity": "B",
+        "cost": 1,
+        "type": "attack",
+        "archetype": "爆发直伤流",
+        "description": "造成 8 点伤害。",
+        "target": "enemy",
+        "sortOrder": 13,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 8
+          }
+        ],
+        "cardText": "造成8点伤害。"
+      }
+    },
+    "noren_14": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_14.png",
+      "definition": {
+        "id": "noren_14",
+        "number": "14",
+        "name": "破势枪托",
+        "rarity": "B",
+        "cost": 1,
+        "type": "attack",
+        "archetype": "爆发直伤流",
+        "description": "造成 5 点伤害。近身技：施加 1 层虚弱。",
+        "target": "enemy",
+        "sortOrder": 14,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 5
+          },
+          {
+            "type": "weak",
+            "amount": 1,
+            "when": "melee"
+          }
+        ],
+        "cardText": "造成5点伤害。近身技：施加1层虚弱。"
+      }
+    },
+    "noren_15": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_15.png",
+      "definition": {
+        "id": "noren_15",
+        "number": "15",
+        "name": "膛压蓄积",
+        "rarity": "B",
+        "cost": 0,
+        "type": "skill",
+        "archetype": "爆发直伤流",
+        "description": "本回合下一张攻击牌的第一段基础伤害增加 4。消耗。",
+        "target": "self",
+        "sortOrder": 15,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "next_damage",
+            "amount": 4
+          }
+        ],
+        "exhaust": true,
+        "cardText": "本回合下一张攻击牌的第一段基础伤害增加4。消耗。"
+      }
+    },
+    "noren_16": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_16.png",
+      "definition": {
+        "id": "noren_16",
+        "number": "16",
+        "name": "后跳斩",
+        "rarity": "A",
+        "cost": 1,
+        "type": "attack",
+        "archetype": "爆发直伤流",
+        "description": "造成 8 点伤害。近身技：抽 2 张牌。",
+        "target": "enemy",
+        "sortOrder": 16,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 8
+          },
+          {
+            "type": "draw",
+            "amount": 2,
+            "when": "melee"
+          }
+        ],
+        "cardText": "造成 8 点伤害。近身技：抽 2 张牌。"
+      }
+    },
+    "noren_17": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_17.png",
+      "definition": {
+        "id": "noren_17",
+        "number": "17",
+        "name": "枪口重击",
+        "rarity": "A",
+        "cost": 2,
+        "type": "attack",
+        "archetype": "爆发直伤流",
+        "description": "造成 12 点伤害。近身技：额外获得 2 颗弹药。",
+        "target": "enemy",
+        "sortOrder": 17,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 12
+          },
+          {
+            "type": "ammo",
+            "amount": 2,
+            "when": "melee"
+          }
+        ],
+        "cardText": "造成12点伤害。近身技：额外获得2颗弹药。"
+      }
+    },
+    "noren_18": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_18.png",
+      "definition": {
+        "id": "noren_18",
+        "number": "18",
+        "name": "重弹装填",
+        "rarity": "B",
+        "cost": 1,
+        "type": "skill",
+        "archetype": "爆发直伤流",
+        "description": "获得 2 颗弹药。本回合下一张攻击牌的第一段基础伤害增加 3。",
+        "target": "self",
+        "sortOrder": 18,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "ammo",
+            "amount": 2
+          },
+          {
+            "type": "next_damage",
+            "amount": 3
+          }
+        ],
+        "cardText": "获得2颗弹药。本回合下一张攻击牌的第一段基础伤害增加3。"
+      }
+    },
+    "noren_19": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_19.png",
+      "definition": {
+        "id": "noren_19",
+        "number": "19",
+        "name": "压制射击",
+        "rarity": "B",
+        "cost": 1,
+        "type": "attack",
+        "archetype": "爆发直伤流",
+        "description": "造成 7 点伤害，施加 2 层虚弱。",
+        "target": "enemy",
+        "sortOrder": 19,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 7
+          },
+          {
+            "type": "weak",
+            "amount": 2
+          }
+        ],
+        "cardText": "造成7点伤害，施加2层虚弱。"
+      }
+    },
+    "noren_20": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_20.png",
+      "definition": {
+        "id": "noren_20",
+        "number": "20",
+        "name": "火力倾泻",
+        "rarity": "A",
+        "cost": 2,
+        "type": "attack",
+        "archetype": "爆发直伤流",
+        "description": "造成 9 点伤害。远程技：消耗全部弹药，每消耗 1 颗弹药，额外攻击 1 次；总段数为 1 加打出前的弹药数。",
+        "target": "enemy",
+        "sortOrder": 20,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 9,
+            "allAmmoHits": true
+          }
+        ],
+        "cardText": "造成 9 点伤害。远程技：消耗全部弹药，每消耗 1 颗弹药，额外攻击 1 次；总段数为 1 加打出前的弹药数。",
+        "consumeAllAmmo": true
+      }
+    },
+    "noren_21": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_21.png",
+      "definition": {
+        "id": "noren_21",
+        "number": "21",
+        "name": "末弹决断",
+        "rarity": "B",
+        "cost": 1,
+        "type": "attack",
+        "archetype": "爆发直伤流",
+        "description": "造成 7 点伤害。远程技：若打出本牌前恰好拥有 1 颗弹药，本牌基础伤害增加 3。",
+        "target": "enemy",
+        "sortOrder": 21,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 7,
+            "lastAmmoBonus": 3
+          }
+        ],
+        "cardText": "造成7点伤害。远程技：若打出本牌前恰好拥有1颗弹药，本牌基础伤害增加3。"
+      }
+    },
+    "noren_22": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_22.png",
+      "definition": {
+        "id": "noren_22",
+        "number": "22",
+        "name": "抢占先机",
+        "rarity": "A",
+        "cost": 0,
+        "type": "skill",
+        "archetype": "爆发直伤流",
+        "description": "本回合下一张攻击牌的费用降低 1，最低为 0。消耗。",
+        "target": "self",
+        "sortOrder": 22,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "next_discount",
+            "amount": 1
+          }
+        ],
+        "exhaust": true,
+        "cardText": "本回合下一张攻击牌的费用降低1，最低为0。消耗。"
+      }
+    },
+    "noren_23": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_23.png",
+      "definition": {
+        "id": "noren_23",
+        "number": "23",
+        "name": "弱点瞄准",
+        "rarity": "S",
+        "cost": 1,
+        "type": "power",
+        "archetype": "爆发直伤流",
+        "description": "本场战斗中，远程形态的攻击本体伤害倍率由 1.5 倍变为 2 倍。",
+        "target": "self",
+        "sortOrder": 23,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "power",
+            "value": "ranged_mastery"
+          }
+        ],
+        "cardText": "本场战斗中，远程形态的攻击本体伤害倍率由 1.5 倍变为 2 倍。"
+      }
+    },
+    "noren_24": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_24.png",
+      "definition": {
+        "id": "noren_24",
+        "number": "24",
+        "name": "弱点锁定",
+        "rarity": "A",
+        "cost": 1,
+        "type": "skill",
+        "archetype": "爆发直伤流",
+        "description": "抽 1 张牌。本回合下一张攻击牌的每段基础伤害增加 6。",
+        "target": "self",
+        "sortOrder": 24,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "draw",
+            "amount": 1
+          },
+          {
+            "type": "buff",
+            "id": "next_hit_damage",
+            "amount": 6
+          }
+        ],
+        "cardText": "抽 1 张牌。本回合下一张攻击牌的每段基础伤害增加 6。"
+      }
+    },
+    "noren_25": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_25.png",
+      "definition": {
+        "id": "noren_25",
+        "number": "25",
+        "name": "处决射击",
+        "rarity": "B",
+        "cost": 2,
+        "type": "attack",
+        "archetype": "爆发直伤流",
+        "description": "造成 12 点伤害。远程技：若目标在本牌使用前的生命值不高于其最大生命值的 50%，本牌基础伤害增加 6。",
+        "target": "enemy",
+        "sortOrder": 25,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 12,
+            "executeBonus": 6
+          }
+        ],
+        "cardText": "造成12点伤害。\n远程技：若目标用牌前生命≤50%，基础伤害+6。"
+      }
+    },
+    "noren_26": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_26.png",
+      "definition": {
+        "id": "noren_26",
+        "number": "26",
+        "name": "终结弹",
+        "rarity": "S",
+        "cost": 3,
+        "type": "attack",
+        "archetype": "爆发直伤流",
+        "description": "造成 30 点伤害。远程技：本牌基础伤害增加 14。",
+        "target": "enemy",
+        "sortOrder": 26,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 30,
+            "rangedBonus": 14
+          }
+        ],
+        "cardText": "造成 30 点伤害。远程技：本牌基础伤害增加 14。"
+      }
+    },
+    "noren_27": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_27.png",
+      "definition": {
+        "id": "noren_27",
+        "number": "27",
+        "name": "剖切",
+        "rarity": "B",
+        "cost": 1,
+        "type": "attack",
+        "archetype": "裂伤流",
+        "description": "造成 5 点伤害，攻击结束后施加 2 层裂伤。",
+        "target": "enemy",
+        "sortOrder": 27,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 5
+          },
+          {
+            "type": "bleed",
+            "amount": 2
+          }
+        ],
+        "cardText": "造成5点伤害，攻击结束后施加2层裂伤。"
+      }
+    },
+    "noren_28": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_28.png",
+      "definition": {
+        "id": "noren_28",
+        "number": "28",
+        "name": "双刃连击",
+        "rarity": "B",
+        "cost": 1,
+        "type": "attack",
+        "archetype": "裂伤流",
+        "description": "造成 3 点伤害，共 2 次。近身技：全部攻击结束后施加 2 层裂伤。",
+        "target": "enemy",
+        "sortOrder": 28,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 3,
+            "hits": 2
+          },
+          {
+            "type": "bleed",
+            "amount": 2,
+            "when": "melee"
+          }
+        ],
+        "cardText": "造成3点伤害，共2次。近身技：全部攻击结束后施加2层裂伤。"
+      }
+    },
+    "noren_29": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_29.png",
+      "definition": {
+        "id": "noren_29",
+        "number": "29",
+        "name": "撕裂斩",
+        "rarity": "A",
+        "cost": 2,
+        "type": "attack",
+        "archetype": "裂伤流",
+        "description": "造成 10 点伤害，攻击结束后施加 4 层裂伤。",
+        "target": "enemy",
+        "sortOrder": 29,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 10
+          },
+          {
+            "type": "bleed",
+            "amount": 4
+          }
+        ],
+        "cardText": "造成10点伤害，攻击结束后施加4层裂伤。"
+      }
+    },
+    "noren_30": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_30.png",
+      "definition": {
+        "id": "noren_30",
+        "number": "30",
+        "name": "加深伤口",
+        "rarity": "A",
+        "cost": 1,
+        "type": "skill",
+        "archetype": "裂伤流",
+        "description": "对一名敌人施加 3 层裂伤。近身技：若目标在本牌使用前已有裂伤，改为施加 6 层裂伤。",
+        "target": "enemy",
+        "sortOrder": 30,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "bleed",
+            "amount": 3,
+            "woundedMeleeAmount": 6
+          }
+        ],
+        "cardText": "对一名敌人施加 3 层裂伤。近身技：若目标在本牌使用前已有裂伤，改为施加 6 层裂伤。"
+      }
+    },
+    "noren_31": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_31.png",
+      "definition": {
+        "id": "noren_31",
+        "number": "31",
+        "name": "架刃",
+        "rarity": "B",
+        "cost": 1,
+        "type": "skill",
+        "archetype": "裂伤流",
+        "description": "获得 4 点格挡。若自身没有弹反，获得 1 层弹反。",
+        "target": "self",
+        "sortOrder": 31,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "block",
+            "amount": 4
+          },
+          {
+            "type": "parry",
+            "amount": 1,
+            "cap": 1
+          }
+        ],
+        "cardText": "获得4点格挡。若自身没有弹反，获得1层弹反。"
+      }
+    },
+    "noren_32": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_32.png",
+      "definition": {
+        "id": "noren_32",
+        "number": "32",
+        "name": "迎击姿态",
+        "rarity": "B",
+        "cost": 2,
+        "type": "skill",
+        "archetype": "裂伤流",
+        "description": "获得 10 点格挡。若自身弹反少于 2 层，获得 1 层弹反。",
+        "target": "self",
+        "sortOrder": 32,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "block",
+            "amount": 10
+          },
+          {
+            "type": "parry",
+            "amount": 1,
+            "cap": 2
+          }
+        ],
+        "cardText": "获得10点格挡。若自身弹反少于2层，获得1层弹反。"
+      }
+    },
+    "noren_33": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_33.png",
+      "definition": {
+        "id": "noren_33",
+        "number": "33",
+        "name": "逆刃架势",
+        "rarity": "A",
+        "cost": 2,
+        "type": "skill",
+        "archetype": "裂伤流",
+        "description": "获得 10 点格挡和 1 层弹反。",
+        "target": "self",
+        "sortOrder": 33,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "block",
+            "amount": 10
+          },
+          {
+            "type": "parry",
+            "amount": 1
+          }
+        ],
+        "cardText": "获得 10 点格挡和 1 层弹反。"
+      }
+    },
+    "noren_34": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_34.png",
+      "definition": {
+        "id": "noren_34",
+        "number": "34",
+        "name": "引伤标记",
+        "rarity": "B",
+        "cost": 0,
+        "type": "skill",
+        "archetype": "裂伤流",
+        "description": "对一名敌人施加 3 层裂伤。消耗。",
+        "target": "enemy",
+        "sortOrder": 34,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "bleed",
+            "amount": 3
+          }
+        ],
+        "exhaust": true,
+        "cardText": "对一名敌人施加 3 层裂伤。消耗。"
+      }
+    },
+    "noren_35": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_35.png",
+      "definition": {
+        "id": "noren_35",
+        "number": "35",
+        "name": "双发速射",
+        "rarity": "B",
+        "cost": 1,
+        "type": "attack",
+        "archetype": "裂伤流",
+        "description": "造成 2 点伤害，共 3 次。",
+        "target": "enemy",
+        "sortOrder": 35,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 2,
+            "hits": 3
+          }
+        ],
+        "cardText": "造成 2 点伤害，共 3 次。"
+      }
+    },
+    "noren_36": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_36.png",
+      "definition": {
+        "id": "noren_36",
+        "number": "36",
+        "name": "深度伤口",
+        "rarity": "S",
+        "cost": 1,
+        "type": "power",
+        "archetype": "裂伤流",
+        "description": "本场战斗中，裂伤触发时不再减少层数。",
+        "target": "self",
+        "sortOrder": 36,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "power",
+            "value": "persistent_bleed"
+          }
+        ],
+        "cardText": "本场战斗中，裂伤触发时不再减少层数。"
+      }
+    },
+    "noren_37": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_37.png",
+      "definition": {
+        "id": "noren_37",
+        "number": "37",
+        "name": "伤口追猎",
+        "rarity": "B",
+        "cost": 1,
+        "type": "attack",
+        "archetype": "裂伤流",
+        "description": "造成 5 点伤害，然后触发 2 次裂伤。近战与远程均生效；远程合计触发 2 次。",
+        "target": "enemy",
+        "sortOrder": 37,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 5,
+            "bleedTriggers": 2
+          }
+        ],
+        "cardText": "造成 5 点伤害，然后触发 2 次裂伤。近战与远程均生效；远程合计触发 2 次。"
+      }
+    },
+    "noren_38": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_38.png",
+      "definition": {
+        "id": "noren_38",
+        "number": "38",
+        "name": "散射扫荡",
+        "rarity": "A",
+        "cost": 2,
+        "type": "attack",
+        "archetype": "裂伤流",
+        "description": "对所有敌人造成 4 点伤害，全部攻击结束后，对所有敌人施加 3 层裂伤。",
+        "target": "all",
+        "sortOrder": 38,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "damage",
+            "amount": 4
+          },
+          {
+            "type": "bleed",
+            "amount": 3
+          }
+        ],
+        "cardText": "对所有敌人造成 4 点伤害，全部攻击结束后，对所有敌人施加 3 层裂伤。"
+      }
+    },
+    "noren_39": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_39.png",
+      "definition": {
+        "id": "noren_39",
+        "number": "39",
+        "name": "血迹追踪",
+        "rarity": "B",
+        "cost": 1,
+        "type": "skill",
+        "archetype": "裂伤流",
+        "description": "选择一名敌人，抽 2 张牌。若该敌人在本牌使用前拥有至少 3 层裂伤，额外抽 1 张牌。",
+        "target": "enemy",
+        "sortOrder": 39,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "draw",
+            "amount": 2
+          },
+          {
+            "type": "draw",
+            "amount": 1,
+            "requiresBleed": 3
+          }
+        ],
+        "cardText": "选择一名敌人，抽 2 张牌。若该敌人在本牌使用前拥有至少 3 层裂伤，额外抽 1 张牌。"
+      }
+    },
+    "noren_40": {
+      "path": "res://assets/cards/noren_fixed_v1/noren_40.png",
+      "definition": {
+        "id": "noren_40",
+        "number": "40",
+        "name": "剖解经验",
+        "rarity": "S",
+        "cost": 1,
+        "type": "power",
+        "archetype": "裂伤流",
+        "description": "每回合首次在近战形态下，用单体卡牌对敌人施加裂伤时，额外施加 1 层裂伤。",
+        "target": "self",
+        "sortOrder": 40,
+        "artAssetId": "",
+        "effects": [
+          {
+            "type": "power",
+            "value": "dissection"
+          }
+        ],
+        "cardText": "每回合首次在近战形态下，用单体卡牌施加裂伤时，额外施加1层裂伤。"
+      }
+    }
+  }
+}

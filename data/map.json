@@ -1,6 +1,6 @@
 {
-  "cityMapAssetId": "city_map",
+  "cityMapAssetId": "city_map_expanded",
   "coordinatesStatus": "illustration-calibrated",
-  "note": "城市插画使用 map.jpg，17 地点以图钉尖端锚定建筑，包含中央科技教会。",
+  "note": "城市底图四周扩绘为 map-expanded-v1.png，原城市区域保持地点锚点基准；17地点与原图保留。",
   "designAspect": 1.78
 }

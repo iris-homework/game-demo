@@ -1,5 +1,11 @@
 extends "res://tests/combat/rules/combat_tests.gd"
 
+func model_for(id: String, hp: int = 100) -> CombatModel:
+	var model := super.model_for(id, hp)
+	# This suite freezes legacy +1 effects, independent of the current loadout.
+	model.profile.cyberware.cards = model.profile.cyberware.cards.filter(func(c): return str(c.id).begins_with("test_cyberware_"))
+	return model
+
 func _ready() -> void:
 	Game.save_enabled = false
 	Game.save_path = "user://cyberware_test_checkpoint.json"
@@ -59,12 +65,13 @@ func _ready() -> void:
 	check(restored.play_card(restored.hand[0],0).damage == 2 and restored.next_attack_bonus == 0,"Restored pending effect resolves once")
 	var legacy := Game.state.duplicate(true)
 	legacy.combat.erase("usedCyberware")
+	legacy.combat.erase("cyberwareCooldowns")
 	legacy.combat.erase("nextAttackBonus")
 	legacy.combat.profile.erase("cyberware")
 	var migrated = Game.migrate_save(legacy)
 	check(Game.valid_save(migrated),"Legacy schema-2 battle remains loadable")
 	restored.restore(migrated.combat)
-	check(restored.cyberware_cards().size() == 4 and restored.next_attack_bonus == 0 and restored.used_cyberware.is_empty(),"Legacy battle gains four unused cards, no free buff")
+	check(restored.cyberware_cards().size() == 3 and restored.next_attack_bonus == 0 and restored.used_cyberware.is_empty(),"Legacy battle gains three configured cards, no free buff")
 	check(not legacy.combat.profile.has("cyberware"),"Migration does not mutate input")
 	for bad_bonus in [-1,0.5,"1",999]:
 		var corrupt := m.snapshot()
@@ -90,6 +97,7 @@ func _ready() -> void:
 	var old_eight := fresh.snapshot()
 	for index in [7,8]:
 		old_eight.profile.cyberware.cards.append({"id":"test_cyberware_%02d" % index,"name":"Legacy %d" % index,"nextAttackBonus":1})
+	old_eight.erase("cyberwareCooldowns")
 	old_eight.usedCyberware = ["test_cyberware_07","test_cyberware_08"]
 	old_eight.nextAttackBonus = 2
 	check(Game.valid_combat(old_eight),"Old eight-card snapshot and earned bonus remain valid")

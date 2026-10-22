@@ -75,7 +75,7 @@ func _ready() -> void:
 	var shoot := config("shoot")
 	var profiles := {
 		"qa_hit":visual("qa_hit", {"idle":"res://assets/combat_test/01a_warden_shield/warden_shield_idle.png", "move":"res://assets/combat_test/01a_warden_shield/warden_shield_move.png", "hit":"res://assets/combat_test/01a_warden_shield/warden_shield_attack.png"}, hit, [637.5,1238], 0.10),
-		"qa_bite":visual("qa_bite", {"idle":"res://assets/combat_test/06b_luggage_lurker/luggage_lurker_idle.png", "move":"res://assets/combat_test/06b_luggage_lurker/luggage_lurker_move.png", "bite":"res://assets/combat_test/06b_luggage_lurker/luggage_lurker_attack.png", "bite_close":"res://assets/combat_test/06b_luggage_lurker/luggage_lurker_idle.png"}, bite, [779.5,893], 0.10),
+		"qa_bite":visual("qa_bite", {"idle":"res://assets/combat_test/06b_luggage_lurker/luggage_lurker_idle.png", "move":"res://assets/combat_test/06b_luggage_lurker/luggage_lurker_move.png", "bite":"res://assets/combat_test/06b_luggage_lurker/luggage_lurker_attack_bite.png", "bite_close":"res://assets/combat_test/06b_luggage_lurker/luggage_lurker_idle.png"}, bite, [779.5,893], 0.10),
 		"qa_shoot":visual("qa_shoot", {"idle":"res://assets/combat_test/noren/noren_gun_idle.png", "shoot":"res://assets/combat_test/noren/noren_shoot_planted.png", "laser":"res://assets/combat_test/noren/noren_shoot_planted.png"}, shoot, [714,1210], 0.099)}
 	var problems: Array[String] = []
 	check(Runtime.parse(profiles.qa_bite, "qa_bite", problems) != null, "explicit idle closure texture accepted without VFX PNG")

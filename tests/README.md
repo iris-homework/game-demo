@@ -9,8 +9,8 @@
 诺伦与多敌人动作测试。在Godot打开该目录的 `battle_background_preview.tscn`，
 按F6运行。`launch.ps1 -Check` 用于执行专项检查。
 
-本目录保存午夜委托的逻辑回归、渲染展示与输入验证。目录按游戏模块组织，
-共 **81 组套件、243 个文件**。每组以 `.tscn` 为运行入口，同名 `.gd`
+本目录保存午夜委托的逻辑回归、渲染展示与输入验证。最初按游戏模块整理了
+**81 组套件、243 个文件**；该数量不含下述主线新增回归及制作台专项。每组以 `.tscn` 为运行入口，同名 `.gd`
 实现检查，`.gd.uid` 保存导入标识；本索引中的链接均指向整理后的新位置。
 
 ## 目录职责
@@ -34,9 +34,21 @@
 | `integration` | R1 集成检查与历史早期入口 |
 | `fixtures` | 测试夹具和只读输入，不属于游戏存档 |
 
-## 完整套件索引
+## 主线新增回归（2026-10-23 合并）
 
-下表按功能列出全部 81 组。场景链接便于直接查看测试入口；需要修改断言时，
+这些新增入口保留在 `tests/` 根目录；原有套件继续使用分类后的目录。
+科技图形测试继承 `combat/interaction/interaction_visual.gd`，不能再引用旧根目录路径。
+
+| 范围 | 套件 |
+| --- | --- |
+| 战斗开局恢复 | [battle_restart_tests](battle_restart_tests.tscn) · [battle_restart_integration](battle_restart_integration.tscn) |
+| 新科技效果 | [technology_effects_tests](technology_effects_tests.tscn) · [technology_effects_visual](technology_effects_visual.tscn) |
+| 固定卡面 | [fixed_card_face_tests](fixed_card_face_tests.tscn) · [fixed_card_face_visual](fixed_card_face_visual.tscn) |
+| 牌库筛选与退出确认 | [card_library_filters](card_library_filters.tscn) · [exit_confirmation_tests](exit_confirmation_tests.tscn) |
+
+## 原有分类套件索引
+
+下表按功能列出原有 81 组。场景链接便于直接查看测试入口；需要修改断言时，
 再打开对应的 `.gd` 文件。同名脚本和 UID 文件与各自场景放在同一目录。
 
 ### 战斗：规则

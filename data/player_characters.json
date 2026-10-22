@@ -17,10 +17,9 @@
     ],
     "skills": [],
     "cyberwareIds": [
-      "test_cyberware_01",
-      "test_cyberware_02",
-      "test_cyberware_03",
-      "test_cyberware_04"
+      "dimensional_pocket",
+      "accelerated_clock",
+      "backup_energy"
     ],
     "combatRules": "noren_v1"
   }

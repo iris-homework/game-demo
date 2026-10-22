@@ -88,8 +88,10 @@ func test_hand_exhaust() -> void:
 
 func _ready() -> void:
 	Game.save_enabled = false
-	Game.save_path = "user://noren_cards_qa.json"
-	Game.meta_path = "user://noren_cards_meta_qa.json"
+	var output := "res://artifacts/qa/battle-restart-2026-10-22/"
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output))
+	Game.save_path = output + "noren-checkpoint.json"
+	Game.meta_path = output + "noren-meta.json"
 	check(Game.card_catalog.size() == 40,"40 definitions")
 	var before_catalog := Game.card_catalog.duplicate(true)
 	var browser_cards := Game.library_cards()
@@ -368,14 +370,16 @@ func _ready() -> void:
 		check(Game.state.deck==deck,"Invalid command atomic: "+command)
 	Game.initialize_combat()
 	check(Game.state.combat.instances.size()==14,"Next battle includes owned additions")
+	var battle_start: Dictionary=Game.state.battleStart.duplicate(true)
 	m=CombatModel.new();m.restore(Game.state.combat);m.draw_cards()
 	m.stance="ranged";m.ammo=4;m.parry=2;m.block=11;m.stance_discount=true
 	Game.commit_combat(m)
 	check(Game.save_game() and Game.load_game(),"Formal save roundtrip")
-	check(Game.state.combat.norenState.parry==2 and Game.state.combat.norenState.block==11,"Combat state restored")
-	var malformed: Dictionary=Game.state.combat.duplicate(true);malformed.norenState.ammo=99
+	check(JSON.parse_string(JSON.stringify(Game.state.combat))==JSON.parse_string(JSON.stringify(battle_start)),"New battle reload restores its frozen entry state before opening draw")
+	check(m.parry==2 and m.block==11,"Saving and loading do not mutate the caller's live model")
+	var malformed: Dictionary=m.snapshot();malformed.norenState.ammo=99
 	check(not Game.valid_combat(malformed),"Reject corrupt ammo")
-	malformed=Game.state.combat.duplicate(true);malformed.norenState.exhaustPile.append(malformed.hand[0])
+	malformed=m.snapshot();malformed.norenState.exhaustPile.append(malformed.hand[0])
 	check(not Game.valid_combat(malformed),"Reject duplicate exhausted instance")
 	var original: Dictionary=Game.state.duplicate(true)
 	Game.start_training("B04")
@@ -392,7 +396,7 @@ func _ready() -> void:
 	Game.state={}
 	check(Game.load_game() and Game.state.deck==["noren_23"],"Console ownership survives actual disk reload")
 	var valid_path:=Game.save_path
-	Game.save_path="user://missing_noren_qa_dir/checkpoint.json"
+	Game.save_path=output+"missing-noren-qa-dir/checkpoint.json"
 	check(Game.console_command("addcard 36").begins_with("添加失败") and Game.state.deck==["noren_23"],"Console save failure rolls ownership back")
 	Game.save_path=valid_path;Game.save_enabled=false
 	for name in ["checkpoint.json","checkpoint.json.bak"]:
