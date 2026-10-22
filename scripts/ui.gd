@@ -192,7 +192,9 @@ func status_bar(section: String, show_days: bool = true, weeks_action: Callable 
 	deck_button.name = "current_deck_button"
 	deck_button.tooltip_text = "查看当前完整卡组及每种牌的数量"
 	deck_button.disabled = Game.state.is_empty()
-	button(self, "退出演练" if Game.training_mode else "菜单", Vector2(1248.0, 16.0), Vector2(140.0, 44.0), Game.menu)
+	var menu_button := button(self, "退出演练" if Game.training_mode else "菜单", Vector2(1248.0, 16.0), Vector2(140.0, 44.0), Game.menu)
+	if not Game.training_mode and Game.state.get("currentScene") == "battle" and not Game.state.get("battleStart", {}).is_empty():
+		menu_button.tooltip_text = "返回主菜单；未结束的战斗再次继续时，从本场开局重来。"
 	hp_bar_width = 166.0
 	refresh_hp()
 	if not Game.status_changed.is_connected(refresh_hp):

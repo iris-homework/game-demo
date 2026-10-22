@@ -18,7 +18,7 @@
 | 地图 | `city_map_expanded` 指向 `map-expanded-v1.png`；`mapContentRect` 表示原城市区域，17 地点的 `mapAnchor` 仍相对该区域 | [地图配置](../data/map.json)、[资源](../data/assets.json)、[地图视图](../scripts/map.gd) |
 | 主菜单背景 | 加载 `noren-bar-seated-v2-detail.png`，由 `menu_native_art.gdshader` 提供局部动画；旧 GIF 和 60 帧 PNG 为历史来源 | [背景实现](../scripts/menu/menu_environment.gd)、[背景 shader](../shaders/menu_native_art.gdshader) |
 | B04 阶段切换 | 小弟先行动、老大最后行动；全部敌方行动结束、下一玩家回合开始前检查小弟死亡并切换意图。玩家阶段击杀小弟不会把当轮已显示的老大意图立即改成攻击 | [CombatModel.end_turn / begin_round_intents](../scripts/combat/combat_model.gd)、[游戏规则](游戏规则.md) |
-| 战斗与存档 | 当前有 40 种诺伦卡牌；诺伦开场五张；新快照使用 `openingDrawDone`。已有战斗保留冻结规则与卡定义；冒险 schema 2 内仍有兼容迁移 | [卡牌目录](../data/cards/cards.json)、[诺伦配置](../data/combat/noren.json)、[CombatModel](../scripts/combat/combat_model.gd)、[Game](../scripts/game.gd) |
+| 战斗与存档 | 当前有 40 种诺伦卡牌；诺伦开场五张；新快照使用 `openingDrawDone`。新正式战斗保存 `battleStart`，未结束时退出／重启继续回到固定开局；已结算胜败不重开。缺少开局快照的旧战斗保留原进度与冻结规则；冒险 schema 2 内兼容迁移 | [卡牌目录](../data/cards/cards.json)、[诺伦配置](../data/combat/noren.json)、[CombatModel](../scripts/combat/combat_model.gd)、[Game](../scripts/game.gd) |
 | 诺伦卡面 | 40 张 v7 Q 版方向的新独立插画已按固定模板套版并接入；全定义匹配才显示对应 PNG，旧定义回退文字卡；含动态费用／规则与悬停大图。最终用户认可及实际游戏画面验收仍待完成 | [展示绑定](../data/cards/card_faces.json)、[资源](../assets/cards/noren_fixed_v1/)、[制作批次](../../卡牌游戏美术资源/卡牌/固定排版模板_v1/production_20261022/README.md)、[接入说明](开发接入说明.md#固定卡面资源2026-10-22) |
 | 本机工具 | 当前工作环境为 macOS；旧 Windows 路径和 `midnight-map-art` 安装记录不是本机可用性的证明。工具与技能按当前会话及本机实际发现结果选择 | [开发工具与工作流](开发工具与工作流.md) |
 

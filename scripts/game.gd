@@ -144,7 +144,7 @@ func initial_state(player_id: String = "") -> Dictionary:
 	if player_id.is_empty(): player_id = config.defaultPlayerCharacterId
 	if not valid_player_character(player_id): return {}
 	var hp := int(player_characters[player_id].attributes.maxHp)
-	return {"schemaVersion":2, "playerCharacterId":player_id, "currentWeek":1, "currentDay":int(config.initialDay), "currentHp":hp, "maxHp":hp, "combat":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "dialogueHistory":[], "battleId":"", "result":"", "battleHistory":[], "deck":[], "battleReward":{}, "portraits":{"left":PLAYER_REFERENCE, "right":"bartender"}}
+	return {"schemaVersion":2, "playerCharacterId":player_id, "currentWeek":1, "currentDay":int(config.initialDay), "currentHp":hp, "maxHp":hp, "combat":{}, "battleStart":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "dialogueHistory":[], "battleId":"", "result":"", "battleHistory":[], "deck":[], "battleReward":{}, "portraits":{"left":PLAYER_REFERENCE, "right":"bartender"}}
 
 func new_game(player_id: String = "") -> void:
 	if transition_locked or battle_busy: return
@@ -296,6 +296,7 @@ func start_event(id: String) -> bool:
 	state.result = ""
 	state.battleReward = {}
 	state.combat = {}
+	state.battleStart = {}
 	state.portraits = {"left":PLAYER_REFERENCE, "right":""}
 	enter_node(e.startNodeId)
 	return true
@@ -438,6 +439,7 @@ func battle_exit(result: String, expected_revision: int) -> bool:
 		return true
 	state.result = result
 	state.battleHistory.append({"battleId":state.battleId, "result":result})
+	state.battleStart = {}
 	enter_node(b.returnNodeByResult[result])
 	return true
 
@@ -484,14 +486,28 @@ func choose_reward_card(id: String, expected_revision: int) -> bool:
 	checkpoint()
 	return true
 
+func restart_unfinished_battle(subject: Dictionary) -> bool:
+	# Old saves have no recoverable opening HP/deck order; retain their snapshot.
+	# Completed results remain committed, including a lethal hit during playback.
+	if subject.get("currentScene", "") != "battle": return false
+	var opening: Dictionary = subject.get("battleStart", {})
+	var combat: Dictionary = subject.get("combat", {})
+	if opening.is_empty() or combat.is_empty() or not combat.get("outcome", "").is_empty(): return false
+	subject.combat = opening.duplicate(true)
+	subject.currentHp = int(opening.playerHp)
+	return true
+
 func save_game() -> bool:
+	# Keep live combat in memory; only the restart point goes to disk until win/lose.
+	var saved := state.duplicate(true)
+	if not training_mode: restart_unfinished_battle(saved)
 	var temp := save_path + ".tmp"
 	var file := FileAccess.open(temp, FileAccess.WRITE)
 	if file == null:
 		last_error = "存档无法写入，请检查目录权限。"
 		notice.emit(last_error)
 		return false
-	file.store_string(JSON.stringify(state, "\t"))
+	file.store_string(JSON.stringify(saved, "\t"))
 	file.flush()
 	file.close()
 	# Keep the previous valid snapshot for recovery from interruption/corruption.
@@ -516,6 +532,7 @@ func valid_save(s) -> bool:
 	if s.maxHp <= 0 or s.currentHp < 0 or s.currentHp > s.maxHp or s.currentDay < 1 or s.currentDay > 7: return false
 	if not s.combat is Dictionary or not s.inventory is Dictionary: return false
 	if not s.combat.is_empty() and not valid_combat(s.combat): return false
+	if not valid_battle_start(s): return false
 	if not s.combat.is_empty() and s.combat.profile.get("playerCharacterId", s.playerCharacterId) != s.playerCharacterId: return false
 	if not s.completedEventIds is Array or not s.flags is Dictionary or not s.choiceHistory is Dictionary or not s.portraits is Dictionary: return false
 	if not s.claimedRewardIds is Array or not s.battleHistory is Array: return false
@@ -554,6 +571,7 @@ func load_game() -> bool:
 		if parser.parse(FileAccess.get_file_as_string(path)) != OK: continue
 		var data = migrate_save(parser.data)
 		if not valid_save(data): continue
+		restart_unfinished_battle(data)
 		state = data
 		state.credits = int(state.credits)
 		if state.dialogueHistory.is_empty() and state.currentScene == "dialogue": record_dialogue()
@@ -571,12 +589,14 @@ func load_game() -> bool:
 func menu() -> void:
 	if transition_locked or battle_busy: return
 	if training_mode: restore_training()
+	elif restart_unfinished_battle(state): revision += 1
 	page = "menu"
 	changed.emit()
 
 func resume() -> void:
 	if state.is_empty(): load_game()
 	else:
+		if not training_mode and restart_unfinished_battle(state): revision += 1
 		page = state.currentScene
 		changed.emit()
 
@@ -606,6 +626,8 @@ func initialize_combat() -> void:
 	rules.deck.append_array(state.deck)
 	model.initialize(state.battleId, int(state.currentHp), int(state.maxHp), rules, definitions, card_catalog)
 	state.combat = model.snapshot()
+	# Capture after the initial shuffle, before the first draw; never reroll on resume.
+	state.battleStart = {} if training_mode else state.combat.duplicate(true)
 
 func commit_combat(model: CombatModel) -> void:
 	state.combat = model.snapshot()
@@ -739,6 +761,7 @@ func migrate_save(data):
 					data.portraits[side] = PLAYER_REFERENCE
 	if not data.has("battleReward"): data.battleReward = {}
 	if not data.has("dialogueHistory"): data.dialogueHistory = []
+	if not data.has("battleStart"): data.battleStart = {}
 	if data.get("schemaVersion",0) == 1:
 		data = data.duplicate(true)
 		data.schemaVersion = 2
@@ -746,6 +769,7 @@ func migrate_save(data):
 		data.maxHp = 100
 		data.currentDay = 1
 		data.combat = {}
+		data.battleStart = {}
 		data.inventory = {}
 	migrate_mercenary_story(data)
 	# Additive schema-2 upgrade: old battles gain the temporary catalog, with
@@ -777,6 +801,7 @@ func migrate_mercenary_story(data: Dictionary) -> void:
 		data.battleId = ""
 		data.result = ""
 		data.combat = {}
+		data.battleStart = {}
 		# Already paid credits and selected cards stay in their original fields.
 		# An unselected reward belonging to a removed encounter is retired with it.
 		data.battleReward = {}
@@ -798,10 +823,32 @@ func migrate_mercenary_story(data: Dictionary) -> void:
 		data.battleId = ""
 		data.result = ""
 		data.combat = {}
+		data.battleStart = {}
 		data.battleReward = {}
 	if data.get("portraits") is Dictionary:
 		for side in ["left", "right"]:
 			if data.portraits.get(side, "") in retired_characters: data.portraits[side] = ""
+
+func valid_battle_start(s: Dictionary) -> bool:
+	var opening = s.get("battleStart", {})
+	if not opening is Dictionary: return false
+	if opening.is_empty(): return true # Legacy in-progress battles remain loadable.
+	if s.get("currentScene") != "battle" or s.combat.is_empty(): return false
+	if not valid_combat(opening): return false
+	if opening.battleId != s.get("battleId") or opening.battleId != s.combat.battleId: return false
+	if opening.turn != 1 or opening.maxHp != s.get("maxHp"): return false
+	if opening.outcome != ("lose" if opening.playerHp == 0 else ""): return false
+	if opening.get("openingDrawDone") != false or not opening.hand.is_empty() or not opening.discardPile.is_empty(): return false
+	if not opening.get("norenState", {}).get("exhaustPile", []).is_empty(): return false
+	# Both snapshots must describe the same frozen encounter and card instances.
+	for field in ["profile", "cardCatalog", "instances", "maxHp"]:
+		if opening[field] != s.combat[field]: return false
+	if opening.enemies.size() != s.combat.enemies.size(): return false
+	for i in opening.enemies.size():
+		var enemy_id = opening.enemies[i].get("id")
+		if not enemy_id is String or enemy_id != s.combat.enemies[i].get("id"): return false
+		if opening.enemies[i].maxHp != s.combat.enemies[i].maxHp: return false
+	return true
 
 func valid_battle_reward(s: Dictionary) -> bool:
 	var r: Dictionary = s.battleReward

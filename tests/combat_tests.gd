@@ -13,7 +13,7 @@ func model_for(id: String, hp: int = 100) -> CombatModel:
 	for enemy_id in Game.battles[id].enemyIds: definitions.append(Game.enemy_catalog[enemy_id])
 	# Freeze historical single-enemy prototypes independently of authored
 	# encounters (covered by fish_rules_tests and gang_rules_tests).
-	if id in ["B04", "B11"]:
+	if id in ["B02", "B04", "B11"]:
 		var legacy_fish: Dictionary = definitions[0].duplicate(true)
 		legacy_fish.maxHp = null
 		legacy_fish.intentSequence = []
@@ -26,8 +26,13 @@ func model_for(id: String, hp: int = 100) -> CombatModel:
 
 func _ready() -> void:
 	Game.save_enabled = false
-	Game.save_path = "user://r1_combat_test.json"
-	Game.meta_path = "user://r1_meta_test.json"
+	var output := "res://artifacts/qa/battle-restart-2026-10-22/"
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output))
+	Game.save_path = output + "combat-checkpoint.json"
+	Game.meta_path = output + "combat-meta.json"
+	var current_robot := CombatModel.new()
+	current_robot.initialize("B02",100,100,Game.prototype_rules,[Game.enemy_catalog.robot])
+	check(current_robot.enemies[0].intent.amount == 10,"Current B02 keeps its authored attack 10 separately from legacy fixtures")
 	for id in Game.battles:
 		var m := model_for(id)
 		check(m.enemies[0].hp == 3,id+" HP 3")
@@ -76,10 +81,12 @@ func _ready() -> void:
 	Game.apply_actions([{"op":"advanceDay","days":20}])
 	check(Game.state.currentDay == 7 and Game.state.currentWeek == 1,"Date capped without advancing week")
 	check(not Game.apply_actions([{"op":"healHpPercent","percent":1.3}]),"Invalid healing action rejected")
-	# Save a damaged, partially played battle; restore piles, HP and intent exactly.
+	# Existing saves without a battle-start baseline retain exact mid-battle resume.
+	# New battles use entry-state restart, covered by battle_restart_tests.
 	Game.state.activeEventId = "E04"
 	Game.state.currentPlaceId = "alley"
 	Game.enter_node("battle")
+	Game.state.battleStart = {}
 	model = model_for("B04",50)
 	model.draw_cards()
 	model.play_card(model.hand[0],0)
@@ -91,7 +98,7 @@ func _ready() -> void:
 	check(JSON.parse_string(JSON.stringify(Game.state)) == JSON.parse_string(JSON.stringify(expected)),"Mid-battle exact roundtrip")
 	var restored := CombatModel.new()
 	restored.restore(Game.state.combat)
-	check(restored.hand.size() == 4 and restored.discard_pile.size() == 1 and restored.enemies[0].hp == 2,"No reset/exploit on resume")
+	check(restored.hand.size() == 4 and restored.discard_pile.size() == 1 and restored.enemies[0].hp == 2,"Legacy battle without baseline preserves its exact in-progress piles")
 	check(restored.player_hp == 50 and Game.state.currentDay == 7,"HP/date persisted")
 	check(not restored.use_item("missing",0,{},Game.item_catalog).ok,"Empty items cannot create effect")
 	check(Game.read_data("cards/cards.json").size() == 40 and Game.item_catalog.is_empty(),"Forty Noren cards and unchanged empty items")
