@@ -23,14 +23,20 @@ func _ready() -> void:
 	label(self,"冷却计入使用当回合 · 每进入下一玩家回合，剩余冷却减少 1",Vector2(124,129),Vector2(1000,31),17,MUTED)
 	close_button = button(self,"关闭  ×",Vector2(1190,78),Vector2(146,46),func(): closed.emit())
 	if model.cyberware_cards().is_empty():
-		label(self,"当前角色没有可激活科技",Vector2(310,360),Vector2(820,60),30,MUTED)
-	for i in model.cyberware_cards().size():
+		label(self,"当前角色没有可激活科技",Vector2(310,236),Vector2(820,60),30,MUTED)
+	var row_width := CombatModel.CYBERWARE_LIMIT*270 + (CombatModel.CYBERWARE_LIMIT-1)*30
+	for i in CombatModel.CYBERWARE_LIMIT:
+		var pos := Vector2((1440-row_width)/2.0+i*300,320)
+		if i >= model.cyberware_cards().size():
+			var empty_slot := panel(self,pos,Vector2(270,246),Color("17131f"),Color("494053"))
+			label(empty_slot,"TECH / %02d" % (i+1),Vector2(20,13),Vector2(228,25),12,MUTED)
+			var empty_label := label(empty_slot,"空位",Vector2(20,99),Vector2(230,48),25,MUTED)
+			empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			continue
 		var definition: Dictionary = model.cyberware_cards()[i]
 		# Normalize legacy snapshot text for display without changing saved rules.
 		var display_name := str(definition.name).replace("义体", "科技")
 		var description := str(definition.description).replace("义体", "科技")
-		var row_width := model.cyberware_cards().size()*270 + maxi(0, model.cyberware_cards().size()-1)*30
-		var pos := Vector2((1440-row_width)/2.0+i*300,320)
 		var b := button(self,"",pos,Vector2(270,246),func(): activation_requested.emit(definition.id))
 		for state_name in ["normal","hover","pressed","disabled","focus"]:
 			var fill := Color("251638")
