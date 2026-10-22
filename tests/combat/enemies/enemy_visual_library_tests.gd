@@ -3,6 +3,7 @@ extends Node
 const Resolver = preload("res://scripts/combat/enemy_visual_resolver.gd")
 const Actor = preload("res://scripts/combat/pose_actor.gd")
 const Stage = preload("res://scripts/combat/test_stage.gd")
+const Pipeline = preload("res://enemy_asset_pipeline/runtime/pipeline_catalog.gd")
 var checks := 0
 var failures := 0
 
@@ -23,10 +24,16 @@ func current_content() -> void:
 		var visual := Game.enemy_combat_visual({"combatVisualId":id})
 		check(visual.id == id and visual.diagnostics.is_empty(), "Current profile validates: "+id)
 		for pose in Game.enemy_visuals.catalog[id].poses:
-			check(visual.poses[pose] is Texture2D, "Current pose loads: "+id+"/"+pose)
+			check(visual.poses.get(pose) is Texture2D, "Current pose loads: "+id+"/"+pose)
 	for id in Game.enemy_catalog:
 		var enemy: Dictionary = Game.enemy_catalog[id]
-		check(Game.enemy_combat_visual(enemy).id == enemy.combatVisualId, "Explicit reference: "+id)
+		var resolved := Game.enemy_combat_visual(enemy)
+		check(resolved.id == enemy.combatVisualId and resolved.diagnostics.is_empty(), "Explicit reference without fallback: "+id)
+		var rendered = actor_for(resolved)
+		for pose in resolved.poses:
+			rendered.set_pose(pose)
+			check(rendered.kind == enemy.combatVisualId and rendered.sprite.texture == resolved.poses[pose], "Enemy actor uses its configured texture: "+id+"/"+pose)
+		rendered.free()
 		var legacy := enemy.duplicate(true)
 		legacy.erase("combatVisualId")
 		var before := legacy.duplicate(true)
@@ -46,6 +53,50 @@ func current_content() -> void:
 		var actor = actor_for(Game.enemy_combat_visual(restored.enemies[0]))
 		check(actor.sprite.texture != null and snapshot == before, "Old snapshot renders without mutation: "+id)
 		actor.free()
+
+func published_content() -> void:
+	# Use the production catalog directly, never the workbench's path repair helper.
+	for id in Pipeline.get_profiles():
+		var raw := Pipeline.get_profile(id)
+		var visual := Game.enemy_combat_visual({"id":"preview_"+id,"combatVisualId":id})
+		check(visual.id == id and visual.pipeline_active and visual.diagnostics.is_empty(), "Published profile resolves without fallback: "+id)
+		var actor = actor_for(visual)
+		for pose in raw.poses:
+			actor.set_pose(pose)
+			check(actor.pose == pose and actor.sprite.texture != null, "Published actor pose renders: "+id+"/"+pose)
+		if not str(raw.get("hitEffectTexture", "")).is_empty():
+			check(visual.hit_effect_texture != null and visual.hit_effect_texture.resource_path == raw.hitEffectTexture, "Published hit effect retains its own binding: "+id)
+		actor.free()
+
+func configured_attack_effects() -> void:
+	for id in ["fish", "robot", "gang", "gang_henchman"]:
+		var visual := Game.enemy_combat_visual(Game.enemy_catalog[id])
+		var stage := Stage.new()
+		add_child(stage)
+		var visuals: Array[Resolver.Visual] = [visual]
+		stage.setup(533,visuals)
+		var contacts := {"count":0}
+		await stage.attack(stage.enemies[0],stage.player,"pierce",[{"damage":1,"blocked":0,"killed":false}],func(_hit,_index):
+			contacts.count += 1
+			if id == "fish":
+				var effects := get_tree().get_nodes_in_group("bite_hit_fx")
+				check(stage.enemies[0].pose == "bite_close" and effects.size() == 1, "Fish contact uses bite pose and one bite effect")
+				if effects.size() == 1:
+					check(effects[0].texture.resource_path == "res://assets/combat_test/12a_fish/fish_bite_hit_fx.png", "Fish bite uses the relocated fish effect")
+			elif id == "robot":
+				var beams := get_tree().get_nodes_in_group("palm_laser_fx")
+				check(stage.enemies[0].pose == "laser" and beams.size() == 1, "Robot contact uses laser pose and one palm beam")
+				if beams.size() == 1:
+					check(beams[0].start.distance_to(stage.world.to_local(stage.enemies[0].sprite.to_global(stage.enemies[0].laser_muzzle))) < 0.01, "Robot beam originates from its calibrated palm")
+			else:
+				var matching := 0
+				for effect in stage.world.get_children():
+					if effect.get_script() == Stage.NeonSlash and effect.mode == "pierce": matching += 1
+				check(stage.enemies[0].pose == "pierce" and matching == 1, "Gang contact retains its pierce effect: "+id))
+		check(contacts.count == 1, "Configured attack presents exactly one hit: "+id)
+		await stage.return_home()
+		stage.queue_free()
+		await get_tree().process_frame
 
 func fallback_order() -> void:
 	var resolver := Resolver.new()
@@ -180,6 +231,8 @@ func _ready() -> void:
 	Game.save_path = "user://enemy_visual_library_test.json"
 	Game.meta_path = "user://enemy_visual_library_meta_test.json"
 	current_content()
+	published_content()
+	await configured_attack_effects()
 	fallback_order()
 	malformed_profiles()
 	catalog_loading()

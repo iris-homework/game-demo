@@ -66,7 +66,7 @@ func _ready() -> void:
 	var snapshot: Dictionary = view.model.snapshot()
 	for i in 3:
 		var actor = stage.enemies[i]
-		check(actor.kind == identities[i] and actor.facing == -1 and actor.sprite.scale.x < 0,"Gang source artwork mirrors left on battle entry: "+str(i))
+		check(actor.kind == identities[i] and actor.facing == -1 and actor.sprite.transform.x.x < 0,"Gang source artwork mirrors left on battle entry: "+str(i))
 		check(actor.poses.size() == 4 and actor.attack_style_override == "pierce","Four authored poses use the existing attack timing: "+str(i))
 		check(view.target_at_point(stage.contact(actor)) == i,"Each enemy torso is independently targetable: "+str(i))
 		check(stage.get_global_rect().encloses(stage.target_rect(i)),"Each initial target remains within the clipped stage: "+str(i))
