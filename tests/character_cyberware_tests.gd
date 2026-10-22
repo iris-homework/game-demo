@@ -4,6 +4,8 @@ var failures := 0
 const FIRST := "test_cyberware_01"
 const SECOND := "test_cyberware_02"
 const FIFTH := "test_cyberware_05"
+const CURRENT_IDS := ["dimensional_pocket", "accelerated_clock", "backup_energy"]
+const LEGACY_IDS := [FIRST, SECOND, "test_cyberware_03", "test_cyberware_04"]
 
 func check(ok: bool, message: String) -> void:
 	checks += 1
@@ -30,14 +32,19 @@ func same_save(a: Dictionary, b: Dictionary) -> bool:
 
 func _ready() -> void:
 	Game.save_enabled = false
-	Game.save_path = "res://artifacts/qa/character-cyberware-2026-10-11/test_checkpoint.json"
-	Game.meta_path = "res://artifacts/qa/character-cyberware-2026-10-11/test_meta.json"
+	Game.save_path = "user://character_cyberware_test_checkpoint.json"
+	Game.meta_path = "user://character_cyberware_test_meta.json"
 	check(Game.player_characters.keys() == ["noren"], "Only Noren ships as playable")
 	var original: Dictionary = Game.player_characters.noren.duplicate(true)
 	var ids: Array = original.cyberwareIds.duplicate()
-	check(ids == Game.prototype_rules.cyberware.cards.slice(0,4).map(func(c): return c.id), "Noren references first four original definitions in order")
+	check(ids == CURRENT_IDS, "Noren references the three authored technologies in order")
+	var current := battle_for()
+	check(current.cyberware_cards().size() == 3 and current.profile.playerCyberwareIds == ids, "Noren battle freezes the three configured IDs")
+	check(current.cyberware_cards() == Game.player_cyberware("noren").cards and Game.valid_combat(current.snapshot()), "Current names, effects and cooldowns freeze in valid battle")
+	# Keep historical stacking coverage on an explicit legacy actor loadout.
+	Game.player_characters.noren.cyberwareIds = LEGACY_IDS.duplicate()
 	var normal := battle_for()
-	check(normal.cyberware_cards().size() == 4 and normal.profile.playerCyberwareIds == ids, "Noren battle freezes four configured IDs")
+	check(normal.cyberware_cards().size() == 4 and normal.profile.playerCyberwareIds == LEGACY_IDS, "Noren battle freezes four configured IDs")
 	check(normal.cyberware_cards() == Game.prototype_rules.cyberware.cards.slice(0,4), "Names, descriptions and effects are unchanged")
 	for definition in normal.cyberware_cards():
 		check(normal.activate_cyberware(definition.id), "Noren can activate " + definition.id)
@@ -48,6 +55,7 @@ func _ready() -> void:
 	check(normal.play_card(normal.hand[0], 0).damage == 6, "Following attack keeps base damage")
 	normal.end_turn()
 	check(normal.available_cyberware_count() == 4 and normal.activate_cyberware(FIRST), "Next player turn releases cooldown")
+	Game.player_characters.noren = original.duplicate(true)
 	# Only in-memory fixture actors have alternative lists.
 	Game.characters["qa_subset"] = Game.characters.noren.duplicate(true)
 	Game.characters["qa_subset"].displayName = "科技配置测试角色"
@@ -62,6 +70,8 @@ func _ready() -> void:
 	check(subset.activate_cyberware(FIFTH) and subset.next_attack_bonus == 1, "Assigned shared definition retains effect")
 	check(subset.profile.playerCharacterId == "qa_subset" and Game.valid_combat(subset.snapshot()), "Actor snapshot with selected definitions is valid")
 	subset.draw_cards()
+	# This case exercises legacy live-snapshot persistence, not restart projection.
+	Game.state.battleStart = {}
 	Game.commit_combat(subset)
 	var saved := Game.state.duplicate(true)
 	check(Game.save_game(), "Configured battle saves to isolated path")
@@ -89,7 +99,7 @@ func _ready() -> void:
 	var rules := Game.player_cyberware("qa_subset")
 	rules.cards[0].nextAttackBonus = 99
 	rules.cards.clear()
-	check(Game.cyberware_definition(FIFTH).nextAttackBonus == 1 and Game.player_cyberware("noren").cards.size() == 4, "Returned data cannot mutate shared catalog or another actor")
+	check(Game.cyberware_definition(FIFTH).nextAttackBonus == 1 and Game.player_cyberware("noren").cards.size() == 3, "Returned data cannot mutate shared catalog or another actor")
 	for bad in ["bad", [FIRST, FIRST], ["missing"], [3], [FIRST,SECOND,FIFTH,"test_cyberware_03","test_cyberware_04"]]:
 		Game.player_characters.noren.cyberwareIds = bad
 		var before := Game.state.duplicate(true)
@@ -97,13 +107,18 @@ func _ready() -> void:
 		Game.new_game("noren")
 		check(Game.state == before, "Bad configuration never resets existing progress")
 	Game.player_characters.noren = original.duplicate(true)
+	Game.player_characters.noren.cyberwareIds = [FIRST]
 	var definition := Game.cyberware_definition(FIRST)
 	var amount = definition.nextAttackBonus
 	definition.nextAttackBonus = 0.5
 	check(not Game.valid_player_character("noren"), "Unsupported fractional catalog effect rejected")
 	definition.nextAttackBonus = amount
+	Game.player_characters.noren = original.duplicate(true)
 	# Legacy snapshots retain full definitions and earned bonuses without new markers.
+	Game.player_characters.noren.cyberwareIds = LEGACY_IDS.duplicate()
 	normal = battle_for()
+	Game.player_characters.noren = original.duplicate(true)
+	Game.state.battleStart = {}
 	normal.draw_cards()
 	normal.activate_cyberware(FIRST)
 	Game.commit_combat(normal)
@@ -120,21 +135,24 @@ func _ready() -> void:
 	var missing := legacy.duplicate(true)
 	missing.combat.profile.erase("cyberware")
 	missing.combat.erase("usedCyberware")
+	missing.combat.erase("cyberwareCooldowns")
 	missing.combat.erase("nextAttackBonus")
 	migrated = Game.migrate_save(missing)
-	check(Game.valid_save(migrated) and migrated.combat.profile.cyberware.cards.size() == 4, "Old pre-cyberware Noren battle gains four configured items")
+	check(Game.valid_save(migrated) and migrated.combat.profile.cyberware.cards.size() == 3, "Old pre-cyberware Noren battle gains three configured items")
 	missing = Game.state.duplicate(true)
 	missing.playerCharacterId = "qa_empty"
 	missing.combat.profile.playerCharacterId = "qa_empty"
 	missing.combat.profile.erase("cyberware")
 	missing.combat.profile.erase("playerCyberwareIds")
 	missing.combat.erase("usedCyberware")
+	missing.combat.erase("cyberwareCooldowns")
 	missing.combat.erase("nextAttackBonus")
 	migrated = Game.migrate_save(missing)
 	check(Game.valid_save(migrated) and migrated.combat.profile.cyberware.cards.is_empty(), "Missing legacy catalog fills from owning actor, never global four")
 	# Previously marked six-slot saves must remain loadable after reducing slots.
 	var old_six := normal.snapshot()
-	old_six.profile.cyberware.cards = Game.prototype_rules.cyberware.cards.duplicate(true)
+	old_six.profile.cyberware.cards = Game.prototype_rules.cyberware.cards.slice(0,6).duplicate(true)
+	old_six.erase("cyberwareCooldowns")
 	old_six.profile.playerCyberwareIds = old_six.profile.cyberware.cards.map(func(c): return c.id)
 	old_six.usedCyberware = [FIFTH, "test_cyberware_06"]
 	old_six.nextAttackBonus = 2
@@ -147,6 +165,7 @@ func _ready() -> void:
 	check(restored.next_attack_bonus == 2 and Game.valid_combat(restored.snapshot()), "Old earned bonus remains valid after restore")
 	var old_eight := legacy_combat.duplicate(true)
 	for index in [5,6,7,8]: old_eight.profile.cyberware.cards.append({"id":"test_cyberware_%02d" % index,"name":"Legacy","nextAttackBonus":1})
+	old_eight.erase("cyberwareCooldowns")
 	old_eight.usedCyberware = ["test_cyberware_07","test_cyberware_08"]
 	old_eight.nextAttackBonus = 2
 	check(Game.valid_combat(old_eight), "Older eight-definition snapshot retains previously earned bonus")
@@ -161,5 +180,7 @@ func _ready() -> void:
 	for id in ["qa_subset", "qa_empty"]:
 		Game.player_characters.erase(id)
 		Game.characters.erase(id)
+	for path in [Game.save_path, Game.save_path + ".bak", Game.save_path + ".tmp"]:
+		if FileAccess.file_exists(path): DirAccess.remove_absolute(path)
 	print("CHARACTER CYBERWARE: ", checks, " checks, ", failures, " failures")
 	get_tree().quit(0 if failures == 0 else 1)

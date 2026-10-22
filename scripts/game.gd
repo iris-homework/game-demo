@@ -128,8 +128,7 @@ func valid_player_character(id) -> bool:
 		var cyberware := cyberware_definition(cyberware_id)
 		if cyberware.is_empty(): return false
 		if not cyberware.get("name") is String or not cyberware.get("description") is String: return false
-		var amount = cyberware.get("nextAttackBonus")
-		if not (amount is int or amount is float) or not is_finite(float(amount)) or amount < 1 or amount != floor(float(amount)): return false
+		if not CombatModel.valid_cyberware_definition(cyberware): return false
 		seen_cyberware.append(cyberware_id)
 	# Skills are authored metadata until a specific effect contract is implemented.
 	if not definition.get("skills") is Array: return false
@@ -947,14 +946,13 @@ func valid_cyberware_state(c: Dictionary) -> bool:
 	var rules = c.profile.get("cyberware", {})
 	if not rules is Dictionary or not rules.get("cards", []) is Array: return false
 	var catalog := {}
+	var cooldown_limits := {}
 	for definition in rules.get("cards", []):
 		if not definition is Dictionary: return false
-		if not definition.get("id") is String or not definition.get("name") is String: return false
+		if not CombatModel.valid_cyberware_definition(definition): return false
 		if catalog.has(definition.id): return false
-		var amount = definition.get("nextAttackBonus", 0)
-		if not (amount is int or amount is float): return false
-		if not is_finite(float(amount)) or amount <= 0 or amount != floor(float(amount)): return false
-		catalog[definition.id] = int(amount)
+		catalog[definition.id] = int(definition.get("nextAttackBonus", 0))
+		cooldown_limits[definition.id] = int(definition.get("cooldownTurns", 1))
 	# New battles freeze the character's list beside its definitions. Older
 	# snapshots may also carry a longer historical list; the current slot limit
 	# applies to new character configurations, not frozen save definitions.
@@ -963,13 +961,25 @@ func valid_cyberware_state(c: Dictionary) -> bool:
 		if not ids is Array or ids != catalog.keys(): return false
 	var seen := []
 	var maximum := 0
-	# Unspent buffs can carry over from earlier turns, while cooldown IDs only
-	# describe the current turn. Allow at most one activation per card per turn.
+	# Preserve the historical upper bound for unspent attack bonuses.
+	# New non-damage technologies contribute zero, even while on cooldown.
 	for amount in catalog.values(): maximum += amount * (int(c.turn) - 1)
 	for id in used:
 		if not id is String or id in seen or not catalog.has(id): return false
 		seen.append(id)
 		maximum += catalog[id]
+	if c.has("cyberwareCooldowns"):
+		var cooldowns = c.cyberwareCooldowns
+		if not cooldowns is Dictionary or cooldowns.size() != used.size(): return false
+		for id in cooldowns:
+			if not id is String or not id in used: return false
+			var remaining = cooldowns[id]
+			if not (remaining is int or remaining is float) or not is_finite(float(remaining)): return false
+			if remaining < 1 or remaining != floor(float(remaining)) or remaining > cooldown_limits[id]: return false
+	else:
+		# Only historical one-turn definitions may omit the new cooldown state.
+		for id in used:
+			if cooldown_limits[id] != 1: return false
 	return bonus <= maximum
 
 func owned_card_counts() -> Dictionary:

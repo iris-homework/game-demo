@@ -857,7 +857,7 @@ func commit() -> void:
 func refresh_cyberware() -> void:
 	if not is_instance_valid(cyberware_status): return
 	cyberware_button.text = "激活科技 · %d/%d" % [model.available_cyberware_count(),model.cyberware_cards().size()]
-	cyberware_status.text = "下次攻击伤害 +%d" % model.next_attack_bonus if model.next_attack_bonus > 0 else "临时科技 / 点击查看"
+	cyberware_status.text = "下次攻击伤害 +%d" % model.next_attack_bonus if model.next_attack_bonus > 0 else "战斗科技 / 点击查看"
 
 func show_cyberware() -> void:
 	if not initialized or Game.battle_busy or Game.transition_locked or is_instance_valid(pile_overlay): return
@@ -871,9 +871,37 @@ func show_cyberware() -> void:
 func activate_cyberware(id: String) -> void:
 	if not initialized or Game.battle_busy or Game.transition_locked or not is_instance_valid(pile_overlay): return
 	if not pile_overlay.has_signal("activation_requested"): return
+	var old_hand := model.hand.duplicate()
+	var redraw := false
+	var legacy_bonus := false
+	for definition in model.cyberware_cards():
+		if definition.id != id: continue
+		redraw = definition.get("effect", "") == "redraw_hand"
+		legacy_bonus = definition.get("effect", "next_attack_bonus") == "next_attack_bonus"
 	if not model.activate_cyberware(id): return
 	commit()
-	pile_overlay.refresh()
+	if legacy_bonus:
+		pile_overlay.refresh()
+		return
+	# Commit the complete model result once; then present discarded/drawn cards.
+	# Redraw can return the same UIDs after recycling, so retire every old view.
+	close_pile()
+	set_busy(true)
+	var retired_views: Array = []
+	if redraw:
+		for uid in old_hand:
+			if not cards.has(uid): continue
+			var view: CombatCard = cards[uid]
+			cards.erase(uid)
+			retired_views.append(view)
+			animate_discard(view)
+	await stage.player.transition_combat_stance(model.stance if model.is_noren() else "melee")
+	for view in retired_views:
+		while is_instance_valid(view) and view.visible: await get_tree().process_frame
+	await deal_hand(true)
+	arrange_hand()
+	refresh_counts()
+	set_busy(false)
 
 func finish(result: String) -> void:
 	if Game.transition_locked or Game.battle_busy or is_instance_valid(pile_overlay): return

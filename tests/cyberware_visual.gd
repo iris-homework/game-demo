@@ -13,10 +13,13 @@ func key(code: Key) -> void:
 
 func _ready() -> void:
 	Game.save_enabled = false
+	Game.save_path = "user://cyberware_visual_checkpoint.json"
+	Game.meta_path = "user://cyberware_visual_meta.json"
 	output = ProjectSettings.globalize_path("res://artifacts/qa/technology-four-2026-10-20/%s_" % OS.get_environment("QA_SIZE"))
 	app = load("res://scenes/main.tscn").instantiate()
 	add_child(app)
 	# Keep the original +1 attack regression independent of current Noren card rules.
+	Game.player_characters.noren.cyberwareIds = ["test_cyberware_01", "test_cyberware_02", "test_cyberware_03", "test_cyberware_04"]
 	Game.player_characters.noren.erase("combatRules")
 	Game.player_characters.noren.startingDeck = Game.prototype_rules.deck.duplicate()
 	await settle(0.4)

@@ -1,5 +1,5 @@
 extends DemoUI
-## Temporary battle activations; separate from the read-only combat piles.
+## Battle technologies; separate from the read-only combat piles.
 signal closed
 signal activation_requested(id: String)
 const PURPLE := Color("c895ff")
@@ -20,7 +20,7 @@ func _ready() -> void:
 	rect(self,Vector2(102,70),Vector2(5,67),PURPLE)
 	label(self,"激活科技",Vector2(122,68),Vector2(350,56),36)
 	label(self,"%02d / TECHNOLOGY" % model.cyberware_cards().size(),Vector2(420,80),Vector2(420,38),20,PURPLE)
-	label(self,"临时名称与效果 · 冷却 1 回合（含当回合）· 下回合恢复可用",Vector2(124,129),Vector2(1000,31),17,MUTED)
+	label(self,"冷却计入使用当回合 · 每进入下一玩家回合，剩余冷却减少 1",Vector2(124,129),Vector2(1000,31),17,MUTED)
 	close_button = button(self,"关闭  ×",Vector2(1190,78),Vector2(146,46),func(): closed.emit())
 	if model.cyberware_cards().is_empty():
 		label(self,"当前角色没有可激活科技",Vector2(310,360),Vector2(820,60),30,MUTED)
@@ -39,32 +39,40 @@ func _ready() -> void:
 			elif state_name == "disabled": fill = Color("25272d")
 			elif state_name == "focus": fill = Color.TRANSPARENT
 			b.add_theme_stylebox_override(state_name,style(fill,PURPLE if state_name != "disabled" else Color("606570"),2))
-		b.tooltip_text = display_name + "（暂定）\n" + description + "\n使用后冷却 1 回合（含当回合），下回合恢复。"
+		var cooldown := int(definition.get("cooldownTurns", 1))
+		b.tooltip_text = display_name + "\n" + description + "\n冷却 %d 回合（含使用当回合）。" % cooldown
 		label(b,"TECH / %02d" % (i+1),Vector2(20,13),Vector2(228,25),12,PURPLE)
 		label(b,display_name,Vector2(20,46),Vector2(230,38),25)
 		rect(b,Vector2(20,92),Vector2(230,1),Color("74528f"))
-		label(b,"+%d" % int(definition.nextAttackBonus),Vector2(19,101),Vector2(110,72),52,PURPLE)
-		label(b,"下次攻击\n伤害增加",Vector2(132,112),Vector2(119,64),18,CREAM)
+		var effect_label := label(b,description,Vector2(20,105),Vector2(230,54),19,CREAM)
+		effect_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label(b,"冷却 %d 回合" % cooldown,Vector2(20,169),Vector2(230,25),15,PURPLE)
 		state_labels.append(label(b,"",Vector2(20,200),Vector2(235,31),17,PURPLE))
 		for child in b.get_children():
 			if child is Label: child.set_meta("active_color",child.get_theme_color("font_color"))
 			elif child is ColorRect: child.set_meta("active_color",child.color)
 		card_buttons.append(b)
 	status_label = label(self,"",Vector2(125,748),Vector2(1100,34),20,PURPLE)
-	label(self,"点击卡牌激活  /  数字 1—4 激活  /  Esc 或右键关闭",Vector2(124,811),Vector2(860,28),15,MUTED)
+	var shortcut := ""
+	if card_buttons.size() == 1: shortcut = "  /  数字 1 激活"
+	elif card_buttons.size() > 1: shortcut = "  /  数字 1—%d 激活" % card_buttons.size()
+	label(self,"点击卡牌激活" + shortcut + "  /  Esc 或右键关闭",Vector2(124,811),Vector2(860,28),15,MUTED)
 	button(self,"返回战斗  →",Vector2(1100,797),Vector2(234,46),func(): closed.emit())
 	refresh()
 	close_button.grab_focus()
 
 func refresh() -> void:
 	for i in card_buttons.size():
-		var used: bool = model.cyberware_cards()[i].id in model.used_cyberware
+		var id: String = model.cyberware_cards()[i].id
+		var remaining := model.cyberware_cooldown(id)
+		var used := not model.cyberware_available(id)
 		card_buttons[i].disabled = used
 		for child in card_buttons[i].get_children():
 			if child is Label: child.add_theme_color_override("font_color",Color("a7abb5") if used else child.get_meta("active_color"))
 			elif child is ColorRect: child.color = Color("606570") if used else child.get_meta("active_color")
-		state_labels[i].text = "冷却中 · 下回合可用" if used else "%d  /  点击激活" % (i+1)
-	status_label.text = "待生效：下次攻击伤害 +%d    /    本回合可用 %d 张" % [model.next_attack_bonus,model.available_cyberware_count()]
+		state_labels[i].text = ("冷却中 · 下回合可用" if remaining == 1 else "冷却中 · 剩余 %d 回合" % remaining) if remaining > 0 else ("当前不可用" if used else "%d  /  点击激活" % (i+1))
+	status_label.text = "本回合可用 %d 项科技" % model.available_cyberware_count()
+	if model.next_attack_bonus > 0: status_label.text += "    /    待生效：下次攻击伤害 +%d" % model.next_attack_bonus
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey:

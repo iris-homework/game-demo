@@ -1,6 +1,6 @@
 {
   "prototype": true,
-  "note": "战斗科技临时规则；名称及效果待正式设计；每张冷却 1 回合，使用当回合计入，下个玩家回合可再次激活。",
+  "note": "战斗科技共用定义；冷却计入使用当回合，每次进入下一玩家回合减1。旧占位定义保留用于旧战斗兼容。",
   "cards": [
     {
       "id": "test_cyberware_01",
@@ -37,6 +37,28 @@
       "name": "临时科技 06",
       "description": "下次攻击伤害 +1",
       "nextAttackBonus": 1
+    },
+    {
+      "id": "dimensional_pocket",
+      "name": "异次元口袋",
+      "description": "切换形态。",
+      "effect": "toggle_stance",
+      "cooldownTurns": 3
+    },
+    {
+      "id": "accelerated_clock",
+      "name": "加速时钟",
+      "description": "弃置所有手牌，抽等量牌。",
+      "effect": "redraw_hand",
+      "cooldownTurns": 999
+    },
+    {
+      "id": "backup_energy",
+      "name": "后备能源",
+      "description": "恢复1点能量。",
+      "effect": "gain_energy",
+      "amount": 1,
+      "cooldownTurns": 3
     }
   ]
 }

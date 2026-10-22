@@ -18,6 +18,8 @@ func open_battle(id: String) -> void:
 
 func _ready() -> void:
 	Game.save_enabled = false
+	Game.save_path = "user://character_cyberware_visual_checkpoint.json"
+	Game.meta_path = "user://character_cyberware_visual_meta.json"
 	output = ProjectSettings.globalize_path("res://artifacts/qa/technology-four-2026-10-20/roles_")
 	app = load("res://scenes/main.tscn").instantiate()
 	add_child(app)
@@ -71,7 +73,7 @@ func _ready() -> void:
 	await open_battle("noren")
 	view = app.view
 	await click(view.cyberware_button.get_rect().get_center())
-	verify(view.pile_overlay.card_buttons.size() == 4 and view.cyberware_button.text.contains("4/4"), "Noren's four-card loadout remains intact after other roles")
+	verify(view.pile_overlay.card_buttons.size() == 3 and view.cyberware_button.text.contains("3/3"), "Noren's three technologies remain intact after other roles")
 	await motion(Vector2(80,180))
 	await shot("noren")
 	for id in ["qa_subset", "qa_empty"]:

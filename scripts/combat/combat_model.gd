@@ -18,8 +18,9 @@ var outcome := ""
 var profile: Dictionary = {}
 var card_catalog: Dictionary = {}
 var log_lines: Array = []
-# IDs on cooldown for this player turn; retained under the legacy save key.
+# IDs on cooldown; retained under the legacy save key.
 var used_cyberware: Array = []
+var cyberware_cooldowns: Dictionary = {}
 var next_attack_bonus := 0
 var energy := 0
 var block := 0
@@ -49,18 +50,60 @@ func cyberware_cards() -> Array:
 func available_cyberware_count() -> int:
 	var available := 0
 	for definition in cyberware_cards():
-		if not definition.id in used_cyberware: available += 1
+		if cyberware_available(definition.id): available += 1
 	return available
 
-func activate_cyberware(id: String) -> bool:
-	if not outcome.is_empty() or player_hp <= 0 or id in used_cyberware: return false
+static func valid_cyberware_definition(definition: Dictionary) -> bool:
+	if not definition.get("id") is String or definition.id.is_empty() or not definition.get("name") is String: return false
+	var cooldown = definition.get("cooldownTurns", 1)
+	if not (cooldown is int or cooldown is float) or not is_finite(float(cooldown)) or cooldown < 1 or cooldown != floor(float(cooldown)): return false
+	match definition.get("effect", "next_attack_bonus"):
+		"next_attack_bonus":
+			var bonus = definition.get("nextAttackBonus")
+			return (bonus is int or bonus is float) and is_finite(float(bonus)) and bonus > 0 and bonus == floor(float(bonus))
+		"toggle_stance", "redraw_hand":
+			return not definition.has("nextAttackBonus")
+		"gain_energy":
+			var amount = definition.get("amount")
+			return not definition.has("nextAttackBonus") and (amount is int or amount is float) and is_finite(float(amount)) and amount > 0 and amount == floor(float(amount))
+	return false
+
+func cyberware_cooldown(id: String) -> int:
+	return int(cyberware_cooldowns.get(id, 1 if id in used_cyberware else 0))
+
+func cyberware_available(id: String) -> bool:
+	if not outcome.is_empty() or player_hp <= 0 or cyberware_cooldown(id) > 0: return false
 	for definition in cyberware_cards():
 		if definition.id != id: continue
-		var bonus := int(definition.get("nextAttackBonus", 0))
-		if bonus <= 0: return false
+		if not valid_cyberware_definition(definition): return false
+		return is_noren() or definition.get("effect", "next_attack_bonus") in ["next_attack_bonus", "redraw_hand"]
+	return false
+
+func advance_cyberware_cooldowns() -> void:
+	for id in used_cyberware.duplicate():
+		var remaining := cyberware_cooldown(id) - 1
+		if remaining > 0:
+			cyberware_cooldowns[id] = remaining
+		else:
+			cyberware_cooldowns.erase(id)
+			used_cyberware.erase(id)
+
+func activate_cyberware(id: String) -> bool:
+	if not cyberware_available(id): return false
+	for definition in cyberware_cards():
+		if definition.id != id: continue
+		match definition.get("effect", "next_attack_bonus"):
+			"next_attack_bonus": buffs.apply(self, "technology", int(definition.nextAttackBonus))
+			"toggle_stance": change_stance("toggle")
+			"redraw_hand":
+				var amount := hand.size()
+				discard_pile.append_array(hand)
+				hand.clear()
+				draw_cards(amount)
+			"gain_energy": energy += int(definition.amount)
 		used_cyberware.append(id)
-		buffs.apply(self, "technology", bonus)
-		log_lines.append("%s 已激活，下次攻击伤害 +%d。" % [definition.name, next_attack_bonus])
+		cyberware_cooldowns[id] = int(definition.get("cooldownTurns", 1))
+		log_lines.append("%s 已激活：%s" % [definition.name, definition.get("description", "下次攻击伤害增加。")])
 		return true
 	return false
 
@@ -231,7 +274,7 @@ func end_turn() -> Dictionary:
 			break
 	if outcome.is_empty():
 		turn += 1
-		used_cyberware.clear()
+		advance_cyberware_cooldowns()
 		for enemy in enemies:
 			enemy.intentIndex += 1
 			enemy.intent = intent_for(enemy, int(enemy.intentIndex))
@@ -244,6 +287,7 @@ func use_item(_item_id: String, _target_index: int, _inventory: Dictionary, _cat
 func snapshot() -> Dictionary:
 	var saved := {"battleId":battle_id,"turn":turn,"playerHp":player_hp,"maxHp":max_hp,"drawPile":draw_pile.duplicate(),"hand":hand.duplicate(),"discardPile":discard_pile.duplicate(),"instances":instances.duplicate(true),"enemies":enemies.duplicate(true),"outcome":outcome,"log":log_lines.slice(-30),"profile":profile.duplicate(true),"cardCatalog":card_catalog.duplicate(true),"usedCyberware":used_cyberware.duplicate(),"nextAttackBonus":next_attack_bonus,"norenState":{"energy":energy,"block":block,"stance":stance,"ammo":ammo,"parry":parry,"exhaustPile":exhaust_pile.duplicate(),"powers":powers.duplicate(),"turnDamageBonus":turn_damage_bonus,"turnDiscount":turn_discount,"stanceDiscount":stance_discount,"pressureUsed":pressure_used,"dissectionUsed":dissection_used},"openingDrawDone":opening_draw_done}
 	if not buff_state.is_empty(): saved.buffs = buff_state.duplicate(true)
+	if not cyberware_cooldowns.is_empty(): saved.cyberwareCooldowns = cyberware_cooldowns.duplicate()
 	return saved
 
 func restore(data: Dictionary) -> void:
@@ -263,6 +307,9 @@ func restore(data: Dictionary) -> void:
 	profile = data.profile.duplicate(true)
 	card_catalog = data.cardCatalog.duplicate(true)
 	used_cyberware = data.get("usedCyberware", []).duplicate()
+	cyberware_cooldowns = data.get("cyberwareCooldowns", {}).duplicate()
+	if not data.has("cyberwareCooldowns"):
+		for id in used_cyberware: cyberware_cooldowns[id] = 1
 	buff_state = buffs.restore_extra_state(data.get("buffs", {}))
 	next_attack_bonus = int(data.get("nextAttackBonus", 0))
 
@@ -494,7 +541,7 @@ func end_noren_turn() -> Dictionary:
 		turn += 1
 		buffs.own_turn_start(self)
 		energy = int(profile.get("energyPerTurn", 3))
-		used_cyberware.clear()
+		advance_cyberware_cooldowns()
 		for enemy in enemies:
 			enemy.intentIndex += 1
 			enemy.intent = intent_for(enemy, int(enemy.intentIndex))
