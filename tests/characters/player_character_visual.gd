@@ -47,7 +47,7 @@ func show_character(id: String, prefix: String) -> Texture2D:
 	var avatar: Texture2D = marker._avatar_pic.texture
 	check(avatar != null, prefix + " map avatar rendered")
 	await shot(prefix + "-map")
-	Game.start_training("B12")
+	Game.start_training("B02")
 	await idle()
 	check(app.view.player_portrait.texture == Game.texture(Game.player_asset_id("battlePortraitAssetId")), prefix + " battle portrait follows ID")
 	check(has_label(Game.display_name("@player")), prefix + " battle label follows ID")

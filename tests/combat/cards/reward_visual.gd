@@ -79,7 +79,7 @@ func _ready() -> void:
 	output += "%dx%d-" % [get_window().size.x,get_window().size.y]
 	app = load("res://scenes/main.tscn").instantiate()
 	add_child(app)
-	configure_battle("B08")
+	configure_battle("B02")
 	await idle()
 	for i in range(3):
 		var view = app.view
@@ -160,10 +160,10 @@ func _ready() -> void:
 	await key(KEY_3)
 	check(Game.state.deck == ["test_reward_02","test_reward_03"] and Game.state.credits == 2000,"Keyboard selects after reload without repeating credits")
 	# Expanded deck: empty first-turn hand must stay empty after a view restore.
-	Game.state.activeEventId = "E12"
-	Game.state.currentPlaceId = "hive"
+	Game.state.activeEventId = "E02"
+	Game.state.currentPlaceId = "junkyard"
 	Game.state.battleReward = {}
-	Game.state.battleId = "B12"
+	Game.state.battleId = "B02"
 	Game.state.currentScene = "battle"
 	Game.initialize_combat()
 	var model := CombatModel.new()

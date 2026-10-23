@@ -56,7 +56,7 @@ func _ready() -> void:
 	await motion(Vector2(417,707))
 	await settle()
 	await shot("button_hover")
-	Game.start_training("B12")
+	Game.start_training("B02")
 	await idle()
 	var view = app.view
 	var uid: String = view.model.hand[0]

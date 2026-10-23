@@ -15,7 +15,7 @@ func _ready() -> void:
 	Game.meta_path = "user://qa-map-event-types/meta.json"
 	Game.state = Game.initial_state()
 	Game.state.currentScene = "map"
-	Game.state.completedEventIds = ["E01"]
+	Game.state.completedEventIds = ["E01", "E04", "E11"]
 	Game.state.currentPlaceId = "junkyard"
 	Game.refresh_event_pool()
 	Game.page = "map"

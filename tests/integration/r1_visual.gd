@@ -30,7 +30,7 @@ func _ready() -> void:
 	app = load("res://scenes/main.tscn").instantiate()
 	add_child(app)
 	await shot("menu")
-	Game.start_training("B12")
+	Game.start_training("B02")
 	await get_tree().create_timer(0.19).timeout
 	await shot("transition")
 	await idle()

@@ -23,7 +23,7 @@ func _ready() -> void:
 	Game.player_characters.noren.erase("combatRules")
 	Game.player_characters.noren.startingDeck = Game.prototype_rules.deck.duplicate()
 	await settle(0.4)
-	Game.start_training("B12")
+	Game.start_training("B02")
 	await idle()
 	var view = app.view
 	view.model.enemies[0].hp = 20

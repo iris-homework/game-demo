@@ -104,7 +104,7 @@ func _ready() -> void:
 	await key(KEY_ESCAPE)
 	check(not app.view.library_button.disabled and Game.state == adventure,"Cancel restores library button and preserves adventure")
 	await click_button(app.view.training_toggle)
-	var training_button: Button = app.view.find_child("training_B12",true,false)
+	var training_button: Button = app.view.find_child("training_B04",true,false)
 	check(training_button.is_visible_in_tree() and not app.view.library_button.get_global_rect().intersects(training_button.get_global_rect()),"Expanded training and library controls do not overlap")
 	await shot("menu-expanded")
 	await click_button(app.view.library_button)

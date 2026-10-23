@@ -62,6 +62,7 @@ func install_fish_hand() -> void:
 	watching.stage.phase_changed.connect(on_phase)
 
 func _ready() -> void:
+	preload("res://tests/fixtures/retired_presentations.gd").install()
 	Game.save_enabled = false
 	Game.save_path = "user://fish_visual_unused.json"
 	Game.meta_path = "user://fish_visual_meta_unused.json"
@@ -137,7 +138,7 @@ func _ready() -> void:
 	Game.menu()
 	await idle()
 	check(Game.state == adventure and not Game.training_mode,"Exiting enemy test restores the full adventure")
-	for battle_id in ["B04","B12"]:
+	for battle_id in ["B04","QA_MECH"]:
 		Game.start_training(battle_id)
 		await idle()
 		check(app.view.stage.enemies[0].kind == ("gang_henchman" if battle_id == "B04" else "finn"),"Other battle uses its configured presentation: "+battle_id)

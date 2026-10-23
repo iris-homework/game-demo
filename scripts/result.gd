@@ -7,7 +7,7 @@ func _ready() -> void:
 		add_child(reward_view)
 		return
 	var e := Game.event_data()
-	var complete: bool = Game.state.flags.get("week1Complete", false) and e.id == "E12"
+	var complete: bool = Game.state.flags.get("week1Complete", false) and e.get("nodes", {}).get("finish", {}).get("effects", []).any(func(action): return action.get("op") == "finishWeek")
 	background(Game.place_data(e.placeId).backgroundAssetId, 0.53)
 	chrome("事件结算")
 	polygon(self,[Vector2(222,166),Vector2(1218,131),Vector2(1232,778),Vector2(238,813)],PINK)

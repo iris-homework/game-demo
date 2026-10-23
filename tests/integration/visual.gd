@@ -34,8 +34,8 @@ func _ready() -> void:
 	Game.enter_node("finish")
 	await capture("result")
 	Game.state.flags.week1Complete = true
-	Game.state.activeEventId = "E12"
-	Game.state.currentPlaceId = "hive"
+	Game.state.activeEventId = "E11"
+	Game.state.currentPlaceId = "pump"
 	Game.enter_node("finish")
 	await capture("week_complete")
 	get_tree().quit()

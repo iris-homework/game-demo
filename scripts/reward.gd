@@ -48,7 +48,7 @@ func _ready() -> void:
 	else:
 		label(card_row,"✓  已领取" if reward.status == "claimed" else "已跳过",Vector2(818,61),Vector2(180,37),21,CYAN if reward.status == "claimed" else MUTED)
 	label(self,"从三张不同的非初始牌中选择一张 · B 蓝 / A 红 / S 金",Vector2(216,695),Vector2(980,32),15,MUTED)
-	var complete: bool = Game.state.flags.get("week1Complete",false) and Game.state.activeEventId == "E12"
+	var complete: bool = Game.state.flags.get("week1Complete",false) and Game.event_data().get("nodes", {}).get("finish", {}).get("effects", []).any(func(action): return action.get("op") == "finishWeek")
 	label(self,"第一周 · 落幕。可返回地图探索剩余事件。" if complete else "时间推进1天。事件已更新到城市地图。",Vector2(216,754),Vector2(820,35),20,CYAN)
 	label(self,"离开将放弃本次未选择的卡牌。" if pending else "奖励已保存，可继续探索城市。",Vector2(216,803),Vector2(775,31),16,MUTED)
 	exit_button = button(self,"返回地图  →",Vector2(1110,782),Vector2(276,61),leave_rewards,true)
