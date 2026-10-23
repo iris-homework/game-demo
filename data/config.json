@@ -1,7 +1,7 @@
 {
   "developmentMode": true,
-  "initialCredits": 0,
-  "initialCreditsNote": "演示初始值，正式初始信用点待确认；F1 可测试支付分支。",
+  "initialCredits": 100,
+  "initialCreditsNote": "新冒险初始信用点为100；F1 可测试支付分支。",
   "saveSchemaVersion": 2,
   "defaultPlayerCharacterId": "noren",
   "initialDay": 1

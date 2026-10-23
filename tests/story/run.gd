@@ -55,8 +55,9 @@ func _ready() -> void:
 	Game.start_event("E03")
 	step_to_stop()
 	var rev := Game.revision
+	var credits_before := int(Game.state.credits)
 	check(not Game.choose(0, rev), "Insufficient credits rejected")
-	check(Game.state.credits == 0 and not Game.state.flags.has("alleyClue"), "No clue or charge on rejected payment")
+	check(Game.state.credits == credits_before and not Game.state.flags.has("alleyClue"), "No clue or charge on rejected payment")
 	Game.state.credits = 300
 	check(Game.choose(0, rev), "Payment succeeds")
 	check(not Game.choose(0, rev), "Double click rejected")
@@ -125,18 +126,19 @@ func _ready() -> void:
 	check(Game.rewards.is_empty(), "No invented production reward")
 	Game.rewards["test"] = {"type":"credits","amount":20,"name":"test"}
 	Game.state = Game.initial_state()
+	var expected_credits := int(Game.state.credits) + 20
 	check(Game.apply_actions([{"op":"grantReward","id":"test"}]), "Configured reward applies")
 	check(Game.apply_actions([{"op":"grantReward","id":"test"}]), "Repeated reward is safe")
-	check(Game.state.credits == 20 and Game.state.claimedRewardIds.size() == 1, "Reward exactly once")
+	check(Game.state.credits == expected_credits and Game.state.claimedRewardIds.size() == 1, "Reward exactly once")
 	check(not Game.apply_actions([{"op":"addCredits","amount":10},{"op":"spendCredits","amount":500}]), "Invalid action batch rejected")
-	check(Game.state.credits == 20, "Invalid batch has no partial effects")
+	check(Game.state.credits == expected_credits, "Invalid batch has no partial effects")
 	Game.rewards.erase("test")
 	# Corrupt current checkpoint, recover the previous backup.
 	Game.save_game(); Game.save_game()
 	var file := FileAccess.open(Game.save_path,FileAccess.WRITE)
 	file.store_string("corrupt"); file.close()
 	check(Game.load_game(), "Backup recovers corrupt checkpoint")
-	check(Game.state.credits == 20 and Game.state.claimedRewardIds.size() == 1, "Claim state persists")
+	check(Game.state.credits == expected_credits and Game.state.claimedRewardIds.size() == 1, "Claim state persists")
 	for path in [Game.save_path,Game.save_path+".bak",Game.save_path+".tmp"]:
 		if FileAccess.file_exists(path): DirAccess.remove_absolute(path)
 	print("TEST RESULTS: %d checks, %d failures" % [checks, failures.size()])

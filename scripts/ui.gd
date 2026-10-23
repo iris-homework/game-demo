@@ -179,16 +179,17 @@ func background(id: String, darkness: float = 0.3) -> void:
 		label(self, "场景美术待补 / " + Game.place_data(Game.state.get("currentPlaceId", "")).get("name", ""), Vector2(64,828), Vector2(650,27), 15, MUTED)
 
 ## 冒险页面共用紧凑状态栏；战斗隐藏日期，将中央留给回合信息。
-func status_bar(section: String, show_days: bool = true, weeks_action: Callable = Callable()) -> void:
+func status_bar(section: String, show_days: bool = true, weeks_action: Callable = Callable(), show_credits: bool = true) -> void:
 	rect(self, Vector2.ZERO, Vector2(1440.0, 76.0), Color("070e19ee"))
 	rect(self, Vector2(0.0, 75.0), Vector2(1440.0, 1.0), Color("2f6178"))
 	label(self, Game.display_name(Game.PLAYER_REFERENCE) + " / " + section, Vector2(24.0, 8.0), Vector2(320.0, 26.0), 19, CREAM)
 	panel(self, Vector2(24.0, 46.0), Vector2(170.0, 12.0), Color("382333"), Color("805071"))
 	hp_fill = rect(self, Vector2(26.0, 48.0), Vector2(166.0, 8.0), PINK)
 	hp_label = label(self, "", Vector2(202.0, 34.0), Vector2(126.0, 28.0), 16, CREAM)
-	credit_icon(self, Vector2(340.0, 21.0), Vector2(34.0, 34.0))
-	credits_label = label(self, "", Vector2(384.0, 12.0), Vector2(170.0, 30.0), 20, CREAM)
-	label(self, "信用点", Vector2(384.0, 44.0), Vector2(170.0, 20.0), 12, MUTED)
+	if show_credits:
+		credit_icon(self, Vector2(340.0, 21.0), Vector2(34.0, 34.0))
+		credits_label = label(self, "", Vector2(384.0, 19.0), Vector2(170.0, 38.0), 20, CREAM)
+		credits_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	if show_days:
 		# Keep the date centered on the canvas, independent of the fields to its left.
 		var day := clampi(int(Game.state.get("currentDay", 1)), 1, 7)

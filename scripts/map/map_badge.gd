@@ -1,6 +1,6 @@
 class_name MidnightMapBadge
 extends Control
-## 事件难度／锁定符号，置于固定直径圆框中。
+## 事件难度／锁定符号使用圆框，常驻地点使用无穷环图案。
 
 const DIAMETER := 28.0
 const STATUS_ICONS := {
@@ -41,6 +41,8 @@ func _measure() -> Vector2:
 				var font := _font if _font != null else get_theme_default_font()
 				width += 4.0 + font.get_string_size(str(count), HORIZONTAL_ALIGNMENT_LEFT, -1, 17).x
 			return Vector2(width, DIAMETER)
+		"resident":
+			return Vector2(DIAMETER, DIAMETER)
 		"lock":
 			return Vector2(DIAMETER, DIAMETER)
 	return Vector2(0.0, 0.0)
@@ -49,6 +51,13 @@ func _draw() -> void:
 	match kind:
 		"normal", "elite", "boss", "lock":
 			_draw_icon_frame()
+		"resident":
+			_draw_icon_frame()
+			var points := PackedVector2Array()
+			for i in range(65):
+				var angle := TAU * i / 64.0
+				points.append(Vector2.ONE * DIAMETER * 0.5 + Vector2(9.0 * cos(angle), 4.8 * sin(2.0 * angle)))
+			draw_polyline(points, accent, 2.2, true)
 
 func _build_icon() -> void:
 	if is_instance_valid(_icon):

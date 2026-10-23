@@ -1,6 +1,6 @@
 extends Node
 ## Logic and synthetic viewport-input coverage. No physical-device/visual claims.
-const OUTPUT := "res://artifacts/qa/technology-loadout-2026-10-23/"
+const OUTPUT := "res://artifacts/qa/technology-autosave-2026-10-23/"
 var checks := 0
 var failures: Array[String] = []
 var records: Array[Dictionary] = []
@@ -218,7 +218,7 @@ func test_map_modal() -> void:
 	if trigger == null or deck == null: return
 	check(is_equal_approx(trigger.position.x + trigger.size.x + 8.0, deck.position.x) and is_equal_approx(trigger.position.y, deck.position.y), "Technology button sits exactly 8 pixels left of deck")
 	check(get_viewport().get_visible_rect().encloses(trigger.get_global_rect()), "Technology entry stays inside map canvas")
-	var original: Dictionary = Game.state.duplicate(true)
+	Game.save_enabled = true
 	var revision: int = Game.revision
 	await click(trigger)
 	check(is_instance_valid(app.technology_browser), "Real map button opens technology configuration")
@@ -227,49 +227,57 @@ func test_map_modal() -> void:
 	check(map_view.process_mode == Node.PROCESS_MODE_DISABLED and trigger.disabled and deck.disabled, "Technology modal pauses map and disables background buttons")
 	check(browser.slot_buttons.size() == 4 and browser.technology_buttons.size() == owned().size(), "Configuration shows four slots and only owned technologies")
 	check(browser.slot_buttons[3].disabled and browser.slot_buttons[3].text.contains("空位"), "Missing fourth technology displays an inactive empty slot")
+	var close_button: Button
+	var manual_buttons := 0
+	for node in browser.find_children("*", "Button", true, false):
+		if node.text.contains("关闭"): close_button = node
+		if node.text in ["保存配置", "取消"]: manual_buttons += 1
+	check(manual_buttons == 0 and is_instance_valid(close_button), "Panel offers close without manual save or cancel buttons")
 	await click(browser.slot_buttons[0])
-	check(browser.draft_ids == [owned()[1], owned()[2]], "Clicking carried slot removes from draft")
-	check(Game.state == original and Game.revision == revision, "Editing draft leaves adventure unchanged")
+	var selection := [owned()[1], owned()[2]]
+	check(browser.selected_ids == selection and Game.equipped_cyberware_ids() == selection, "Clicking carried slot immediately updates adventure and visible selection")
+	check(Game.revision == revision + 1 and browser.expected_revision == Game.revision, "Auto-save advances and synchronizes revision exactly once")
+	var disk = JSON.parse_string(FileAccess.get_file_as_string(Game.save_path))
+	check(disk is Dictionary and disk.get("equippedCyberwareIds") == selection, "Slot click writes selection to disk before closing")
+	check(is_instance_valid(app.technology_browser) and map_view.process_mode == Node.PROCESS_MODE_DISABLED, "Auto-save keeps configuration open and map paused")
 	await escape()
-	check(not is_instance_valid(app.technology_browser) and Game.state == original and Game.revision == revision, "Escape discards unsaved technology changes")
-	check(map_view.process_mode == Node.PROCESS_MODE_INHERIT and not trigger.disabled and not deck.disabled, "Cancel restores map processing and button state")
+	check(not is_instance_valid(app.technology_browser) and Game.equipped_cyberware_ids() == selection, "Escape keeps automatically saved technology changes")
+	check(map_view.process_mode == Node.PROCESS_MODE_INHERIT and not trigger.disabled and not deck.disabled, "Close restores map processing and button state")
+	check(get_viewport().gui_get_focus_owner() == trigger, "Close restores focus to technology entry")
 	await click(trigger)
 	browser = app.technology_browser
-	check(browser.draft_ids == owned(), "Reopening loads saved selection rather than canceled draft")
-	browser.remove_slot(0)
+	check(browser.selected_ids == selection, "Reopening loads automatically saved selection")
 	Game.revision += 1
 	var stale_revision: int = Game.revision
-	await click(browser.save_button)
-	check(is_instance_valid(app.technology_browser) and Game.state == original and Game.revision == stale_revision, "Stale UI save stays open and preserves adventure")
-	check(browser.draft_ids == [owned()[1], owned()[2]], "Rejected stale save retains draft for review")
-	await escape()
-	await click(trigger)
-	browser = app.technology_browser
-	browser.remove_slot(0)
+	var original: Dictionary = Game.state.duplicate(true)
+	await click(browser.slot_buttons[0])
+	check(is_instance_valid(app.technology_browser) and Game.state == original and Game.revision == stale_revision, "Stale UI change stays open and preserves adventure")
+	check(browser.selected_ids == selection and browser.expected_revision == stale_revision and browser.message_label.text.contains("保存失败"), "Rejected stale change restores saved UI and synchronizes revision for retry")
 	var valid_path: String = Game.save_path
-	Game.save_enabled = true
 	Game.save_path = OUTPUT + "write-blocker/checkpoint.json"
-	await click(browser.save_button)
-	check(is_instance_valid(app.technology_browser) and Game.state == original and Game.revision == stale_revision, "Failed UI disk write stays open and preserves adventure/revision")
-	check(browser.draft_ids == [owned()[1], owned()[2]], "Failed UI disk write retains draft")
+	await click(browser.technology_buttons[owned()[0]])
+	check(is_instance_valid(app.technology_browser) and Game.state == original and Game.revision == stale_revision, "Failed auto-save preserves adventure and revision")
+	check(browser.selected_ids == selection and browser.message_label.text.contains("保存失败"), "Failed auto-save restores selection and displays failure")
+	check(browser.slot_buttons[2].disabled and browser.technology_buttons[owned()[0]].get_node("selection_state").text == "点击携带", "Failed auto-save refreshes slots and owned technology highlight")
 	Game.save_path = valid_path
-	Game.save_enabled = false
-	await escape()
-	await click(trigger)
-	browser = app.technology_browser
-	for i in range(3): browser.remove_slot(0)
-	check(browser.draft_ids.is_empty(), "Draft can remove every carried technology")
-	await click(browser.save_button)
-	check(not is_instance_valid(app.technology_browser) and Game.equipped_cyberware_ids().is_empty(), "Save commits intentionally empty equipment and closes modal")
-	await click(trigger)
-	browser = app.technology_browser
+	await click(browser.technology_buttons[owned()[0]])
+	check(browser.selected_ids == selection + [owned()[0]] and Game.revision == stale_revision + 1, "Retry after disk failure saves successfully without reopening")
+	for i in range(3): await click(browser.slot_buttons[0])
+	check(browser.selected_ids.is_empty() and Game.equipped_cyberware_ids().is_empty(), "Consecutive clicks automatically save intentionally empty equipment")
+	disk = JSON.parse_string(FileAccess.get_file_as_string(Game.save_path))
+	check(disk is Dictionary and disk.get("equippedCyberwareIds") == [], "Empty equipment persists immediately to disk")
 	check(browser.slot_buttons.size() == 4, "Empty equipment still shows all four slots")
 	for slot in browser.slot_buttons: check(slot.disabled and slot.text.contains("空位"), "Unfilled equipment slot is inactive and visibly empty")
 	await click(browser.technology_buttons[owned()[2]])
 	await click(browser.technology_buttons[owned()[0]])
-	check(browser.draft_ids == [owned()[2], owned()[0]], "Owned technology clicks append in selected order")
-	await click(browser.save_button)
-	check(Game.equipped_cyberware_ids() == [owned()[2], owned()[0]], "UI save preserves selected order")
+	selection = [owned()[2], owned()[0]]
+	check(browser.selected_ids == selection and Game.equipped_cyberware_ids() == selection, "Consecutive owned technology clicks immediately save selected order")
+	await click(browser.technology_buttons[owned()[2]])
+	check(Game.equipped_cyberware_ids() == [owned()[0]], "Clicking selected owned technology immediately saves removal")
+	for node in browser.find_children("*", "Button", true, false):
+		if node.text.contains("关闭"): close_button = node
+	await click(close_button)
+	check(not is_instance_valid(app.technology_browser) and Game.equipped_cyberware_ids() == [owned()[0]], "Close button preserves automatically saved selection")
 	await click(deck)
 	check(is_instance_valid(app.deck_browser), "Existing deck entry remains functional")
 	Game.open_technology_loadout()
@@ -283,6 +291,8 @@ func test_map_modal() -> void:
 	await escape()
 	app.queue_free()
 	await settle()
+	Game.state = {}
+	check(Game.load_game() and Game.equipped_cyberware_ids() == [owned()[0]], "Cold load preserves changes made only through automatic UI saving")
 
 func _ready() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUTPUT))

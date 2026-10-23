@@ -115,7 +115,7 @@ func enter(params: Dictionary) -> void:
 		shade_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(shade_view)
 	# Battle has no footer; changing the section title must retain that layout.
-	status_bar(Game.battle_type_label(Game.battle_type()),false)
+	status_bar(Game.battle_type_label(Game.battle_type()),false,Callable(),false)
 	tag("演练模式 · 不影响冒险" if Game.training_mode else ("诺伦 / 形态与弹药" if model.is_noren() else "旧版测试规则"),Vector2(760,117),CYAN,310)
 	if Game.texture(place_asset) == null:
 		label(self,"场景美术待补",Vector2(43,203),Vector2(330,26),13,MUTED)
@@ -526,6 +526,7 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 		return
 	var played_preview := model.card_preview(uid,target,maxi(0,extra_ammo))
 	var played_cost := model.card_cost(uid)
+	var block_before := model.block
 	var result := model.play_card(uid,target,discard_uid,maxi(0,extra_ammo))
 	if result.is_empty(): return
 	if cards.has(uid):
@@ -555,6 +556,11 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 	for retired_view in retired_views:
 		if (retired_view.uid == uid and result.get("exhausted",false)) or retired_view.uid in result.get("exhaustedCards",[]): animate_exhaust(retired_view)
 		else: animate_discard(retired_view)
+	var block_gained := maxi(0, model.block - block_before)
+	if block_gained > 0:
+		shown_player_block = model.block
+		refresh_player_plate()
+		stage.present_card_gain("block", block_gained)
 	# Choose once per committed card; all hits and targets share its attack motion.
 	var style := choose_player_attack_style(model.card(uid), result)
 	stage.player.set_combat_stance(result.get("stance", "melee"))
@@ -580,6 +586,7 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 	await stage.player.transition_combat_stance(model.stance if model.is_noren() else "melee")
 	for retired_view in retired_views:
 		while is_instance_valid(retired_view) and retired_view.visible: await get_tree().process_frame
+	stage.present_card_gain("draw", result.get("drawn", []).size())
 	await deal_hand(true)
 	arrange_hand()
 	refresh_counts()

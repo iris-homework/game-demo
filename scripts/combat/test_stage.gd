@@ -10,6 +10,7 @@ const PalmLaser = preload("res://scripts/combat/palm_laser_fx.gd")
 const BiteHit = preload("res://scripts/combat/bite_hit_fx.gd")
 const PollutionSpit = preload("res://scripts/combat/pollution_spit_fx.gd")
 const FishDeathBurst = preload("res://scripts/combat/fish_death_burst_fx.gd")
+const CardGainFX = preload("res://scripts/combat/card_gain_fx.gd")
 const AuthoredAttack := preload("res://scripts/combat/authored_attack.gd")
 const PipelineCatalogScript := preload("res://enemy_asset_pipeline/runtime/pipeline_catalog.gd")
 const ACTOR_SCALE := 1.2544
@@ -183,6 +184,15 @@ func wide() -> void:
 
 func contact(actor: Node2D) -> Vector2:
 	return actor.to_global(Vector2(0,-62))
+
+func present_card_gain(kind: String, amount: int) -> Node2D:
+	if amount <= 0 or not is_instance_valid(player): return null
+	var fx := CardGainFX.new()
+	fx.kind = kind
+	fx.amount = amount
+	fx.position = Vector2(0,-48)
+	player.add_child(fx)
+	return fx
 
 func target_rect(index: int) -> Rect2:
 	var actor := enemies[index]

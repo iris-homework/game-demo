@@ -402,7 +402,8 @@
         0,
         0
       ],
-      "avatarSide": "left"
+      "avatarSide": "left",
+      "resident": true
     }
   },
   {
@@ -431,7 +432,8 @@
         0,
         0
       ],
-      "avatarSide": "left"
+      "avatarSide": "left",
+      "resident": true
     }
   },
   {
@@ -502,7 +504,8 @@
         0,
         0
       ],
-      "avatarSide": "left"
+      "avatarSide": "left",
+      "resident": true
     }
   }
 ]

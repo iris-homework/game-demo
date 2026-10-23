@@ -340,6 +340,7 @@ func _make_spec(place: Dictionary, avatar_texture: Texture2D) -> Dictionary:
 	var completed := bool(state.completed)
 	var anchor := map_rect.position + Vector2(float(place.mapAnchor[0]), float(place.mapAnchor[1])) * map_rect.size
 	var display: Dictionary = place.get("mapDisplay", {}) if place.get("mapDisplay", {}) is Dictionary else {}
+	var resident := bool(display.get("resident", false))
 	var offset := _vec2(display.get("offset", [0.0, 0.0]))
 	var label_offset := _vec2(display.get("labelOffset", [0.0, 0.0]))
 	var side := str(display.get("avatarSide", "left"))
@@ -376,6 +377,10 @@ func _make_spec(place: Dictionary, avatar_texture: Texture2D) -> Dictionary:
 			symbol_tint = accent.lightened(0.35)
 			badges.append({"kind": kind, "count": counts[kind], "color": accent})
 		boss_effect = counts.boss > 0
+	if resident:
+		accent = Color("79e69b")
+		boss_effect = false
+		badges.push_front({"kind": "resident", "count": 0, "color": accent})
 	var tooltip := str(place.get("description", ""))
 	if not open:
 		tooltip = str(place.get("lockHint", "尚未开放"))
