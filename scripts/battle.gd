@@ -15,7 +15,9 @@ const ActorHUD = preload("res://scripts/combat/actor_hud.gd")
 const EnemyHPSummary = preload("res://scripts/combat/enemy_hp_summary.gd")
 const EnemyIntent = preload("res://scripts/combat/enemy_intent.gd")
 const EnergyHUD = preload("res://scripts/combat/energy_hud.gd")
+const AmmoHUD = preload("res://scripts/combat/ammo_hud.gd")
 var player_plate: Control
+var player_hover: Control
 var shown_player_ammo := 0
 var shown_player_block := 0
 var shown_player_parry := 0
@@ -40,8 +42,8 @@ var pending_recycles: Dictionary = {}
 var shuffle_fx: Node2D
 var end_button: Button
 var cyberware_button: Button
-var cyberware_status: Label
 var resources_label: Label
+var ammo_panel: Control
 var energy_panel: Panel
 var energy_value: Label
 var held_start := Vector2.ZERO
@@ -126,8 +128,14 @@ func enter(params: Dictionary) -> void:
 	player_plate = ActorHUD.new()
 	player_plate.z_index = -1
 	add_child(player_plate)
-	resources_label = label(self,"",Vector2(220,620)+actor_offset,Vector2(220,25),14,CYAN)
+	player_hover = preload("res://scripts/combat/stance_hover.gd").new()
+	add_child(player_hover)
+	ammo_panel = AmmoHUD.new()
+	ammo_panel.position = Vector2(30,637-AmmoHUD.DIMENSIONS.y-16)
+	add_child(ammo_panel)
+	resources_label = label(ammo_panel,"",Vector2(6,3),Vector2(AmmoHUD.DIMENSIONS.x-12,22),15,AmmoHUD.ORANGE)
 	resources_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	ammo_panel.value_label = resources_label
 	build_energy_hud()
 	exhaust_button = button(self,"消耗 0",Vector2(1240,770),Vector2(170,30),func(): show_pile("消耗 / 能力",model.exhaust_pile))
 	exhaust_button.add_theme_font_size_override("font_size",13)
@@ -150,15 +158,13 @@ func enter(params: Dictionary) -> void:
 	end_button = button(self,"结束回合  →",Vector2(1240,719),Vector2(170,40),end_turn_pressed,true)
 	end_button.add_theme_font_size_override("font_size",16)
 	end_button.tooltip_text = "敌方执行头顶意图；未使用手牌弃置，再抽取新手牌。每回合恢复 3 能量、抽 5 张牌。"
-	cyberware_button = button(self,"激活科技",Vector2(30,637),Vector2(170,40),show_cyberware)
+	cyberware_button = button(self,"激活科技",Vector2(30,667),Vector2(170,40),show_cyberware)
 	cyberware_button.add_theme_font_size_override("font_size",15)
 	for state_name in ["normal","hover","pressed","focus"]:
 		var purple_style := button_style(state_name,false)
 		purple_style.border_color = Color("c895ff")
 		if state_name != "focus": purple_style.bg_color = Color("482866") if state_name == "hover" else Color("251638")
 		cyberware_button.add_theme_stylebox_override(state_name,purple_style)
-	cyberware_status = label(self,"",Vector2(30,683),Vector2(170,24),11,Color("c895ff"))
-	cyberware_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	refresh_cyberware()
 	if Game.config.developmentMode:
 		button(self,"调试结果",Vector2(900,163),Vector2(160,36),show_debug_results).add_theme_font_size_override("font_size",15)
@@ -867,9 +873,9 @@ func commit() -> void:
 	refresh_resources()
 
 func refresh_cyberware() -> void:
-	if not is_instance_valid(cyberware_status): return
-	cyberware_button.text = "激活科技 · %d/%d" % [model.available_cyberware_count(),model.cyberware_cards().size()]
-	cyberware_status.text = "下次攻击伤害 +%d" % model.next_attack_bonus if model.next_attack_bonus > 0 else "战斗科技 / 点击查看"
+	if not is_instance_valid(cyberware_button): return
+	cyberware_button.text = "激活科技"
+	cyberware_button.tooltip_text = "下次攻击伤害 +%d" % model.next_attack_bonus if model.next_attack_bonus > 0 else "点击查看战斗科技"
 
 func show_cyberware() -> void:
 	if not initialized or Game.battle_busy or Game.transition_locked or is_instance_valid(pile_overlay): return
@@ -1035,11 +1041,21 @@ func timing(key: String, fallback: float) -> float:
 
 func update_target_rects() -> void:
 	if not is_instance_valid(stage) or not is_instance_valid(enemy_hud): return
+	update_player_hover()
 	for i in targets.size():
 		var area: Rect2 = stage.target_rect(i)
 		targets[i].position = area.position-enemy_hud.global_position
 		targets[i].size = area.size
 	update_enemy_plates()
+
+func update_player_hover() -> void:
+	if not is_instance_valid(player_hover): return
+	player_hover.configure(model.stance,int(model.profile.get("ammoCap",10)))
+	var area: Rect2 = (stage.player.get_global_transform() * stage.player.target_bounds).intersection(stage.get_global_rect())
+	player_hover.position = area.position-global_position
+	player_hover.size = area.size
+	player_hover.visible = model.is_noren() and model.outcome.is_empty() and stage.player.visible and stage.player.modulate.a > 0.01 and area.has_area() and not Game.battle_busy and not Game.transition_locked and selected_uid.is_empty() and not is_instance_valid(pile_overlay)
+	player_hover.mouse_filter = Control.MOUSE_FILTER_PASS if player_hover.visible else Control.MOUSE_FILTER_IGNORE
 
 func anchor_plate(plate: Control, actor: Node2D) -> void:
 	var foot := actor.to_global(Vector2.ZERO)
@@ -1071,9 +1087,6 @@ func update_enemy_plates() -> void:
 				var overlap := left.global_position.x+ActorHUD.WIDTH+20-right.global_position.x
 				left.global_position.x = maxf(24,left.global_position.x-overlap/2)
 				right.global_position.x = minf(1416-ActorHUD.WIDTH,right.global_position.x+overlap/2)
-	resources_label.global_position = player_plate.global_position+Vector2(-12,player_plate.size.y+2)
-	resources_label.visible = player_plate.visible
-	resources_label.modulate.a = player_plate.modulate.a
 
 func enemy_statuses(enemy: Dictionary) -> Array:
 	return model.buffs.enemy_badges(enemy)
@@ -1133,10 +1146,13 @@ func refresh_resources() -> void:
 		var per_turn := maxi(1,int(model.profile.get("energyPerTurn",3)))
 		energy_panel.set_energy(model.energy,per_turn)
 	if not model.is_noren():
-		resources_label.text = "旧版战斗快照"
+		ammo_panel.visible = false
 		return
 	refresh_ammo()
 	if is_instance_valid(exhaust_button): exhaust_button.text = "消耗 / 能力 %d" % model.exhaust_pile.size()
 
 func refresh_ammo() -> void:
-	resources_label.text = "%s  ·  弹药 %d / %d" % ["近战" if model.stance == "melee" else "远程",shown_player_ammo,int(model.profile.get("ammoCap",10))]
+	if not is_instance_valid(ammo_panel): return
+	ammo_panel.visible = model.is_noren()
+	if ammo_panel.visible:
+		ammo_panel.set_ammo(shown_player_ammo,int(model.profile.get("ammoCap",10)),model.stance)

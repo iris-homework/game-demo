@@ -41,7 +41,7 @@ func _ready() -> void:
 	var frozen: Dictionary=app.view.model.snapshot()
 	check(frozen.profile.ammoCap==10,"Fresh battle loads ten-ammo cap")
 	check(frozen.cardCatalog.noren_03.effects.size()==2 and frozen.cardCatalog.noren_03.effects[0].type=="parry" and int(frozen.cardCatalog.noren_03.effects[0].amount)==1 and frozen.cardCatalog.noren_03.effects[1].type=="stance" and frozen.cardCatalog.noren_03.effects[1].value=="melee","Fresh battle loads revised Close In definition")
-	check(app.view.resources_label.text.ends_with("2 / 10"),"Fresh battle HUD shows loaded ammo configuration")
+	check(app.view.ammo_panel.filled_slot_count() == 2 and app.view.ammo_panel.capacity == 10,"Fresh battle HUD shows loaded ammo configuration")
 	Game.open_current_deck()
 	await idle()
 	var expected_deck: Array=["noren_01","noren_02","noren_03","noren_04","noren_08","noren_13","noren_40"]

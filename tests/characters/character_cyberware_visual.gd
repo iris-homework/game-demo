@@ -35,7 +35,7 @@ func _ready() -> void:
 	Game.characters.qa_empty.name = "无科技测试角色"
 	await open_battle("qa_subset")
 	var view = app.view
-	verify(view.cyberware_button.text.contains("2/2"), "HUD uses role's two cyberware cards")
+	verify((view.cyberware_button.text == "激活科技" and view.model.available_cyberware_count() == 2 and view.model.cyberware_cards().size() == 2), "HUD uses role's two cyberware cards")
 	await click(view.cyberware_button.get_rect().get_center())
 	var overlay = view.pile_overlay
 	verify(is_instance_valid(overlay) and overlay.card_buttons.size() == 2, "Only role's selected cards are rendered")
@@ -51,10 +51,10 @@ func _ready() -> void:
 	await motion(Vector2(80,180))
 	await shot("subset")
 	await key(KEY_ESCAPE)
-	verify(not is_instance_valid(view.pile_overlay) and view.cyberware_button.text.contains("0/2"), "Closing retains role-specific cooldown count")
+	verify(not is_instance_valid(view.pile_overlay) and (view.cyberware_button.text == "激活科技" and view.model.available_cyberware_count() == 0 and view.model.cyberware_cards().size() == 2), "Closing retains role-specific cooldown count")
 	await open_battle("qa_empty")
 	view = app.view
-	verify(view.cyberware_button.text.contains("0/0"), "Empty role has no implicit four-card loadout")
+	verify((view.cyberware_button.text == "激活科技" and view.model.available_cyberware_count() == 0 and view.model.cyberware_cards().size() == 0), "Empty role has no implicit four-card loadout")
 	await click(view.cyberware_button.get_rect().get_center())
 	overlay = view.pile_overlay
 	verify(is_instance_valid(overlay) and overlay.card_buttons.is_empty(), "Empty role still opens informative overlay")
@@ -73,7 +73,7 @@ func _ready() -> void:
 	await open_battle("noren")
 	view = app.view
 	await click(view.cyberware_button.get_rect().get_center())
-	verify(view.pile_overlay.card_buttons.size() == 3 and view.cyberware_button.text.contains("3/3"), "Noren's three technologies remain intact after other roles")
+	verify(view.pile_overlay.card_buttons.size() == 3 and (view.cyberware_button.text == "激活科技" and view.model.available_cyberware_count() == 3 and view.model.cyberware_cards().size() == 3), "Noren's three technologies remain intact after other roles")
 	await motion(Vector2(80,180))
 	await shot("noren")
 	for id in ["qa_subset", "qa_empty"]:

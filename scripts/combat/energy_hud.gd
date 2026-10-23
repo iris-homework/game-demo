@@ -14,7 +14,8 @@ var slot_effects: Array[ColorRect] = []
 
 func _init() -> void:
 	size = DIMENSIONS
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mouse_filter = Control.MOUSE_FILTER_PASS
+	tooltip_text = "出牌所需要的资源"
 	add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	set_process(false)
 

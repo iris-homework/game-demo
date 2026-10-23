@@ -8,11 +8,11 @@ var impact_poses: Array[String] = []
 var committed_snapshot: Dictionary = {}
 var selected_style := ""
 var expected_rng_state := 0
-var ammo_history: Array[String] = []
+var ammo_history: Array[int] = []
 
 func sample_ammo() -> void:
 	if not is_instance_valid(app) or not is_instance_valid(app.view): return
-	var line: String=app.view.resources_label.text
+	var line: int=app.view.ammo_panel.filled_slot_count()
 	if not line in ammo_history: ammo_history.append(line)
 
 func check(ok: bool, title: String) -> void:
@@ -139,8 +139,8 @@ func _ready() -> void:
 	check(view.melee_animation_rng.state == expected_rng_state,"One card consumes exactly one local motion choice")
 	await idle()
 	get_tree().process_frame.disconnect(sample_ammo)
-	check(view.model.ammo==6 and view.resources_label.text.ends_with("6 / 10"),"Four melee hits grant four ammo once")
-	check([2,3,4,5,6].all(func(n): return ammo_history.any(func(line): return line.ends_with("%d / 10" % n))),"Melee ammo display advances at each hit without showing final ammo early")
+	check(view.model.ammo==6 and view.ammo_panel.filled_slot_count() == 6,"Four melee hits grant four ammo once")
+	check([2,3,4,5,6].all(func(n): return ammo_history.has(n)),"Melee ammo display advances at each hit without showing final ammo early")
 	check(impact_poses.size() == 4,"All four real card hits reach impact")
 	check(view.model.snapshot() == committed_snapshot and Game.state.combat == committed_snapshot,"Complete presentation preserves committed combat state")
 	check(view.melee_animation_rng.state == expected_rng_state,"Complete multi-hit card consumes no extra motion choices")

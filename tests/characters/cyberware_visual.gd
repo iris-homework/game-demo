@@ -64,7 +64,7 @@ func _ready() -> void:
 	await shot("activated")
 	await key(KEY_ESCAPE)
 	verify(Game.page == "battle" and not is_instance_valid(view.pile_overlay),"Escape closes only overlay")
-	verify(view.cyberware_status.text.contains("+2"),"Battle HUD shows pending bonus")
+	verify(view.cyberware_button.tooltip_text.contains("+2"),"Technology hover shows pending bonus")
 	await shot("battle_bonus")
 	view.select_card(view.model.hand[0])
 	view.play_selected(99)
@@ -82,7 +82,7 @@ func _ready() -> void:
 	verify(not is_instance_valid(view.pile_overlay) and Game.page == "battle","Right-click closes without leaving battle")
 	await click(view.end_button.get_rect().get_center())
 	await idle()
-	verify(view.model.turn == turn+1 and view.cyberware_button.text.contains("4/4"),"Next turn restores all four activations in HUD")
+	verify(view.model.turn == turn+1 and (view.cyberware_button.text == "激活科技" and view.model.available_cyberware_count() == 4 and view.model.cyberware_cards().size() == 4),"Next turn restores all four activations in HUD")
 	await click(view.cyberware_button.get_rect().get_center())
 	overlay = view.pile_overlay
 	verify(not overlay.card_buttons[0].disabled and overlay.state_labels[0].text.contains("点击激活"),"Next-turn card is available again")

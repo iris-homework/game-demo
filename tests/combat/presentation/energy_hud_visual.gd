@@ -28,7 +28,7 @@ func _ready() -> void:
 	check(view.energy_panel.visible and view.energy_value.text == "3 / 3","Opening energy is full")
 	check(view.energy_panel.filled_slot_count() == 3 and not view.energy_panel.is_processing(),"Full energy lights three slots with animation stopped")
 	check(not view.resources_label.text.contains("能量"),"Energy is shown only in its dedicated HUD")
-	check(view.cyberware_button.get_rect().end.y < view.cyberware_status.position.y and view.cyberware_status.get_rect().end.y < view.energy_panel.position.y,"Technology and energy form separate vertical rows")
+	check(view.cyberware_button.get_rect().end.y < view.energy_panel.position.y,"Technology and energy form separate vertical rows")
 	check(view.energy_panel.get_rect().end.y < view.DRAW_POS.y,"Energy panel clears draw pile")
 	await shot("full")
 	# Exercise the moved button through viewport input, then return to battle.

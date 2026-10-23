@@ -42,7 +42,7 @@ func _ready() -> void:
 	Game.start_training("B04")
 	await idle()
 	var view = app.view
-	verify(view.cyberware_button.text.contains("3/3"), "HUD starts with three ready technologies")
+	verify((view.cyberware_button.text == "激活科技" and view.model.available_cyberware_count() == 3 and view.model.cyberware_cards().size() == 3), "HUD starts with three ready technologies")
 	await open_technology(view)
 	var overlay = view.pile_overlay
 	verify(overlay.card_buttons.size() == 3, "Exactly three authored technologies are visible")
@@ -82,7 +82,7 @@ func _ready() -> void:
 	verify(view.model.hand.size() == old_hand.size() and view.model.discard_pile == old_hand, "Clock swaps the entire displayed hand at equal count")
 	for card in old_views: verify(not is_instance_valid(card) or not card.visible, "Old hand card is retired after clock")
 	check_committed(view, committed, "Clock activation")
-	verify(view.cyberware_button.text.contains("0/3"), "HUD shows all three cooling")
+	verify((view.cyberware_button.text == "激活科技" and view.model.available_cyberware_count() == 0 and view.model.cyberware_cards().size() == 3), "HUD shows all three cooling")
 	await open_technology(view)
 	for i in 3:
 		verify(view.pile_overlay.card_buttons[i].disabled, "Cooling card is disabled: %d" % i)
@@ -98,7 +98,7 @@ func _ready() -> void:
 		print("TECHNOLOGY VISUAL: end turn ", index + 1)
 		view.end_turn_pressed()
 		await idle()
-	verify(view.model.turn == 4 and view.cyberware_button.text.contains("2/3"), "Turn four releases pocket and energy while clock remains cooling")
+	verify(view.model.turn == 4 and (view.cyberware_button.text == "激活科技" and view.model.available_cyberware_count() == 2 and view.model.cyberware_cards().size() == 3), "Turn four releases pocket and energy while clock remains cooling")
 	await open_technology(view)
 	verify(view.pile_overlay.state_labels[1].text.contains("996"), "Long cooldown correctly ticks to 996")
 	var hand_count: int = view.model.hand.size()

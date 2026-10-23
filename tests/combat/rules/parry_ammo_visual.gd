@@ -21,7 +21,7 @@ func _ready() -> void:
 		enemy.intent={"type":"attack","amount":4,"hits":3}
 	view.shown_enemies=view.model.enemies.duplicate(true)
 	view.refresh_resources();view.refresh_enemy_hud();view.commit()
-	check(view.resources_label.text.ends_with("7 / 10"),"HUD shows configured ten-ammo capacity")
+	check(view.ammo_panel.filled_slot_count() == 7 and view.ammo_panel.capacity == 10,"HUD shows configured ten-ammo capacity")
 	check(view.model.buffs.player_badges(view.model)[0].description.contains("50%") and view.model.buffs.player_badges(view.model)[0].description.contains("最多 3 层"),"Parry tooltip shows half damage and three charges")
 	view.end_turn_pressed()
 	var seen: Array=[]
@@ -32,7 +32,7 @@ func _ready() -> void:
 		if view.presenting_enemy_turn:
 			if committed.is_empty(): committed=view.model.snapshot()
 			stable=stable and view.model.snapshot()==committed
-			if not view.resources_label.text in seen: seen.append(view.resources_label.text)
+			if not view.ammo_panel.filled_slot_count() in seen: seen.append(view.ammo_panel.filled_slot_count())
 		await get_tree().process_frame
 		if Time.get_ticks_msec()-started>30000:
 			check(false,"Parry presentation timed out")
@@ -41,15 +41,15 @@ func _ready() -> void:
 	await idle()
 	print("PARRY AMMO DISPLAY: ",seen)
 	check(stable,"Animation never repeats parry model effects")
-	check(["7 / 10","8 / 10","9 / 10","10 / 10"].all(func(suffix): return seen.any(func(line): return line.ends_with(suffix))),"Ammo display advances once at each of three counter contacts")
-	check(view.model.ammo==10 and view.resources_label.text.ends_with("10 / 10") and view.model.parry==0,"Enemy turn finishes at ten ammo with all three charges spent")
+	check([7,8,9,10].all(func(count): return seen.has(count)),"Ammo display advances once at each of three counter contacts")
+	check(view.model.ammo==10 and view.ammo_panel.filled_slot_count() == 10 and view.model.parry==0,"Enemy turn finishes at ten ammo with all three charges spent")
 	check(view.model.enemies.all(func(e): return e.hp==114 and e.bleed==0),"Each twelve-damage multi-hit attack receives one six-damage counter without bleed")
 	check(view.shown_enemies.all(func(e): return e.hp==114 and e.bleed==0),"Displayed enemy state matches model after counters")
 	check(Game.valid_combat(Game.state.combat),"Final ten-ammo snapshot validates")
 	await shot("three-counters-ten-ammo")
 	view.model.profile.ammoCap=6;view.model.ammo=6
 	view.refresh_resources()
-	check(view.resources_label.text.ends_with("6 / 6"),"Older snapshot capacity is displayed from its profile")
+	check(view.ammo_panel.filled_slot_count() == 6 and view.ammo_panel.capacity == 6,"Older snapshot capacity is displayed from its profile")
 	Game.menu();await idle()
 	check(Game.state==adventure and not Game.training_mode,"Training restores adventure")
 	app.queue_free()
