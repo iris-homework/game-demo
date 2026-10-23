@@ -12,11 +12,12 @@ func _ready() -> void:
 	expected_revision = Game.revision
 	var reward: Dictionary = Game.state.battleReward
 	var pending: bool = reward.status == "pending"
+	var event_reward: bool = reward.get("source", "battle") == "event"
 	background("city", 0.76)
-	chrome("战斗奖励")
-	var heading := label(self,"战斗胜利",Vector2(210,145),Vector2(920,80),58)
+	chrome("委托奖励" if event_reward else "战斗奖励")
+	var heading := label(self,"约定的回礼" if event_reward else "战斗胜利",Vector2(210,145),Vector2(920,80),58)
 	heading.add_theme_color_override("font_color",CREAM)
-	tag("VICTORY / " + reward.battleId,Vector2(214,115),CYAN,220)
+	tag("COMMISSION / " + reward.eventId if event_reward else "VICTORY / " + reward.battleId,Vector2(214,115),CYAN,290)
 	label(self,Game.event_data().title + "  /  " + Game.battle_type_label(reward.get("battleType", "normal")) + "  /  战利品已结算",Vector2(216,239),Vector2(980,40),20,MUTED)
 	rect(self,Vector2(214,296),Vector2(1012,1),Color("3a5155"))
 	label(self,"本次战利品",Vector2(214,314),Vector2(500,35),22)
@@ -55,7 +56,8 @@ func _ready() -> void:
 		label(card_row,"✓  已领取" if reward.status == "claimed" else "已跳过",Vector2(818,61),Vector2(180,37),21,CYAN if reward.status == "claimed" else MUTED)
 	label(self,"从三张不同的非初始牌中选择一张 · B 蓝 / A 红 / S 金",Vector2(216,695),Vector2(980,32),15,MUTED)
 	var complete: bool = Game.state.flags.get("week1Complete",false) and Game.event_data().get("nodes", {}).get("finish", {}).get("effects", []).any(func(action): return action.get("op") == "finishWeek")
-	label(self,"第一周 · 落幕。可返回地图探索剩余事件。" if complete else "时间推进1天。事件已更新到城市地图。",Vector2(216,754),Vector2(820,35),20,CYAN)
+	var time_text := "领奖不消耗时间。可以继续探索城市。" if event_reward else "时间推进1天。事件已更新到城市地图。"
+	label(self,"第一周 · 落幕。可返回地图探索剩余事件。" if complete else time_text,Vector2(216,754),Vector2(820,35),20,CYAN)
 	label(self,"离开将放弃本次未选择的卡牌。" if pending else "奖励已保存，可继续探索城市。",Vector2(216,803),Vector2(775,31),16,MUTED)
 	exit_button = button(self,"返回地图  →",Vector2(1110,782),Vector2(276,61),leave_rewards,true)
 	fade_in()

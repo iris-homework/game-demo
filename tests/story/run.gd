@@ -44,7 +44,7 @@ func _ready() -> void:
 	Game.meta_path = "user://automated_test_meta.json"
 	# Validate authored references, including legacy saved result nodes.
 	check(Game.places.size() == 17, "17 places including church")
-	check(Game.events.size() == 5, "5 independent commission events")
+	check(Game.events.size() == 6 and Game.events.has("E01R"), "opening, four commissions, and gated return reward event")
 	for e in Game.events.values():
 		check(not Game.place_data(e.placeId).is_empty(), e.id + " place exists")
 		for n in e.nodes.values():
@@ -68,12 +68,12 @@ func _ready() -> void:
 	Game.state.credits = 300
 	check(Game.choose(0, rev), "Payment succeeds")
 	check(not Game.choose(0, rev), "Double click rejected")
-	check(Game.state.credits == 0 and Game.state.flags.alleyClue, "Payment applied once")
+	check(Game.state.credits == 0 and not Game.state.flags.has("alleyClue"), "Payment applied once without a retired clue")
 	step_to_stop()
 	check("E03" in Game.state.completedEventIds, "Payment finishes E03")
-	# Both target choices allow completing every remaining independent event.
-	for target in [0,1]:
-		start_contract(target)
+	# All three support choices allow completing every independent commission.
+	for support in [0,1,2]:
+		start_contract(support)
 		offer_event("E03")
 		Game.start_event("E03"); step_to_stop(); Game.choose(1,Game.revision); step_to_stop()
 		Game.battle_exit("win",Game.revision); step_to_stop(); Game.claim_rewards(Game.revision)
@@ -130,8 +130,8 @@ func _ready() -> void:
 	check(Game.training_mode and Game.state == training and Game.revision == training_revision and Game.page == "battle", "Direct training surrender leaves battle intact")
 	Game.finish_training("lose")
 	check(not Game.training_mode and Game.page == "menu" and Game.state == adventure, "Training defeat restores adventure")
-	# Configured rewards are claimed atomically and idempotently; production pool is empty.
-	check(Game.rewards.is_empty(), "No invented production reward")
+	# Configured rewards are claimed atomically and idempotently.
+	check(Game.events.E01.rewardIds.is_empty(), "Opening chip support does not invent a configured credit reward")
 	Game.rewards["test"] = {"type":"credits","amount":20,"name":"test"}
 	Game.state = Game.initial_state()
 	var expected_credits := int(Game.state.credits) + 20

@@ -31,6 +31,7 @@ func roundtrip() -> bool:
 func _ready() -> void:
 	Game.save_enabled = false
 	Game.save_path = "res://artifacts/qa/reward-2026-10-09/test_checkpoint.json"
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(Game.save_path.get_base_dir()))
 	Game.meta_path = "res://artifacts/qa/reward-2026-10-09/test_meta.json"
 	for id in Game.battles:
 		start_battle(id)

@@ -90,10 +90,10 @@ func _ready() -> void:
 	await capture("choice")
 	var before: Dictionary = Game.state.duplicate(true)
 	await click(Vector2(720,700))
-	await click(Vector2(720,450))
+	await click(Vector2(720,600))
 	check(Game.state == before, "Middle gap and bottom clicks never bypass a choice")
 	await click(app.view.choice_buttons[0].get_global_rect().get_center())
-	check(Game.state != before and Game.state.targetId == "richard", "Choice click still selects the intended branch")
+	check(Game.state != before and Game.state.flags.get("openingSupportChipId") == "money_chip", "Choice click still selects the intended branch")
 	Game.state.completedEventIds = ["E01"]
 	Game.visit("hive")
 	Game.start_event("E03")

@@ -33,6 +33,7 @@ func key(code: Key) -> void:
 func _ready() -> void:
 	Game.save_enabled = false
 	Game.save_path = output + "checkpoint.json"
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(Game.save_path.get_base_dir()))
 	Game.meta_path = output + "meta.json"
 	Game.new_game()
 	check(Game.state.dialogueHistory.size() == 1, "New game records opening")
@@ -125,7 +126,7 @@ func _ready() -> void:
 	await key(KEY_ESCAPE)
 	check(app.view.skip_button.disabled and not app.view.choice_buttons[0].disabled, "Original disabled states restored")
 	await click(app.view.choice_buttons[0].get_global_rect().get_center())
-	check(Game.state.targetId == "richard", "Choice works after closing history")
+	check(Game.state.flags.get("openingSupportChipId") == "money_chip", "Choice works after closing history")
 	await click(app.view.history_button.get_global_rect().get_center())
 	await key(KEY_TAB)
 	check(app.view.history_overlay.is_ancestor_of(get_viewport().gui_get_focus_owner()), "Tab focus stays inside modal")

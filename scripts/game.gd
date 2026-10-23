@@ -240,6 +240,14 @@ func meets(condition: Dictionary, subject: Dictionary = {}) -> bool:
 				if not found: return false
 			"completed":
 				if not value in s.completedEventIds: return false
+			"completedCount":
+				var completed := 0
+				var seen := []
+				for id in value.ids:
+					if id in seen: continue
+					seen.append(id)
+					if id in s.completedEventIds: completed += 1
+				if completed < int(value.atLeast): return false
 			"flag":
 				if not s.flags.get(value, false): return false
 			"target":
@@ -348,7 +356,7 @@ func objective() -> String:
 	var targets := map_target_events()
 	if targets.size() == 1: return targets[0].title + "  /  " + place_data(targets[0].placeId).name
 	if targets.size() > 1: return "%d 个可进行的事件" % targets.size()
-	return "探索城市，寻找新的线索"
+	return "探索城市，寻找新的委托"
 
 func event_data() -> Dictionary:
 	return events.get(state.get("activeEventId", ""), {})
@@ -440,13 +448,19 @@ func apply_actions(actions: Array) -> bool:
 			"setTarget":
 				if not a.get("value", "") in ["richard", "lumina"]: return false
 				draft.targetId = a.value
+			"grantTechnology":
+				if not a.get("id") is String or not a.get("equip", false) is bool: return false
+				var id: String = a.get("id", "")
+				var definition := cyberware_definition(id)
+				if id.begins_with("test_") or definition.is_empty() or not CombatModel.valid_cyberware_definition(definition): return false
+				if not id in draft.ownedCyberwareIds: draft.ownedCyberwareIds.append(id)
+				if a.get("equip", false) and not id in draft.equippedCyberwareIds and draft.equippedCyberwareIds.size() < CombatModel.CYBERWARE_LIMIT:
+					draft.equippedCyberwareIds.append(id)
 			"completeEvent":
 				if not events.has(a.get("id", "")): return false
 				if not a.id in draft.completedEventIds:
 					draft.completedEventIds.append(a.id)
-					# The opening conversation completes normally without spending a day.
-					if a.id != "E01":
-						draft.currentDay = mini(7, int(draft.currentDay) + 1)
+					draft.currentDay = mini(7, int(draft.currentDay) + event_completion_days(a.id))
 			"healHpPercent":
 				var percent := float(a.get("percent", -1.0))
 				if percent < 0.0 or percent > 1.0: return false
@@ -472,6 +486,9 @@ func apply_actions(actions: Array) -> bool:
 	if not training_mode: black_market_model.refresh(draft, card_catalog, black_market_rules)
 	state = draft
 	return true
+
+func event_completion_days(id: String) -> int:
+	return maxi(0, int(events.get(id, {}).get("completionDays", 0 if id == "E01" else 1)))
 
 func enter_node(id: String) -> void:
 	if transition_locked or battle_busy or (not training_mode and is_run_over()): return
@@ -542,16 +559,32 @@ func skip_dialogue(expected_revision: int) -> void:
 		if revision == previous_revision: return
 
 func choose(index: int, expected_revision: int) -> bool:
-	if transition_locked or battle_busy or expected_revision != revision or state.currentScene != "dialogue": return false
+	if transition_locked or battle_busy or expected_revision != revision or page != "dialogue" or state.currentScene != "dialogue": return false
 	var choices: Array = node_data().get("choices", [])
 	if index < 0 or index >= choices.size(): return false
 	var c: Dictionary = choices[index]
 	if not meets(c.get("condition", {})): return false
 	if not event_data().nodes.has(c.next) and c.next != "@map": return false
+	var previous := state
+	var previous_page := page
+	var previous_revision := revision
+	var previous_refresh_rng := event_refresh_rng.state
+	var previous_market_rng := black_market_model.rng.state
 	if not apply_actions(c.get("effects", [])): return false
 	state.choiceHistory[state.activeEventId + ":" + state.activeNodeId] = c.id
 	record_dialogue(c.label)
+	_defer_checkpoint = true
 	enter_node(c.next)
+	_defer_checkpoint = false
+	var missing_reward: bool = state.currentScene == "result" and event_data().has("rewardBattleType") and state.battleReward.is_empty()
+	if missing_reward or (save_enabled and not training_mode and not save_game()):
+		state = previous
+		page = previous_page
+		revision = previous_revision
+		event_refresh_rng.state = previous_refresh_rng
+		black_market_model.rng.state = previous_market_rng
+		return false
+	changed.emit()
 	return true
 
 func battle_exit(result: String, expected_revision: int) -> bool:
@@ -652,13 +685,18 @@ func claim_rewards(expected_revision: int) -> bool:
 
 func prepare_battle_reward() -> void:
 	# Finish-node entry occurs only after all authored post-battle dialogue.
-	if training_mode or state.result != "win": return
-	var battle: Dictionary = battles.get(state.battleId, {})
-	if battle.get("eventId", "") != state.activeEventId: return
-	if not {"battleId":state.battleId, "result":"win"} in state.battleHistory: return
-	var claim_id: String = state.activeEventId + ":" + state.battleId + ":victory"
+	if training_mode: return
+	var event_reward: bool = event_data().has("rewardBattleType")
+	var kind: String = event_data().get("rewardBattleType", "normal") if event_reward else battle_type()
+	var claim_id: String = state.activeEventId + ":commission" if event_reward else state.activeEventId + ":" + state.battleId + ":victory"
+	if event_reward:
+		if not meets(event_data().unlockCondition) or not state.battleId.is_empty(): return
+	else:
+		if state.result != "win": return
+		var battle: Dictionary = battles.get(state.battleId, {})
+		if battle.get("eventId", "") != state.activeEventId: return
+		if not {"battleId":state.battleId, "result":"win"} in state.battleHistory: return
 	if claim_id in state.claimedRewardIds: return
-	var kind := battle_type()
 	var rates = card_reward_rates.get(kind, {})
 	var options: Array[String] = card_reward_sampler.sample(card_catalog, rates) if rates is Dictionary else []
 	if options.size() != 3:
@@ -669,6 +707,7 @@ func prepare_battle_reward() -> void:
 	state.battleReward = {"claimId":claim_id, "eventId":state.activeEventId,
 		"battleId":state.battleId, "battleType":kind, "credits":int(reward_rules.credits),
 		"options":options, "selectedCardId":"", "status":"pending"}
+	if event_reward: state.battleReward.source = "event"
 
 func has_battle_reward() -> bool:
 	var reward: Dictionary = state.get("battleReward", {})
@@ -679,10 +718,15 @@ func choose_reward_card(id: String, expected_revision: int) -> bool:
 	var reward: Dictionary = state.battleReward
 	if reward.status != "pending" or not id in reward.options or not reward_rules.cards.has(id): return false
 	# One checkpoint contains both ownership and the consumed choice.
+	var previous := state.duplicate(true)
 	state.deck.append(id)
 	reward.selectedCardId = id
 	reward.status = "claimed"
-	checkpoint()
+	if save_enabled and not training_mode and not save_game():
+		state = previous
+		return false
+	revision += 1
+	changed.emit()
 	return true
 
 func restart_unfinished_battle(subject: Dictionary) -> bool:
@@ -1156,6 +1200,9 @@ func migrate_save(data):
 	if not data.has("refreshedEventIds"):
 		data.refreshedEventIds = []
 		refresh_event_pool(data)
+	# Make the new return visit available to eligible existing adventures, too.
+	elif data.get("refreshedEventIds") is Array and data.get("completedEventIds") is Array and data.get("flags") is Dictionary and not "E01R" in data.completedEventIds and events.has("E01R"):
+		if meets(events.E01R.unlockCondition, data): refresh_event_pool(data)
 	# Additive schema-2 upgrade: old battles gain the temporary catalog, with
 	# no used cards or pending buff. Existing snapshots retain their own rules.
 	var combat = data.get("combat", {})
@@ -1237,8 +1284,16 @@ func valid_battle_reward(s: Dictionary) -> bool:
 	for key in ["claimId", "eventId", "battleId", "selectedCardId", "status"]:
 		if not r.get(key) is String: return false
 	if r.eventId != s.activeEventId or r.battleId != s.battleId: return false
-	if not battles.has(r.battleId) or battles[r.battleId].eventId != r.eventId: return false
-	if r.claimId != r.eventId + ":" + r.battleId + ":victory" or not r.claimId in s.claimedRewardIds: return false
+	if not r.claimId in s.claimedRewardIds: return false
+	if r.get("source", "battle") == "event":
+		var event: Dictionary = events.get(r.eventId, {})
+		if not event.has("rewardBattleType") or not r.battleId.is_empty(): return false
+		if r.get("battleType") != event.rewardBattleType or r.claimId != r.eventId + ":commission": return false
+		if not r.eventId in s.completedEventIds or not meets(event.unlockCondition, s): return false
+	elif r.get("source", "battle") == "battle":
+		if not battles.has(r.battleId) or battles[r.battleId].eventId != r.eventId: return false
+		if r.claimId != r.eventId + ":" + r.battleId + ":victory": return false
+	else: return false
 	if not (r.get("credits") is int or r.get("credits") is float) or r.credits != int(reward_rules.credits): return false
 	if not r.get("options") is Array or r.options.size() != 3: return false
 	var seen := []

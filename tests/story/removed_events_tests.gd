@@ -16,12 +16,17 @@ func ids(values: Array) -> Array:
 
 func test_catalog() -> void:
 	Game.state = Game.initial_state()
-	check(Game.events.keys() == ["E01", "E02", "E03", "E04", "E11"], "only the five retained events are authored")
+	var event_ids: Array = Game.events.keys()
+	event_ids.sort()
+	check(event_ids == ["E01", "E01R", "E02", "E03", "E04", "E11"], "five retained events plus the gated return reward are authored")
 	check(Game.battles.keys() == ["B02", "B03", "B04", "B11"], "only four retained battles are authored")
 	check(Game.read_data("weeks/week1/week.json").eventIds == Game.events.keys(), "week index matches event catalog")
-	check(ids(Game.eligible_events()) == Game.events.keys(), "all events eligible before E01, without flags or target")
+	check(ids(Game.eligible_events()) == ["E01", "E02", "E03", "E04", "E11"], "five original events remain eligible before E01, but return reward is gated")
 	for event in Game.events.values():
-		check(event.unlockCondition.is_empty(), "no event prerequisite " + event.id)
+		if event.id == "E01R":
+			check(not event.unlockCondition.is_empty(), "return reward requires completed commissions")
+		else:
+			check(event.unlockCondition.is_empty(), "no event prerequisite " + event.id)
 		check(event.refreshTimeRange == {"startDay":null, "endDay":null}, "anytime range " + event.id)
 		check(event.nodes.has(event.startNodeId), "valid start node " + event.id)
 		for node in event.nodes.values():
@@ -82,7 +87,7 @@ func test_retired_checkpoints() -> void:
 			old.battleReward = {"eventId":event_id, "battleId":battle_id, "status":"pending"}
 			var frozen := old.duplicate(true)
 			var migrated: Dictionary = Game.migrate_save(old)
-			var label := event_id + "/" + scene
+			var label: String = event_id + "/" + scene
 			check(old == frozen, "migration is read only " + label)
 			check(Game.valid_save(migrated), "retired checkpoint remains loadable " + label)
 			check(migrated.activeEventId == "E01" and migrated.activeNodeId == "finish", "safe retained anchor " + label)

@@ -127,7 +127,7 @@ func _ready() -> void:
 			finish_event(id)
 			check(not id in target_ids(), "completed event leaves targets " + id)
 		check(Game.state.completedEventIds.size() == 5 and Game.state.currentDay == 5, "all remaining events complete without an ordered chain")
-		check(Game.available_events().is_empty(), "no removed finale or port event appears")
+		check(target_ids() == ["E01R"] and Game.map_place_state("bar").target, "only the earned bar return reward remains, with no retired finale or port event")
 		check(Game.map_place_state("camp").open and Game.map_place_state("tower").open, "locations remain open without allegiance")
 	reset_map()
 	for outcome in ["lose"]:

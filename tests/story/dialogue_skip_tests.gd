@@ -61,7 +61,7 @@ func _ready() -> void:
 	Game.skip_dialogue(rev)
 	Game.skip_dialogue(Game.revision)
 	check(Game.state == initial, "Double click and choice-node skip are harmless")
-	Game.choose(0, Game.revision)
+	Game.choose(2, Game.revision)
 	Game.skip_dialogue(Game.revision)
 	check(Game.state.currentScene == "result" and "E01" in Game.state.completedEventIds, "Selected branch finishes normally")
 	Game.claim_rewards(Game.revision)

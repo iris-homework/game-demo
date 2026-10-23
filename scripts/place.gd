@@ -10,7 +10,7 @@ func _ready() -> void:
 	cut_panel(self, Vector2(827,129), Vector2(542,641), Color("090b12ed"), CREAM)
 	rect(self,Vector2(860,217),Vector2(100,4),PINK)
 	label(self, "此地的故事", Vector2(859,159), Vector2(455,55), 30)
-	label(self, "每完成一个事件推进1天 · 地图最多3个事件", Vector2(861,228), Vector2(453,45), 16, MUTED)
+	label(self, "完成委托推进1天 · 开幕与领奖不耗时", Vector2(861,228), Vector2(453,45), 16, MUTED)
 	var available := Game.available_events(p.id)
 	if available.is_empty():
 		label(self, "此刻，一切安静。", Vector2(861,350), Vector2(455,60), 27)

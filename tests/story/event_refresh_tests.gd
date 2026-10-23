@@ -55,18 +55,18 @@ func start_contract() -> void:
 	Game.refresh_event_pool()
 
 func test_opening_date() -> void:
-	for choice in [0, 1]:
+	for choice in [0, 1, 2]:
 		for skip in [false, true]:
 			reset_authored()
 			Game.new_game()
 			if skip: Game.skip_dialogue(Game.revision)
 			else: step_to_stop()
 			check(Game.state.activeNodeId == "contract" and Game.state.currentDay == 1, "opening reaches choice on day one")
-			check(Game.choose(choice, Game.revision), "opening target choice accepted")
+			check(Game.choose(choice, Game.revision), "opening support choice accepted")
 			if skip: Game.skip_dialogue(Game.revision)
 			else: step_to_stop()
-			check(Game.state.currentScene == "result" and Game.state.completedEventIds == ["E01"] and Game.state.currentDay == 1, "both opening branches finish without spending time, skip=" + str(skip))
-			check(Game.state.targetId == ("richard" if choice == 0 else "lumina"), "opening still records selected target")
+			check(Game.state.currentScene == "result" and Game.state.completedEventIds == ["E01"] and Game.state.currentDay == 1, "all opening branches finish without spending time, skip=" + str(skip))
+			check(Game.state.targetId.is_empty() and Game.state.flags.get("openingSupportChipId") == ["money_chip", "healing_chip", "swift_chip"][choice], "opening records selected support without selecting a target")
 			check(Game.claim_rewards(Game.revision) and Game.state.currentScene == "map" and Game.state.currentDay == 1, "opening returns to map on day one")
 			check(not "E01" in Game.state.refreshedEventIds, "completed opening leaves the event pool")
 			check(Game.save_game(), "day one opening checkpoint saves")
@@ -257,6 +257,7 @@ func test_ui() -> void:
 	await get_tree().process_frame
 	var text := all_text(view)
 	check("刷新时间" in text and "随时" in text, "place view shows event refresh time")
+	check("完成委托推进1天" in text and "开幕与领奖不耗时" in text, "place HUD distinguishes commission time from opening and return reward")
 	check(not "主线" in text and not "可选事件" in text and not "支线" in text, "place view uses unified event terminology")
 	check("第 7 天" in text, "date label displays day seven")
 	check(view.find_child("day_segment_7", true, false) != null and view.find_child("day_segment_8", true, false) == null, "date HUD has exactly seven segments")

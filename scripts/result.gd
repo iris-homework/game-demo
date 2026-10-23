@@ -17,6 +17,8 @@ func _ready() -> void:
 	label(self, e.title, Vector2(285,373), Vector2(870,55), 28, PINK)
 	var reward_ids: Array = e.get("rewardIds", [])
 	var reward_text := "本次无奖励"
+	var support: Dictionary = Game.cyberware_definition(str(Game.state.flags.get("openingSupportChipId", ""))) if e.id == "E01" else {}
+	if not support.is_empty(): reward_text = "已获得 · " + support.name
 	if not reward_ids.is_empty():
 		var parts: Array[String] = []
 		for id in reward_ids:
@@ -25,8 +27,11 @@ func _ready() -> void:
 			parts.append(("已领取 · " if claimed else "可领取 · ") + str(r.get("name", id)))
 		reward_text = "\n".join(parts)
 	label(self, reward_text, Vector2(285,459), Vector2(860,85), 25)
-	label(self, "本事件没有额外奖励。" if reward_ids.is_empty() else "领取记录与物品在同一检查点保存。", Vector2(286,551), Vector2(850,40), 17, MUTED)
+	var reward_hint := "本事件没有额外奖励。" if reward_ids.is_empty() else "领取记录与物品在同一检查点保存。"
+	if not support.is_empty(): reward_hint = "已携带，进入战斗后自动生效。" if support.id in Game.equipped_cyberware_ids() else "已加入已有科技，可在地图的科技配置中携带。"
+	label(self, reward_hint, Vector2(286,551), Vector2(850,40), 17, MUTED)
 	var progress_text := "开幕对话不消耗时间。" if e.id == "E01" else "当前为第%d天。" % int(Game.state.currentDay)
+	if e.id == "E01": progress_text += "完成三个不同委托后，回午夜酒馆找老板娘领奖。"
 	label(self, "第二周与第三周：内容待设计。可返回城市探索剩余事件。" if complete else progress_text + "事件已更新到城市地图，进度已自动保存。", Vector2(286,615), Vector2(850,53), 20, CYAN)
 	var rev := Game.revision
 	button(self, "返回城市地图    →" if reward_ids.is_empty() else "领取并返回城市地图    →", Vector2(765,704), Vector2(390,59), func(): Game.claim_rewards(rev), true)

@@ -46,7 +46,7 @@ func _ready() -> void:
 	app.view.text_label.visible_characters = 0
 	await click(app.view.skip_button)
 	check(Game.state.activeNodeId == "contract", "Click while typing reaches choice")
-	check(app.view.skip_button.disabled and app.view.choice_buttons.size() == 2, "Choice stops and disables skip")
+	check(app.view.skip_button.disabled and app.view.choice_buttons.size() == 3, "Choice stops and disables skip")
 	var previous: Dictionary = Game.state.duplicate(true)
 	await click(app.view.skip_button)
 	check(Game.state == previous, "Disabled button cannot choose")

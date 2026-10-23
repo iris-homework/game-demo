@@ -6,7 +6,7 @@
     "unlockCondition": {},
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
-    "description": "在地下酒馆接下你的第一份委托。",
+    "description": "领取一枚支援芯片，约定完成三个委托后回酒馆领奖。",
     "demoNote": "",
     "rewardIds": [],
     "nodes": {
@@ -14,7 +14,7 @@
         "id": "intro_01",
         "speakerId": "bartender",
         "speakerSide": "right",
-        "text": "欢迎来到午夜酒馆，小姑娘。最近城里不太平，找人的委托倒是多了不少。你这时候来，是想喝酒，还是想找活干？",
+        "text": "欢迎来到午夜酒馆，小姑娘。最近城里不太平，缺人手的地方倒是不少。你这时候来，是想喝酒，还是想找活干？",
         "next": "intro_02"
       },
       "intro_02": {
@@ -28,49 +28,79 @@
         "id": "intro_03",
         "speakerId": "bartender",
         "speakerSide": "right",
-        "text": "消息是有的，黑市上的事我也知道一些。正好有两份没人接的委托，你要不要试试？办成了，报酬少不了。",
+        "text": "想在这里站稳脚跟，就自己去城里找委托做。完成三个不同的委托，再回来找我，我给你一份额外奖励。",
         "next": "intro_04"
       },
       "intro_04": {
         "id": "intro_04",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "成交。",
+        "text": "三个委托，我记住了。不过，装备支援总该有一点吧？",
         "next": "intro_05"
       },
       "intro_05": {
         "id": "intro_05",
         "speakerId": "bartender",
         "speakerSide": "right",
-        "text": "爽快。来，挑一个吧。",
+        "text": "早给你备好了。金钱芯片、治疗芯片、迅捷芯片，挑一枚带上。剩下的，就看你自己的本事了。",
         "next": "contract"
       },
       "contract": {
         "id": "contract",
         "speakerId": "",
         "speakerSide": "",
-        "text": "选择一份委托",
+        "text": "选择一枚支援芯片（免费获得，有空槽时自动携带）",
         "choices": [
           {
-            "id": "richard",
-            "label": "理查德  /  追踪失联的欠债人",
+            "id": "money_chip",
+            "label": "金钱芯片  /  战斗胜利后额外获得30信用点",
             "next": "chosen_01",
             "effects": [
               {
-                "op": "setTarget",
-                "value": "richard"
+                "op": "grantTechnology",
+                "id": "money_chip",
+                "equip": true
+              },
+              {
+                "op": "setFlag",
+                "key": "openingSupportChipId",
+                "value": "money_chip"
               }
             ],
             "condition": {}
           },
           {
-            "id": "lumina",
-            "label": "卢米娜  /  寻找失联的货运联络人",
+            "id": "healing_chip",
+            "label": "治疗芯片  /  战斗胜利后回复5点生命",
             "next": "chosen_01",
             "effects": [
               {
-                "op": "setTarget",
-                "value": "lumina"
+                "op": "grantTechnology",
+                "id": "healing_chip",
+                "equip": true
+              },
+              {
+                "op": "setFlag",
+                "key": "openingSupportChipId",
+                "value": "healing_chip"
+              }
+            ],
+            "condition": {}
+          },
+          {
+            "id": "swift_chip",
+            "label": "迅捷芯片  /  第一回合额外抽2张牌",
+            "next": "chosen_01",
+            "effects": [
+              {
+                "op": "grantTechnology",
+                "id": "swift_chip",
+                "equip": true
+              },
+              {
+                "op": "setFlag",
+                "key": "openingSupportChipId",
+                "value": "swift_chip"
               }
             ],
             "condition": {}
@@ -81,7 +111,7 @@
         "id": "chosen_01",
         "speakerId": "bartender",
         "speakerSide": "right",
-        "text": "选好了？那就祝你好运，小姑娘。我看好你。",
+        "text": "芯片拿好了。去城里挑你接得下的委托，完成三个，再回午夜酒馆找我领奖。别光顾着挣钱，记得活着回来。",
         "next": "finish"
       },
       "finish": {
@@ -93,7 +123,8 @@
     "refreshTimeRange": {
       "startDay": null,
       "endDay": null
-    }
+    },
+    "completionDays": 0
   },
   "E02": {
     "id": "E02",
@@ -102,7 +133,7 @@
     "unlockCondition": {},
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
-    "description": "垃圾场传出怪动静，也许能找到目标的线索。",
+    "description": "回收站老板雇你停用垃圾场里失控的分拣机器人，让工人能安全开工。",
     "demoNote": "",
     "rewardIds": [],
     "nodes": {
@@ -110,28 +141,28 @@
         "id": "intro_01",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "喂，你见过{目标姓名}吗？",
+        "text": "回收站老板让我来处理这台失控的机器。喂，能听见吗？停止作业，关闭动力。",
         "next": "intro_02"
       },
       "intro_02": {
         "id": "intro_02",
         "speakerId": "robot",
         "speakerSide": "right",
-        "text": "检索中……目、目标……错误！存储区损坏。请重试！",
+        "text": "指令冲突……禁止停机……入侵者，清除！",
         "next": "intro_03"
       },
       "intro_03": {
         "id": "intro_03",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "看来问不出什么。先走吧。",
+        "text": "看来是听不进去了。得先让它停下来。",
         "next": "intro_04"
       },
       "intro_04": {
         "id": "intro_04",
         "speakerId": "",
         "speakerSide": "right",
-        "text": "机器人发出刺耳的警报，动作失控，转向{主角姓名}。",
+        "text": "机器人发出刺耳的警报，挥动机械臂，朝{主角姓名}冲来。",
         "next": "battle",
         "type": "stage"
       },
@@ -139,14 +170,14 @@
         "id": "win_01",
         "speakerId": "robot",
         "speakerSide": "right",
-        "text": "警报！目标……滋——清除……清除……",
+        "text": "警报……动力中断……停、停止作业……",
         "next": "win_02"
       },
       "win_02": {
         "id": "win_02",
         "speakerId": "",
         "speakerSide": "right",
-        "text": "机器人倒下，彻底停止运转。",
+        "text": "机器人轰然倒下，机械臂不再抽动，垃圾场终于安静下来。",
         "next": "win_03",
         "type": "stage"
       },
@@ -154,7 +185,7 @@
         "id": "win_03",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "白忙一场。去别处找线索吧。",
+        "text": "好了，工人们能回来开工了。这份委托可以交差了。",
         "next": "finish"
       },
       "battle": {
@@ -166,7 +197,7 @@
         "id": "lose",
         "speakerId": "",
         "speakerSide": "",
-        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励。",
         "choices": [
           {
             "id": "return",
@@ -181,7 +212,7 @@
         "id": "surrender",
         "speakerId": "",
         "speakerSide": "",
-        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励。",
         "choices": [
           {
             "id": "return",
@@ -210,7 +241,7 @@
     "unlockCondition": {},
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
-    "description": "艾克似乎知道委托目标的下落。",
+    "description": "城寨住户委托你取回被艾克扣下的供电配件，让楼里的公共照明恢复运作。",
     "demoNote": "",
     "rewardIds": [],
     "nodes": {
@@ -218,21 +249,21 @@
         "id": "intro_01",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "你知道{目标姓名}在哪儿吗？",
+        "text": "楼里的住户委托我来拿回供电配件。艾克，东西是你扣下的吧？",
         "next": "intro_02"
       },
       "intro_02": {
         "id": "intro_02",
         "speakerId": "ike",
         "speakerSide": "right",
-        "text": "知道啊。三百信用点，一口价。",
+        "text": "在我这儿。想拿走？三百信用点，算保管费。",
         "next": "payment"
       },
       "payment": {
         "id": "payment",
         "speakerId": "",
         "speakerSide": "",
-        "text": "情报的价码：300 信用点",
+        "text": "艾克索要300信用点，才肯交还配件。",
         "choices": [
           {
             "id": "pay",
@@ -242,11 +273,6 @@
               {
                 "op": "spendCredits",
                 "amount": 300
-              },
-              {
-                "op": "setFlag",
-                "key": "alleyClue",
-                "value": true
               }
             ],
             "condition": {
@@ -266,42 +292,42 @@
         "id": "paid_01",
         "speakerId": "ike",
         "speakerSide": "right",
-        "text": "嘿嘿，痛快。{目标姓名}躲在后巷。",
+        "text": "嘿嘿，痛快。配件就在这只箱子里，拿走吧。",
         "next": "paid_02"
       },
       "paid_02": {
         "id": "paid_02",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "谢了。",
+        "text": "配件齐了。先送回去，别让整栋楼今晚还摸黑。",
         "next": "paid_03"
       },
       "paid_03": {
         "id": "paid_03",
         "speakerId": "ike",
         "speakerSide": "right",
-        "text": "不用谢，一手交钱，一手交消息。",
+        "text": "东西拿到了就走吧，我可不管你们怎么装。",
         "next": "finish"
       },
       "refuse_01": {
         "id": "refuse_01",
         "speakerId": "ike",
         "speakerSide": "right",
-        "text": "不肯付？那我可什么都不知道。",
+        "text": "不肯付？那这箱东西你就别想带走。",
         "next": "refuse_02"
       },
       "refuse_02": {
         "id": "refuse_02",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "你确定要这么谈？",
+        "text": "扣了别人的东西，还想收钱？把箱子放下。",
         "next": "refuse_03"
       },
       "refuse_03": {
         "id": "refuse_03",
         "speakerId": "",
         "speakerSide": "right",
-        "text": "艾克摆出架势。",
+        "text": "艾克一脚把配件箱踢到身后，攥紧拳头挡住去路。",
         "next": "battle",
         "type": "stage"
       },
@@ -309,14 +335,14 @@
         "id": "win_01",
         "speakerId": "ike",
         "speakerSide": "right",
-        "text": "停停停！我说！{目标姓名}在后巷！",
+        "text": "停！别打了！箱子拿走，我不要钱了！",
         "next": "win_02"
       },
       "win_02": {
         "id": "win_02",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "早说不就好了。",
+        "text": "以后别再扣住户的东西。配件拿到了，该送回去恢复照明了。",
         "next": "finish"
       },
       "battle": {
@@ -328,7 +354,7 @@
         "id": "lose",
         "speakerId": "",
         "speakerSide": "",
-        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励。",
         "choices": [
           {
             "id": "return",
@@ -343,7 +369,7 @@
         "id": "surrender",
         "speakerId": "",
         "speakerSide": "",
-        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励。",
         "choices": [
           {
             "id": "return",
@@ -357,13 +383,7 @@
       "finish": {
         "id": "finish",
         "type": "finish",
-        "effects": [
-          {
-            "op": "setFlag",
-            "key": "alleyClue",
-            "value": true
-          }
-        ]
+        "effects": []
       }
     },
     "refreshTimeRange": {
@@ -378,7 +398,7 @@
     "unlockCondition": {},
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
-    "description": "根据艾克的线索，前往后巷深处。",
+    "description": "后巷商户联名委托你赶走拦路收保护费的黑帮，恢复巷道通行。",
     "demoNote": "",
     "rewardIds": [],
     "nodes": {
@@ -386,21 +406,21 @@
         "id": "intro_01",
         "speakerId": "gang",
         "speakerSide": "right",
-        "text": "又来一个外地人。艾克把你骗来的？",
+        "text": "这条巷子归我们管。想过去，先交钱。",
         "next": "intro_02"
       },
       "intro_02": {
         "id": "intro_02",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "……那家伙果然没说实话。",
+        "text": "商户们委托我来清路。带上你的人走，以后别再来收保护费。",
         "next": "intro_03"
       },
       "intro_03": {
         "id": "intro_03",
         "speakerId": "",
         "speakerSide": "right",
-        "text": "黑帮头目带人围上来。",
+        "text": "黑帮头目冷笑一声，两名手下堵住巷口，向{主角姓名}围来。",
         "next": "battle",
         "type": "stage"
       },
@@ -408,28 +428,28 @@
         "id": "win_01",
         "speakerId": "gang",
         "speakerSide": "right",
-        "text": "等等！别动手！你想知道什么，我都说！",
+        "text": "等等！别动手了！我们走，现在就走！",
         "next": "win_02"
       },
       "win_02": {
         "id": "win_02",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "{目标姓名}在哪儿？",
+        "text": "把路让开。再来骚扰这里的商户，我还会来找你们。",
         "next": "win_03"
       },
       "win_03": {
         "id": "win_03",
         "speakerId": "gang",
         "speakerSide": "right",
-        "text": "港口！我听说他就在港口，去那儿准能找到！",
+        "text": "听见了！都撤，别堵在这儿！",
         "next": "win_04"
       },
       "win_04": {
         "id": "win_04",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "最好是真的。",
+        "text": "路清出来了。让商户们放心开门吧，这份委托办完了。",
         "next": "finish"
       },
       "battle": {
@@ -441,7 +461,7 @@
         "id": "lose",
         "speakerId": "",
         "speakerSide": "",
-        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励。",
         "choices": [
           {
             "id": "return",
@@ -456,7 +476,7 @@
         "id": "surrender",
         "speakerId": "",
         "speakerSide": "",
-        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励。",
         "choices": [
           {
             "id": "return",
@@ -470,13 +490,7 @@
       "finish": {
         "id": "finish",
         "type": "finish",
-        "effects": [
-          {
-            "op": "setFlag",
-            "key": "portClue",
-            "value": true
-          }
-        ]
+        "effects": []
       }
     },
     "refreshTimeRange": {
@@ -491,7 +505,7 @@
     "unlockCondition": {},
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
-    "description": "处理受污染水域中异变的鱼群。",
+    "description": "泵站检修员发布了清理委托：驱除占据排水口的变异鱼，恢复检修通道。",
     "demoNote": "",
     "rewardIds": [],
     "nodes": {
@@ -499,7 +513,7 @@
         "id": "intro_01",
         "speakerId": "",
         "speakerSide": "right",
-        "text": "变异鱼群从污水中跃出，露出尖齿。",
+        "text": "按照泵站检修员的委托，{主角姓名}来到堵塞的排水口。变异鱼群从污水中跃出，露出尖齿。",
         "next": "intro_02",
         "type": "stage"
       },
@@ -507,14 +521,14 @@
         "id": "intro_02",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "这些到底是什么东西？",
+        "text": "就是这些家伙挡着检修通道？好，清完这群鱼就能交差。",
         "next": "battle"
       },
       "win_01": {
         "id": "win_01",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "呼……全是黏液。得赶紧回去洗个澡。",
+        "text": "呼……通道清干净了，可以通知检修员进场。全身都是黏液，这活可真够呛。",
         "next": "finish"
       },
       "battle": {
@@ -526,7 +540,7 @@
         "id": "lose",
         "speakerId": "",
         "speakerSide": "",
-        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "text": "战败结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励。",
         "choices": [
           {
             "id": "return",
@@ -541,12 +555,82 @@
         "id": "surrender",
         "speakerId": "",
         "speakerSide": "",
-        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励，也未获得胜利线索。",
+        "text": "投降结果已记录。后续剧情待补。此次事件尚未完成，未发放奖励。",
         "choices": [
           {
             "id": "return",
             "label": "返回城市地图（保留结果）",
             "next": "@map",
+            "effects": [],
+            "condition": {}
+          }
+        ]
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": []
+      }
+    },
+    "refreshTimeRange": {
+      "startDay": null,
+      "endDay": null
+    }
+  },
+  "E01R": {
+    "id": "E01R",
+    "title": "三个委托后的回礼",
+    "placeId": "bar",
+    "unlockCondition": {
+      "all": [
+        {
+          "completed": "E01"
+        },
+        {
+          "completedCount": {
+            "ids": [
+              "E02",
+              "E03",
+              "E04",
+              "E11"
+            ],
+            "atLeast": 3
+          }
+        }
+      ]
+    },
+    "repeatPolicy": "once",
+    "startNodeId": "return_01",
+    "description": "已完成三个委托。回午夜酒馆找老板娘，领取额外奖励。",
+    "demoNote": "奖励等同一次普通战斗：信用点与卡牌三选一。领奖不消耗时间。",
+    "rewardIds": [],
+    "rewardBattleType": "normal",
+    "completionDays": 0,
+    "nodes": {
+      "return_01": {
+        "id": "return_01",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "三个委托，都办完了。我来领你答应的奖励。",
+        "next": "return_02"
+      },
+      "return_02": {
+        "id": "return_02",
+        "speakerId": "bartender",
+        "speakerSide": "right",
+        "text": "消息我都听到了，干得不错。说好的报酬，一分也不会少。信用点拿好，再挑一张合用的卡牌。",
+        "next": "collect"
+      },
+      "collect": {
+        "id": "collect",
+        "speakerId": "bartender",
+        "speakerSide": "right",
+        "text": "以后还想接活，就继续去城里看看。今晚这杯，算我请你。",
+        "choices": [
+          {
+            "id": "claim",
+            "label": "领取奖励",
+            "next": "finish",
             "effects": [],
             "condition": {}
           }
