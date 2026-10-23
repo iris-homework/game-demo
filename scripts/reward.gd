@@ -76,7 +76,6 @@ func open_picker() -> void:
 	rect(picker,Vector2.ZERO,Vector2(1440,900),Color(0.015,0.025,0.04,0.94))
 	cut_panel(picker,Vector2(129,117),Vector2(1182,670),Color("101920"),CYAN,25)
 	label(picker,"选择一张奖励卡牌",Vector2(191,157),Vector2(1030,65),40)
-	label(picker,"三选一  /  点击卡牌领取，所选卡牌将在后续战斗中加入牌组。",Vector2(194,233),Vector2(1030,39),19,MUTED)
 	option_buttons.clear()
 	for i in range(3):
 		var id: String = Game.state.battleReward.options[i]
@@ -105,7 +104,6 @@ func open_picker() -> void:
 		var caption := label(picker,"选择这张  [%d]" % (i+1),pos+Vector2(0,357),Vector2(270,35),19,CYAN)
 		caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	var back := button(picker,"返回奖励  /  Esc",Vector2(1052,717),Vector2(212,44),close_picker)
-	label(picker,"按品级颜色查看卡牌 · 领取后加入拥有牌组",Vector2(192,726),Vector2(680,32),16,MUTED)
 	var focus_buttons: Array[Button] = option_buttons.duplicate()
 	focus_buttons.append(back)
 	for i in focus_buttons.size():
