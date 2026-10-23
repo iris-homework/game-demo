@@ -171,7 +171,10 @@ func test_terminal_results() -> void:
 		Game.state = {}
 		check(Game.load_game() and same(Game.state.combat, terminal), outcome + ": cold continue retains terminal snapshot")
 		var revision := Game.revision
-		check(Game.battle_exit(outcome, revision), outcome + ": returns to its authored story")
+		if outcome == "win":
+			check(Game.battle_exit(outcome, revision), "Win returns to its authored story")
+		else:
+			check(Game.page == "defeat" and Game.state.currentScene == "defeat" and not Game.can_continue(), "Committed defeat resumes only the terminal page")
 		check(Game.state.battleStart.is_empty(), outcome + ": clears old baseline at battle exit")
 		check(not Game.battle_exit(outcome, revision), outcome + ": rejects duplicate battle exit")
 		if outcome == "win":
@@ -188,7 +191,7 @@ func test_terminal_results() -> void:
 			check(Game.load_game() and Game.state.credits == int(Game.config.initialCredits) + 1000 and Game.state.deck == [options[0]], "Claimed reward survives cold continue exactly once")
 		else:
 			check(Game.state.currentHp == 0 and Game.state.battleReward.is_empty() and Game.state.credits == int(Game.config.initialCredits), "Defeat retains zero HP without rewards")
-			check(Game.choose(0, Game.revision) and Game.page == "map", "Defeat can return to map")
+			check(not Game.choose(0, Game.revision) and Game.page == "defeat", "Defeat cannot choose the legacy map exit")
 
 func test_next_battle_and_training() -> void:
 	var baseline := begin_case("next-and-training")

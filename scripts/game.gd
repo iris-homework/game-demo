@@ -373,12 +373,12 @@ func checkpoint() -> void:
 	changed.emit()
 
 func go_map() -> void:
-	if transition_locked or battle_busy: return
+	if transition_locked or battle_busy or is_run_over(): return
 	state.currentScene = "map"
 	checkpoint()
 
 func visit(id: String) -> void:
-	if transition_locked or battle_busy: return
+	if transition_locked or battle_busy or is_run_over(): return
 	var p := place_data(id)
 	if p.is_empty(): return
 	state.currentPlaceId = id
@@ -386,7 +386,7 @@ func visit(id: String) -> void:
 	checkpoint()
 
 func start_event(id: String) -> bool:
-	if transition_locked or battle_busy: return false
+	if transition_locked or battle_busy or is_run_over(): return false
 	if not events.has(id): return false
 	var e: Dictionary = events[id]
 	if not id in state.get("refreshedEventIds", []) or id in state.completedEventIds or not meets(e.unlockCondition) or not event_in_refresh_range(e): return false
@@ -452,7 +452,7 @@ func apply_actions(actions: Array) -> bool:
 	return true
 
 func enter_node(id: String) -> void:
-	if transition_locked or battle_busy: return
+	if transition_locked or battle_busy or (not training_mode and is_run_over()): return
 	if id == "@map":
 		go_map()
 		return
@@ -535,16 +535,34 @@ func choose(index: int, expected_revision: int) -> bool:
 func battle_exit(result: String, expected_revision: int) -> bool:
 	if result not in ["win", "lose"]: return false
 	if transition_locked or battle_busy or expected_revision != revision or state.currentScene != "battle": return false
+	if not training_mode and is_run_over() and result != "lose": return false
 	var b: Dictionary = battles.get(state.battleId, {})
-	if not b.get("returnNodeByResult", {}).has(result): return false
+	if b.is_empty() or (result == "win" and not b.get("returnNodeByResult", {}).has(result)): return false
 	if training_mode:
 		finish_training(result)
+		return true
+	if result == "lose":
+		mark_run_failed(state)
+		checkpoint()
 		return true
 	state.result = result
 	state.battleHistory.append({"battleId":state.battleId, "result":result})
 	state.battleStart = {}
 	enter_node(b.returnNodeByResult[result])
 	return true
+
+func is_run_over(subject: Dictionary = {}) -> bool:
+	var s: Dictionary = state if subject.is_empty() else subject
+	return s.get("currentScene", "") == "defeat" or s.get("result", "") == "lose" or (s.get("currentScene", "") == "dialogue" and s.get("activeNodeId", "") == "lose") or (s.get("currentScene", "") == "battle" and s.get("combat", {}).get("outcome", "") == "lose")
+
+func mark_run_failed(subject: Dictionary) -> void:
+	# Also used for a lethal snapshot saved before its presentation has finished.
+	if subject.get("result", "") != "lose" and subject.get("battleHistory") is Array:
+		subject.battleHistory.append({"battleId":subject.get("battleId", ""), "result":"lose"})
+	subject.result = "lose"
+	subject.currentScene = "defeat"
+	subject.battleStart = {}
+	subject.battleReward = {}
 
 func claim_rewards(expected_revision: int) -> bool:
 	if transition_locked or battle_busy or expected_revision != revision or state.currentScene != "result": return false
@@ -605,7 +623,9 @@ func restart_unfinished_battle(subject: Dictionary) -> bool:
 func save_game() -> bool:
 	# Keep live combat in memory; only the restart point goes to disk until win/lose.
 	var saved := state.duplicate(true)
-	if not training_mode: restart_unfinished_battle(saved)
+	if not training_mode:
+		if is_run_over(saved): mark_run_failed(saved)
+		else: restart_unfinished_battle(saved)
 	var temp := save_path + ".tmp"
 	var file := FileAccess.open(temp, FileAccess.WRITE)
 	if file == null:
@@ -659,7 +679,8 @@ func valid_save(s) -> bool:
 		if not id is String or not (reward_rules.cards.has(id) or card_catalog.has(id) or prototype_rules.cards.has(id)): return false
 	if not valid_battle_reward(s): return false
 	if not (s.credits is float or s.credits is int) or s.credits < 0: return false
-	if not s.currentScene in ["map", "place", "dialogue", "battle", "result"]: return false
+	if not s.currentScene in ["map", "place", "dialogue", "battle", "result", "defeat"]: return false
+	if s.currentScene == "defeat" and (s.result != "lose" or not s.battleStart.is_empty() or not s.battleReward.is_empty()): return false
 	if not s.targetId in ["", "richard", "lumina"]: return false
 	if not s.portraits.has("left") or not s.portraits.has("right"): return false
 	for side in ["left", "right"]:
@@ -675,6 +696,18 @@ func valid_save(s) -> bool:
 
 func has_save() -> bool:
 	return FileAccess.file_exists(save_path) or FileAccess.file_exists(save_path + ".bak")
+
+func can_continue() -> bool:
+	if not state.is_empty(): return not is_run_over()
+	# Read only; follow the same main/backup precedence as load_game().
+	for path in [save_path, save_path + ".bak"]:
+		if not FileAccess.file_exists(path): continue
+		var parser := JSON.new()
+		if parser.parse(FileAccess.get_file_as_string(path)) != OK: continue
+		var data = migrate_save(parser.data)
+		if valid_save(data): return not is_run_over(data)
+	# Keep the existing damaged-save error available when neither file validates.
+	return has_save()
 
 func load_game() -> bool:
 	for path in [save_path, save_path + ".bak"]:
@@ -702,7 +735,7 @@ func load_game() -> bool:
 ## User navigation asks the main view to confirm before changing adventure state.
 func request_menu() -> void:
 	if transition_locked or battle_busy or page == "menu": return
-	if page in ["card_library", "cyberware"]:
+	if page in ["card_library", "cyberware", "defeat"]:
 		menu()
 	else:
 		menu_requested.emit()
@@ -714,6 +747,9 @@ func request_quit() -> void:
 func menu() -> void:
 	if transition_locked or battle_busy: return
 	if training_mode: restore_training()
+	elif is_run_over() and state.get("currentScene", "") != "defeat":
+		mark_run_failed(state)
+		revision += 1
 	elif restart_unfinished_battle(state): revision += 1
 	page = "menu"
 	changed.emit()
@@ -721,7 +757,11 @@ func menu() -> void:
 func resume() -> void:
 	if state.is_empty(): load_game()
 	else:
-		if not training_mode and restart_unfinished_battle(state): revision += 1
+		if not training_mode:
+			if is_run_over():
+				mark_run_failed(state)
+				revision += 1
+			elif restart_unfinished_battle(state): revision += 1
 		page = state.currentScene
 		changed.emit()
 
@@ -962,6 +1002,9 @@ func migrate_save(data):
 		if combat.get("profile") is Dictionary and not combat.profile.has("cyberware"):
 			if valid_player_character(data.get("playerCharacterId")):
 				combat.profile.cyberware = player_cyberware(data.playerCharacterId)
+	# New terminal page and old authored lose nodes share the same failed run.
+	# Keep malformed combat data for valid_save() to reject rather than hide it.
+	if data.get("combat", {}) is Dictionary and is_run_over(data): mark_run_failed(data)
 	return data
 
 func migrate_mercenary_story(data: Dictionary) -> void:

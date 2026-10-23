@@ -88,8 +88,8 @@ func _build_right_column() -> void:
 	logo = title
 
 	continue_button = _menu_button("continue_commission", "继续委托", Vector2(COLUMN_X, 330), Vector2(COLUMN_WIDTH, 66), Game.resume, true)
-	# 无内存进度且无存档时禁用；禁用按钮会被 Godot 焦点环自动跳过。
-	continue_button.disabled = Game.state.is_empty() and not Game.has_save()
+	# Failed adventures remain recorded, but cannot be continued.
+	continue_button.disabled = not Game.can_continue()
 	continue_button.tooltip_text = "继续冒险；未结束的新战斗将从本场开局重来。"
 	if continue_button.disabled: continue_button.focus_mode = Control.FOCUS_NONE
 	progress_summary = label(ui_layer, _summary_text(), Vector2(COLUMN_X + 2, 410), Vector2(COLUMN_WIDTH - 2, 26), 15, MUTED)
@@ -198,6 +198,8 @@ func _menu_button(node_name: String, text: String, pos: Vector2, dimensions: Vec
 	return b
 
 func _summary_text() -> String:
+	if not Game.can_continue() and (not Game.state.is_empty() or Game.has_save()):
+		return "本次冒险已结束 · 请开始新的委托"
 	if not Game.state.is_empty():
 		var place_name := str(Game.place_data(Game.state.get("currentPlaceId", "")).get("name", ""))
 		return place_name if not place_name.is_empty() else "进行中的委托"

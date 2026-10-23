@@ -614,14 +614,9 @@ func show_card_choice(title: String, options: Array, callback: Callable) -> void
 	add_child(pile_overlay)
 
 func animate_exhaust(view: CombatCard) -> void:
-	view.set_enabled(false)
-	var tween := create_tween().set_parallel(true)
-	tween.tween_property(view,"position",Vector2(1180,690),0.35)
-	tween.tween_property(view,"scale",Vector2.ONE*0.25,0.35)
-	tween.tween_property(view,"modulate:a",0.0,0.4)
-	await tween.finished
-	view.hide()
-	view.queue_free()
+	var fx := preload("res://scripts/combat/exhaust_fx.gd").new()
+	add_child(fx)
+	fx.start(view)
 
 func arrange_hand() -> void:
 	for i in model.hand.size():

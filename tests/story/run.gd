@@ -82,7 +82,7 @@ func _ready() -> void:
 		check(Game.state.flags.get("week1Complete",false), "Week one completed")
 		check(Game.state.currentWeek == 1, "No empty future week")
 		check(not Game.start_event("E12"), "No repeating Boss")
-	# Every battle must resume the exact corresponding node after disk roundtrip.
+	# Disk roundtrip preserves victory story or the terminal defeat page.
 	for b in Game.battles.values():
 		for result in ["win", "lose"]:
 			Game.state = Game.initial_state()
@@ -99,11 +99,14 @@ func _ready() -> void:
 			check(Game.state == before_rejected and Game.revision == battle_rev and Game.page == "battle", "Rejected surrender preserves battle")
 			check(Game.battle_exit(result,battle_rev), b.id + " " + result)
 			check(not Game.battle_exit(result,battle_rev), "Duplicate battle result rejected")
-			check(Game.state.activeNodeId == b.returnNodeByResult[result], "Exact return node")
+			check(Game.state.activeNodeId == b.returnNodeByResult.win if result == "win" else Game.page == "defeat" and Game.state.currentScene == "defeat", "Exact victory node or terminal defeat page")
 			if result != "win":
 				check(Game.state.completedEventIds.is_empty(), "Failure not completed")
 				check(Game.state.flags.is_empty(), "Failure grants no clues")
-				check(Game.node_data().has("choices"), "Failure has an exit")
+				check(Game.is_run_over() and not Game.can_continue(), "Failure ends the adventure")
+				var failed := Game.state.duplicate(true)
+				Game.go_map()
+				check(Game.state == failed and Game.page == "defeat", "Failure cannot return to map")
 			check(Game.save_game() and Game.load_game(), "Restore result node")
 	# Legacy result checkpoints still return to the map; new training cannot surrender.
 	Game.state = Game.initial_state()

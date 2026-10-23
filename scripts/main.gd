@@ -6,6 +6,7 @@ const VIEWS = {
 	"dialogue": preload("res://scenes/dialogue.tscn"),
 	"battle": preload("res://scenes/battle.tscn"),
 	"result": preload("res://scenes/result.tscn"),
+	"defeat": preload("res://scenes/defeat.tscn"),
 	"cyberware": preload("res://scenes/cyberware.tscn"),
 	"card_library": preload("res://scenes/card_library.tscn")
 }
@@ -126,7 +127,7 @@ func _input(event: InputEvent) -> void:
 	if is_instance_valid(card_console): return
 	if preload("res://scripts/card_console.gd").is_toggle_event(event):
 		get_viewport().set_input_as_handled()
-		if Game.config.developmentMode and not Game.battle_busy and not Game.transition_locked:
+		if Game.config.developmentMode and not Game.battle_busy and not Game.transition_locked and not Game.is_run_over():
 			open_card_console()
 		return
 	if Game.transition_locked:
@@ -136,16 +137,17 @@ func _input(event: InputEvent) -> void:
 	if Game.battle_busy:
 		get_viewport().set_input_as_handled()
 		return
-	if event.keycode == KEY_F1 and Game.config.developmentMode and not Game.state.is_empty():
+	if event.keycode == KEY_F1 and Game.config.developmentMode and not Game.state.is_empty() and not Game.is_run_over():
 		toggle_debug()
 		get_viewport().set_input_as_handled()
 	elif event.keycode == KEY_ESCAPE:
 		get_viewport().set_input_as_handled()
 		if is_instance_valid(debug_panel):
 			close_debug()
-		elif Game.page in ["map", "menu", "result", "dialogue"] and view.has_method("handle_escape") and view.handle_escape():
+		elif Game.page in ["map", "menu", "result", "dialogue", "defeat"] and view.has_method("handle_escape") and view.handle_escape():
 			pass
-		elif Game.page == "menu" and not Game.state.is_empty(): Game.resume()
+		elif Game.page == "menu":
+			if not Game.state.is_empty() and Game.can_continue(): Game.resume()
 		else: Game.request_menu()
 	elif is_instance_valid(debug_panel): get_viewport().set_input_as_handled()
 

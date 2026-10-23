@@ -45,6 +45,7 @@
 | 地图事件类型标记（无窗口） | [map_event_types_tests](map/map_event_types_tests.tscn)，覆盖类型映射、混合计数、Boss特效开关及角标点击边界；不含渲染验收 |
 | 战斗类型、冻结与旧档（无窗口） | [battle_type_tests](combat/rules/battle_type_tests.tscn) |
 | 按战斗类型的奖励概率（无窗口） | [card_reward_rates_tests](combat/cards/card_reward_rates_tests.tscn) |
+| 战败终局（无窗口） | [defeat_tests](defeat_tests.tscn)：八场失败、致死落盘、旧档、继续禁用、防绕过、胜利／演练／新局与UI结构；不代替实际渲染验收 |
 | 战斗开局恢复 | [battle_restart_tests](battle_restart_tests.tscn) · [battle_restart_integration](battle_restart_integration.tscn) |
 | 地图科技配置与保存 | [technology_loadout_tests](technology_loadout_tests.tscn) |
 | 新科技效果 | [technology_effects_tests](technology_effects_tests.tscn) · [technology_effects_visual](technology_effects_visual.tscn) |
@@ -78,6 +79,8 @@
 | 机器人 (`combat/enemies/robot`) | [robot_laser_visual](combat/enemies/robot/robot_laser_visual.tscn) · [robot_rules_tests](combat/enemies/robot/robot_rules_tests.tscn) |
 
 ### 战斗：表现与输入
+
+消耗牌特效专项见 [exhaust_fx_tests](combat/presentation/exhaust_fx_tests.tscn)：无窗口检查自身消耗、能力牌、拆卸弹药所选手牌与普通弃牌分流、完整原卡与动态文字的合成结构、选中与输入禁用、过程模型不变、四区守恒、忙碌防重入和正常／切页中途清理。关闭保存并使用专用路径，不调用截图或系统鼠标；不代表实际渲染与审美验收。
 
 角色形态悬停专项见 [stance_hover_tests](combat/presentation/stance_hover_tests.tscn)：无窗口检查双形态说明内容、视口合成悬停命中、人物移动／镜头缩放后范围跟随、选牌／忙碌／弹层隐藏与恢复及模型不变；关闭保存并使用专用路径，不移动系统鼠标，不代表实际渲染或物理鼠标验收。
 
