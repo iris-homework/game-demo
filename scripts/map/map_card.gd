@@ -125,8 +125,9 @@ func _build_detail(accent: Color, name_text: String, state_text: String, desc_te
 		var lock := _label_into(list, lock_text_full, 15, LOCKED)
 		lock.custom_minimum_size = Vector2(0.0, _text_height(lock_text_full, 15, content_w))
 	if events.is_empty():
-		var none := _label_into(list, "此地暂无新的事件。", 16, MUTED)
-		none.custom_minimum_size = Vector2(0.0, 24.0)
+		if not bool(_content.get("resident", false)):
+			var none := _label_into(list, "此地暂无新的事件。", 16, MUTED)
+			none.custom_minimum_size = Vector2(0.0, 24.0)
 		if has_heal:
 			var hint_text := str(healing.get("hint", "可以使用现有服务；进入地点查看区域。"))
 			var hint := _label_into(list, hint_text, 14, MUTED)
@@ -165,7 +166,9 @@ func _build_detail(accent: Color, name_text: String, state_text: String, desc_te
 			heal_button.add_theme_constant_override("icon_max_width",24)
 		footer_y += BUTTON_HEIGHT + 8.0
 	if has_enter:
-		_add_button("进入地点    →", "enter_place", Rect2(PAD, footer_y, inner_w, BUTTON_HEIGHT), false, func(): _emit("enter", ""))
+		var market := str(_content.get("id", "")) == "market"
+		var enter_button := _add_button("进入黑市    →" if market else "进入地点    →", "enter_place", Rect2(PAD, footer_y, inner_w, BUTTON_HEIGHT), market, func(): _emit("enter", ""))
+		if market: enter_button.add_theme_color_override("font_hover_color", DemoUI.INK)
 	_add_button("关闭", "close_place", Rect2(card_width - PAD - 56.0, 12.0, 56.0, 24.0), false, func(): _emit("close", "")).add_theme_font_size_override("font_size", 12)
 
 func _build_preview(accent: Color, name_text: String, state_text: String, desc_text: String, lock_text: String, open: bool, events: Array, inner_w: float, max_h: float, name_h: float, state_h: float) -> void:
@@ -198,7 +201,8 @@ func _build_preview(accent: Color, name_text: String, state_text: String, desc_t
 	_build_header(accent, name_text, state_text, desc_text, lock_text, open, inner_w)
 	var y := header_h
 	if rows.is_empty():
-		_label("此地暂无新的事件。", Vector2(PAD, y), Vector2(inner_w, 22.0), 15, MUTED)
+		if not bool(_content.get("resident", false)):
+			_label("此地暂无新的事件。", Vector2(PAD, y), Vector2(inner_w, 22.0), 15, MUTED)
 	else:
 		for row in rows:
 			var event: Dictionary = row.event
@@ -225,7 +229,8 @@ func _detail_body_height(desc_text: String, lock_text: String, open: bool, event
 	if not open and not lock_text.is_empty():
 		heights.append(_text_height("尚未开放 · " + lock_text, 15, width))
 	if events.is_empty():
-		heights.append(24.0)
+		if not bool(_content.get("resident", false)):
+			heights.append(24.0)
 		if bool(_content.get("has_service", false)):
 			var healing: Dictionary = _content.get("healing_service", {})
 			heights.append(_text_height(str(healing.get("hint", "可以使用现有服务；进入地点查看区域。")), 14, width))

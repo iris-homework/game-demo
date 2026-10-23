@@ -1,0 +1,23 @@
+{
+  "slots": 9,
+  "restockDays": [
+    1,
+    4,
+    7
+  ],
+  "buyPrices": {
+    "B": 50,
+    "A": 100,
+    "S": 150
+  },
+  "sellPrices": {
+    "C": 25,
+    "B": 50,
+    "A": 100,
+    "S": 150
+  },
+  "legacySellPrice": 25,
+  "pricingStatus": "configured",
+  "buyPriceVariation": 10,
+  "pricingVersion": 2
+}

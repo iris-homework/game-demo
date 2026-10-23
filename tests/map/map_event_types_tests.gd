@@ -95,6 +95,24 @@ func _ready() -> void:
 	check(live.selected_id == "junkyard" and is_instance_valid(live.detail), "event detail still opens")
 	check(live.markers.junkyard.has_avatar, "current avatar coexists with boss")
 	check(Game.state == before, "map presentation and selection leave state unchanged")
+	for id in ["market", "mall", "clinic"]:
+		live.select_place(id)
+		var content: Dictionary = live._card_content(id)
+		check(content.resident and not content.state_label.contains("暂无"), "resident header has no empty-event notice " + id)
+		var text := ""
+		for node in live.detail.find_children("*", "Label", true, false): text += node.text
+		check(not text.contains("暂无新的事件"), "resident body has no empty-event notice " + id)
+		if id == "market":
+			var enter: Button = live.detail.find_child("enter_place", true, false)
+			check(enter.text == "进入黑市    →", "market entry has explicit destination")
+			check(enter.get_theme_stylebox("normal").bg_color == DemoUI.PINK, "market entry uses red accent style")
+		if id == "clinic": check(live.detail.find_child("heal_place", true, false) != null, "resident clinic keeps healing action")
+	live.select_place("tower")
+	var ordinary_text := ""
+	for node in live.detail.find_children("*", "Label", true, false): ordinary_text += node.text
+	check(ordinary_text.contains("暂无新的事件"), "ordinary eventless location retains existing notice")
+	check(live.detail.find_child("enter_place", true, false).text == "进入地点    →", "ordinary entry keeps generic label")
+	check(Game.state == before, "resident detail changes do not modify adventure state")
 	live.queue_free()
 	await get_tree().process_frame
 	Game.battles = authored

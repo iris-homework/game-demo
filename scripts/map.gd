@@ -275,8 +275,6 @@ func _notification(what: int) -> void:
 func _build_hud() -> void:
 	map_chrome("城市总览")
 	var deck_button := get_node("current_deck_button") as Button
-	var menu_button := get_node("menu_button") as Button
-	deck_button.position.x = menu_button.position.x - deck_button.size.x - 8.0
 	var technology_button := button(self,"科技配置",Vector2(deck_button.position.x-140,deck_button.position.y),Vector2(132,44),Game.open_technology_loadout)
 	technology_button.name = "technology_loadout_button"
 
@@ -529,6 +527,7 @@ func _card_content(id: String) -> Dictionary:
 	var place := Game.place_data(id)
 	var state := _place_state(id)
 	var open := bool(state.open)
+	var resident := bool(place.get("mapDisplay", {}).get("resident", false))
 	var available: Array = state.available if state.available is Array else []
 	var labels: Array = []
 	if bool(state.current):
@@ -538,7 +537,7 @@ func _card_content(id: String) -> Dictionary:
 	if not open:
 		labels.append("尚未开放")
 	elif available.is_empty():
-		labels.append("已完成" if bool(state.completed) else "暂无新事件")
+		labels.append("常驻地点" if resident else ("已完成" if bool(state.completed) else "暂无新事件"))
 	else:
 		labels.append("可接委托")
 	var accent := Color("c9d3e0")
@@ -559,7 +558,7 @@ func _card_content(id: String) -> Dictionary:
 		})
 	var service := Game.healing_service(id)
 	return {
-		"id": id, "name": str(place.get("name", id)), "accent": accent,
+		"id": id, "name": str(place.get("name", id)), "accent": accent, "resident": resident,
 		"state_label": " · ".join(labels), "description": str(place.get("description", "")),
 		"lock_hint": str(place.get("lockHint", "")), "open": open,
 		"events": rows, "has_service": not service.is_empty(), "healing_service": service,

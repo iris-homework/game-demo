@@ -303,5 +303,9 @@
       0,
       0
     ]
+  },
+  "black_market_shop": {
+    "path": "res://assets/market/black-market-shop-v1.png",
+    "kind": "background"
   }
 }

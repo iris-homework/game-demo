@@ -61,7 +61,10 @@ func swap_view() -> void:
 	if is_instance_valid(view):
 		remove_child(view)
 		view.queue_free()
-	view = VIEWS.get(Game.page,VIEWS.menu).instantiate()
+	if Game.page == "place" and Game.state.get("currentPlaceId") == "market":
+		view = preload("res://scenes/black_market.tscn").instantiate()
+	else:
+		view = VIEWS.get(Game.page,VIEWS.menu).instantiate()
 	shown_page = Game.page
 	add_child(view)
 
@@ -144,7 +147,7 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		if is_instance_valid(debug_panel):
 			close_debug()
-		elif Game.page in ["map", "menu", "result", "dialogue", "defeat"] and view.has_method("handle_escape") and view.handle_escape():
+		elif Game.page in ["map", "menu", "place", "result", "dialogue", "defeat"] and view.has_method("handle_escape") and view.handle_escape():
 			pass
 		elif Game.page == "menu":
 			if not Game.state.is_empty() and Game.can_continue(): Game.resume()

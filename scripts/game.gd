@@ -37,6 +37,8 @@ var item_catalog: Dictionary
 var prototype_rules: Dictionary
 var reward_rules: Dictionary
 var card_reward_rates: Dictionary
+var black_market_model := preload("res://scripts/black_market_model.gd").new()
+var black_market_rules: Dictionary
 var card_reward_sampler := preload("res://scripts/card_reward_sampler.gd").new()
 var noren_rules: Dictionary
 var map_config: Dictionary
@@ -74,6 +76,7 @@ func _ready() -> void:
 	prototype_rules.cyberware = read_data("prototype/cyberware.json")
 	reward_rules = read_data("prototype/rewards.json")
 	card_reward_rates = read_data("card_reward_rates.json")
+	black_market_rules = read_data("black_market.json")
 	reward_rules.cards.merge(card_catalog, true)
 	noren_rules = read_data("combat/noren.json")
 	player_characters = read_data("player_characters.json")
@@ -201,8 +204,9 @@ func initial_state(player_id: String = "") -> Dictionary:
 	if player_id.is_empty(): player_id = config.defaultPlayerCharacterId
 	if not valid_player_character(player_id): return {}
 	var hp := int(player_characters[player_id].attributes.maxHp)
-	var fresh := {"schemaVersion":2, "playerCharacterId":player_id, "ownedCyberwareIds":player_characters[player_id].get("cyberwareIds", []).duplicate(), "equippedCyberwareIds":player_characters[player_id].get("cyberwareIds", []).duplicate(), "currentWeek":1, "currentDay":int(config.initialDay), "currentHp":hp, "maxHp":hp, "combat":{}, "battleStart":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "dialogueHistory":[], "battleId":"", "result":"", "battleHistory":[], "deck":[], "battleReward":{}, "portraits":{"left":PLAYER_REFERENCE, "right":"bartender"}, "refreshedEventIds":[]}
+	var fresh := {"schemaVersion":2, "playerCharacterId":player_id, "ownedCyberwareIds":player_characters[player_id].get("cyberwareIds", []).duplicate(), "equippedCyberwareIds":player_characters[player_id].get("cyberwareIds", []).duplicate(), "currentWeek":1, "currentDay":int(config.initialDay), "currentHp":hp, "maxHp":hp, "combat":{}, "battleStart":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "dialogueHistory":[], "battleId":"", "result":"", "battleHistory":[], "deck":[], "removedStartingCards":[], "battleReward":{}, "portraits":{"left":PLAYER_REFERENCE, "right":"bartender"}, "refreshedEventIds":[]}
 	refresh_event_pool(fresh)
+	black_market_model.refresh(fresh, card_catalog, black_market_rules)
 	return fresh
 
 func new_game(player_id: String = "") -> void:
@@ -373,6 +377,7 @@ func texture(id: String) -> Texture2D:
 
 func checkpoint() -> void:
 	refresh_event_pool()
+	if not training_mode: black_market_model.refresh(state, card_catalog, black_market_rules)
 	revision += 1
 	if save_enabled and not training_mode: save_game()
 	page = state.currentScene
@@ -456,6 +461,7 @@ func apply_actions(actions: Array) -> bool:
 			_:
 				push_error("Rejected action: " + str(a))
 				return false
+	if not training_mode: black_market_model.refresh(draft, card_catalog, black_market_rules)
 	state = draft
 	return true
 
@@ -643,7 +649,12 @@ func save_game() -> bool:
 		return false
 	file.store_string(JSON.stringify(saved, "\t"))
 	file.flush()
+	var write_error := file.get_error()
 	file.close()
+	if write_error != OK:
+		last_error = "保存检查点写入失败：" + str(write_error)
+		notice.emit(last_error)
+		return false
 	# Keep the previous valid snapshot for recovery from interruption/corruption.
 	if FileAccess.file_exists(save_path):
 		DirAccess.copy_absolute(save_path, save_path + ".bak")
@@ -678,6 +689,8 @@ func valid_save(s) -> bool:
 	if not s.completedEventIds is Array or not s.flags is Dictionary or not s.choiceHistory is Dictionary or not s.portraits is Dictionary: return false
 	if not s.claimedRewardIds is Array or not s.battleHistory is Array: return false
 	if not s.deck is Array or not s.battleReward is Dictionary: return false
+	if not valid_removed_starting_cards(s): return false
+	if not black_market_model.valid(s.get("blackMarket"), card_catalog, black_market_rules): return false
 	if not s.get("dialogueHistory", []) is Array: return false
 	for entry in s.get("dialogueHistory", []):
 		if not entry is Dictionary: return false
@@ -727,8 +740,14 @@ func load_game() -> bool:
 		if not valid_save(data): continue
 		restart_unfinished_battle(data)
 		refresh_event_pool(data)
+		var previous_state := state
 		state = data
 		state.credits = int(state.credits)
+		# Persist newly generated legacy/stale stock so reloading cannot reroll it.
+		if save_enabled and data.get("blackMarket") != parser.data.get("blackMarket"):
+			if not save_game():
+				state = previous_state
+				return false
 		if state.dialogueHistory.is_empty() and state.currentScene == "dialogue": record_dialogue()
 		page = state.currentScene
 		revision += 1
@@ -811,9 +830,8 @@ func initialize_combat() -> void:
 	rules.playerSkills = player.skills.duplicate(true)
 	rules.playerCyberwareIds = equipped_cyberware_ids()
 	rules.cyberware = player_cyberware()
-	rules.deck = player.startingDeck.duplicate()
+	rules.deck = full_deck_ids()
 	rules.cards.merge(reward_rules.cards, false)
-	rules.deck.append_array(state.deck)
 	model.initialize(state.battleId, int(state.currentHp), int(state.maxHp), rules, definitions, card_catalog)
 	state.combat = model.snapshot()
 	# Capture after the initial shuffle, before the first draw; never reroll on resume.
@@ -932,6 +950,7 @@ func start_training(battle_id: String = "B04") -> void:
 	var fresh := initial_state(player_character_id())
 	if fresh.is_empty(): return
 	fresh.deck = state.get("deck", []).duplicate()
+	fresh.removedStartingCards = state.get("removedStartingCards", []).duplicate()
 	if valid_technology_loadout(state.get("equippedCyberwareIds"), player_character_id()):
 		fresh.equippedCyberwareIds = equipped_cyberware_ids()
 	training_backup = state.duplicate(true)
@@ -1044,6 +1063,8 @@ func migrate_save(data):
 		data.combat = {}
 		data.battleStart = {}
 		data.inventory = {}
+	if not data.has("removedStartingCards"): data.removedStartingCards = []
+	black_market_model.refresh(data, card_catalog, black_market_rules)
 	migrate_mercenary_story(data)
 	# Keep an existing draw across reloads; legacy saves get a pool without
 	# retroactively charging days for events they completed before this rule.
@@ -1244,10 +1265,98 @@ func valid_cyberware_state(c: Dictionary) -> bool:
 			if cooldown_limits[id] != 1: return false
 	return bonus <= maximum
 
+func valid_removed_starting_cards(subject: Dictionary) -> bool:
+	var removed = subject.get("removedStartingCards")
+	if not removed is Array: return false
+	var available: Array = player_characters.get(subject.get("playerCharacterId", ""), {}).get("startingDeck", []).duplicate()
+	for id in removed:
+		if not id is String or not id in available: return false
+		available.erase(id)
+	return true
+
+func full_deck_ids(subject: Dictionary = {}) -> Array:
+	var source: Dictionary = state if subject.is_empty() else subject
+	var player_id: String = source.get("playerCharacterId", config.defaultPlayerCharacterId)
+	var ids: Array = player_characters.get(player_id, {}).get("startingDeck", []).duplicate()
+	for id in source.get("removedStartingCards", []): ids.erase(id)
+	ids.append_array(source.get("deck", []))
+	return ids
+
+func market_buy_price(card_id: String) -> int:
+	return black_market_model.price(card_catalog.get(card_id, {}), black_market_rules)
+
+func market_sell_price(card_id: String) -> int:
+	var definition: Dictionary = card_catalog.get(card_id, reward_rules.cards.get(card_id, prototype_rules.cards.get(card_id, {})))
+	if not definition.is_empty() and definition.get("rarity", "") not in ["C", "B", "A", "S"]:
+		return int(black_market_rules.get("legacySellPrice", 25))
+	return black_market_model.price(definition, black_market_rules, false)
+
+func black_market_state() -> Dictionary:
+	return state.get("blackMarket", {}).duplicate(true)
+
+func ensure_black_market() -> bool:
+	if state.is_empty() or training_mode or transition_locked or battle_busy: return false
+	var draft := state.duplicate(true)
+	if not black_market_model.refresh(draft, card_catalog, black_market_rules):
+		return black_market_model.valid(state.get("blackMarket"), card_catalog, black_market_rules)
+	return _commit_market(draft)
+
+func _market_reject(message: String) -> bool:
+	last_error = message
+	notice.emit(message)
+	return false
+
+func _market_can_trade(expected_revision: int) -> bool:
+	if state.is_empty() or page != "place" or state.get("currentScene") != "place" or state.get("currentPlaceId") != "market":
+		return _market_reject("请先进入黑市。")
+	if training_mode or transition_locked or battle_busy or is_run_over(): return _market_reject("当前无法交易。")
+	if expected_revision != revision: return _market_reject("黑市状态已更新，请重新选择。")
+	var stock = state.get("blackMarket")
+	if not black_market_model.valid(stock, card_catalog, black_market_rules): return _market_reject("黑市库存无效。")
+	if stock.week != state.currentWeek or stock.restockDay != black_market_model.period(int(state.currentDay), black_market_rules):
+		return _market_reject("黑市已到补货时间，请重新进入。")
+	return true
+
+func _commit_market(draft: Dictionary) -> bool:
+	var previous := state
+	state = draft
+	if save_enabled and not save_game():
+		state = previous
+		return false
+	revision += 1
+	last_error = ""
+	status_changed.emit()
+	return true
+
+func buy_market_card(index: int, expected_revision: int) -> bool:
+	if not _market_can_trade(expected_revision): return false
+	if index < 0 or index >= state.blackMarket.slots.size(): return _market_reject("无效的商品位置。")
+	var slot: Dictionary = state.blackMarket.slots[index]
+	if slot.sold: return _market_reject("这张卡牌已经售罄。")
+	if state.credits < slot.price: return _market_reject("信用点不足。")
+	var draft := state.duplicate(true)
+	draft.credits -= int(slot.price)
+	draft.deck.append(slot.cardId)
+	draft.blackMarket.slots[index].sold = true
+	return _commit_market(draft)
+
+func sell_market_card(card_id: String, expected_revision: int) -> bool:
+	if not _market_can_trade(expected_revision): return false
+	if state.blackMarket.soldCardUsed: return _market_reject("本轮已出售过卡牌，补货后可再次出售。")
+	if not card_id in full_deck_ids(): return _market_reject("当前卡组没有这张卡牌。")
+	var price := market_sell_price(card_id)
+	if price <= 0: return _market_reject("这张卡牌暂不支持回收。")
+	var draft := state.duplicate(true)
+	# Added copies are removed first; otherwise record one removed starting copy.
+	if card_id in draft.deck: draft.deck.erase(card_id)
+	else: draft.removedStartingCards.append(card_id)
+	draft.credits += price
+	draft.blackMarket.soldCardUsed = true
+	return _commit_market(draft)
+
 func owned_card_counts() -> Dictionary:
 	var counts := {}
-	var ids: Array = player_definition().get("startingDeck", []).duplicate()
-	ids.append_array(state.get("deck", []))
+	var ids := full_deck_ids()
 	for id in ids: counts[id] = int(counts.get(id, 0)) + 1
 	return counts
 

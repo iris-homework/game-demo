@@ -179,7 +179,7 @@ func background(id: String, darkness: float = 0.3) -> void:
 		label(self, "场景美术待补 / " + Game.place_data(Game.state.get("currentPlaceId", "")).get("name", ""), Vector2(64,828), Vector2(650,27), 15, MUTED)
 
 ## 冒险页面共用紧凑状态栏；战斗隐藏日期，将中央留给回合信息。
-func status_bar(section: String, show_days: bool = true, weeks_action: Callable = Callable(), show_credits: bool = true) -> void:
+func status_bar(section: String, show_days: bool = true, weeks_action: Callable = Callable(), show_credits: bool = true, reserve_action_slot: bool = false) -> void:
 	rect(self, Vector2.ZERO, Vector2(1440.0, 76.0), Color("070e19ee"))
 	rect(self, Vector2(0.0, 75.0), Vector2(1440.0, 1.0), Color("2f6178"))
 	label(self, Game.display_name(Game.PLAYER_REFERENCE) + " / " + section, Vector2(24.0, 8.0), Vector2(320.0, 26.0), 19, CREAM)
@@ -212,6 +212,8 @@ func status_bar(section: String, show_days: bool = true, weeks_action: Callable 
 	deck_button.disabled = Game.state.is_empty()
 	var menu_button := button(self, "退出演练" if Game.training_mode else "菜单", Vector2(1248.0, 16.0), Vector2(140.0, 44.0), Game.request_menu)
 	menu_button.name = "menu_button"
+	if not reserve_action_slot and not weeks_action.is_valid():
+		deck_button.position.x = menu_button.position.x - deck_button.size.x - 8.0
 	if not Game.training_mode and Game.state.get("currentScene") == "battle" and not Game.state.get("battleStart", {}).is_empty():
 		menu_button.tooltip_text = "返回主菜单；未结束的战斗再次继续时，从本场开局重来。"
 	hp_bar_width = 166.0
@@ -219,8 +221,8 @@ func status_bar(section: String, show_days: bool = true, weeks_action: Callable 
 	if not Game.status_changed.is_connected(refresh_hp):
 		Game.status_changed.connect(refresh_hp)
 
-func map_chrome(section: String, weeks_action: Callable = Callable()) -> void:
-	status_bar(section, true, weeks_action)
+func map_chrome(section: String, weeks_action: Callable = Callable(), reserve_action_slot: bool = false) -> void:
+	status_bar(section, true, weeks_action, true, reserve_action_slot)
 
 func chrome(section: String, show_days: bool = true) -> void:
 	status_bar(section, show_days)

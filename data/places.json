@@ -410,7 +410,7 @@
     "id": "market",
     "name": "黑市",
     "backgroundAssetId": "market",
-    "description": "隐藏在城寨里的交易场所。商品、卡牌和交易规则待设计。",
+    "description": "隐藏在城寨里的卡牌黑市。出售九张非C级卡牌，每批可回收一张旧牌；第1、4、7天开始时全部补货。",
     "mapAnchor": [
       0.182,
       0.77

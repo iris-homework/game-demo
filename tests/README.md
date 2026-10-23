@@ -1,5 +1,7 @@
 # 测试目录索引
 
+黑市交易专项：[black_market_tests](market/black_market_tests.tscn)127项（库存、日期、买卖、存读／迁移、实际删牌、演练、失败回滚、浮动价冻结及价格版本原地迁移）；[market_ui_tests](market/market_ui_tests.tscn)97项（真实主场景路由、两行货架、确认／取消、余额、售罄、出售选择、Tab／Esc／F1隔离、HUD和第4天刷新）。均headless运行，仅写专项路径，不能代表实际像素或物理鼠标验收。证据：`artifacts/qa/black-market-2026-10-23/`。
+
 有／无人物版卡面专项：[card_face_style_tests](card_face_style_tests.tscn)。以隔离用户目录及独立偏好／存档路径headless运行，覆盖两套80张实图、菜单按钮双向切换、持久化重读、无效偏好、失败写盘、模态／焦点／锁、浏览与放大复用、40牌×2形态×2风格的动态排版及快照不变。不能代替实际像素和物理输入验收；本轮结果见`artifacts/qa/card-face-style-2026-10-23/`。
 
 十种已发布敌人的菜单演练专项：[published_training_tests](combat/enemies/published_training_tests.tscn)，在隔离复制工程中headless运行；覆盖十选择、真实战斗视图及攻击回调、咬击／射击演出、胜负与退出恢复、临时注册清理、存档哨兵、原三入口及模态焦点／Esc／锁定。只验证逻辑和节点时序，不替代像素渲染或真实鼠标验收，不启动桌面窗口。
