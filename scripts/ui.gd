@@ -6,10 +6,12 @@ const PINK := Color("ff3158")
 const CYAN := Color("64ffe1")
 const CREAM := Color("f5f3eb")
 const MUTED := Color("a7b0be")
+const CREDIT_ICON := preload("res://assets/icons/ui/credits.svg")
 var base_font: Font
 var button_font: FontVariation
 var hp_fill: ColorRect
 var hp_label: Label
+var credits_label: Label
 var hp_bar_width := 166.0
 
 func _init() -> void:
@@ -143,6 +145,18 @@ func image_asset(parent: Node, id: String, pos: Vector2, dimensions: Vector2, co
 	parent.add_child(n)
 	return n
 
+func credit_icon(parent: Node, pos: Vector2, dimensions: Vector2) -> TextureRect:
+	var n := TextureRect.new()
+	n.name = "credit_icon"
+	n.texture = CREDIT_ICON
+	n.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	n.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	n.position = pos
+	n.size = dimensions
+	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(n)
+	return n
+
 func background(id: String, darkness: float = 0.3) -> void:
 	rect(self, Vector2.ZERO, Vector2(1440,900), INK)
 	if image_asset(self, id, Vector2.ZERO, Vector2(1440,900)) == null:
@@ -172,8 +186,9 @@ func status_bar(section: String, show_days: bool = true, weeks_action: Callable 
 	panel(self, Vector2(24.0, 46.0), Vector2(170.0, 12.0), Color("382333"), Color("805071"))
 	hp_fill = rect(self, Vector2(26.0, 48.0), Vector2(166.0, 8.0), PINK)
 	hp_label = label(self, "", Vector2(202.0, 34.0), Vector2(126.0, 28.0), 16, CREAM)
-	label(self, "%d CR" % int(Game.state.get("credits", 0)), Vector2(340.0, 12.0), Vector2(116.0, 30.0), 20, CREAM)
-	label(self, "信用点", Vector2(340.0, 44.0), Vector2(116.0, 20.0), 12, MUTED)
+	credit_icon(self, Vector2(340.0, 21.0), Vector2(34.0, 34.0))
+	credits_label = label(self, "", Vector2(384.0, 12.0), Vector2(170.0, 30.0), 20, CREAM)
+	label(self, "信用点", Vector2(384.0, 44.0), Vector2(170.0, 20.0), 12, MUTED)
 	if show_days:
 		# Keep the date centered on the canvas, independent of the fields to its left.
 		var day := clampi(int(Game.state.get("currentDay", 1)), 1, 7)
@@ -211,6 +226,8 @@ func chrome(section: String, show_days: bool = true) -> void:
 		label(self,"● 自动保存    /    F1 开发面板",Vector2(1100,859),Vector2(310,27),12,MUTED)
 
 func refresh_hp() -> void:
+	if is_instance_valid(credits_label):
+		credits_label.text = "%d" % int(Game.state.get("credits", 0))
 	if not is_instance_valid(hp_fill): return
 	var maximum := int(Game.state.get("maxHp",100))
 	var hp := int(Game.state.get("currentHp",100))

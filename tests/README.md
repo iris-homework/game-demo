@@ -101,7 +101,7 @@
 | 分类 | 套件 |
 | --- | --- |
 | 角色与科技 (`characters`) | [character_cyberware_tests](characters/character_cyberware_tests.tscn) · [character_cyberware_visual](characters/character_cyberware_visual.tscn) · [cyberware_tests](characters/cyberware_tests.tscn) · [cyberware_visual](characters/cyberware_visual.tscn) · [player_character_tests](characters/player_character_tests.tscn) · [player_character_visual](characters/player_character_visual.tscn) |
-| 地图 (`map`) | [map_config_tests](map/map_config_tests.tscn) · [map_input_stability](map/map_input_stability.tscn) · [map_model_tests](map/map_model_tests.tscn) · [map_visual](map/map_visual.tscn) · [map_zoom_visual](map/map_zoom_visual.tscn) |
+| 地图 (`map`) | [clinic_payment_tests](map/clinic_payment_tests.tscn) · [map_config_tests](map/map_config_tests.tscn) · [map_input_stability](map/map_input_stability.tscn) · [map_model_tests](map/map_model_tests.tscn) · [map_visual](map/map_visual.tscn) · [map_zoom_visual](map/map_zoom_visual.tscn) |
 | 剧情 (`story`) | [dialogue_click_visual](story/dialogue_click_visual.tscn) · [dialogue_history_tests](story/dialogue_history_tests.tscn) · [dialogue_skip_tests](story/dialogue_skip_tests.tscn) · [dialogue_skip_visual](story/dialogue_skip_visual.tscn) · [mercenary_tests](story/mercenary_tests.tscn) · [mercenary_visual](story/mercenary_visual.tscn) · [run](story/run.tscn) |
 | 主菜单 (`menu`) | [menu_visual](menu/menu_visual.tscn) |
 

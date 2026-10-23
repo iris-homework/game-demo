@@ -63,7 +63,8 @@ func _ready() -> void:
 		check(Game.page == "place" and Game.state.currentPlaceId == p.id, "initial visit succeeds " + p.id)
 	check(not Game.start_event("E12"), "open places do not bypass story prerequisites")
 	Game.state.currentHp = 50
-	check(Game.heal_at("clinic") and Game.state.currentHp == 80, "clinic service available before E01")
+	Game.state.credits = 150
+	check(Game.heal_at("clinic") and Game.state.currentHp == 80 and Game.state.credits == 0, "clinic service available before E01 at configured price")
 	var last_place: String = Game.state.currentPlaceId
 	Game.visit("unknown")
 	check(Game.state.currentPlaceId == last_place, "unknown location still rejected")

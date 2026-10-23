@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>信用点 · 芯片币</title>
+  <!-- Transparent, cut-corner token; the open C and paired circuit contacts remain legible at HUD scale. -->
+  <path d="M35 6H93L122 35V93L93 122H35L6 93V35Z" fill="#0b1520" stroke="#ffda83" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M39 17H89L111 39V89L89 111H39L17 89V39Z" fill="#302c22" stroke="#9e8046" stroke-width="2"/>
+  <path d="M86 43L76 34H50L35 49V79L50 94H76L86 85" fill="none" stroke="#ffda83" stroke-width="11" stroke-linecap="square" stroke-linejoin="bevel"/>
+  <path d="M55 23V35M68 23V35M55 93V105M68 93V105" fill="none" stroke="#ffda83" stroke-width="5"/>
+  <path d="M76 59H99V69H76Z" fill="#64ffe1"/>
+</svg>

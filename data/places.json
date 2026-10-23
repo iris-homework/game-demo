@@ -473,7 +473,7 @@
     "id": "clinic",
     "name": "地下诊所",
     "backgroundAssetId": "clinic",
-    "description": "蜂巢城寨内不起眼的小诊所。原型治疗每次回复 30% 最大生命；正式费用与限制待设计。",
+    "description": "蜂巢城寨内不起眼的小诊所。支付 150 信用点，每次回复 30% 最大生命值。",
     "mapAnchor": [
       0.329,
       0.739
@@ -489,7 +489,8 @@
       {
         "id": "heal",
         "type": "healHpPercent",
-        "percent": 0.3
+        "percent": 0.3,
+        "creditsCost": 150
       }
     ],
     "mapDisplay": {

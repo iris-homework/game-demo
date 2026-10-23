@@ -80,6 +80,7 @@ func _build() -> void:
 
 func _build_detail(accent: Color, name_text: String, state_text: String, desc_text: String, lock_text: String, open: bool, events: Array, inner_w: float, max_h: float, name_h: float, state_h: float) -> void:
 	var has_heal := open and bool(_content.get("has_service", false))
+	var healing: Dictionary = _content.get("healing_service", {})
 	var has_enter := open
 	var footer_h := 14.0
 	if has_heal:
@@ -126,9 +127,10 @@ func _build_detail(accent: Color, name_text: String, state_text: String, desc_te
 	if events.is_empty():
 		var none := _label_into(list, "此地暂无新的事件。", 16, MUTED)
 		none.custom_minimum_size = Vector2(0.0, 24.0)
-		if bool(_content.get("has_service", false)):
-			var hint := _label_into(list, "可以使用现有服务；进入地点查看区域。", 14, MUTED)
-			hint.custom_minimum_size = Vector2(0.0, 22.0)
+		if has_heal:
+			var hint_text := str(healing.get("hint", "可以使用现有服务；进入地点查看区域。"))
+			var hint := _label_into(list, hint_text, 14, MUTED)
+			hint.custom_minimum_size = Vector2(0.0, _text_height(hint_text, 14, content_w))
 	else:
 		var head := _label_into(list, "可用事件", 15, accent)
 		head.custom_minimum_size = Vector2(0.0, 20.0)
@@ -154,7 +156,13 @@ func _build_detail(accent: Color, name_text: String, state_text: String, desc_te
 	add_child(strip)
 	var footer_y := height - footer_h + 6.0
 	if has_heal:
-		_add_button("治疗 · 回复 30% 最大 HP", "heal_place", Rect2(PAD, footer_y, inner_w, BUTTON_HEIGHT), false, func(): _emit("heal", ""))
+		var heal_button := _add_button(str(healing.get("label", "治疗")), "heal_place", Rect2(PAD, footer_y, inner_w, BUTTON_HEIGHT), false, func(): _emit("heal", ""))
+		heal_button.disabled = not bool(healing.get("can_heal", false))
+		heal_button.tooltip_text = str(healing.get("hint", ""))
+		if int(healing.get("credits_cost", 0)) > 0:
+			heal_button.icon = DemoUI.CREDIT_ICON
+			heal_button.expand_icon = true
+			heal_button.add_theme_constant_override("icon_max_width",24)
 		footer_y += BUTTON_HEIGHT + 8.0
 	if has_enter:
 		_add_button("进入地点    →", "enter_place", Rect2(PAD, footer_y, inner_w, BUTTON_HEIGHT), false, func(): _emit("enter", ""))
@@ -220,7 +228,8 @@ func _detail_body_height(desc_text: String, lock_text: String, open: bool, event
 	if events.is_empty():
 		heights.append(24.0)
 		if bool(_content.get("has_service", false)):
-			heights.append(22.0)
+			var healing: Dictionary = _content.get("healing_service", {})
+			heights.append(_text_height(str(healing.get("hint", "可以使用现有服务；进入地点查看区域。")), 14, width))
 	else:
 		heights.append(20.0)
 		for event in events:

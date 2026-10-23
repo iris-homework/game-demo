@@ -23,8 +23,7 @@ func _ready() -> void:
 	label(self,"REWARDS / 02",Vector2(1040,320),Vector2(195,28),14,CYAN)
 
 	var credits := cut_panel(self,Vector2(214,371),Vector2(1012,128),Color("172025"),Color("655a3f"),18)
-	cut_panel(credits,Vector2(24,23),Vector2(78,78),Color("302c22"),GOLD,14)
-	label(credits,"CR",Vector2(36,41),Vector2(63,39),28,GOLD)
+	credit_icon(credits,Vector2(24,23),Vector2(78,78))
 	label(credits,"信用点",Vector2(130,19),Vector2(350,32),19,MUTED)
 	label(credits,"+1,000",Vector2(126,53),Vector2(380,60),42,GOLD)
 	label(credits,"✓  已到账",Vector2(819,49),Vector2(175,37),21,GOLD)

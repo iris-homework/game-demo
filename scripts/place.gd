@@ -33,8 +33,16 @@ func _ready() -> void:
 			y += 275
 		else: y += 205
 	content.custom_minimum_size.y = y
-	if not p.get("services",[]).is_empty():
-		button(self,"治疗 · 回复 30% 最大 HP",Vector2(69,605),Vector2(460,63),func(): Game.heal_at(p.id),true)
-		label(self,"原型验证：免费；不推进日期；生命回复至上限。",Vector2(69,675),Vector2(650,30),16,CYAN)
-	button(self, "← 返回城市地图", Vector2(69,710), Vector2(290,61), Game.go_map)
+	var service := Game.healing_service(p.id)
+	if not service.is_empty():
+		var heal_button := button(self,service.label,Vector2(69,605),Vector2(460,63),func(): Game.heal_at(p.id),true)
+		heal_button.name = "heal_place"
+		heal_button.disabled = not service.can_heal
+		heal_button.tooltip_text = service.hint
+		if service.credits_cost > 0:
+			heal_button.icon = DemoUI.CREDIT_ICON
+			heal_button.expand_icon = true
+			heal_button.add_theme_constant_override("icon_max_width",24)
+		label(self,service.hint,Vector2(69,673),Vector2(650,44),16,CYAN).name = "healing_hint"
+	button(self, "← 返回城市地图", Vector2(69,744 if not service.is_empty() else 710), Vector2(290,61), Game.go_map).name = "return_map"
 	fade_in()

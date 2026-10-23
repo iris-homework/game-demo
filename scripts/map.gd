@@ -556,12 +556,12 @@ func _card_content(id: String) -> Dictionary:
 			"description": str(event.get("description", "")),
 			"optional": bool(event.get("optional", false)),
 		})
-	var services: Array = state.services if state.services is Array else []
+	var service := Game.healing_service(id)
 	return {
 		"id": id, "name": str(place.get("name", id)), "accent": accent,
 		"state_label": " · ".join(labels), "description": str(place.get("description", "")),
 		"lock_hint": str(place.get("lockHint", "")), "open": open,
-		"events": rows, "has_service": not services.is_empty(),
+		"events": rows, "has_service": not service.is_empty(), "healing_service": service,
 	}
 
 func _place_card(card: Control, id: String) -> void:

@@ -728,18 +728,49 @@ func commit_combat(model: CombatModel) -> void:
 	if save_enabled and not training_mode: save_game()
 	status_changed.emit()
 
+func healing_service(place_id: String) -> Dictionary:
+	# Views and commits consume the same authored price, percentage and availability.
+	var p := place_data(place_id)
+	for service in p.get("services", []):
+		if not service is Dictionary or service.get("type", "") != "healHpPercent": continue
+		var percent_value = service.get("percent", -1)
+		var cost_value = service.get("creditsCost", 0)
+		if not (percent_value is int or percent_value is float) or not (cost_value is int or cost_value is float): return {}
+		var percent := float(percent_value)
+		var cost := int(cost_value)
+		if not is_finite(percent) or percent <= 0.0 or percent > 1.0 or cost_value != cost or cost < 0: return {}
+		var amount := mini(int(state.get("maxHp", 0)) - int(state.get("currentHp", 0)), roundi(int(state.get("maxHp", 0)) * percent))
+		var reason := ""
+		if int(state.get("currentHp", 0)) >= int(state.get("maxHp", 0)):
+			reason = "生命值已满，无需治疗"
+		elif amount <= 0:
+			reason = "当前生命值无法恢复"
+		elif int(state.get("credits", 0)) < cost:
+			reason = "信用点不足（需要 %d）" % cost
+		var price := "%d 信用点" % cost if cost > 0 else "免费"
+		var label_text := "治疗 %d%% · %s" % [roundi(percent * 100.0), price]
+		var hint := "回复 %d%% 最大生命值；%s；不推进日期。" % [roundi(percent * 100.0), price]
+		if not reason.is_empty(): hint += "\n" + reason + "。"
+		return {"percent":percent, "credits_cost":cost, "amount":amount, "can_heal":reason.is_empty(), "reason":reason, "label":label_text, "hint":hint}
+	return {}
+
 func heal_at(place_id: String) -> bool:
 	if transition_locked or battle_busy or not state.currentScene in ["map", "place"]: return false
-	var p := place_data(place_id)
-	if p.is_empty(): return false
-	for service in p.get("services", []):
-		if service.type == "healHpPercent":
-			var previous := int(state.currentHp)
-			if not apply_actions([{"op":"healHpPercent", "percent":service.percent}]): return false
-			checkpoint()
-			notice.emit("生命恢复 +%d  /  %d HP" % [int(state.currentHp)-previous, state.maxHp])
-			return true
-	return false
+	var service := healing_service(place_id)
+	if service.is_empty(): return false
+	if not service.can_heal:
+		notice.emit(service.reason)
+		return false
+	var previous := int(state.currentHp)
+	var actions: Array = [
+		{"op":"spendCredits", "amount":service.credits_cost},
+		{"op":"healHpPercent", "percent":service.percent},
+	]
+	if not apply_actions(actions): return false
+	checkpoint()
+	var payment := "支付 %d 信用点 · " % service.credits_cost if service.credits_cost > 0 else ""
+	notice.emit(payment + "生命恢复 +%d  /  %d HP" % [int(state.currentHp)-previous, state.maxHp])
+	return true
 
 func training_scenery_choices() -> Array[Dictionary]:
 	var choices: Array[Dictionary] = [{"id":"", "name":"默认场景（后巷）"}]
