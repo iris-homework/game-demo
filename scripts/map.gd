@@ -23,6 +23,7 @@ const DRAG_THRESHOLD := 6.0
 const MAP_VIEW := Rect2(0.0, HUD_HEIGHT, 1440.0, 824.0)
 const ZOOM_BAR := Rect2(1120.0, 846.0, 304.0, 44.0)
 const GOLD := Color("ffdb72")
+const EVENT_COLORS := {"normal": Color("ffdb72"), "elite": Color("ff465c"), "boss": Color("ff58e6")}
 
 ## 治疗会触发 checkpoint 让整页重建；只在治疗前设置，新视图消费或失败时清空。
 static var pending_selection_id := ""
@@ -307,6 +308,7 @@ func _build_markers() -> void:
 			"avatar_side": spec.avatar_side, "avatar_texture": spec.avatar_texture,
 			"avatar_crop": spec.avatar_crop,
 			"badges": spec.badges, "font": base_font, "tooltip": spec.tooltip,
+			"boss_effect": spec.boss_effect,
 		})
 		marker.chosen.connect(_on_marker_chosen)
 		marker.hover_changed.connect(_on_marker_hover)
@@ -331,8 +333,6 @@ func _build_markers() -> void:
 func _make_spec(place: Dictionary, avatar_texture: Texture2D) -> Dictionary:
 	var id := str(place.get("id", ""))
 	var state := _place_state(id)
-	var main_events: Array = state.main_events if state.main_events is Array else []
-	var optional_events: Array = state.optional_events if state.optional_events is Array else []
 	var available: Array = state.available if state.available is Array else []
 	var open := bool(state.open)
 	var current := bool(state.current)
@@ -357,26 +357,25 @@ func _make_spec(place: Dictionary, avatar_texture: Texture2D) -> Dictionary:
 	if not open:
 		accent = Color("a7b6ca")
 		symbol_tint = Color("a7b6ca")
-	elif target:
-		accent = GOLD
-		symbol_tint = Color("fff0bf")
 	elif current:
 		accent = Color("7af4ff")
 		symbol_tint = Color("d8fcff")
-	elif not main_events.is_empty():
-		accent = Color("83dce5")
-	elif not optional_events.is_empty():
-		accent = Color("a8e3eb")
 	if open and completed and available.is_empty():
 		symbol_tint = Color("d8e4ef")
 	var badges: Array = []
+	var boss_effect := false
 	if not open:
 		badges.append({"kind": "lock", "count": 0, "color": accent})
 	else:
-		if not main_events.is_empty():
-			badges.append({"kind": "main", "count": main_events.size(), "color": accent})
-		if not optional_events.is_empty():
-			badges.append({"kind": "optional", "count": optional_events.size(), "color": accent})
+		var counts := {"normal": 0, "elite": 0, "boss": 0}
+		for event in available:
+			counts[Game.map_event_type(str(event.get("id", "")))] += 1
+		for kind in ["normal", "elite", "boss"]:
+			if counts[kind] == 0: continue
+			accent = EVENT_COLORS[kind]
+			symbol_tint = accent.lightened(0.35)
+			badges.append({"kind": kind, "count": counts[kind], "color": accent})
+		boss_effect = counts.boss > 0
 	var tooltip := str(place.get("description", ""))
 	if not open:
 		tooltip = str(place.get("lockHint", "尚未开放"))
@@ -385,7 +384,7 @@ func _make_spec(place: Dictionary, avatar_texture: Texture2D) -> Dictionary:
 		"label_offset": label_offset, "avatar_side": side, "avatar": current,
 		"current": current, "target": target, "persistent_name": current or target,
 		"accent": accent, "frame_tint": frame_tint, "symbol_tint": symbol_tint,
-		"badges": badges, "avatar_texture": avatar_texture,
+		"badges": badges, "boss_effect": boss_effect, "avatar_texture": avatar_texture,
 		"avatar_crop": Game.player_character().get("mapAvatarCrop", [0.0, 0.0, 1.0, 1.0]), "tooltip": tooltip,
 	}
 

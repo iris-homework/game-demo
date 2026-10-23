@@ -30,6 +30,7 @@ var symbol_tint := Color.WHITE
 var persistent_name := false
 var name_offset := Vector2.ZERO
 var has_avatar := false
+var boss_effect := false
 
 var _frame_tex: TextureRect
 var _hover_tween: Tween
@@ -52,6 +53,7 @@ func prepare(spec: Dictionary) -> void:
 	persistent_name = bool(spec.get("persistent_name", false))
 	name_offset = spec.get("name_offset", Vector2.ZERO)
 	has_avatar = bool(spec.get("avatar", false))
+	boss_effect = bool(spec.get("boss_effect", false))
 	var side := "right" if str(spec.get("avatar_side", "left")) == "right" else "left"
 	frame_size = Vector2(marker_height * MidnightMapAssets.FRAME_CANVAS.x / MidnightMapAssets.FRAME_CANVAS.y, marker_height)
 	tip_local = Vector2(frame_size.x * MidnightMapAssets.FRAME_TIP.x, frame_size.y * MidnightMapAssets.FRAME_TIP.y)
@@ -106,6 +108,7 @@ func _frame_view(texture: Texture2D, origin: Vector2, view_scale: float, tint: C
 	material.shader = preload("res://scripts/map/frame_state.gdshader")
 	var edge_color := accent
 	material.set_shader_parameter("edge_color", Color(edge_color, tint.a))
+	material.set_shader_parameter("boss_effect", boss_effect)
 	node.material = material
 	node.modulate = Color.WHITE
 	add_child(node)
@@ -160,6 +163,14 @@ func _build_badges(spec: Dictionary) -> void:
 		badge.position = Vector2(right, TOP_PAD - badge_size.y * 0.25)
 		right -= 3.0
 		_badges.append(badge)
+	# Mixed tiers and counts can exceed the frame width. Include them in the
+	# marker bounds so placement avoidance and map hit testing remain accurate.
+	var extra_left := maxf(0.0, -(right + 3.0)) if not _badges.is_empty() else 0.0
+	if extra_left > 0.0:
+		for child in get_children():
+			if child is Control: child.position.x += extra_left
+		left_pad += extra_left
+		size.x += extra_left
 
 func _build_name() -> void:
 	_name_label = Label.new()

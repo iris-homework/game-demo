@@ -1,11 +1,12 @@
 class_name MidnightMapBadge
 extends Control
-## 用户提供的任务／锁定符号，置于固定直径圆框中。
+## 事件难度／锁定符号，置于固定直径圆框中。
 
 const DIAMETER := 28.0
 const STATUS_ICONS := {
-	"main": preload("res://assets/icons/map/exclamation-mark-64.png"),
-	"optional": preload("res://assets/icons/map/question-mark-52.png"),
+	"normal": preload("res://assets/icons/map/exclamation-mark-64.png"),
+	"elite": preload("res://assets/icons/map/exclamation-mark-64.png"),
+	"boss": preload("res://assets/icons/map/boss-skull.svg"),
 	"lock": preload("res://assets/icons/map/lock-60.png"),
 }
 const ICON_SHADER := preload("res://scripts/map/badge_icon.gdshader")
@@ -26,6 +27,7 @@ func setup(kind_value: String, count_value: int, accent_value: Color, font_value
 	size = _size
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_build_icon()
+	set_process(kind == "boss")
 	queue_redraw()
 
 func badge_size() -> Vector2:
@@ -33,7 +35,7 @@ func badge_size() -> Vector2:
 
 func _measure() -> Vector2:
 	match kind:
-		"main", "optional":
+		"normal", "elite", "boss":
 			var width := DIAMETER
 			if count > 1:
 				var font := _font if _font != null else get_theme_default_font()
@@ -45,7 +47,7 @@ func _measure() -> Vector2:
 
 func _draw() -> void:
 	match kind:
-		"main", "optional", "lock":
+		"normal", "elite", "boss", "lock":
 			_draw_icon_frame()
 
 func _build_icon() -> void:
@@ -65,12 +67,14 @@ func _build_icon() -> void:
 	_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_icon.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	_icon.size = Vector2(18.0, 18.0)
-	_icon.position = Vector2.ONE * (DIAMETER - 18.0) * 0.5
+	var icon_size := 20.0 if kind == "boss" else 18.0
+	_icon.size = Vector2.ONE * icon_size
+	_icon.position = Vector2.ONE * (DIAMETER - icon_size) * 0.5
 	_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_icon.modulate = accent
+	_icon.modulate = Color.WHITE if kind == "boss" else accent
 	var material := ShaderMaterial.new()
 	material.shader = ICON_SHADER
+	material.set_shader_parameter("boss_effect", kind == "boss")
 	_icon.material = material
 	add_child(_icon)
 
@@ -78,11 +82,22 @@ func _draw_icon_frame() -> void:
 	var center := Vector2.ONE * DIAMETER * 0.5
 	var radius := DIAMETER * 0.5 - 0.75
 	draw_circle(center, radius, Color(0.03, 0.05, 0.09, 0.94), true, -1.0, true)
-	draw_arc(center, radius, 0.0, TAU, 128, accent, 1.5, true)
+	if kind == "boss":
+		var phase := Time.get_ticks_msec() * 0.001
+		for segment in range(24):
+			var angle := TAU * segment / 24.0
+			var neon := Color.from_hsv(fposmod(segment / 24.0 + phase * 0.18, 1.0), 0.72, 1.0)
+			draw_arc(center, radius, angle, angle + TAU / 24.0, 5, Color(neon, 0.18), 5.0, true)
+			draw_arc(center, radius, angle, angle + TAU / 24.0, 5, neon, 1.5, true)
+	else:
+		draw_arc(center, radius, 0.0, TAU, 128, accent, 1.5, true)
 	# Additional event counts sit beside the circle; they never stretch its shape.
-	if kind in ["main", "optional"] and count > 1:
+	if kind in ["normal", "elite", "boss"] and count > 1:
 		var font := _font if _font != null else get_theme_default_font()
 		var baseline := DIAMETER * 0.5 + 17.0 * 0.36
 		draw_string_outline(font, Vector2(DIAMETER + 4.0, baseline), str(count), HORIZONTAL_ALIGNMENT_LEFT, -1.0, 17, 4, Color(0.03, 0.05, 0.09, 0.94))
 		draw_string(font, Vector2(DIAMETER + 4.0, baseline), str(count), HORIZONTAL_ALIGNMENT_LEFT, -1.0, 17, accent)
 
+
+func _process(_delta: float) -> void:
+	queue_redraw()

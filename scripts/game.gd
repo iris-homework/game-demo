@@ -258,6 +258,17 @@ func map_target_events() -> Array:
 	targets.sort_custom(func(a, b): return str(a.id) < str(b.id))
 	return targets
 
+func map_event_type(event_id: String) -> String:
+	# Map events use upcoming authored battles, never a previous frozen combat.
+	# Dialogue-only events are normal; branches use the highest configured tier.
+	var kind := "normal"
+	for battle in battles.values():
+		if str(battle.get("eventId", "")) != event_id: continue
+		var candidate := configured_battle_type(str(battle.get("id", "")))
+		if candidate == "boss": return "boss"
+		if candidate == "elite": kind = "elite"
+	return kind
+
 func map_place_state(id: String) -> Dictionary:
 	var p := place_data(id)
 	if p.is_empty(): return {}
