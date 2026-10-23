@@ -1,5 +1,7 @@
 # 测试目录索引
 
+十种已发布敌人的菜单演练专项：[published_training_tests](combat/enemies/published_training_tests.tscn)，在隔离复制工程中headless运行；覆盖十选择、真实战斗视图及攻击回调、咬击／射击演出、胜负与退出恢复、临时注册清理、存档哨兵、原三入口及模态焦点／Esc／锁定。只验证逻辑和节点时序，不替代像素渲染或真实鼠标验收，不启动桌面窗口。
+
 敌人 PNG 制作、校准和发布另见[敌人制作台](../enemy_asset_pipeline/README.md)。
 按用户指定，其隔离试用入口位于 `enemy_asset_pipeline/test/test_workbench.tscn`；
 该目录还保存管线、运行时及图形集成检查，不计入下述历史 81 组统计。
