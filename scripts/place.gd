@@ -10,7 +10,7 @@ func _ready() -> void:
 	cut_panel(self, Vector2(827,129), Vector2(542,641), Color("090b12ed"), CREAM)
 	rect(self,Vector2(860,217),Vector2(100,4),PINK)
 	label(self, "此地的故事", Vector2(859,159), Vector2(455,55), 30)
-	label(self, "主线优先 · 一次性事件完成后不重复触发", Vector2(861,228), Vector2(453,45), 16, MUTED)
+	label(self, "每完成一个事件推进1天 · 地图最多3个事件", Vector2(861,228), Vector2(453,45), 16, MUTED)
 	var available := Game.available_events(p.id)
 	if available.is_empty():
 		label(self, "此刻，一切安静。", Vector2(861,350), Vector2(455,60), 27)
@@ -25,7 +25,7 @@ func _ready() -> void:
 	scroll.add_child(content)
 	var y := 0
 	for e in available:
-		label(content, ("可选" if e.optional else "主线") + "  /  " + e.id, Vector2(2,y), Vector2(450,32), 16, CYAN if e.optional else PINK)
+		label(content, "刷新时间：" + Game.event_refresh_time_label(e), Vector2(2,y), Vector2(450,32), 16, CYAN)
 		button(content, e.title + "    →", Vector2(0,y+42), Vector2(455,60), func(): Game.start_event(e.id), true)
 		label(content, e.description, Vector2(2,y+116), Vector2(451,72), 18, MUTED)
 		if not e.demoNote.is_empty():

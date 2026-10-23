@@ -196,12 +196,14 @@ func status_bar(section: String, show_days: bool = true, weeks_action: Callable 
 		var date_width := 238.0
 		var date_x := (1440.0 - date_width) * 0.5
 		var date_label := label(self, "第 %d 天" % day, Vector2(date_x, 8.0), Vector2(date_width, 26.0), 19, CYAN)
+		date_label.name = "current_day_label"
 		date_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		rect(self, Vector2(date_x, 39.0), Vector2(date_width, 22.0), Color("456576"))
 		rect(self, Vector2(date_x + 1.0, 40.0), Vector2(date_width - 2.0, 20.0), Color("0b1520"))
 		for index in range(7):
 			var x := date_x + 6.0 + float(index) * 33.0
-			rect(self, Vector2(x, 45.0), Vector2(28.0, 10.0), CYAN if index < day else Color("253544"))
+			var segment := rect(self, Vector2(x, 45.0), Vector2(28.0, 10.0), CYAN if index < day else Color("253544"))
+			segment.name = "day_segment_%d" % (index + 1)
 	if weeks_action.is_valid():
 		button(self, "周次", Vector2(1096.0, 16.0), Vector2(140.0, 44.0), weeks_action).add_theme_font_size_override("font_size", 17)
 	var deck_button := button(self, "牌库", Vector2(976,16), Vector2(108,44), Game.open_current_deck)

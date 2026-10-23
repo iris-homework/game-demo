@@ -202,9 +202,8 @@ func _build_preview(accent: Color, name_text: String, state_text: String, desc_t
 	else:
 		for row in rows:
 			var event: Dictionary = row.event
-			var optional := bool(event.get("optional", false))
-			var tag_text := "可选事件" if optional else "主线任务"
-			_label(tag_text, Vector2(PAD, y), Vector2(inner_w, 18.0), 12, CYAN if optional else PINK)
+			var tag_text := "刷新时间：" + str(event.get("refresh_time", "随时"))
+			_label(tag_text, Vector2(PAD, y), Vector2(inner_w, 18.0), 12, CYAN)
 			y += 18.0
 			_label(str(event.get("title", "")), Vector2(PAD, y), Vector2(inner_w, float(row.title_h)), 16, CREAM)
 			y += float(row.title_h) + 2.0
@@ -245,14 +244,13 @@ func _detail_body_height(desc_text: String, lock_text: String, open: bool, event
 	return total
 
 func _add_event_block(list: VBoxContainer, event: Dictionary, width: float) -> void:
-	var optional := bool(event.get("optional", false))
 	var event_id := str(event.get("id", ""))
 	var block := VBoxContainer.new()
 	block.name = "event_block_" + event_id
 	block.add_theme_constant_override("separation", 4)
 	block.mouse_filter = Control.MOUSE_FILTER_PASS
 	list.add_child(block)
-	var tag := _label_into(block, "可选事件" if optional else "主线任务", 13, CYAN if optional else PINK)
+	var tag := _label_into(block, "刷新时间：" + str(event.get("refresh_time", "随时")), 13, CYAN)
 	tag.custom_minimum_size = Vector2(0.0, 18.0)
 	var title_text := str(event.get("title", event_id))
 	var title := _label_into(block, title_text, 17, CREAM)
@@ -262,7 +260,7 @@ func _add_event_block(list: VBoxContainer, event: Dictionary, width: float) -> v
 		var desc := _label_into(block, desc_text, 15, MUTED)
 		desc.custom_minimum_size = Vector2(0.0, _text_height(desc_text, 15, width))
 	# 可见文案保持简短；内部事件 ID 只留在节点名里供输入测试查找。
-	var button := _button_into(block, "开始事件" if optional else "开始任务", "event_" + event_id, BUTTON_HEIGHT, not optional, func(): _emit("event", event_id))
+	var button := _button_into(block, "开始事件", "event_" + event_id, BUTTON_HEIGHT, true, func(): _emit("event", event_id))
 	button.custom_minimum_size = Vector2(0.0, BUTTON_HEIGHT)
 	# 滚轮事件继续传给 detail_scroll（force_pass_scroll_events 默认开启），点击仍由按钮自己处理。
 	button.mouse_filter = Control.MOUSE_FILTER_PASS

@@ -455,11 +455,11 @@ func _place_state(id: String) -> Dictionary:
 	if not (raw is Dictionary):
 		return {
 			"place": Game.place_data(id), "open": false, "available": [],
-			"main_events": [], "optional_events": [], "current": false,
+			"current": false,
 			"target": false, "completed": false, "services": [],
 		}
 	var state: Dictionary = raw
-	for key in ["available", "main_events", "optional_events", "services"]:
+	for key in ["available", "services"]:
 		if not (state.get(key, null) is Array):
 			state[key] = []
 	if not state.has("place"):
@@ -530,8 +530,6 @@ func _card_content(id: String) -> Dictionary:
 	var state := _place_state(id)
 	var open := bool(state.open)
 	var available: Array = state.available if state.available is Array else []
-	var main_events: Array = state.main_events if state.main_events is Array else []
-	var optional_events: Array = state.optional_events if state.optional_events is Array else []
 	var labels: Array = []
 	if bool(state.current):
 		labels.append("当前所在地")
@@ -550,16 +548,14 @@ func _card_content(id: String) -> Dictionary:
 		accent = GOLD
 	elif bool(state.current):
 		accent = CYAN
-	elif not main_events.is_empty():
+	elif not available.is_empty():
 		accent = Color("4fc6d4")
-	elif not optional_events.is_empty():
-		accent = Color("3f9fb0")
 	var rows: Array = []
 	for event in available:
 		rows.append({
 			"id": str(event.get("id", "")), "title": str(event.get("title", "")),
 			"description": str(event.get("description", "")),
-			"optional": bool(event.get("optional", false)),
+			"refresh_time": Game.event_refresh_time_label(event),
 		})
 	var service := Game.healing_service(id)
 	return {
@@ -778,7 +774,7 @@ func show_weeks() -> void:
 	var dialog := AcceptDialog.new()
 	dialog.name = "week_dialog"
 	dialog.title = "周次档案"
-	dialog.dialog_text = "第一周：%s / 第 %d 天\n\n第二周：内容待设计\n第三周：内容待设计\n\n时间不会因移动、对话或治疗自动推进。" % ["已完成" if Game.state.flags.get("week1Complete", false) else "进行中", int(Game.state.get("currentDay", 1))]
+	dialog.dialog_text = "第一周：%s / 第 %d 天\n\n第二周：内容待设计\n第三周：内容待设计\n\n每完成一个事件推进1天；移动、对话与治疗不计时。\n地图同时最多刷新3个事件。" % ["已完成" if Game.state.flags.get("week1Complete", false) else "进行中", int(Game.state.get("currentDay", 1))]
 	dialog.ok_button_text = "返回城市"
 	dialog.exclusive = true
 	add_child(dialog)

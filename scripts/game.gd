@@ -17,6 +17,8 @@ const LEGACY_PLAYER_CHARACTER_ID := "noren"
 const PLAYER_REFERENCE := "@player"
 const TRAINING_ENEMY_HP := 100
 const BATTLE_TYPES := {"normal":"普通战斗", "elite":"精英战斗", "boss":"Boss战"}
+const EVENT_REFRESH_LIMIT := 3
+var event_refresh_rng := RandomNumberGenerator.new()
 var places: Array
 var events: Dictionary
 var battles: Dictionary
@@ -52,6 +54,7 @@ func read_data(path: String):
 	return JSON.parse_string(FileAccess.get_file_as_string("res://data/" + path))
 
 func _ready() -> void:
+	event_refresh_rng.randomize()
 	assets = read_data("assets.json")
 	characters = read_data("characters.json")
 	places = read_data("places.json")
@@ -194,7 +197,9 @@ func initial_state(player_id: String = "") -> Dictionary:
 	if player_id.is_empty(): player_id = config.defaultPlayerCharacterId
 	if not valid_player_character(player_id): return {}
 	var hp := int(player_characters[player_id].attributes.maxHp)
-	return {"schemaVersion":2, "playerCharacterId":player_id, "ownedCyberwareIds":player_characters[player_id].get("cyberwareIds", []).duplicate(), "equippedCyberwareIds":player_characters[player_id].get("cyberwareIds", []).duplicate(), "currentWeek":1, "currentDay":int(config.initialDay), "currentHp":hp, "maxHp":hp, "combat":{}, "battleStart":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "dialogueHistory":[], "battleId":"", "result":"", "battleHistory":[], "deck":[], "battleReward":{}, "portraits":{"left":PLAYER_REFERENCE, "right":"bartender"}}
+	var fresh := {"schemaVersion":2, "playerCharacterId":player_id, "ownedCyberwareIds":player_characters[player_id].get("cyberwareIds", []).duplicate(), "equippedCyberwareIds":player_characters[player_id].get("cyberwareIds", []).duplicate(), "currentWeek":1, "currentDay":int(config.initialDay), "currentHp":hp, "maxHp":hp, "combat":{}, "battleStart":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "dialogueHistory":[], "battleId":"", "result":"", "battleHistory":[], "deck":[], "battleReward":{}, "portraits":{"left":PLAYER_REFERENCE, "right":"bartender"}, "refreshedEventIds":[]}
+	refresh_event_pool(fresh)
+	return fresh
 
 func new_game(player_id: String = "") -> void:
 	if transition_locked or battle_busy: return
@@ -239,24 +244,67 @@ func place_data(id: String) -> Dictionary:
 		if p.id == id: return p
 	return {}
 
-func available_events(place_id: String = "") -> Array:
+func event_in_refresh_range(event: Dictionary, subject: Dictionary = {}) -> bool:
+	var s: Dictionary = state if subject.is_empty() else subject
+	var window = event.get("refreshTimeRange", {"startDay":null, "endDay":null})
+	if not window is Dictionary: return false
+	var start = window.get("startDay")
+	var end = window.get("endDay")
+	for bound in [start, end]:
+		if bound == null: continue
+		if not (bound is int or bound is float): return false
+		if not is_finite(float(bound)) or bound < 1 or bound != floor(float(bound)): return false
+	if start != null and end != null and start > end: return false
+	var day := int(s.get("currentDay", config.initialDay))
+	return (start == null or day >= start) and (end == null or day <= end)
+
+func event_refresh_time_label(event: Dictionary) -> String:
+	var window = event.get("refreshTimeRange", {})
+	if not window is Dictionary: return "配置无效"
+	var start = window.get("startDay")
+	var end = window.get("endDay")
+	if start == null and end == null: return "随时"
+	if start == null: return "第%d天及以前" % int(end)
+	if end == null: return "第%d天起" % int(start)
+	return "第%d—%d天" % [int(start), int(end)]
+
+func eligible_events(subject: Dictionary = {}) -> Array:
+	var s: Dictionary = state if subject.is_empty() else subject
+	if s.is_empty(): return []
+	if not s.get("completedEventIds") is Array or not s.get("flags") is Dictionary: return []
+	if not s.get("targetId") is String or not (s.get("credits") is int or s.get("credits") is float): return []
+	if not (s.get("currentDay") is int or s.get("currentDay") is float): return []
+	if not is_finite(float(s.currentDay)) or s.currentDay < 1 or s.currentDay != floor(float(s.currentDay)): return []
 	var found: Array = []
 	for e in events.values():
-		if (place_id.is_empty() or e.placeId == place_id) and not e.id in state.get("completedEventIds", []) and meets(e.unlockCondition):
+		if not e.id in s.get("completedEventIds", []) and meets(e.get("unlockCondition", {}), s) and event_in_refresh_range(e, s) and not place_data(e.placeId).is_empty():
 			found.append(e)
-	found.sort_custom(func(a, b): return int(a.optional) < int(b.optional))
+	found.sort_custom(func(a, b): return str(a.id) < str(b.id))
 	return found
 
+func refresh_event_pool(subject: Dictionary = {}) -> void:
+	var s: Dictionary = state if subject.is_empty() else subject
+	if s.is_empty(): return
+	var candidates: Array = eligible_events(s).map(func(e): return e.id)
+	var kept: Array = []
+	for id in s.get("refreshedEventIds", []):
+		if id in candidates and not id in kept and kept.size() < EVENT_REFRESH_LIMIT:
+			kept.append(id)
+			candidates.erase(id)
+	while kept.size() < EVENT_REFRESH_LIMIT and not candidates.is_empty():
+		var index := event_refresh_rng.randi_range(0, candidates.size() - 1)
+		kept.append(candidates[index])
+		candidates.remove_at(index)
+	s.refreshedEventIds = kept
+
+func available_events(place_id: String = "") -> Array:
+	# Queries never draw new events or mutate a checkpoint.
+	var refreshed: Array = state.get("refreshedEventIds", [])
+	var visible: Array = eligible_events().filter(func(e): return e.id in refreshed).slice(0, EVENT_REFRESH_LIMIT)
+	return visible.filter(func(e): return place_id.is_empty() or e.placeId == place_id)
+
 func map_target_events() -> Array:
-	# UI targets are derived from authored progress, never the last activeEventId.
-	if state.get("flags", {}).get("week1Complete", false): return []
-	var targets: Array = []
-	for e in available_events():
-		var p := place_data(e.placeId)
-		if not e.optional and not p.is_empty():
-			targets.append(e)
-	targets.sort_custom(func(a, b): return str(a.id) < str(b.id))
-	return targets
+	return available_events()
 
 func map_event_type(event_id: String) -> String:
 	# Map events use upcoming authored battles, never a previous frozen combat.
@@ -273,30 +321,21 @@ func map_place_state(id: String) -> Dictionary:
 	var p := place_data(id)
 	if p.is_empty(): return {}
 	var available: Array = available_events(id)
-	available.sort_custom(func(a, b):
-		if bool(a.optional) != bool(b.optional): return not bool(a.optional)
-		return str(a.id) < str(b.id))
-	var main_events: Array = []
-	var optional_events: Array = []
-	for e in available:
-		if e.optional: optional_events.append(e)
-		else: main_events.append(e)
 	var completed := false
 	for e in events.values():
 		if e.placeId == id and e.id in state.get("completedEventIds", []):
 			completed = true
 			break
 	return {"place":p, "open":true, "available":available,
-		"main_events":main_events, "optional_events":optional_events,
 		"current":state.get("currentPlaceId", "") == id,
-		"target":not main_events.is_empty() and not state.get("flags", {}).get("week1Complete", false),
+		"target":not available.is_empty(),
 		"completed":completed and available.is_empty(), "services":p.get("services", [])}
 
 func objective() -> String:
-	if state.get("flags", {}).get("week1Complete", false): return "第一周已完成 · 可继续探索支线"
+	if state.get("flags", {}).get("week1Complete", false): return "第一周已完成 · 可继续探索剩余事件"
 	var targets := map_target_events()
 	if targets.size() == 1: return targets[0].title + "  /  " + place_data(targets[0].placeId).name
-	if targets.size() > 1: return "%d 个可推进的主线目标" % targets.size()
+	if targets.size() > 1: return "%d 个可进行的事件" % targets.size()
 	return "探索城市，寻找新的线索"
 
 func event_data() -> Dictionary:
@@ -327,6 +366,7 @@ func texture(id: String) -> Texture2D:
 	return load(path)
 
 func checkpoint() -> void:
+	refresh_event_pool()
 	revision += 1
 	if save_enabled and not training_mode: save_game()
 	page = state.currentScene
@@ -349,7 +389,7 @@ func start_event(id: String) -> bool:
 	if transition_locked or battle_busy: return false
 	if not events.has(id): return false
 	var e: Dictionary = events[id]
-	if id in state.completedEventIds or not meets(e.unlockCondition): return false
+	if not id in state.get("refreshedEventIds", []) or id in state.completedEventIds or not meets(e.unlockCondition) or not event_in_refresh_range(e): return false
 	if place_data(e.placeId).is_empty(): return false
 	state.activeEventId = id
 	state.currentPlaceId = e.placeId
@@ -383,7 +423,9 @@ func apply_actions(actions: Array) -> bool:
 				draft.targetId = a.value
 			"completeEvent":
 				if not events.has(a.get("id", "")): return false
-				if not a.id in draft.completedEventIds: draft.completedEventIds.append(a.id)
+				if not a.id in draft.completedEventIds:
+					draft.completedEventIds.append(a.id)
+					draft.currentDay = mini(7, int(draft.currentDay) + 1)
 			"healHpPercent":
 				var percent := float(a.get("percent", -1.0))
 				if percent < 0.0 or percent > 1.0: return false
@@ -593,7 +635,13 @@ func valid_save(s) -> bool:
 		if not s[key] is String: return false
 	for key in ["maxHp", "currentHp", "currentDay", "credits"]:
 		if not (s[key] is int or s[key] is float): return false
-	if s.maxHp <= 0 or s.currentHp < 0 or s.currentHp > s.maxHp or s.currentDay < 1 or s.currentDay > 7: return false
+	if s.maxHp <= 0 or s.currentHp < 0 or s.currentHp > s.maxHp: return false
+	if not is_finite(float(s.currentDay)) or s.currentDay < 1 or s.currentDay > 7 or s.currentDay != floor(float(s.currentDay)): return false
+	if not s.refreshedEventIds is Array or s.refreshedEventIds.size() > EVENT_REFRESH_LIMIT: return false
+	var seen_events := []
+	for id in s.refreshedEventIds:
+		if not id is String or not events.has(id) or id in seen_events: return false
+		seen_events.append(id)
 	if not s.combat is Dictionary or not s.inventory is Dictionary: return false
 	if not s.combat.is_empty() and not valid_combat(s.combat): return false
 	if not valid_battle_start(s): return false
@@ -636,6 +684,7 @@ func load_game() -> bool:
 		var data = migrate_save(parser.data)
 		if not valid_save(data): continue
 		restart_unfinished_battle(data)
+		refresh_event_pool(data)
 		state = data
 		state.credits = int(state.credits)
 		if state.dialogueHistory.is_empty() and state.currentScene == "dialogue": record_dialogue()
@@ -901,6 +950,11 @@ func migrate_save(data):
 		data.battleStart = {}
 		data.inventory = {}
 	migrate_mercenary_story(data)
+	# Keep an existing draw across reloads; legacy saves get a pool without
+	# retroactively charging days for events they completed before this rule.
+	if not data.has("refreshedEventIds"):
+		data.refreshedEventIds = []
+		refresh_event_pool(data)
 	# Additive schema-2 upgrade: old battles gain the temporary catalog, with
 	# no used cards or pending buff. Existing snapshots retain their own rules.
 	var combat = data.get("combat", {})

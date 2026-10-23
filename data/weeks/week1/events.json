@@ -7,7 +7,6 @@
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
     "description": "在地下酒馆接下你的第一份委托。",
-    "optional": false,
     "demoNote": "",
     "rewardIds": [],
     "nodes": {
@@ -90,6 +89,10 @@
         "type": "finish",
         "effects": []
       }
+    },
+    "refreshTimeRange": {
+      "startDay": null,
+      "endDay": null
     }
   },
   "E02": {
@@ -102,7 +105,6 @@
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
     "description": "垃圾场传出怪动静，也许能找到目标的线索。",
-    "optional": true,
     "demoNote": "",
     "rewardIds": [],
     "nodes": {
@@ -197,6 +199,10 @@
         "type": "finish",
         "effects": []
       }
+    },
+    "refreshTimeRange": {
+      "startDay": null,
+      "endDay": null
     }
   },
   "E03": {
@@ -209,7 +215,6 @@
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
     "description": "艾克似乎知道委托目标的下落。",
-    "optional": false,
     "demoNote": "",
     "rewardIds": [],
     "nodes": {
@@ -364,6 +369,10 @@
           }
         ]
       }
+    },
+    "refreshTimeRange": {
+      "startDay": null,
+      "endDay": null
     }
   },
   "E04": {
@@ -376,7 +385,6 @@
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
     "description": "根据艾克的线索，前往后巷深处。",
-    "optional": false,
     "demoNote": "",
     "rewardIds": [],
     "nodes": {
@@ -476,6 +484,10 @@
           }
         ]
       }
+    },
+    "refreshTimeRange": {
+      "startDay": null,
+      "endDay": null
     }
   },
   "E05A": {
@@ -495,7 +507,6 @@
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
     "description": "在港口找到理查德，完成追踪委托并交接。",
-    "optional": false,
     "demoNote": "",
     "rewardIds": [],
     "nodes": {
@@ -596,6 +607,10 @@
         "text": "这份委托到此为止。领完报酬，去看看还有什么活。",
         "next": "finish"
       }
+    },
+    "refreshTimeRange": {
+      "startDay": null,
+      "endDay": null
     }
   },
   "E05B": {
@@ -615,7 +630,6 @@
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
     "description": "在港口找到卢米娜，完成追踪委托并交接。",
-    "optional": false,
     "demoNote": "",
     "rewardIds": [],
     "nodes": {
@@ -723,6 +737,10 @@
         "text": "这份委托到此为止。领完报酬，去看看还有什么活。",
         "next": "finish"
       }
+    },
+    "refreshTimeRange": {
+      "startDay": null,
+      "endDay": null
     }
   },
   "E08": {
@@ -742,7 +760,6 @@
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
     "description": "一名装载过量科技的男子在街区失控。",
-    "optional": true,
     "demoNote": "完成任一港口追踪委托后开放。",
     "rewardIds": [],
     "nodes": {
@@ -814,6 +831,10 @@
         "type": "finish",
         "effects": []
       }
+    },
+    "refreshTimeRange": {
+      "startDay": null,
+      "endDay": null
     }
   },
   "E11": {
@@ -833,7 +854,6 @@
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
     "description": "处理受污染水域中异变的鱼群。",
-    "optional": true,
     "demoNote": "完成任一港口追踪委托后开放。",
     "rewardIds": [],
     "nodes": {
@@ -899,6 +919,10 @@
         "type": "finish",
         "effects": []
       }
+    },
+    "refreshTimeRange": {
+      "startDay": null,
+      "endDay": null
     }
   },
   "E12": {
@@ -918,7 +942,6 @@
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
     "description": "黑帮头目驾驶机甲，回到蜂巢城寨复仇。",
-    "optional": false,
     "demoNote": "完成任一港口追踪委托后开放。",
     "rewardIds": [],
     "nodes": {
@@ -994,6 +1017,10 @@
           }
         ]
       }
+    },
+    "refreshTimeRange": {
+      "startDay": null,
+      "endDay": null
     }
   }
 }

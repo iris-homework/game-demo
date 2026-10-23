@@ -17,6 +17,7 @@ func _ready() -> void:
 	Game.state.currentScene = "map"
 	Game.state.completedEventIds = ["E01"]
 	Game.state.currentPlaceId = "junkyard"
+	Game.refresh_event_pool()
 	Game.page = "map"
 	var before: Dictionary = Game.state.duplicate(true)
 	var authored: Dictionary = Game.battles.duplicate(true)
@@ -28,7 +29,7 @@ func _ready() -> void:
 		Game.battles.B02.battleType = tier
 		check(Game.map_event_type("E02") == tier, "event follows configured battle " + tier)
 		var spec: Dictionary = view._make_spec(Game.place_data("junkyard"), null)
-		check(spec.badges.size() == 1 and spec.badges[0].kind == tier, "optional event badge " + tier)
+		check(spec.badges.size() == 1 and spec.badges[0].kind == tier, "event badge " + tier)
 		check(spec.accent == view.EVENT_COLORS[tier] and spec.badges[0].color == spec.accent, "current place does not override event color " + tier)
 		check(spec.avatar and spec.boss_effect == (tier == "boss"), "avatar and boss flag " + tier)
 		var marker := MidnightMapMarker.new()
@@ -46,16 +47,18 @@ func _ready() -> void:
 	check(MidnightMapBadge.STATUS_ICONS.boss != MidnightMapBadge.STATUS_ICONS.normal, "boss has separate skull")
 	Game.battles.B03.battleType = "elite"
 	var main: Dictionary = view._make_spec(Game.place_data("hive"), null)
-	check(main.target and main.badges[0].kind == "elite" and main.accent == view.EVENT_COLORS.elite, "main target uses elite red")
-	Game.events["QA_MAP_NORMAL"] = {"id": "QA_MAP_NORMAL", "placeId": "junkyard", "optional": false, "unlockCondition": {}}
-	Game.events["QA_MAP_ELITE"] = {"id": "QA_MAP_ELITE", "placeId": "junkyard", "optional": true, "unlockCondition": {}}
+	check(main.target and main.badges[0].kind == "elite" and main.accent == view.EVENT_COLORS.elite, "event target uses elite red")
+	Game.events["QA_MAP_NORMAL"] = {"id": "QA_MAP_NORMAL", "placeId": "junkyard", "unlockCondition": {}}
+	Game.events["QA_MAP_ELITE"] = {"id": "QA_MAP_ELITE", "placeId": "junkyard", "unlockCondition": {}}
 	Game.battles["QA_MAP_BATTLE"] = {"id": "QA_MAP_BATTLE", "eventId": "QA_MAP_ELITE", "battleType": "elite"}
+	Game.state.refreshedEventIds = ["E02", "QA_MAP_NORMAL", "QA_MAP_ELITE"]
 	var mixed: Dictionary = view._make_spec(Game.place_data("junkyard"), null)
 	check(mixed.badges.map(func(b): return b.kind) == ["normal", "elite", "boss"], "mixed event tiers remain separate")
 	check(mixed.boss_effect and mixed.accent == view.EVENT_COLORS.boss, "highest tier colors mixed place")
-	Game.events["QA_MAP_NORMAL2"] = {"id": "QA_MAP_NORMAL2", "placeId": "junkyard", "optional": true, "unlockCondition": {}}
+	Game.events["QA_MAP_NORMAL2"] = {"id": "QA_MAP_NORMAL2", "placeId": "junkyard", "unlockCondition": {}}
+	Game.state.refreshedEventIds = ["E02", "QA_MAP_NORMAL", "QA_MAP_NORMAL2"]
 	mixed = view._make_spec(Game.place_data("junkyard"), null)
-	check(mixed.badges[0].count == 2, "normal main and optional aggregate without losing count")
+	check(mixed.badges[0].count == 2, "two normal events aggregate within the three-event limit")
 	var mixed_marker := MidnightMapMarker.new()
 	mixed_marker.prepare({"id": "junkyard", "accent": mixed.accent, "badges": mixed.badges, "boss_effect": true})
 	mixed_marker.set_tip(Vector2(400, 400))

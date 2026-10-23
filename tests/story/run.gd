@@ -36,6 +36,7 @@ func start_contract(index: int) -> void:
 func _ready() -> void:
 	Game.save_enabled = false
 	Game.save_path = "user://automated_test_checkpoint.json"
+	Game.meta_path = "user://automated_test_meta.json"
 	# Validate authored references, including legacy saved result nodes.
 	check(Game.places.size() == 17, "17 places including church")
 	check(Game.events.size() == 9, "9 independent commission events")

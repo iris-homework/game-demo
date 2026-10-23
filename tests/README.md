@@ -41,6 +41,7 @@
 
 | 范围 | 套件 |
 | --- | --- |
+| 事件刷新池、时间与日期（无窗口） | [event_refresh_tests](story/event_refresh_tests.tscn)：6候选全局3上限、按地点一致、入口防绕过、保留补位／失效、查询只读、区间闭边界、完成与失败事务、真实付费／战败／胜利／奖励、第7天封顶／非法日期拒绝及存读、旧档补池不追算、演练及HUD／地点刷新文案；关闭保存，save/meta专用路径 |
 | 地图事件类型标记（无窗口） | [map_event_types_tests](map/map_event_types_tests.tscn)，覆盖类型映射、混合计数、Boss特效开关及角标点击边界；不含渲染验收 |
 | 战斗类型、冻结与旧档（无窗口） | [battle_type_tests](combat/rules/battle_type_tests.tscn) |
 | 按战斗类型的奖励概率（无窗口） | [card_reward_rates_tests](combat/cards/card_reward_rates_tests.tscn) |
@@ -128,6 +129,7 @@
 
 以下入口已由现有文档或 QA 入口明确按 headless 运行：
 
+- `story/event_refresh_tests`：统一事件刷新池、时间区间、完成耗时及存读／演练隔离；含无窗口UI节点结构检查，不代表渲染或真实输入验收。
 - `story/run`：剧情流程与配置回归。
 - `combat/rules/combat_tests`：战斗模型回归。
 - `map/map_config_tests` 和 `map/map_model_tests`：地图配置与模型。

@@ -190,7 +190,7 @@ func present_card_gain(kind: String, amount: int) -> Node2D:
 	var fx := CardGainFX.new()
 	fx.kind = kind
 	fx.amount = amount
-	fx.position = Vector2(0,-48)
+	fx.position = player.target_bounds.get_center()
 	player.add_child(fx)
 	return fx
 

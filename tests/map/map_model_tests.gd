@@ -16,6 +16,7 @@ func reset_map() -> void:
 	Game.state.targetId = "richard"
 	Game.state.credits = 300
 	Game.page = "map"
+	Game.refresh_event_pool()
 
 func target_ids() -> Array:
 	return Game.map_target_events().map(func(e): return e.id)
@@ -41,7 +42,7 @@ func finish_event(id: String, choice: int = 0) -> void:
 
 func _ready() -> void:
 	Game.save_enabled = false
-	var evidence_dir := ProjectSettings.globalize_path("res://artifacts/qa/map-build-2026-10-07/model-test-files")
+	var evidence_dir := ProjectSettings.globalize_path("res://artifacts/qa/event-refresh-2026-10-23/map-model-test-files")
 	DirAccess.make_dir_recursive_absolute(evidence_dir)
 	Game.save_path = evidence_dir.path_join("test-checkpoint.json")
 	Game.meta_path = evidence_dir.path_join("test-meta.json")
@@ -81,12 +82,12 @@ func _ready() -> void:
 	Game.go_map()
 	check(Game.map_place_state("church").current and not Game.map_place_state("church").target, "church return updates avatar without changing objective")
 	reset_map()
-	check(target_ids() == ["E03"], "initial target is hive")
+	check(target_ids() == ["E02", "E03"], "all initially refreshed events are targets")
 	check(Game.map_place_state("bar").current, "current avatar at bar")
 	check(Game.map_place_state("bar").completed, "bar completed and no new event")
 	check(Game.map_place_state("hospital").open and Game.map_place_state("hospital").available.is_empty(), "open service place without task")
-	check(Game.map_place_state("hive").target and not Game.map_place_state("junkyard").target, "optional does not become main target")
-	check(Game.map_place_state("junkyard").optional_events.size() == 1, "optional badge data")
+	check(Game.map_place_state("hive").target and Game.map_place_state("junkyard").target, "all refreshed places are targets")
+	check(Game.map_place_state("junkyard").available.size() == 1, "unified event badge data")
 	var previous := JSON.stringify(Game.state)
 	Game.map_place_state("hive")
 	Game.map_target_events()
@@ -95,37 +96,40 @@ func _ready() -> void:
 	Game.state.currentPlaceId = "hive"
 	check(Game.map_place_state("hive").current and Game.map_place_state("hive").target, "same-place current and target coexist")
 	Game.state.activeEventId = "E01"
-	check(target_ids() == ["E03"], "completed stale active event not used as target")
+	check(target_ids() == ["E02", "E03"], "completed stale active event not used as target")
 	# Synthetic map combinations stay in memory and leave authored data unchanged.
 	var tower: Dictionary = Game.place_data("tower")
 	tower.unlockCondition = {"flag":"obsoletePlaceLock"}
-	var fake_event := {"id":"MAP_LOCKED_TEST", "placeId":"tower", "optional":false, "unlockCondition":{}, "title":"Locked fixture"}
+	var fake_event := {"id":"MAP_LOCKED_TEST", "placeId":"tower", "refreshTimeRange":{"startDay":null,"endDay":null}, "unlockCondition":{}, "title":"Locked fixture"}
 	Game.events[fake_event.id] = fake_event
+	Game.refresh_event_pool()
 	check(Game.available_events("tower").size() > 0, "fixture event-level condition passes")
 	check(Game.map_place_state("tower").open and Game.map_place_state("tower").target and Game.map_place_state("tower").available.size() == 1, "obsolete place condition cannot hide available events or targets")
 	check("MAP_LOCKED_TEST" in target_ids(), "target query ignores obsolete place condition")
 	Game.visit("tower")
 	check(Game.state.currentPlaceId == "tower", "visit ignores obsolete place condition")
 	Game.events.erase(fake_event.id)
-	Game.events["MAP_PARALLEL_TEST"] = {"id":"MAP_PARALLEL_TEST", "placeId":"bar", "optional":false, "unlockCondition":{}, "title":"Parallel fixture"}
-	check(target_ids() == ["E03", "MAP_PARALLEL_TEST"], "all simultaneous main candidates in stable order")
-	check(Game.objective() == "2 个可推进的主线目标", "multiple candidates not arbitrarily reduced")
+	Game.events["MAP_PARALLEL_TEST"] = {"id":"MAP_PARALLEL_TEST", "placeId":"bar", "refreshTimeRange":{"startDay":null,"endDay":null}, "unlockCondition":{}, "title":"Parallel fixture"}
+	Game.refresh_event_pool()
+	check(target_ids() == ["E02", "E03", "MAP_PARALLEL_TEST"], "all refreshed events in stable order")
+	check(Game.objective() == "3 个可进行的事件", "objective counts all refreshed events")
 	Game.events.erase("MAP_PARALLEL_TEST")
 	tower.erase("unlockCondition")
 	# Actual first-week routes, including both independent contracts.
 	for contract in ["richard", "lumina"]:
 		reset_map()
 		Game.state.targetId = contract
+		finish_event("E02")
 		finish_event("E03")
 		check(target_ids() == ["E04"], "alley target after hive " + contract)
 		finish_event("E04")
 		check(target_ids() == ["E05A" if contract == "richard" else "E05B"], "correct port branch " + contract)
 		finish_event("E05A" if contract == "richard" else "E05B")
 		check(Game.map_place_state("camp").open and Game.map_place_state("tower").open, "both locations open without allegiance " + contract)
-		check(target_ids() == ["E12"], "hive finale " + contract)
+		check(target_ids() == ["E08", "E11", "E12"], "all three post-port events refreshed " + contract)
 		finish_event("E12")
-		check(target_ids().is_empty(), "no false next-week target " + contract)
-		check(Game.map_place_state("pump").optional_events.size() == 1, "optional remains after week completion " + contract)
+		check(target_ids() == ["E08", "E11"], "remaining refreshed events stay visible after week completion " + contract)
+		check(Game.map_place_state("pump").available.size() == 1, "remaining event persists after week completion " + contract)
 	reset_map()
 	for outcome in ["lose"]:
 		Game.start_event("E03")
@@ -138,7 +142,7 @@ func _ready() -> void:
 		check(Game.state.currentScene == "battle", "actual encounter reached for " + outcome)
 		check(Game.battle_exit(outcome, Game.revision), "actual battle return " + outcome)
 		check(Game.choose(0, Game.revision) and Game.page == "map", "return choice reaches map " + outcome)
-		check(not "E03" in Game.state.completedEventIds and target_ids() == ["E03"], "unfinished target retained on " + outcome)
+		check(not "E03" in Game.state.completedEventIds and target_ids() == ["E02", "E03"], "unfinished events retained on " + outcome)
 		reset_map()
 	Game.state.currentHp = 50
 	var current: String = Game.state.currentPlaceId
@@ -150,7 +154,7 @@ func _ready() -> void:
 	check(Game.save_game(), "test-path checkpoint written")
 	Game.state = {}
 	check(Game.load_game(), "test-path checkpoint restored")
-	check(Game.state.get("currentPlaceId", "") == expected.currentPlaceId and target_ids() == ["E03"], "restored place and target derived correctly")
+	check(Game.state.get("currentPlaceId", "") == expected.currentPlaceId and target_ids() == ["E02", "E03"], "restored place and refreshed targets derived correctly")
 	check(Game.state.get("schemaVersion", 0) == 2, "save schema retained")
 	for p in Game.places:
 		check(Game.map_place_state(p.id).open, "restored save keeps place open " + p.id)
