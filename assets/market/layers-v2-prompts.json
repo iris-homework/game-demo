@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-23",
+  "tool": "built-in imagegen",
+  "background": {
+    "file": "black-market-background-v2.png",
+    "source": "exec-14969282-18b9-45fd-a3e4-cef845a8a8c6.png",
+    "prompt": "Edit the supplied cyberpunk card-shop illustration into a clean background plate for layered game compositing. REMOVE ONLY the white-haired woman and the small cyan card in her raised hand. Fill her former silhouette with the continuation of the dark purple industrial alley, shop wall and cables behind her. Preserve every counter, holographic screen, cup, hanging lamp, sign board, merchandise shelf, perspective, lighting, palette, ink style, layout and camera view as closely as possible. Especially preserve the foreground counter and blue holographic terminal edges at exactly the same positions. No people, no silhouette or ghost of the removed woman, no new objects, no text, no UI. Keep the original wide 16:10 composition and all geometry outside her silhouette unchanged. This plate will have a separate high-resolution transparent character placed back into the exact original pose."
+  },
+  "character": {
+    "file": "black-market-shopkeeper-layer-v2.png",
+    "source": "exec-2df641cc-af4d-4c2f-b5c4-5aefeb2a4a87.png",
+    "prompt": "Create ONE high-resolution transparent character sprite, portrait canvas 1536x2048 or larger. Image 1 is the pose, camera angle, expression and upper-body proportions reference from the currently used shop scene. Image 2 is the canonical character identity and crisp ink/cel drawing reference. Isolate and redraw ONLY the shopkeeper, no scenery. Preserve the pose in Image 1 closely: front-facing three-quarter waist-up woman, head tilted slightly toward image-left, knowing friendly smile, her hand on image-left raised holding a small glowing cyan rectangular card near shoulder height, other black-gloved hand resting horizontally at waist level as if on a counter. Long ivory-white straight hair with blunt angular bangs, golden amber eyes, asymmetric cyan triangular hair ornament on image-right, burgundy/magenta ribbons, black/deep wine angular long coat with crisp magenta trim, white collared shirt, black gloves. No hat, no glasses. Sharp deliberate black ink contours, clean solid cel shading, bright ivory hair and shirt, amber eyes with clear pupils, high-fidelity to the exact original character. Render genuinely higher-detail clean lines and facial features rather than upscaling a blurry patch. Large head/face occupying at least 500 pixels of canvas width. Frame from top of hair down to mid-thigh, complete hair/arms/coat silhouette, small 3% transparent margins, full raised cyan card not clipped. No counter, no floor, no background, no shadows behind the silhouette, no text, no watermark, no duplicate body parts. Actual transparent RGBA background, not a painted checkerboard."
+  },
+  "counter": "Runtime polygon + background texture; no additional raster editing."
+}

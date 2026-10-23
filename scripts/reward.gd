@@ -25,9 +25,15 @@ func _ready() -> void:
 	var credits := cut_panel(self,Vector2(214,371),Vector2(1012,128),Color("172025"),Color("655a3f"),18)
 	credit_icon(credits,Vector2(24,23),Vector2(78,78))
 	label(credits,"信用点",Vector2(130,19),Vector2(350,32),19,MUTED)
-	label(credits,"+1,000",Vector2(126,53),Vector2(380,60),42,GOLD)
+	label(credits,"+%d" % int(reward.credits),Vector2(126,53),Vector2(380,60),42,GOLD)
 	label(credits,"✓  已到账",Vector2(819,49),Vector2(175,37),21,GOLD)
 
+	var passive: Dictionary = Game.battle_passive_summary()
+	if int(passive.get("credits",0)) > 0 or int(passive.get("healing",0)) > 0:
+		var effects: Array[String] = []
+		if int(passive.credits) > 0: effects.append("金钱芯片 +%d 信用点" % int(passive.credits))
+		if int(passive.healing) > 0: effects.append("治疗芯片 +%d 生命" % int(passive.healing))
+		label(credits,"额外被动收益："+"  ·  ".join(effects),Vector2(480,88),Vector2(502,30),15,CYAN).name = "passive_reward_summary"
 	var card_row := cut_panel(self,Vector2(214,519),Vector2(1012,161),Color("14242a") if pending else PANEL,CYAN if pending else Color("485661"),18)
 	for i in range(3):
 		cut_panel(card_row,Vector2(30+i*11,42-i*8),Vector2(48,70),Color("10232a"),CYAN if pending else MUTED,8)

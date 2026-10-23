@@ -1,0 +1,28 @@
+{
+  "offers": [
+    {
+      "id": "dimensional_pocket",
+      "price": 150
+    },
+    {
+      "id": "accelerated_clock",
+      "price": 150
+    },
+    {
+      "id": "backup_energy",
+      "price": 150
+    },
+    {
+      "id": "money_chip",
+      "price": 150
+    },
+    {
+      "id": "healing_chip",
+      "price": 150
+    },
+    {
+      "id": "swift_chip",
+      "price": 150
+    }
+  ]
+}

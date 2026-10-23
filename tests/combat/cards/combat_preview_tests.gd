@@ -45,9 +45,42 @@ func preview_text(m: CombatModel, target: int = 0, extra: int = -1, uid: String 
 	var numbers := RegEx.new()
 	numbers.compile("[0-9]+(?:[／–][0-9]+)*")
 	var original: String = m.card(uid).get("cardText", m.card(uid).get("description", ""))
-	check(numbers.sub(result.cardText, "#", true) == numbers.sub(original, "#", true), "Card face changes numbers only, without adding effect text")
-	check(numbers.sub(result.description, "#", true) == numbers.sub(m.card(uid).get("description", ""), "#", true), "Tooltip preserves all original nonnumeric wording")
+	check(numbers.sub(normalize_dynamic_damage(result.cardText), "#", true) == numbers.sub(original, "#", true), "Card face preserves authored rules besides explicit dynamic-hit damage")
+	check(numbers.sub(normalize_dynamic_damage(result.description), "#", true) == numbers.sub(m.card(uid).get("description", ""), "#", true), "Tooltip preserves authored rules besides explicit dynamic-hit damage")
 	return str(result.get("text", ""))
+
+func normalize_dynamic_damage(text: String) -> String:
+	var pattern := RegEx.new()
+	pattern.compile("首段造成([0-9–]+)点伤害，后续每段造成[0-9–]+点伤害")
+	return pattern.sub(text, "造成 $1 点伤害", true)
+
+func test_barrage_first_hit_wording() -> void:
+	for form in ["melee", "ranged"]:
+		for bullets in [0, 1, 3, 10]:
+			var m := fixture([20], form)
+			m.ammo = bullets
+			m.next_attack_bonus = 4
+			m.energy = 10
+			var before := m.snapshot()
+			var preview := m.card_preview("card_000", 0)
+			var expected := "首段造成20点伤害，后续每段造成14点伤害。" if form == "ranged" and bullets > 0 else ("造成 20 点伤害。" if form == "ranged" else "造成 13 点伤害。")
+			check(preview.cardText.begins_with(expected), "Barrage card face distinguishes segment values: %s %d" % [form, bullets])
+			check(preview.description.begins_with(expected), "Barrage tooltip distinguishes segment values: %s %d" % [form, bullets])
+			check(preview.cardText.ends_with("总段数为 1 加打出前的弹药数。"), "Barrage keeps authored ammo count rule")
+			check(m.snapshot() == before, "Barrage wording consumes no bonus, ammo or state")
+			if form == "ranged" and bullets == 0: continue
+			var played := m.play_card("card_000", 0)
+			var expected_hits: int = bullets + 1 if form == "ranged" else 1
+			check(played.hits.size() == expected_hits, "Barrage execution keeps declared segment count")
+			check(played.hits[0].damage == (20 if form == "ranged" else 13), "Barrage actual first hit matches preview")
+			if form == "ranged":
+				check(played.hits.slice(1).all(func(hit): return hit.damage == 14), "Barrage subsequent actual hits match lower preview value")
+	var m := fixture([20], "ranged", 2)
+	m.ammo = 10
+	m.next_attack_bonus = 4
+	m.buffs.apply(m, "vulnerable", 1, 1)
+	var preview := m.card_preview("card_000", -1)
+	check(preview.cardText.begins_with("首段造成20–30点伤害，后续每段造成14–21点伤害。"), "Untargeted barrage keeps separate first/later vulnerability ranges")
 
 func contains(actual: String, expected: String, label: String) -> void:
 	check(expected in actual, "%s expected <%s>, got <%s>" % [label, expected, actual])
@@ -343,6 +376,7 @@ func _ready() -> void:
 	contains(preview_text(exhaust_preview), "消耗另一张手牌。", "Dismantle previews hand exhaustion")
 	check(exhaust_preview.snapshot() == exhaust_before, "Dismantle preview never moves candidate cards")
 	test_numeric_effects()
+	test_barrage_first_hit_wording()
 	test_read_only_catalog()
 	test_potential_status_and_conditional_wording()
 	var m := fixture([1])

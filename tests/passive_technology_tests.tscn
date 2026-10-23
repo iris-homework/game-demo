@@ -1,0 +1,4 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://tests/passive_technology_tests.gd" id="1"]
+[node name="PassiveTechnologyTests" type="Node"]
+script = ExtResource("1")

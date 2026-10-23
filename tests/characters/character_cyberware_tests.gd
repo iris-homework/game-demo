@@ -84,7 +84,7 @@ func _ready() -> void:
 	check(not restored.activate_cyberware(FIFTH), "Restore cannot bypass cooldown")
 	check(restored.play_card(restored.hand[0], 0).damage == 7, "Restored pending bonus resolves exactly once")
 	Game.start_training("B02")
-	check(Game.state.combat.profile.playerCharacterId == "qa_subset" and Game.state.combat.profile.cyberware.cards.is_empty(), "Training uses current actor's new list")
+	check(Game.state.combat.profile.playerCharacterId == "qa_subset" and Game.state.combat.profile.playerCyberwareIds == saved.equippedCyberwareIds and Game.state.ownedCyberwareIds == saved.ownedCyberwareIds and Game.state.equippedCyberwareIds == saved.equippedCyberwareIds, "Training preserves saved ownership and equipment despite changed actor defaults")
 	Game.finish_training("lose")
 	check(same_save(Game.state, saved), "Training restores previous adventure and its frozen list")
 	subset = battle_for("qa_subset")

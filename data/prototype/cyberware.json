@@ -59,6 +59,30 @@
       "effect": "gain_energy",
       "amount": 1,
       "cooldownTurns": 3
+    },
+    {
+      "id": "money_chip",
+      "name": "金钱芯片",
+      "description": "战斗胜利后，额外获得30信用点。",
+      "type": "passive",
+      "effect": "victory_credits",
+      "amount": 30
+    },
+    {
+      "id": "healing_chip",
+      "name": "治疗芯片",
+      "description": "战斗胜利后，回复5点生命，不超过生命上限。",
+      "type": "passive",
+      "effect": "victory_heal",
+      "amount": 5
+    },
+    {
+      "id": "swift_chip",
+      "name": "迅捷芯片",
+      "description": "战斗第一回合开始时，额外抽2张牌。",
+      "type": "passive",
+      "effect": "opening_draw",
+      "amount": 2
     }
   ]
 }

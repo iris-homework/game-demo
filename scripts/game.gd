@@ -39,6 +39,7 @@ var reward_rules: Dictionary
 var card_reward_rates: Dictionary
 var black_market_model := preload("res://scripts/black_market_model.gd").new()
 var black_market_rules: Dictionary
+var technology_shop_rules: Dictionary
 var card_reward_sampler := preload("res://scripts/card_reward_sampler.gd").new()
 var noren_rules: Dictionary
 var map_config: Dictionary
@@ -46,6 +47,8 @@ var meta_profile := {"schemaVersion":1, "cyberwareState":{}}
 var meta_path := "user://meta_profile.json"
 var transition_locked := false
 var battle_busy := false
+# Victory routing may checkpoint internally; publish only after its one disk write.
+var _defer_checkpoint := false
 var training_mode := false
 var training_backup: Dictionary = {}
 var training_enemies: Array = []
@@ -77,6 +80,7 @@ func _ready() -> void:
 	reward_rules = read_data("prototype/rewards.json")
 	card_reward_rates = read_data("card_reward_rates.json")
 	black_market_rules = read_data("black_market.json")
+	technology_shop_rules = read_data("technology_shop.json")
 	reward_rules.cards.merge(card_catalog, true)
 	noren_rules = read_data("combat/noren.json")
 	player_characters = read_data("player_characters.json")
@@ -204,7 +208,7 @@ func initial_state(player_id: String = "") -> Dictionary:
 	if player_id.is_empty(): player_id = config.defaultPlayerCharacterId
 	if not valid_player_character(player_id): return {}
 	var hp := int(player_characters[player_id].attributes.maxHp)
-	var fresh := {"schemaVersion":2, "playerCharacterId":player_id, "ownedCyberwareIds":player_characters[player_id].get("cyberwareIds", []).duplicate(), "equippedCyberwareIds":player_characters[player_id].get("cyberwareIds", []).duplicate(), "currentWeek":1, "currentDay":int(config.initialDay), "currentHp":hp, "maxHp":hp, "combat":{}, "battleStart":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "dialogueHistory":[], "battleId":"", "result":"", "battleHistory":[], "deck":[], "removedStartingCards":[], "battleReward":{}, "portraits":{"left":PLAYER_REFERENCE, "right":"bartender"}, "refreshedEventIds":[]}
+	var fresh := {"schemaVersion":2, "playerCharacterId":player_id, "ownedCyberwareIds":player_characters[player_id].get("cyberwareIds", []).duplicate(), "equippedCyberwareIds":player_characters[player_id].get("cyberwareIds", []).duplicate(), "currentWeek":1, "currentDay":int(config.initialDay), "currentHp":hp, "maxHp":hp, "combat":{}, "battleStart":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "dialogueHistory":[], "battleId":"", "result":"", "battleHistory":[], "deck":[], "removedStartingCards":[], "battleReward":{}, "battlePassiveReward":{}, "portraits":{"left":PLAYER_REFERENCE, "right":"bartender"}, "refreshedEventIds":[]}
 	refresh_event_pool(fresh)
 	black_market_model.refresh(fresh, card_catalog, black_market_rules)
 	return fresh
@@ -379,6 +383,9 @@ func checkpoint() -> void:
 	refresh_event_pool()
 	if not training_mode: black_market_model.refresh(state, card_catalog, black_market_rules)
 	revision += 1
+	if _defer_checkpoint:
+		page = state.currentScene
+		return
 	if save_enabled and not training_mode: save_game()
 	page = state.currentScene
 	changed.emit()
@@ -407,6 +414,7 @@ func start_event(id: String) -> bool:
 	state.battleId = ""
 	state.result = ""
 	state.battleReward = {}
+	state.battlePassiveReward = {}
 	state.combat = {}
 	state.battleStart = {}
 	state.portraits = {"left":PLAYER_REFERENCE, "right":""}
@@ -560,11 +568,64 @@ func battle_exit(result: String, expected_revision: int) -> bool:
 		mark_run_failed(state)
 		checkpoint()
 		return true
+	if state.get("currentHp", 0) <= 0 or state.get("combat", {}).get("playerHp", 0) <= 0: return false
+	# Keep ownership, payment, healing, claims and the first post-battle node in
+	# one checkpoint. No scene/status signal escapes before the write succeeds.
+	var previous := state
+	var previous_page := page
+	var previous_revision := revision
+	state = state.duplicate(true)
 	state.result = result
 	state.battleHistory.append({"battleId":state.battleId, "result":result})
 	state.battleStart = {}
+	_apply_victory_technologies()
+	_defer_checkpoint = true
 	enter_node(b.returnNodeByResult[result])
+	_defer_checkpoint = false
+	if state.currentScene == "battle" or (save_enabled and not save_game()):
+		state = previous
+		page = previous_page
+		revision = previous_revision
+		return false
+	changed.emit()
 	return true
+
+func _apply_victory_technologies() -> void:
+	var claim_id: String = state.activeEventId + ":" + state.battleId + ":passive_victory"
+	if claim_id in state.claimedRewardIds: return
+	var credits := 0
+	var healing := 0
+	for definition in state.get("combat", {}).get("profile", {}).get("cyberware", {}).get("cards", []).slice(0, CombatModel.CYBERWARE_LIMIT):
+		if not CombatModel.valid_cyberware_definition(definition) or not CombatModel.is_passive_cyberware(definition): continue
+		if definition.effect == "victory_credits": credits += int(definition.amount)
+		elif definition.effect == "victory_heal": healing += int(definition.amount)
+	if credits == 0 and healing == 0: return
+	healing = mini(healing, maxi(0, int(state.maxHp) - int(state.currentHp)))
+	state.credits += credits
+	state.currentHp += healing
+	if not state.combat.is_empty(): state.combat.playerHp = state.currentHp
+	state.claimedRewardIds.append(claim_id)
+	state.battlePassiveReward = {"claimId":claim_id, "eventId":state.activeEventId, "battleId":state.battleId, "credits":credits, "healing":healing}
+
+func battle_passive_summary() -> Dictionary:
+	var reward: Dictionary = state.get("battlePassiveReward", {})
+	if training_mode or reward.get("eventId", "") != state.get("activeEventId", "") or reward.get("battleId", "") != state.get("battleId", ""):
+		return {"credits":0, "healing":0}
+	return {"credits":int(reward.get("credits", 0)), "healing":int(reward.get("healing", 0))}
+
+func valid_battle_passive_reward(subject: Dictionary) -> bool:
+	var reward = subject.get("battlePassiveReward", {})
+	if not reward is Dictionary: return false
+	if reward.is_empty(): return true
+	for key in ["claimId", "eventId", "battleId"]:
+		if not reward.get(key) is String: return false
+	for key in ["credits", "healing"]:
+		var value = reward.get(key)
+		if not (value is int or value is float) or not is_finite(float(value)) or value < 0 or value != floor(float(value)): return false
+	if reward.healing > subject.maxHp: return false
+	if reward.eventId != subject.activeEventId or reward.battleId != subject.battleId: return false
+	if reward.claimId != reward.eventId + ":" + reward.battleId + ":passive_victory" or not reward.claimId in subject.claimedRewardIds: return false
+	return {"battleId":reward.battleId, "result":"win"} in subject.battleHistory
 
 func is_run_over(subject: Dictionary = {}) -> bool:
 	var s: Dictionary = state if subject.is_empty() else subject
@@ -655,14 +716,35 @@ func save_game() -> bool:
 		last_error = "保存检查点写入失败：" + str(write_error)
 		notice.emit(last_error)
 		return false
-	# Keep the previous valid snapshot for recovery from interruption/corruption.
-	if FileAccess.file_exists(save_path):
-		DirAccess.copy_absolute(save_path, save_path + ".bak")
+	# Never replace a good recovery copy with a damaged primary checkpoint.
+	# Stage the backup too: a failed copy must not truncate the existing backup.
+	if checkpoint_file_is_valid(save_path):
+		var backup_temp := save_path + ".bak.tmp"
+		var backup_error := DirAccess.copy_absolute(save_path, backup_temp)
+		if backup_error == OK:
+			backup_error = DirAccess.rename_absolute(backup_temp, save_path + ".bak")
+		if backup_error != OK:
+			last_error = "备份检查点失败：" + str(backup_error)
+			notice.emit(last_error)
+			return false
 	var err := DirAccess.rename_absolute(temp, save_path)
 	if err != OK:
 		last_error = "保存检查点失败：" + str(err)
 		notice.emit(last_error)
 	return err == OK
+
+func checkpoint_file_is_valid(path: String) -> bool:
+	if not FileAccess.file_exists(path): return false
+	var parser := JSON.new()
+	if parser.parse(FileAccess.get_file_as_string(path)) != OK: return false
+	# Legacy validation may generate missing pools on a copy. Do not consume the
+	# live adventure's random sequences merely to decide whether to rotate a file.
+	var event_rng_state := event_refresh_rng.state
+	var market_rng_state := black_market_model.rng.state
+	var valid := valid_save(migrate_save(parser.data))
+	event_refresh_rng.state = event_rng_state
+	black_market_model.rng.state = market_rng_state
+	return valid
 
 func valid_save(s) -> bool:
 	if not s is Dictionary or s.get("schemaVersion", 0) != 2: return false
@@ -699,7 +781,7 @@ func valid_save(s) -> bool:
 		if entry.kind not in ["dialogue", "choice"]: return false
 	for id in s.deck:
 		if not id is String or not (reward_rules.cards.has(id) or card_catalog.has(id) or prototype_rules.cards.has(id)): return false
-	if not valid_battle_reward(s): return false
+	if not valid_battle_reward(s) or not valid_battle_passive_reward(s): return false
 	if not (s.credits is float or s.credits is int) or s.credits < 0: return false
 	if not s.currentScene in ["map", "place", "dialogue", "battle", "result", "defeat"]: return false
 	if s.currentScene == "defeat" and (s.result != "lose" or not s.battleStart.is_empty() or not s.battleReward.is_empty()): return false
@@ -813,6 +895,7 @@ func battle_type_label(kind: String) -> String:
 	return BATTLE_TYPES.get(kind, BATTLE_TYPES.normal)
 
 func initialize_combat() -> void:
+	state.battlePassiveReward = {}
 	var battle: Dictionary = battles[state.battleId]
 	var definitions: Array = []
 	for id in battle.enemyIds:
@@ -951,7 +1034,8 @@ func start_training(battle_id: String = "B04") -> void:
 	if fresh.is_empty(): return
 	fresh.deck = state.get("deck", []).duplicate()
 	fresh.removedStartingCards = state.get("removedStartingCards", []).duplicate()
-	if valid_technology_loadout(state.get("equippedCyberwareIds"), player_character_id()):
+	if valid_equipped_technologies(state.get("equippedCyberwareIds"), state.get("ownedCyberwareIds")):
+		fresh.ownedCyberwareIds = owned_cyberware_ids()
 		fresh.equippedCyberwareIds = equipped_cyberware_ids()
 	training_backup = state.duplicate(true)
 	training_scenery_place_id = ""
@@ -1048,6 +1132,7 @@ func migrate_save(data):
 				if data.portraits.get(side) == LEGACY_PLAYER_CHARACTER_ID:
 					data.portraits[side] = PLAYER_REFERENCE
 	if not data.has("battleReward"): data.battleReward = {}
+	if not data.has("battlePassiveReward"): data.battlePassiveReward = {}
 	if not data.has("dialogueHistory"): data.dialogueHistory = []
 	if not data.has("battleStart"): data.battleStart = {}
 	if not data.has("equippedCyberwareIds") and valid_player_character(data.get("playerCharacterId")):
@@ -1107,6 +1192,7 @@ func migrate_mercenary_story(data: Dictionary) -> void:
 		data.battleStart = {}
 		# Credits and already selected cards stay; pending retired offers are closed.
 		data.battleReward = {}
+		data.battlePassiveReward = {}
 		data.portraits = {"left":PLAYER_REFERENCE, "right":""}
 	if data.get("completedEventIds") is Array:
 		data.completedEventIds = data.completedEventIds.filter(func(id): return not id in retired_events)
@@ -1160,8 +1246,33 @@ func valid_battle_reward(s: Dictionary) -> bool:
 		if not id is String or not reward_rules.cards.has(id) or id in seen: return false
 		seen.append(id)
 	if not r.status in ["pending", "claimed", "skipped"]: return false
-	if r.status == "claimed": return r.selectedCardId in r.options and r.selectedCardId in s.deck
+	# A claim records the past selection; the acquired copy may since have been sold.
+	# The claim receipt and original offer remain validated above, independently of ownership.
+	if r.status == "claimed": return r.selectedCardId in r.options
 	return r.selectedCardId.is_empty()
+
+func valid_frozen_card(definition) -> bool:
+	# Validate the frozen shape, never compare historical balance values to today's catalog.
+	if not definition is Dictionary: return false
+	for key in ["name", "type"]:
+		if not definition.get(key) is String or definition[key].is_empty(): return false
+	for key in ["id", "description", "cardText", "rarity", "target", "artAssetId"]:
+		if definition.has(key) and not definition[key] is String: return false
+	if definition.has("rarity") and (not definition.has("cost") or not definition.get("description") is String): return false
+	if definition.has("cost") and definition.cost != null:
+		if not (definition.cost is int or definition.cost is float) or not is_finite(float(definition.cost)): return false
+	for key in ["exhaust", "consumeAllAmmo"]:
+		if definition.has(key) and not definition[key] is bool: return false
+	if not definition.get("effects") is Array: return false
+	for effect in definition.effects:
+		if not effect is Dictionary or not effect.get("type") is String or effect.type.is_empty(): return false
+		for key in ["id", "value", "when"]:
+			if effect.has(key) and not effect[key] is String: return false
+		for key in ["amount", "hits", "cap", "executeBonus", "lastAmmoBonus", "rangedBonus", "requiresBleed", "bleedTriggers", "woundedMeleeAmount"]:
+			if effect.has(key) and (not (effect[key] is int or effect[key] is float) or not is_finite(float(effect[key]))): return false
+		for key in ["allAmmoHits", "rangedIgnoreBlock"]:
+			if effect.has(key) and not effect[key] is bool: return false
+	return true
 
 func valid_combat(c: Dictionary) -> bool:
 	for key in ["battleId","turn","playerHp","maxHp","drawPile","hand","discardPile","instances","enemies","outcome","log","profile","cardCatalog"]:
@@ -1183,7 +1294,8 @@ func valid_combat(c: Dictionary) -> bool:
 	for uid in c.drawPile + c.hand + c.discardPile + exhausted:
 		if not uid is String or uid in seen or not c.instances.has(uid): return false
 		seen.append(uid)
-		if not c.cardCatalog.has(c.instances[uid]): return false
+		if not c.instances[uid] is String or not c.cardCatalog.has(c.instances[uid]): return false
+		if not valid_frozen_card(c.cardCatalog[c.instances[uid]]): return false
 	if seen.size() != c.instances.size(): return false
 	for enemy in c.enemies:
 		if not enemy is Dictionary: return false
@@ -1230,12 +1342,14 @@ func valid_cyberware_state(c: Dictionary) -> bool:
 	if not rules is Dictionary or not rules.get("cards", []) is Array: return false
 	var catalog := {}
 	var cooldown_limits := {}
+	var passive_ids := []
 	for definition in rules.get("cards", []):
 		if not definition is Dictionary: return false
 		if not CombatModel.valid_cyberware_definition(definition): return false
 		if catalog.has(definition.id): return false
 		catalog[definition.id] = int(definition.get("nextAttackBonus", 0))
 		cooldown_limits[definition.id] = int(definition.get("cooldownTurns", 1))
+		if CombatModel.is_passive_cyberware(definition): passive_ids.append(definition.id)
 	# New battles freeze the character's list beside its definitions. Older
 	# snapshots may also carry a longer historical list; the current slot limit
 	# applies to new character configurations, not frozen save definitions.
@@ -1248,7 +1362,7 @@ func valid_cyberware_state(c: Dictionary) -> bool:
 	# New non-damage technologies contribute zero, even while on cooldown.
 	for amount in catalog.values(): maximum += amount * (int(c.turn) - 1)
 	for id in used:
-		if not id is String or id in seen or not catalog.has(id): return false
+		if not id is String or id in seen or not catalog.has(id) or id in passive_ids: return false
 		seen.append(id)
 		maximum += catalog[id]
 	if c.has("cyberwareCooldowns"):
@@ -1281,6 +1395,40 @@ func full_deck_ids(subject: Dictionary = {}) -> Array:
 	for id in source.get("removedStartingCards", []): ids.erase(id)
 	ids.append_array(source.get("deck", []))
 	return ids
+
+func technology_shop_offers() -> Array:
+	# Fixed catalog; adventure ownership is the purchase record, with no restock.
+	var offers = technology_shop_rules.get("offers")
+	if not offers is Array or offers.size() > 6: return []
+	var seen := []
+	for offer in offers:
+		if not offer is Dictionary or not offer.get("id") is String or offer.id in seen: return []
+		if offer.id.begins_with("test_"): return []
+		var definition := cyberware_definition(offer.id)
+		if definition.is_empty() or not CombatModel.valid_cyberware_definition(definition): return []
+		var price = offer.get("price")
+		if not (price is int or price is float) or not is_finite(float(price)) or price <= 0 or price != floor(float(price)): return []
+		seen.append(offer.id)
+	return offers.duplicate(true)
+
+func buy_shop_technology(index: int, expected_revision: int) -> bool:
+	if state.is_empty() or page != "place" or state.get("currentScene") != "place" or state.get("currentPlaceId") != "mall":
+		return _market_reject("请先进入沃斯商场。")
+	if training_mode or transition_locked or battle_busy or is_run_over(): return _market_reject("当前无法购买科技。")
+	if expected_revision != revision: return _market_reject("商场状态已更新，请重新选择。")
+	var offers := technology_shop_offers()
+	if offers.is_empty(): return _market_reject("科技商品配置无效。")
+	if index < 0 or index >= offers.size(): return _market_reject("无效的科技商品位置。")
+	var offer: Dictionary = offers[index]
+	var owned := owned_cyberware_ids()
+	if not valid_owned_technologies(owned): return _market_reject("已有科技记录无效。")
+	if offer.id in owned: return _market_reject("本次冒险已经拥有这项科技。")
+	if state.credits < offer.price: return _market_reject("信用点不足。")
+	var draft := state.duplicate(true)
+	draft.credits -= int(offer.price)
+	owned.append(offer.id)
+	draft.ownedCyberwareIds = owned
+	return _commit_market(draft)
 
 func market_buy_price(card_id: String) -> int:
 	return black_market_model.price(card_catalog.get(card_id, {}), black_market_rules)
@@ -1412,7 +1560,14 @@ func valid_noren_state(c: Dictionary) -> bool:
 	for key in ["energy", "ammo"]:
 		var value = n.get(key)
 		if not (value is int or value is float) or not is_finite(float(value)) or value < 0 or value != floor(float(value)): return false
-	if n.energy > int(c.profile.get("energyPerTurn", 3)) or n.ammo > int(c.profile.get("ammoCap", 10)): return false
+	# Energy resets each turn; only technologies activated this turn can raise
+	# its ceiling. Use frozen definitions so older battles keep their own rules.
+	var maximum_energy := int(c.profile.get("energyPerTurn", 3))
+	for definition in c.profile.get("cyberware", {}).get("cards", []).slice(0, CombatModel.CYBERWARE_LIMIT):
+		if definition.get("effect", "") != "gain_energy" or not definition.id in c.get("usedCyberware", []): continue
+		if int(c.get("cyberwareCooldowns", {}).get(definition.id, 1)) == int(definition.get("cooldownTurns", 1)):
+			maximum_energy += int(definition.amount)
+	if n.energy > maximum_energy or n.ammo > int(c.profile.get("ammoCap", 10)): return false
 	if n.get("stance") not in ["melee", "ranged"]: return false
 	if not n.get("exhaustPile") is Array: return false
 	return buffs.valid_snapshot(c)

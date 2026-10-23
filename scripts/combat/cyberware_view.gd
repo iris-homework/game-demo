@@ -2,6 +2,7 @@ extends DemoUI
 ## Battle technologies; separate from the read-only combat piles.
 signal closed
 signal activation_requested(id: String)
+const TechnologyIcons = preload("res://scripts/technology_icons.gd")
 const PURPLE := Color("c895ff")
 var model: CombatModel
 var card_buttons: Array[Button] = []
@@ -26,43 +27,43 @@ func _ready() -> void:
 		label(self,"当前角色没有可激活科技",Vector2(310,236),Vector2(820,60),30,MUTED)
 	var row_width := CombatModel.CYBERWARE_LIMIT*270 + (CombatModel.CYBERWARE_LIMIT-1)*30
 	for i in CombatModel.CYBERWARE_LIMIT:
-		var pos := Vector2((1440-row_width)/2.0+i*300,320)
+		var pos := Vector2((1440-row_width)/2.0+i*300,282)
 		if i >= model.cyberware_cards().size():
-			var empty_slot := panel(self,pos,Vector2(270,246),Color("17131f"),Color("494053"))
+			var empty_slot := panel(self,pos,Vector2(270,340),Color("17131f"),Color("494053"))
 			label(empty_slot,"TECH / %02d" % (i+1),Vector2(20,13),Vector2(228,25),12,MUTED)
-			var empty_label := label(empty_slot,"空位",Vector2(20,99),Vector2(230,48),25,MUTED)
+			var empty_label := label(empty_slot,"空位",Vector2(20,146),Vector2(230,48),25,MUTED)
 			empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			continue
 		var definition: Dictionary = model.cyberware_cards()[i]
 		# Normalize legacy snapshot text for display without changing saved rules.
 		var display_name := str(definition.name).replace("义体", "科技")
 		var description := str(definition.description).replace("义体", "科技")
-		var b := button(self,"",pos,Vector2(270,246),func(): activation_requested.emit(definition.id))
+		var passive := CombatModel.is_passive_cyberware(definition)
+		var b := button(self,"",pos,Vector2(270,340),func():
+			if model.cyberware_available(definition.id): activation_requested.emit(definition.id))
 		for state_name in ["normal","hover","pressed","disabled","focus"]:
 			var fill := Color("251638")
 			if state_name == "hover": fill = Color("482866")
 			elif state_name == "pressed": fill = Color("342047")
-			elif state_name == "disabled": fill = Color("25272d")
+			elif state_name == "disabled": fill = Color("18312f") if passive else Color("25272d")
 			elif state_name == "focus": fill = Color.TRANSPARENT
-			b.add_theme_stylebox_override(state_name,style(fill,PURPLE if state_name != "disabled" else Color("606570"),2))
+			b.add_theme_stylebox_override(state_name,style(fill,CYAN if passive else PURPLE if state_name != "disabled" else Color("606570"),2))
 		var cooldown := int(definition.get("cooldownTurns", 1))
-		b.tooltip_text = display_name + "\n" + description + "\n冷却 %d 回合（含使用当回合）。" % cooldown
+		b.tooltip_text = display_name + "\n" + description + ("\n被动科技，携带后自动生效，无法手动激活。" if passive else "\n冷却 %d 回合（含使用当回合）。" % cooldown)
 		label(b,"TECH / %02d" % (i+1),Vector2(20,13),Vector2(228,25),12,PURPLE)
-		label(b,display_name,Vector2(20,46),Vector2(230,38),25)
-		rect(b,Vector2(20,92),Vector2(230,1),Color("74528f"))
-		var effect_label := label(b,description,Vector2(20,105),Vector2(230,54),19,CREAM)
+		TechnologyIcons.create(b,str(definition.id),Vector2(79,42),Vector2(112,112))
+		label(b,display_name,Vector2(20,166),Vector2(230,38),25)
+		rect(b,Vector2(20,209),Vector2(230,1),Color("74528f"))
+		var effect_label := label(b,description,Vector2(20,220),Vector2(230,50),17,CREAM)
 		effect_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		label(b,"冷却 %d 回合" % cooldown,Vector2(20,169),Vector2(230,25),15,PURPLE)
-		state_labels.append(label(b,"",Vector2(20,200),Vector2(235,31),17,PURPLE))
+		label(b,TechnologyIcons.activation_label(definition),Vector2(20,276),Vector2(230,25),15,PURPLE)
+		state_labels.append(label(b,"",Vector2(20,304),Vector2(235,31),17,PURPLE))
 		for child in b.get_children():
 			if child is Label: child.set_meta("active_color",child.get_theme_color("font_color"))
 			elif child is ColorRect: child.set_meta("active_color",child.color)
 		card_buttons.append(b)
 	status_label = label(self,"",Vector2(125,748),Vector2(1100,34),20,PURPLE)
-	var shortcut := ""
-	if card_buttons.size() == 1: shortcut = "  /  数字 1 激活"
-	elif card_buttons.size() > 1: shortcut = "  /  数字 1—%d 激活" % card_buttons.size()
-	label(self,"点击卡牌激活" + shortcut + "  /  Esc 或右键关闭",Vector2(124,811),Vector2(860,28),15,MUTED)
+	label(self,"主动科技：点击或对应数字键激活 · 被动科技：自动生效 / Esc 或右键关闭",Vector2(124,811),Vector2(860,28),15,MUTED)
 	button(self,"返回战斗  →",Vector2(1100,797),Vector2(234,46),func(): closed.emit())
 	refresh()
 	close_button.grab_focus()
@@ -71,13 +72,20 @@ func refresh() -> void:
 	for i in card_buttons.size():
 		var id: String = model.cyberware_cards()[i].id
 		var remaining := model.cyberware_cooldown(id)
+		var passive := CombatModel.is_passive_cyberware(model.cyberware_cards()[i])
 		var used := not model.cyberware_available(id)
 		card_buttons[i].disabled = used
 		for child in card_buttons[i].get_children():
-			if child is Label: child.add_theme_color_override("font_color",Color("a7abb5") if used else child.get_meta("active_color"))
-			elif child is ColorRect: child.color = Color("606570") if used else child.get_meta("active_color")
-		state_labels[i].text = ("冷却中 · 下回合可用" if remaining == 1 else "冷却中 · 剩余 %d 回合" % remaining) if remaining > 0 else ("当前不可用" if used else "%d  /  点击激活" % (i+1))
-	status_label.text = "本回合可用 %d 项科技" % model.available_cyberware_count()
+			if child is Label: child.add_theme_color_override("font_color",Color("a7abb5") if used and not passive else child.get_meta("active_color"))
+			elif child is ColorRect: child.color = Color("606570") if used and not passive else child.get_meta("active_color")
+			elif child is TextureRect: child.modulate = Color(0.65,0.65,0.7,0.65) if used and not passive else Color.WHITE
+		if passive:
+			state_labels[i].text = "被动 · 无需激活"
+		elif remaining > 0:
+			state_labels[i].text = "冷却中 · 下回合可用" if remaining == 1 else "冷却中 · 剩余 %d 回合" % remaining
+		else:
+			state_labels[i].text = "当前不可用" if used else "%d  /  点击激活" % (i+1)
+	status_label.text = "本回合可激活 %d 项主动科技" % model.available_cyberware_count()
 	if model.next_attack_bonus > 0: status_label.text += "    /    待生效：下次攻击伤害 +%d" % model.next_attack_bonus
 
 func _input(event: InputEvent) -> void:

@@ -1,6 +1,7 @@
 extends DemoUI
 ## Each equipment change is committed immediately; closing only dismisses the panel.
 signal closed
+const TechnologyIcons = preload("res://scripts/technology_icons.gd")
 const PURPLE := Color("c895ff")
 var selected_ids: Array = []
 var slot_buttons: Array[Button] = []
@@ -23,6 +24,8 @@ func _ready() -> void:
 	summary_label = label(self,"",Vector2(124,187),Vector2(900,30),20,PURPLE)
 	for i in CombatModel.CYBERWARE_LIMIT:
 		var slot := button(self,"",Vector2(135+i*300,234),Vector2(270,130),remove_slot.bind(i))
+		TechnologyIcons.create(slot,"",Vector2(18,34),Vector2(60,60))
+		label(slot,"",Vector2(92,28),Vector2(162,80),18).name = "equipped_title"
 		slot_buttons.append(slot)
 	label(self,"已有科技",Vector2(124,408),Vector2(900,38),25)
 	label(self,"点击携带或卸下；上方顺序对应战斗中的数字键。",Vector2(124,451),Vector2(1080,30),17,MUTED)
@@ -44,9 +47,10 @@ func _ready() -> void:
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		card.pressed.connect(toggle_technology.bind(id))
 		grid.add_child(card)
-		label(card,str(definition.name),Vector2(20,18),Vector2(336,36),25)
-		label(card,str(definition.description),Vector2(20,66),Vector2(336,64),19)
-		label(card,"冷却 %d 回合" % int(definition.get("cooldownTurns",1)),Vector2(20,132),Vector2(336,26),16,PURPLE)
+		TechnologyIcons.create(card,id,Vector2(20,18),Vector2(96,96))
+		label(card,str(definition.name),Vector2(134,25),Vector2(222,40),24)
+		label(card,TechnologyIcons.activation_label(definition),Vector2(134,78),Vector2(222,26),16,PURPLE)
+		label(card,str(definition.description),Vector2(20,119),Vector2(336,50),17)
 		label(card,"",Vector2(20,174),Vector2(336,26),17,PURPLE).name = "selection_state"
 		technology_buttons[id] = card
 	if technology_buttons.is_empty():
@@ -86,7 +90,10 @@ func refresh() -> void:
 	for i in slot_buttons.size():
 		var slot := slot_buttons[i]
 		slot.disabled = i >= selected_ids.size()
-		slot.text = "%02d  /  空位" % (i+1) if slot.disabled else "%02d  /  %s\n点击卸下" % [i+1,Game.cyberware_definition(selected_ids[i]).name]
+		slot.text = "%02d  /  空位" % (i+1) if slot.disabled else ""
+		var id := "" if slot.disabled else str(selected_ids[i])
+		TechnologyIcons.assign(slot.get_node("technology_icon"),id)
+		slot.get_node("equipped_title").text = "" if slot.disabled else "%02d / %s\n点击卸下" % [i+1,Game.cyberware_definition(id).name]
 		slot.add_theme_font_size_override("font_size",20)
 	for id in technology_buttons:
 		var card: Button = technology_buttons[id]

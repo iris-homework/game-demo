@@ -56,7 +56,8 @@ static func build(model, uid: String, target: int, extra: int) -> Dictionary:
 	return {"text":"\n".join(lines), "cardText":_card_text(definition, rows), "description":_card_text({"cardText":definition.get("description", "")}, rows), "effects":rows}
 
 static func _card_text(definition: Dictionary, rows: Array) -> String:
-	# Keep every authored word. Replace existing effect numbers only; implicit
+	# Keep authored rules. Replace effect numbers; dynamic multi-hit attacks need
+	# explicit first/later wording when their segment values differ. Implicit
 	# attack ammo, stance rewards and bleed triggers never introduce new lines.
 	var text: String = definition.get("cardText", definition.get("description", ""))
 	var damage_rows: Array = rows.filter(func(row): return row.type == "damage")
@@ -67,6 +68,16 @@ static func _card_text(definition: Dictionary, rows: Array) -> String:
 	for index in range(mini(matches.size(), damage_rows.size()) - 1, -1, -1):
 		var found: RegExMatch = matches[index]
 		var samples: Array = damage_rows[index].samples
+		if damage_rows[index].get("dynamicHits", false) and samples[0].size() > 1:
+			var first: Array = []
+			var later: Array = []
+			for sample in samples:
+				first.append(sample[0])
+				later.append_array(sample.slice(1))
+			if _range(first) != _range(later):
+				var replacement := "首段造成%s点伤害，后续每段造成%s点伤害" % [_range(first), _range(later)]
+				text = text.substr(0, found.get_start()) + replacement + text.substr(found.get_end())
+				continue
 		var repeated := found.get_start(2) >= 0
 		var parts: PackedStringArray = []
 		var count: int = samples[0].size() if repeated else 1
@@ -194,7 +205,7 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 						# Keep HP/block intact for potential damage, advancing only nominal layers.
 						if active and layers>0 and copy.buffs.count(copy,"persistent_bleed")==0: copy.enemies[target].bleed=layers-1
 				bonus = 0
-				rows.append({"type":"damage", "values":hits if active else [0], "bypass":copy.is_noren() and form == "ranged" and effect.get("rangedIgnoreBlock", false)})
+				rows.append({"type":"damage", "values":hits if active else [0], "dynamicHits":effect.get("allAmmoHits", false), "bypass":copy.is_noren() and form == "ranged" and effect.get("rangedIgnoreBlock", false)})
 				rows.append({"type":"bleed_damage", "values":bleeding if active else [0]})
 			"ammo":
 				var previous: int = copy.ammo

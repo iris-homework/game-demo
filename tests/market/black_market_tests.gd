@@ -1,7 +1,7 @@
 extends Node
 var checks := 0
 var failures := 0
-var qa_dir := "res://artifacts/qa/black-market-2026-10-23"
+var qa_dir := OS.get_environment("QA_OUT_DIR") if not OS.get_environment("QA_OUT_DIR").is_empty() else "res://artifacts/qa/black-market-2026-10-23"
 var good_path := ""
 
 func check(ok: bool, message: String) -> void:
@@ -244,6 +244,61 @@ func test_save() -> void:
 	saved = Game.state.duplicate(true)
 	check(Game.load_game() and same_saved_state(Game.state, saved), "catchup refresh is persisted and never rerolled on reload")
 
+func test_reward_card_sale_reload() -> void:
+	reset()
+	Game.save_enabled = true
+	Game.state.activeEventId = "E02"
+	Game.state.currentPlaceId = Game.battles.B02.placeId
+	Game.enter_node("battle")
+	check(Game.battle_exit("win", Game.revision), "reward sale: enter victory dialogue")
+	var steps := 0
+	while Game.state.currentScene == "dialogue" and steps < 30:
+		Game.advance(Game.revision)
+		steps += 1
+	check(Game.has_battle_reward(), "reward sale: actual finish creates reward offer")
+	if not Game.has_battle_reward(): return
+	var earned: String = Game.state.battleReward.options[0]
+	check(Game.choose_reward_card(earned, Game.revision), "reward sale: claim offered card")
+	check(Game.claim_rewards(Game.revision), "reward sale: leave reward page")
+	Game.visit("market")
+	check(Game.owned_card_counts().get(earned, 0) == 1, "reward sale: earned card has exactly one copy")
+	var credits_before := int(Game.state.credits)
+	check(Game.sell_market_card(earned, Game.revision), "reward sale: sell last earned copy")
+	check(not earned in Game.full_deck_ids() and Game.state.credits == credits_before + Game.market_sell_price(earned), "reward sale: remove card and credit sale once")
+	check(Game.state.battleReward.status == "claimed" and Game.state.battleReward.selectedCardId == earned, "reward sale: keep historical claim after sale")
+	# A second normal checkpoint rotates the sold state into the backup too.
+	Game.go_map()
+	var saved := Game.state.duplicate(true)
+	for path in [good_path, good_path + ".bak"]:
+		var disk = JSON.parse_string(FileAccess.get_file_as_string(path))
+		check(disk is Dictionary and not earned in disk.deck and disk.blackMarket.soldCardUsed, "reward sale: both disk checkpoints retain the completed sale")
+		check(Game.valid_save(Game.migrate_save(disk)), "reward sale: sold reward checkpoint passes loading validation: " + path.get_file())
+	Game.state = {}
+	var loaded := Game.load_game()
+	check(loaded and same_saved_state(Game.state, saved), "reward sale: cold load preserves full post-sale progress")
+	if not loaded: return
+	# The existing backup must also load, with the sale and reward history intact.
+	var backup = JSON.parse_string(FileAccess.get_file_as_string(good_path + ".bak"))
+	var file := FileAccess.open(good_path, FileAccess.WRITE)
+	file.store_string("invalid test checkpoint")
+	file.close()
+	Game.state = {}
+	loaded = Game.load_game()
+	check(loaded and same_saved_state(Game.state, backup), "reward sale: backup restores sold reward without giving the card back")
+	if not loaded: return
+	var after_sale_credits := int(Game.state.credits)
+	Game.enter_node("finish")
+	check(Game.state.credits == after_sale_credits and Game.state.battleReward.status == "claimed", "reward sale: finish reentry cannot repeat victory credits")
+	for option in Game.state.battleReward.options:
+		check(not Game.choose_reward_card(option, Game.revision), "reward sale: no reward option can be claimed again")
+	check(not earned in Game.full_deck_ids() and Game.state.blackMarket.soldCardUsed, "reward sale: reload and finish reentry preserve removal and sale limit")
+	var invalid := Game.state.duplicate(true)
+	invalid.claimedRewardIds.erase(invalid.battleReward.claimId)
+	check(not Game.valid_save(invalid), "reward sale: missing claim receipt still rejected")
+	invalid = Game.state.duplicate(true)
+	invalid.battleReward.selectedCardId = "noren_01"
+	check(not Game.valid_save(invalid), "reward sale: selected card outside the original offer still rejected")
+
 func _ready() -> void:
 	var directory := ProjectSettings.globalize_path(qa_dir.path_join("test-files"))
 	DirAccess.make_dir_recursive_absolute(directory)
@@ -256,6 +311,7 @@ func _ready() -> void:
 	test_compatibility()
 	test_price_revision()
 	test_save()
+	test_reward_card_sale_reload()
 	Game.save_enabled = false
 	var result := {"checks":checks, "failures":failures, "scope":"headless model, transactions, saves, day changes; no rendered UI or physical input"}
 	var file := FileAccess.open(qa_dir.path_join("logic-result.json"), FileAccess.WRITE)

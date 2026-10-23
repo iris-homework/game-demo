@@ -380,7 +380,7 @@
     "id": "mall",
     "name": "沃斯商场",
     "backgroundAssetId": "mall",
-    "description": "沃斯集团拥有的城市最大商场。商品与补给功能待设计。",
+    "description": "沃斯集团旗下的科技商场。出售现有战斗科技，未上架的货位暂时留空。购买后可在地图的科技配置中携带。",
     "mapAnchor": [
       0.449,
       0.3

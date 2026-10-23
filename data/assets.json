@@ -307,5 +307,17 @@
   "black_market_shop": {
     "path": "res://assets/market/black-market-shop-v1.png",
     "kind": "background"
+  },
+  "black_market_background": {
+    "path": "res://assets/market/black-market-background-v2.png",
+    "kind": "background"
+  },
+  "black_market_shopkeeper": {
+    "path": "res://assets/market/black-market-shopkeeper-layer-v2.png",
+    "kind": "portrait"
+  },
+  "woss_mall_shop": {
+    "path": "res://assets/market/woss-mall-shop-v1.png",
+    "kind": "background"
   }
 }

@@ -52,6 +52,7 @@ var held_confirmation := false
 var exhaust_button: Button
 var pile_overlay: Control
 var initialized := false
+var pending_battle_result := ""
 var stage: Control
 var shown_enemies: Array = []
 var shown_player_hp := -1
@@ -638,6 +639,11 @@ func animate_discard(view: CombatCard, delay: float = 0.0, turn_cleanup: bool = 
 	fx.start(view,DISCARD_POS+PILE_SIZE/2.0,0.32 if turn_cleanup else 0.40,delay,0.55 if turn_cleanup else 1.0)
 
 func end_turn_pressed() -> void:
+	# A terminal snapshot can enter this view without drawing/initializing a hand.
+	# Retry only the transactional story exit, never the combat turn or card play.
+	if not pending_battle_result.is_empty():
+		finish(pending_battle_result)
+		return
 	if not initialized or not model.outcome.is_empty() or Game.transition_locked or Game.battle_busy or is_instance_valid(pile_overlay): return
 	set_busy(true)
 	selected_uid = ""
@@ -918,7 +924,15 @@ func activate_cyberware(id: String) -> void:
 
 func finish(result: String) -> void:
 	if Game.transition_locked or Game.battle_busy or is_instance_valid(pile_overlay): return
-	Game.battle_exit(result,Game.revision)
+	if Game.battle_exit(result,Game.revision):
+		pending_battle_result = ""
+		return
+	pending_battle_result = result
+	end_button.text = "重试战后结算"
+	end_button.tooltip_text = "保存未完成。处理存储问题后点击重试，战斗结果会保留。"
+	end_button.disabled = false
+	turn_label.text = "战后结算 / 等待保存"
+	Game.notice.emit("战后结算未能保存，请点击“重试战后结算”。")
 
 func use_item(item_id: String) -> void:
 	if Game.battle_busy or Game.transition_locked: return

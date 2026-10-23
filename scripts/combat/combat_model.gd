@@ -53,8 +53,24 @@ func available_cyberware_count() -> int:
 		if cyberware_available(definition.id): available += 1
 	return available
 
+static func is_passive_cyberware(definition: Dictionary) -> bool:
+	return definition.get("type", "active") == "passive"
+
+func passive_technology_amount(effect: String) -> int:
+	var amount := 0
+	for definition in cyberware_cards():
+		if is_passive_cyberware(definition) and valid_cyberware_definition(definition) and definition.get("effect") == effect:
+			amount += int(definition.amount)
+	return amount
+
 static func valid_cyberware_definition(definition: Dictionary) -> bool:
 	if not definition.get("id") is String or definition.id.is_empty() or not definition.get("name") is String: return false
+	var kind = definition.get("type", "active")
+	if kind not in ["active", "passive"]: return false
+	if kind == "passive":
+		if definition.has("cooldownTurns") or definition.has("nextAttackBonus"): return false
+		var amount = definition.get("amount")
+		return definition.get("effect") in ["victory_credits", "victory_heal", "opening_draw"] and (amount is int or amount is float) and is_finite(float(amount)) and amount > 0 and amount == floor(float(amount))
 	var cooldown = definition.get("cooldownTurns", 1)
 	if not (cooldown is int or cooldown is float) or not is_finite(float(cooldown)) or cooldown < 1 or cooldown != floor(float(cooldown)): return false
 	match definition.get("effect", "next_attack_bonus"):
@@ -75,7 +91,7 @@ func cyberware_available(id: String) -> bool:
 	if not outcome.is_empty() or player_hp <= 0 or cyberware_cooldown(id) > 0: return false
 	for definition in cyberware_cards():
 		if definition.id != id: continue
-		if not valid_cyberware_definition(definition): return false
+		if not valid_cyberware_definition(definition) or is_passive_cyberware(definition): return false
 		return is_noren() or definition.get("effect", "next_attack_bonus") in ["next_attack_bonus", "redraw_hand"]
 	return false
 
@@ -199,8 +215,9 @@ func attack_hit_amount(definition: Dictionary, effect: Dictionary, form: String,
 func draw_cards(amount: int = -1) -> Array:
 	var drawn: Array = []
 	if not outcome.is_empty(): return drawn
+	var opening_bonus := passive_technology_amount("opening_draw") if not opening_draw_done and turn == 1 else 0
 	opening_draw_done = true
-	var desired := int(profile.get("handSize", 3)) if amount < 0 else hand.size() + amount
+	var desired := (int(profile.get("handSize", 3)) if amount < 0 else hand.size() + amount) + opening_bonus
 	while hand.size() < desired:
 		if draw_pile.is_empty():
 			if discard_pile.is_empty() or not profile.get("recycleDiscardWhenEmpty", true): break

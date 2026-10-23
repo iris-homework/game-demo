@@ -71,8 +71,10 @@ func _ready() -> void:
 	for place in ["hospital","clinic"]:
 		for hp in [50,90]:
 			Game.state.currentHp = hp
+			Game.state.credits = 150 # Clinic is paid; this case checks successful treatment.
 			check(Game.heal_at(place),place+" service")
 			check(Game.state.currentHp == (80 if hp == 50 else 100),place+" heal30% capped")
+			check(Game.state.credits == (0 if place == "clinic" else 150),place+" correct treatment cost")
 			check(Game.state.currentDay == 1,place+" no automatic time cost")
 	Game.state.currentHp = 50
 	check(not Game.heal_at("bar"),"No healing at non-service location")

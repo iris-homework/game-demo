@@ -167,7 +167,7 @@ func _build_detail(accent: Color, name_text: String, state_text: String, desc_te
 		footer_y += BUTTON_HEIGHT + 8.0
 	if has_enter:
 		var market := str(_content.get("id", "")) == "market"
-		var enter_button := _add_button("进入黑市    →" if market else "进入地点    →", "enter_place", Rect2(PAD, footer_y, inner_w, BUTTON_HEIGHT), market, func(): _emit("enter", ""))
+		var enter_button := _add_button("进入黑市    →" if market else "进入商场    →" if str(_content.get("id", "")) == "mall" else "进入地点    →", "enter_place", Rect2(PAD, footer_y, inner_w, BUTTON_HEIGHT), market, func(): _emit("enter", ""))
 		if market: enter_button.add_theme_color_override("font_hover_color", DemoUI.INK)
 	_add_button("关闭", "close_place", Rect2(card_width - PAD - 56.0, 12.0, 56.0, 24.0), false, func(): _emit("close", "")).add_theme_font_size_override("font_size", 12)
 

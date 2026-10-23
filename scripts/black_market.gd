@@ -17,7 +17,7 @@ func _ready() -> void:
 	Game.ensure_black_market()
 	# Keep the shopkeeper at the source illustration brightness.
 	rect(self,Vector2.ZERO,Vector2(1440,900),INK)
-	image_asset(self,"black_market_shop",Vector2.ZERO,Vector2(1440,900))
+	add_child(preload("res://scripts/black_market_art.gd").new())
 	status_bar("黑市")
 	panel(self,Vector2(430,94),Vector2(982,734),Color("090b12a8"),Color("49394d"))
 	cut_panel(self,Vector2(28,96),Vector2(220,66),Color("100e19e8"),PINK,18)

@@ -1,6 +1,17 @@
 # 测试目录索引
 
-黑市交易专项：[black_market_tests](market/black_market_tests.tscn)127项（库存、日期、买卖、存读／迁移、实际删牌、演练、失败回滚、浮动价冻结及价格版本原地迁移）；[market_ui_tests](market/market_ui_tests.tscn)97项（真实主场景路由、两行货架、确认／取消、余额、售罄、出售选择、Tab／Esc／F1隔离、HUD和第4天刷新）。均headless运行，仅写专项路径，不能代表实际像素或物理鼠标验收。证据：`artifacts/qa/black-market-2026-10-23/`。
+2026-10-24余项修复：新增`remaining_bug_tests.tscn`（56项，备份轮换／复制和替换失败保护、旧卡牌快照拒绝及兼容、开场结算文案、五种模态地图拖动取消）与`battle_recovery_tests.tscn`（12项，胜利保存失败、按钮重试及收益防重）；扩展`combat_preview_tests`至2311项，覆盖动态多段首段／后续伤害。另跑双卡面2762项，覆盖两套模板的动态文案边界。整合14套6795项断言0失败，全部headless及隔离路径；战败套件首轮因专用用户目录命名保护拒绝执行，补正确隔离名后309项通过，未去掉保护。原战斗模型的诊所成功夹具补足150信用点并新增扣款断言，106项通过；原先4项失败不是治疗代码错误。故障注入产生预期备份复制错误及损坏卡面偏好解析错误，部分界面套件仍有已有退出资源清理提示；无物理输入或像素验收。证据`artifacts/qa/remaining-bugs-2026-10-24/`。
+
+2026-10-24奖励卡出售存档修复：`market/black_market_tests`新增真实领奖后出售最后副本、二次保存轮换、主档及备份重新读取、防重领及非法领取记录拒绝；支持`QA_OUT_DIR`指定证据目录。修改前140项中3项失败，修复后148项0失败；奖励78、剧情257项0失败，合计483项通过。战斗模型102项中4项诊所治疗失败，修改前原代码同样失败，未改断言或治疗逻辑。隔离复制工程及独立用户目录headless运行，证据`artifacts/qa/reward-sale-save-2026-10-24/`；未做渲染或物理输入检查。
+
+2026-10-24被动科技：`passive_technology_tests.tscn`137项覆盖三枚定义、首回合加牌、禁止激活、冻结四槽、胜利独立收益与防重、封顶、战败／演练、存读／旧档／失败回滚；`technology_icons_tests.tscn`扩展至301项覆盖六张PNG、所有入口、被动点击／快捷键拒绝、主动并存和收益只读。商场UI98、配置131；相关核心回归结果及已知限制见`artifacts/qa/passive-technology-2026-10-24/backend-summary.json`和`artifacts/qa/passive-technologies-2026-10-24/`。共12套1758断言通过；无窗口、未使用正式存档，浏览器预览不替代Godot像素和物理输入验收。下文旧计数属于对应历史轮次。
+
+后排绕行裁剪专项：[rear_lane_clipping_tests](combat/presentation/rear_lane_clipping_tests.tscn)，无窗口验证三种地面高度下的旧边界复现、完整绕行期间身体与玩家目标边界、接近终点、手牌区裁剪及脚底排序；不移动系统鼠标、不写正式存档，不替代渲染像素验收。
+
+科技图标统一接入：[technology_icons_tests](technology_icons_tests.tscn)175项，检查三张透明PNG、商场／确认框、配置／携带槽、战斗科技卡和只读档案，包含资源一致性、尺寸／遮挡、空位、历史快照、冷却、卸装与无状态写入。另跑商场UI80、配置131，共386项通过，证据`artifacts/qa/technology-icons-2026-10-23/`；无窗口检查不替代Godot像素和物理输入。
+
+沃斯商场：[technology_shop_tests](market/technology_shop_tests.tscn)覆盖原有科技货单、0—6货位、测试占位拒绝、交易保护、保存失败回滚、读档、装备及战斗效果；[technology_shop_ui_tests](market/technology_shop_ui_tests.tscn)覆盖三商品三空位、默认已拥有、确认／取消、模态焦点、余额／已有态及返回。使用专项存档路径、headless运行，修订证据位于`artifacts/qa/technology-shop-2026-10-23/existing-only/`。界面专项导出真实节点布局JSON供浏览器预览，不能代表Godot像素或物理输入验收。
+黑市交易专项：[black_market_tests](market/black_market_tests.tscn)127项（库存、日期、买卖、存读／迁移、实际删牌、演练、失败回滚、浮动价冻结及价格版本原地迁移）；[market_ui_tests](market/market_ui_tests.tscn)103项（真实主场景路由、分层纹理／透明度／原生像素余量／前景遮挡、两行货架、确认／取消、余额、售罄、出售选择、Tab／Esc／F1隔离、HUD和第4天刷新）。均headless运行，仅写专项路径，不能代表实际像素或物理鼠标验收。交易证据：`artifacts/qa/black-market-2026-10-23/`，本轮分层证据：`artifacts/qa/black-market-layers-2026-10-23/`。
 
 有／无人物版卡面专项：[card_face_style_tests](card_face_style_tests.tscn)。以隔离用户目录及独立偏好／存档路径headless运行，覆盖两套80张实图、菜单按钮双向切换、持久化重读、无效偏好、失败写盘、模态／焦点／锁、浏览与放大复用、40牌×2形态×2风格的动态排版及快照不变。不能代替实际像素和物理输入验收；本轮结果见`artifacts/qa/card-face-style-2026-10-23/`。
 

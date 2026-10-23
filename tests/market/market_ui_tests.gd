@@ -39,6 +39,17 @@ func _ready() -> void:
 	check(view.get_script().resource_path.ends_with("black_market.gd"),"Map visit routes to the real shop")
 	check(view.get_node_or_null("return_map") != null,"Shop has a city-map exit")
 	check(Game.texture("black_market_shop") != null,"Generated shop background imported")
+	var scenery: Control = view.get_node("black_market_art")
+	check(scenery.get_child_count() == 3,"Shop uses background portrait and counter layers")
+	var portrait: TextureRect = scenery.get_node("black_market_shopkeeper")
+	var backdrop: TextureRect = scenery.get_node("black_market_background")
+	var counter: Polygon2D = scenery.get_node("black_market_counter")
+	check(portrait.texture == Game.texture("black_market_shopkeeper") and portrait.texture != backdrop.texture,"Portrait resolves its independent texture")
+	check(portrait.texture.get_width() >= portrait.size.x * 1.8 and portrait.texture.get_height() >= portrait.size.y * 1.8,"Portrait has native detail headroom at current display size")
+	var portrait_image := portrait.texture.get_image()
+	check(portrait_image.detect_alpha() != Image.ALPHA_NONE and portrait_image.get_pixel(0,0).a == 0,"Portrait has real transparency")
+	check(counter.texture == backdrop.texture and counter.get_index() > portrait.get_index(),"Foreground reuses the exact background texture above the portrait")
+	check(scenery.mouse_filter == Control.MOUSE_FILTER_IGNORE and portrait.modulate == Color.WHITE,"Art stays bright and does not capture shop input")
 	check(view.stock.find_children("buy_slot_*","Button",true,false).size() == 9,"Nine purchase slots")
 	var seen := []
 	for i in 9:

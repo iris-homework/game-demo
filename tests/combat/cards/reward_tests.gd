@@ -95,7 +95,7 @@ func _ready() -> void:
 	finish_dialogue()
 	Game.claim_rewards(Game.revision)
 	check(Game.page == "map" and Game.state.battleReward.status == "skipped" and Game.state.deck.is_empty() and Game.state.credits == int(Game.config.initialCredits) + 1000,"Exit without card preserves credits")
-	# Schema 1/2 compatibility and rejection of malformed reward ownership.
+	# Schema 1/2 compatibility and rejection of malformed reward claims.
 	var old := Game.initial_state()
 	old.erase("battleReward")
 	check(Game.valid_save(Game.migrate_save(old)),"Old schema 2 accepts additive reward migration")
@@ -107,7 +107,7 @@ func _ready() -> void:
 	invalid = Game.state.duplicate(true)
 	invalid.battleReward.status = "claimed"
 	invalid.battleReward.selectedCardId = "test_reward_01"
-	check(not Game.valid_save(invalid),"Claim without owned card rejected")
+	check(not Game.valid_save(invalid),"Claim outside the original offer rejected")
 	invalid = Game.state.duplicate(true)
 	invalid.deck = "bad"
 	check(not Game.valid_save(invalid),"Malformed deck rejected")

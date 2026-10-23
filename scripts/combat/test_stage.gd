@@ -51,8 +51,10 @@ func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual], scen
 	# Visual instances already owned by a running battle are not touched.
 	PipelineCatalogScript.refresh()
 	var count := enemy_visuals.size()
-	position = Vector2(0,270)
-	size = Vector2(1440,420)
+	# Rear-lane detours need headroom above the old y=270 cut line.
+	# Keep the lower edge at 690 so actors/effects stay out of the hand area.
+	position = Vector2(0,160)
+	size = Vector2(1440,530)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	clip_contents = true
 	floor_y = feet_y-position.y
@@ -259,9 +261,13 @@ func frame_attack(attacker: Node2D, defender: Node2D, destination: Vector2) -> v
 		var bottom := -INF
 		for actor in actors_root.get_children():
 			if not actor.alive: continue
-			var foot: Vector2 = destination if actor == attacker else actor.position
-			top = minf(top,foot.y-135*depth_scale(foot))
-			bottom = maxf(bottom,foot.y+20*depth_scale(foot))
+			# Frame the complete approach, including rear-lane detours, rather
+			# than only the final contact point while the attacker is moving.
+			var feet: Array[Vector2] = [actor.position]
+			if actor == attacker: feet = approach_path(attacker,defender,destination)
+			for foot in feet:
+				top = minf(top,foot.y+minf(-135,actor.target_bounds.position.y)*depth_scale(foot))
+				bottom = maxf(bottom,foot.y+maxf(20,actor.target_bounds.end.y)*depth_scale(foot))
 		magnification = maxf(1.0,minf(magnification,ATTACK_ZOOM_FACTOR*(size.y-48)/(bottom-top)))
 		target_y = (top+bottom)*0.5+(floor_y-35-size.y*0.5)/magnification
 	camera_to((destination.x+defender.position.x)*0.5,magnification,0.25,target_y)

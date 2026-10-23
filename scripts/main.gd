@@ -63,6 +63,8 @@ func swap_view() -> void:
 		view.queue_free()
 	if Game.page == "place" and Game.state.get("currentPlaceId") == "market":
 		view = preload("res://scenes/black_market.tscn").instantiate()
+	elif Game.page == "place" and Game.state.get("currentPlaceId") == "mall":
+		view = preload("res://scenes/technology_shop.tscn").instantiate()
 	else:
 		view = VIEWS.get(Game.page,VIEWS.menu).instantiate()
 	shown_page = Game.page
@@ -236,7 +238,7 @@ func toggle_debug() -> void:
 	if is_instance_valid(debug_panel):
 		close_debug()
 		return
-	if Game.page == "battle" and view.has_method("cancel_selection"): view.cancel_selection()
+	if view.has_method("cancel_selection"): view.cancel_selection()
 	# GUI mouse filtering alone cannot stop the battle's _input handlers.
 	debug_previous_focus = get_viewport().gui_get_focus_owner()
 	debug_background_process_mode = view.process_mode
@@ -362,6 +364,7 @@ func open_technology_loadout() -> void:
 	if is_instance_valid(technology_browser) or is_instance_valid(exit_dialog) or is_instance_valid(deck_browser) or is_instance_valid(card_console) or is_instance_valid(debug_panel): return
 	var trigger := view.get_node_or_null("technology_loadout_button") as Button
 	if trigger == null or trigger.disabled: return
+	if view.has_method("cancel_selection"): view.cancel_selection()
 	technology_previous_focus = get_viewport().gui_get_focus_owner()
 	technology_background_process_mode = view.process_mode
 	view.process_mode = Node.PROCESS_MODE_DISABLED

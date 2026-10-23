@@ -206,6 +206,12 @@ func _cancel_drag() -> void:
 	_dragging = false
 	_drag_marker = ""
 
+func cancel_selection() -> void:
+	# Shared modal hook: the disabled view cannot receive a later mouse release.
+	_cancel_drag()
+	_pointer_seen = false
+	_set_hovered_marker("")
+
 func _map_navigation_allowed(point: Vector2) -> bool:
 	return (_window_active and not Game.transition_locked and not Game.battle_busy
 		and not is_instance_valid(_week_dialog) and _pointer_over_map_layer()
@@ -218,6 +224,9 @@ func _navigate_map(event: InputEvent) -> void:
 		_cancel_drag()
 		return
 	if _drag_pending and event is InputEventMouseMotion:
+		if (event.button_mask & MOUSE_BUTTON_MASK_LEFT) == 0:
+			_cancel_drag()
+			return
 		var delta := point - _drag_start
 		if not _dragging and delta.length() >= DRAG_THRESHOLD:
 			_dragging = true
