@@ -12,7 +12,7 @@ func check(ok: bool, message: String) -> void:
 func reset_map() -> void:
 	Game.state = Game.initial_state()
 	Game.state.currentScene = "map"
-	Game.state.completedEventIds = ["E01"]
+	Game.state.completedEventIds = ["E01", "E04", "E11"]
 	Game.state.targetId = "richard"
 	Game.state.credits = 300
 	Game.page = "map"
@@ -62,7 +62,7 @@ func _ready() -> void:
 		check(Game.map_place_state(p.id).open, "place open before any event " + p.id)
 		Game.visit(p.id)
 		check(Game.page == "place" and Game.state.currentPlaceId == p.id, "initial visit succeeds " + p.id)
-	check(not Game.start_event("E12"), "open places do not bypass story prerequisites")
+	check(not Game.start_event("E12"), "retired event cannot be started from an open place")
 	Game.state.currentHp = 50
 	Game.state.credits = 150
 	check(Game.heal_at("clinic") and Game.state.currentHp == 80 and Game.state.credits == 0, "clinic service available before E01 at configured price")
@@ -115,21 +115,20 @@ func _ready() -> void:
 	check(Game.objective() == "3 个可进行的事件", "objective counts all refreshed events")
 	Game.events.erase("MAP_PARALLEL_TEST")
 	tower.erase("unlockCondition")
-	# Actual first-week routes, including both independent contracts.
-	for contract in ["richard", "lumina"]:
+	# Remaining events are independent of target and all historical clue flags.
+	for contract in ["richard", "lumina", ""]:
 		reset_map()
+		Game.state.completedEventIds = ["E01"]
 		Game.state.targetId = contract
-		finish_event("E02")
-		finish_event("E03")
-		check(target_ids() == ["E04"], "alley target after hive " + contract)
-		finish_event("E04")
-		check(target_ids() == ["E05A" if contract == "richard" else "E05B"], "correct port branch " + contract)
-		finish_event("E05A" if contract == "richard" else "E05B")
-		check(Game.map_place_state("camp").open and Game.map_place_state("tower").open, "both locations open without allegiance " + contract)
-		check(target_ids() == ["E08", "E11", "E12"], "all three post-port events refreshed " + contract)
-		finish_event("E12")
-		check(target_ids() == ["E08", "E11"], "remaining refreshed events stay visible after week completion " + contract)
-		check(Game.map_place_state("pump").available.size() == 1, "remaining event persists after week completion " + contract)
+		for id in ["E11", "E04", "E03", "E02"]:
+			check(Game.events[id].unlockCondition.is_empty(), "no prerequisite " + id)
+			Game.state.refreshedEventIds = [id]
+			Game.refresh_event_pool()
+			finish_event(id)
+			check(not id in target_ids(), "completed event leaves targets " + id)
+		check(Game.state.completedEventIds.size() == 5 and Game.state.currentDay == 5, "all remaining events complete without an ordered chain")
+		check(Game.available_events().is_empty(), "no removed finale or port event appears")
+		check(Game.map_place_state("camp").open and Game.map_place_state("tower").open, "locations remain open without allegiance")
 	reset_map()
 	for outcome in ["lose"]:
 		Game.start_event("E03")
@@ -141,7 +140,7 @@ func _ready() -> void:
 			guard += 1
 		check(Game.state.currentScene == "battle", "actual encounter reached for " + outcome)
 		check(Game.battle_exit(outcome, Game.revision), "actual battle return " + outcome)
-		check(Game.choose(0, Game.revision) and Game.page == "map", "return choice reaches map " + outcome)
+		check(not Game.choose(0, Game.revision) and Game.page == "defeat" and not Game.can_continue(), "defeat is terminal " + outcome)
 		check(not "E03" in Game.state.completedEventIds and target_ids() == ["E02", "E03"], "unfinished events retained on " + outcome)
 		reset_map()
 	Game.state.currentHp = 50

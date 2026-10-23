@@ -66,7 +66,7 @@ func _ready() -> void:
 	Game.player_characters.qa_actor.startingDeck = ["test_attack"]
 	Game.state = {}
 	check(Game.load_game() and same_checkpoint(Game.state, saved), "Load preserves existing HP, piles and snapshot despite config edits")
-	Game.start_training("B12")
+	Game.start_training("B02")
 	check(Game.player_character_id() == "qa_actor" and Game.state.maxHp == 200 and Game.state.combat.instances.size() == 2, "Training uses current character base deck plus owned reward")
 	Game.finish_training("lose")
 	check(same_checkpoint(Game.state, saved), "Training restores full adventure identity and progress")

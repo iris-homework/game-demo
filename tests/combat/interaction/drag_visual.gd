@@ -15,7 +15,7 @@ func _ready() -> void:
 	output = OS.get_temp_dir().path_join("midnight_drag_")
 	app = load("res://scenes/main.tscn").instantiate()
 	add_child(app)
-	Game.start_training("B12")
+	Game.start_training("B02")
 	await idle()
 	var view = app.view
 	var uid: String = view.model.hand[0]

@@ -295,7 +295,7 @@ func test_snapshot_and_training() -> void:
 	check(Game.state.combat.enemies.map(func(e): return e.id) == ["fish", "fish_second"] and Game.state.combat.enemies.all(func(e): return e.hp == 30 and e.maxHp == 30), "Game formal B11 initializes two 30-HP fish")
 	var adventure: Dictionary = Game.state.duplicate(true)
 	var catalog: Dictionary = Game.enemy_catalog.duplicate(true)
-	for battle_id in ["B11", "B04", "B12"]:
+	for battle_id in ["B11", "B04", "B02"]:
 		Game.start_training(battle_id)
 		check(Game.training_mode and Game.state.battleId == battle_id, "Training starts requested battle " + battle_id)
 		var expected_hp: Array = [15, 15, 30] if battle_id == "B04" else ([30, 30] if battle_id == "B11" else [100])

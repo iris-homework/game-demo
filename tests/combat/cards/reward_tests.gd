@@ -38,7 +38,7 @@ func _ready() -> void:
 		check(Game.battle_exit("win",rev),id + " accepts victory")
 		check(not Game.battle_exit("win",rev),"Duplicate result rejected")
 		check(Game.page == "dialogue" and Game.state.credits == int(Game.config.initialCredits) and Game.state.battleReward.is_empty(),"No rewards before dialogue ends")
-		if id == "B08": check(roundtrip(),"Resume post-battle dialogue from disk")
+		if id == "B02": check(roundtrip(),"Resume post-battle dialogue from disk")
 		finish_dialogue()
 		check(Game.page == "result" and Game.has_battle_reward(),id + " opens victory reward after dialogue")
 		check(Game.state.credits == int(Game.config.initialCredits) + 1000 and Game.state.battleReward.options.size() == 3,"Exactly 1000 credits and three offers")
@@ -54,17 +54,17 @@ func _ready() -> void:
 		check(roundtrip() and Game.state.battleReward.status == "claimed" and Game.state.deck == [options[1]],"Claimed reward persists")
 		check(Game.claim_rewards(Game.revision) and Game.page == "map","Exit reward to map")
 		check(not Game.choose_reward_card(options[0],Game.revision),"No claiming from map")
-	# Nonvictories return through their original story nodes, with no reward.
+	# Nonvictories end the run without a reward.
 	for outcome in ["lose"]:
-		start_battle("B08")
+		start_battle("B02")
 		Game.battle_exit(outcome,Game.revision)
 		finish_dialogue()
-		check(Game.page == "map" and Game.state.credits == int(Game.config.initialCredits) and Game.state.deck.is_empty() and Game.state.battleReward.is_empty(),outcome + " never rewards")
+		check(Game.page == "defeat" and not Game.can_continue() and Game.state.credits == int(Game.config.initialCredits) and Game.state.deck.is_empty() and Game.state.battleReward.is_empty(),outcome + " never rewards")
 	Game.new_game()
 	finish_dialogue()
 	check(Game.page == "result" and not Game.has_battle_reward() and Game.state.credits == int(Game.config.initialCredits),"Nonbattle event retains normal result")
 	# Acquired cards augment the next adventure battle and survive a combat save.
-	start_battle("B08")
+	start_battle("B02")
 	Game.battle_exit("win",Game.revision)
 	finish_dialogue()
 	var earned: String = Game.state.battleReward.options[0]
@@ -85,12 +85,12 @@ func _ready() -> void:
 	check(roundtrip() and Game.state.combat.instances.size() == 11,"Expanded battle snapshot restores")
 	# Training never consumes the pending reward or changes adventure ownership.
 	var saved := Game.state.duplicate(true)
-	Game.start_training("B12")
+	Game.start_training("B02")
 	check(Game.state.combat.instances.size() == 11,"Training copies currently owned deck")
 	Game.battle_exit("win",Game.revision)
 	check(Game.page == "menu" and Game.state == saved,"Training victory restores adventure without rewards")
 	# Explicit exit skips just the unchosen card, retaining credits.
-	start_battle("B08")
+	start_battle("B02")
 	Game.battle_exit("win",Game.revision)
 	finish_dialogue()
 	Game.claim_rewards(Game.revision)

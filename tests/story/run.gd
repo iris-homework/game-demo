@@ -15,7 +15,12 @@ func step_to_stop() -> void:
 		guard += 1
 	check(guard < 80, "Dialogue terminates")
 
+func offer_event(id: String) -> void:
+	Game.state.refreshedEventIds = [id]
+	Game.refresh_event_pool()
+
 func complete_event(id: String, outcome: String = "win", choice: int = 0) -> void:
+	offer_event(id)
 	check(Game.start_event(id), "Start " + id)
 	step_to_stop()
 	if Game.state.currentScene == "battle":
@@ -39,7 +44,7 @@ func _ready() -> void:
 	Game.meta_path = "user://automated_test_meta.json"
 	# Validate authored references, including legacy saved result nodes.
 	check(Game.places.size() == 17, "17 places including church")
-	check(Game.events.size() == 9, "9 independent commission events")
+	check(Game.events.size() == 5, "5 independent commission events")
 	for e in Game.events.values():
 		check(not Game.place_data(e.placeId).is_empty(), e.id + " place exists")
 		for n in e.nodes.values():
@@ -52,7 +57,8 @@ func _ready() -> void:
 			check(Game.events[b.eventId].nodes.has(b.returnNodeByResult[result]), b.id + " return " + result)
 	# Payment rejection is atomic; payment is committed once even under duplicate click.
 	start_contract(0)
-	check(not Game.start_event("E04"), "Locked event rejected")
+	check(Game.events.E04.unlockCondition.is_empty(), "E04 no longer requires a clue")
+	offer_event("E03")
 	Game.start_event("E03")
 	step_to_stop()
 	var rev := Game.revision
@@ -65,23 +71,21 @@ func _ready() -> void:
 	check(Game.state.credits == 0 and Game.state.flags.alleyClue, "Payment applied once")
 	step_to_stop()
 	check("E03" in Game.state.completedEventIds, "Payment finishes E03")
-	# Both contracts converge on the independent mercenary finale.
+	# Both target choices allow completing every remaining independent event.
 	for target in [0,1]:
 		start_contract(target)
+		offer_event("E03")
 		Game.start_event("E03"); step_to_stop(); Game.choose(1,Game.revision); step_to_stop()
 		Game.battle_exit("win",Game.revision); step_to_stop(); Game.claim_rewards(Game.revision)
 		complete_event("E02")
 		complete_event("E04")
-		complete_event("E05A" if target == 0 else "E05B")
 		check(not Game.state.has("faction"), "No allegiance after contract completion")
-		for removed in ["E06", "E07", "E09", "E10"]:
+		for removed in ["E05A", "E05B", "E06", "E07", "E08", "E09", "E10", "E12"]:
 			check(not Game.start_event(removed), "Removed event cannot start " + removed)
-		complete_event("E08")
 		complete_event("E11")
-		complete_event("E12")
-		check(Game.state.flags.get("week1Complete",false), "Week one completed")
+		check(Game.state.completedEventIds.size() == 5 and Game.state.currentDay == 6, "All five events complete exactly once and each spends one day")
 		check(Game.state.currentWeek == 1, "No empty future week")
-		check(not Game.start_event("E12"), "No repeating Boss")
+		check(not Game.start_event("E11"), "Completed event cannot repeat")
 	# Disk roundtrip preserves victory story or the terminal defeat page.
 	for b in Game.battles.values():
 		for result in ["win", "lose"]:
@@ -118,7 +122,7 @@ func _ready() -> void:
 	check(Game.save_game() and Game.load_game(), "Legacy surrender dialogue still loads")
 	check(Game.choose(0, Game.revision) and Game.page == "map", "Legacy surrender can return to map")
 	var adventure := Game.state.duplicate(true)
-	Game.start_training("B12")
+	Game.start_training("B02")
 	var training := Game.state.duplicate(true)
 	var training_revision := Game.revision
 	check(not Game.battle_exit("surrender", Game.revision), "Training battle exit rejects surrender")

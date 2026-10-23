@@ -51,6 +51,8 @@ func start_contract() -> void:
 	step_to_stop()
 	check("E01" in Game.state.completedEventIds and Game.state.currentDay == 2, "E01 first completion spends one day")
 	Game.claim_rewards(Game.revision)
+	Game.state.refreshedEventIds = ["E02", "E03"]
+	Game.refresh_event_pool()
 
 func all_text(node: Node) -> String:
 	var result := ""
@@ -199,7 +201,7 @@ func test_days_and_failures() -> void:
 
 func test_save() -> void:
 	reset_authored()
-	check(Game.state.refreshedEventIds == ["E01"], "new adventure has initial refreshed E01")
+	check(Game.eligible_events().size() == 5 and Game.state.refreshedEventIds.size() == 3, "new adventure has five ungated candidates and three refreshed events")
 	for event in Game.events.values():
 		check(not event.has("optional") and event.get("refreshTimeRange") == {"startDay":null,"endDay":null}, "authored event uses anytime range and no category " + event.id)
 	Game.state.currentDay = 7
@@ -221,10 +223,10 @@ func test_save() -> void:
 	legacy.currentDay = 4
 	var migrated = Game.migrate_save(legacy)
 	check(Game.valid_save(migrated) and migrated.currentDay == 4, "old schema two fills fields without replaying completed event dates")
-	check(migrated.refreshedEventIds == ["E03"] and not legacy.has("refreshedEventIds"), "legacy pool initialized without modifying source")
+	check(migrated.refreshedEventIds.size() == 3 and migrated.refreshedEventIds.all(func(id): return id in ["E03", "E04", "E11"]) and not legacy.has("refreshedEventIds"), "legacy pool initialized without modifying source")
 	var file := FileAccess.open(Game.save_path, FileAccess.WRITE)
 	file.store_string(JSON.stringify(legacy)); file.close()
-	check(Game.load_game() and Game.state.currentDay == 4 and Game.state.refreshedEventIds == ["E03"], "old schema two migrates on actual load")
+	check(Game.load_game() and Game.state.currentDay == 4 and Game.state.refreshedEventIds.size() == 3 and Game.state.refreshedEventIds.all(func(id): return id in ["E03", "E04", "E11"]), "old schema two migrates on actual load")
 
 func test_ui() -> void:
 	start_contract()

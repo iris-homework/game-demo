@@ -103,7 +103,7 @@ func _ready() -> void:
 	check(not restored.use_item("missing",0,{},Game.item_catalog).ok,"Empty items cannot create effect")
 	check(Game.read_data("cards/cards.json").size() == 40 and Game.item_catalog.is_empty(),"Forty Noren cards and unchanged empty items")
 	var original := Game.state.duplicate(true)
-	Game.start_training("B12")
+	Game.start_training("B02")
 	check(Game.training_mode and Game.state.currentHp == 100,"Practice isolated")
 	Game.battle_exit("win",Game.revision)
 	check(not Game.training_mode and Game.state == original,"Practice restores exact adventure")

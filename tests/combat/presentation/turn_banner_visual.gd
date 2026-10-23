@@ -48,7 +48,7 @@ func _ready() -> void:
 	app = load("res://scenes/main.tscn").instantiate()
 	add_child(app)
 	await motion(Vector2(720,270))
-	Game.start_training("B12")
+	Game.start_training("B02")
 	await wait_banner("第1回合")
 	var view = app.view
 	verify(Game.battle_busy and not view.initialized,"Opening announcement locks battle before the first deal")

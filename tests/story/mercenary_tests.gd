@@ -1,7 +1,6 @@
 extends Node
 
 const OUTPUT := "res://artifacts/qa/free-mercenary-2026-10-15/"
-const BEFORE := OUTPUT + "before/data/"
 var checks := 0
 var failures := 0
 
@@ -10,9 +9,6 @@ func check(ok: bool, message: String) -> void:
 	if not ok:
 		failures += 1
 		push_error("MERCENARY: " + message)
-
-func read_fixture(path: String):
-	return JSON.parse_string(FileAccess.get_file_as_string(BEFORE + path))
 
 func check_condition(condition: Dictionary) -> void:
 	for key in condition:
@@ -40,14 +36,18 @@ func _ready() -> void:
 		check(not e.nodes.has("join"), "No recruitment choice")
 		for n in e.nodes.values():
 			for a in n.get("effects", []): check(a.op != "setFaction", "No allegiance action")
-	for id in ["E06", "E07", "E09", "E10"]: check(not Game.events.has(id), "Retired event removed")
-	for id in ["B09", "B10"]: check(not Game.battles.has(id), "Retired encounter removed")
-	var current_events := Game.events
-	var current_battles := Game.battles
-	var current_enemies := Game.enemy_catalog
-	var legacy_events: Dictionary = read_fixture("weeks/week1/events.json")
-	var legacy_battles: Dictionary = read_fixture("battles.json")
-	var legacy_enemies: Dictionary = read_fixture("enemies/enemies.json")
+	for id in ["E05A", "E05B", "E06", "E07", "E08", "E09", "E10", "E12"]: check(not Game.events.has(id), "Retired event removed")
+	for id in ["B05A", "B05B", "B08", "B09", "B10", "B12"]: check(not Game.battles.has(id), "Retired encounter removed")
+	# Self-contained checkpoint matrix: no dependency on untracked QA artifacts.
+	var legacy_events: Dictionary = {}
+	var legacy_battles := {"B09":{"eventId":"E09"}, "B10":{"eventId":"E10"}}
+	var legacy_ids := {"E05A":"B05A", "E05B":"B05B", "E06":"B05A", "E07":"B05B", "E09":"B09", "E10":"B10"}
+	for event_id in legacy_ids:
+		legacy_events[event_id] = {"placeId":"port", "nodes":{}}
+		for node_id in ["intro_01", "join", "accept_01", "refuse_01", "win_01", "lose", "surrender"]:
+			legacy_events[event_id].nodes[node_id] = {}
+		legacy_events[event_id].nodes.battle = {"type":"battle", "battleId":legacy_ids[event_id]}
+		legacy_events[event_id].nodes.finish = {"type":"finish"}
 	# Exercise every authored checkpoint in the changed/removed stories, including combat.
 	for event_id in ["E05A", "E05B", "E06", "E07", "E09", "E10"]:
 		for node_id in legacy_events[event_id].nodes:
@@ -68,13 +68,9 @@ func _ready() -> void:
 			Game.state.choiceHistory = {"E01:contract":Game.state.targetId, "E05A:join":"accept", "E05B:join":"refuse"}
 			Game.state.portraits = {"left":"@player", "right":"fitz"}
 			if node.get("type", "") == "battle":
-				Game.events = legacy_events
-				Game.battles = legacy_battles
-				Game.enemy_catalog = legacy_enemies
-				Game.enter_node(node_id)
-				Game.events = current_events
-				Game.battles = current_battles
-				Game.enemy_catalog = current_enemies
+				Game.state.currentScene = "battle"
+				Game.state.battleId = node.battleId
+				Game.state.combat = {"battleId":node.battleId}
 			elif node.get("type", "") == "finish":
 				Game.state.currentScene = "result"
 				Game.state.completedEventIds.append(event_id)
@@ -88,11 +84,11 @@ func _ready() -> void:
 				check(migrated[key] == legacy[key], "Preserves " + key + " " + label)
 			Game.state = migrated
 			check(Game.save_game() and Game.load_game(), "Disk roundtrip " + label)
-			if event_id in ["E06", "E07", "E09", "E10"]:
-				check(Game.page == "map" and Game.state.currentPlaceId == "port", "Retired checkpoint returns to port " + label)
-				check(Game.map_target_events().map(func(e): return e.id) == ["E12"], "Finale reachable after migration " + label)
-			elif Game.state.currentScene == "dialogue" and node_id != "intro_01" and (node_id.begins_with("win_") or node_id.begins_with("accept_") or node_id.begins_with("refuse_") or node_id == "join"):
-				advance_to_result()
+			check(Game.state.activeEventId == "E01" and Game.state.currentPlaceId == "bar", "Retired checkpoint uses safe retained anchor " + label)
+			if node_id == "lose":
+				check(Game.page == "defeat" and not Game.can_continue(), "Legacy failure remains terminal " + label)
+			else:
+				check(Game.page == "map" and Game.map_target_events().map(func(e): return e.id) == ["E02", "E11"], "Retired checkpoint resumes remaining ungated events " + label)
 	# Old selected and pending rewards on retired encounters never duplicate credits/cards.
 	for bid in ["B09", "B10"]:
 		for reward_status in ["pending", "claimed", "skipped"]:
@@ -111,26 +107,25 @@ func _ready() -> void:
 			var migrated: Dictionary = Game.migrate_save(old)
 			check(Game.valid_save(migrated) and migrated.battleReward.is_empty(), "Retired reward cleared " + bid + reward_status)
 			check(migrated.credits == old.credits and migrated.deck == old.deck and migrated.claimedRewardIds == old.claimedRewardIds, "Retired earnings preserved")
-	# Port victory pending rewards remain available and can only be claimed once.
-	Game.state = Game.initial_state()
-	Game.state.activeEventId = "E05B"
-	Game.state.targetId = "lumina"
-	Game.state.currentPlaceId = "port"
-	Game.enter_node("battle")
-	Game.battle_exit("win", Game.revision)
-	Game.state.activeNodeId = "join"
-	Game.state.faction = "resistance"
-	Game.state = Game.migrate_save(Game.state)
-	advance_to_result()
-	check(Game.state.credits == 1000 and Game.has_battle_reward(), "Migrated recruitment settles port reward")
-	Game.state.faction = "resistance"
-	Game.state = Game.migrate_save(Game.state)
-	check(Game.choose_reward_card("test_reward_01", Game.revision), "Existing port pending card remains claimable")
-	Game.enter_node("finish")
-	check(Game.state.credits == 1000 and Game.state.deck == ["test_reward_01"], "Port reward remains exactly once")
+	# Newly retired port/finale rewards preserve paid earnings and selected cards.
+	for pair in [["E05A", "B05A"], ["E05B", "B05B"], ["E08", "B08"], ["E12", "B12"]]:
+		for status in ["pending", "claimed", "skipped"]:
+			var old := Game.initial_state()
+			old.activeEventId = pair[0]
+			old.activeNodeId = "finish"
+			old.currentScene = "result"
+			old.battleId = pair[1]
+			old.credits = 6543
+			old.currentDay = 5
+			old.deck = ["test_reward_01"] if status == "claimed" else []
+			old.battleReward = {"eventId":pair[0], "battleId":pair[1], "status":status}
+			var migrated: Dictionary = Game.migrate_save(old)
+			check(Game.valid_save(migrated) and migrated.battleReward.is_empty(), "Removed pending offer cannot be claimed " + pair[0] + status)
+			check(migrated.credits == old.credits and migrated.deck == old.deck and migrated.currentDay == old.currentDay, "Removed reward keeps paid earnings and date")
 	# A retained battle snapshot must be bit-for-bit stable.
 	Game.state = Game.initial_state()
-	Game.state.activeEventId = "E12"
+	Game.state.activeEventId = "E04"
+	Game.state.currentPlaceId = "alley"
 	Game.enter_node("battle")
 	var combat: Dictionary = Game.state.combat.duplicate(true)
 	Game.state.faction = "company"

@@ -40,7 +40,7 @@ func _ready() -> void:
 	add_child(app)
 	Game.new_game()
 	await capture("01-opening")
-	Game.state.completedEventIds = ["E01", "E03", "E04", "E05A"]
+	Game.state.completedEventIds = ["E01", "E03", "E04"]
 	Game.state.flags = {"alleyClue":true,"portClue":true}
 	Game.state.targetId = "richard"
 	Game.go_map()
@@ -48,18 +48,18 @@ func _ready() -> void:
 	app.view.select_place("camp")
 	await capture("02-map-camp")
 	check("归零运动营地" in texts(app.view), "Original camp name appears")
-	check(Game.map_target_events().map(func(e): return e.id) == ["E12"], "Map finale objective is reachable")
+	check(Game.map_target_events().map(func(e): return e.id) == ["E02", "E11"], "Map shows the two remaining independent events")
 	Game.visit("tower")
 	await capture("03-tower")
 	Game.menu()
 	await capture("04-menu")
 	check(app.view.progress_summary.text == "沃斯大楼", "Menu keeps location")
-	Game.state.activeEventId = "E05B"
-	Game.state.currentPlaceId = "port"
+	Game.state.activeEventId = "E04"
+	Game.state.currentPlaceId = "alley"
 	Game.state.targetId = "lumina"
-	Game.state.portraits = {"left":"@player", "right":"lumina"}
+	Game.state.portraits = {"left":"@player", "right":"gang"}
 	Game.enter_node("win_03")
-	await capture("05-port-handoff")
-	check("交接" in app.view.text_label.text, "Port displays ordinary handoff")
+	await capture("05-retained-dialogue")
+	check("港口" in app.view.text_label.text, "Retained event displays its authored dialogue")
 	print("MERCENARY VISUAL: %d checks, %d failures; %s" % [checks, failures, output])
 	get_tree().quit(0 if failures == 0 else 1)

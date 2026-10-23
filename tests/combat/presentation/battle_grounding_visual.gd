@@ -15,6 +15,7 @@ func motion(pos: Vector2) -> void:
 		get_tree().quit(1)
 
 func _ready() -> void:
+	preload("res://tests/fixtures/retired_presentations.gd").install()
 	Game.save_enabled = false
 	Game.save_path = "user://battle_grounding_qa_checkpoint.json"
 	Game.meta_path = "user://battle_grounding_qa_meta.json"
@@ -24,19 +25,19 @@ func _ready() -> void:
 	app = load("res://scenes/main.tscn").instantiate()
 	add_child(app)
 	await settle(0.4)
-	for id in ["B04", "B12", "B11", "B05A"]:
+	for id in ["B04", "QA_MECH", "B11", "QA_PORT"]:
 		Game.start_training(id)
 		await idle()
 		await motion(Vector2(720,100))
 		await settle(0.3)
 		var view = app.view
-		var extra: float = {"B04":20.0,"B12":40.0,"B11":80.0,"B05A":0.0}[id]
+		var extra: float = {"B04":20.0,"QA_MECH":40.0,"B11":80.0,"QA_PORT":0.0}[id]
 		verify(view.player_portrait.position.is_equal_approx(Vector2(90,239+extra)), id + " player placement")
 		verify(view.enemy_position(0).is_equal_approx(Vector2(791,253+extra)), id + " enemy placement")
 		var target_rect: Rect2 = view.targets[0].get_global_rect()
 		verify(is_equal_approx(target_rect.position.y,283+extra), id + " target follows stage exactly once")
 		verify(target_rect.end.y < view.end_button.position.y, id + " target stays above hand controls")
-		if id == "B12":
+		if id == "QA_MECH":
 			verify(view.enemy_portraits[0].position.is_equal_approx(view.enemy_position(0)), "mech uses calibrated position")
 			var shadow_found := false
 			for child in view.get_children():

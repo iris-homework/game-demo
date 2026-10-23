@@ -47,7 +47,7 @@ func setup_case(label: String) -> void:
 func begin_battle(label: String, battle_id: String, hp: int = 1) -> CombatModel:
 	setup_case(label)
 	Game.state.currentHp = hp
-	Game.state.targetId = "richard" if battle_id != "B05B" else "lumina"
+	Game.state.targetId = "richard"
 	Game.state.activeEventId = Game.battles[battle_id].eventId
 	Game.state.currentPlaceId = Game.battles[battle_id].placeId
 	Game.save_enabled = true
@@ -75,7 +75,7 @@ func assert_ended(label: String) -> void:
 	check(Game.is_run_over() and not Game.can_continue(), label + ": run over and continue unavailable")
 
 func test_all_battles() -> void:
-	check(Game.battles.size() == 8, "Fixture covers the eight currently authored battles")
+	check(Game.battles.size() == 4, "Fixture covers the four currently authored battles")
 	for battle_id in Game.battles:
 		var label := "loss-" + str(battle_id)
 		var model := begin_battle(label, battle_id)

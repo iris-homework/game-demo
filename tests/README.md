@@ -2,6 +2,10 @@
 
 十种已发布敌人的菜单演练专项：[published_training_tests](combat/enemies/published_training_tests.tscn)，在隔离复制工程中headless运行；覆盖十选择、真实战斗视图及攻击回调、咬击／射击演出、胜负与退出恢复、临时注册清理、存档哨兵、原三入口及模态焦点／Esc／锁定。只验证逻辑和节点时序，不替代像素渲染或真实鼠标验收，不启动桌面窗口。
 
+## 2026-10-23 事件删减与无前置回归
+
+[removed_events_tests](story/removed_events_tests.tscn)检查五事件／四战斗目录、空前置、三项刷新上限、无目标对白与支付选项，以及全部退役事件的对白／战斗／奖励／战败旧档迁移、既有收益与快照保留。本次以远端PR交付，仅做静态检查，未运行Godot；建议合并前在隔离环境执行本专项及现有事件刷新、完整剧情、迁移、地图、战败和奖励回归。通用单敌演练夹具改用B02；退役敌人画面专项通过仅测试可用的内存夹具保留，不重新接入生产目录。
+
 敌人 PNG 制作、校准和发布另见[敌人制作台](../enemy_asset_pipeline/README.md)。
 按用户指定，其隔离试用入口位于 `enemy_asset_pipeline/test/test_workbench.tscn`；
 该目录还保存管线、运行时及图形集成检查，不计入下述历史 81 组统计。

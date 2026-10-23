@@ -355,7 +355,9 @@ func render_text(value: String) -> String:
 	value = value.replace("{主角姓名}", display_name(PLAYER_REFERENCE))
 	var target: String = state.get("targetId", "")
 	if "{目标姓名}" in value:
-		if not characters.has(target):
+		if target.is_empty():
+			value = value.replace("{目标姓名}", "委托目标")
+		elif not characters.has(target):
 			push_error("Unresolved target variable")
 			return "内容配置错误：缺少委托目标。"
 		value = value.replace("{目标姓名}", display_name(target))
@@ -730,8 +732,8 @@ func load_game() -> bool:
 		revision += 1
 		changed.emit()
 		if path.ends_with(".bak"): notice.emit("已从备用检查点恢复进度。")
-		if parser.data.get("activeEventId", "") in ["E06", "E07", "E09", "E10"]:
-			notice.emit("旧阵营事件已移除，已返回港口。已有信用点和卡牌保留，该事件未选的奖励卡不再领取。")
+		if parser.data.get("activeEventId", "") in ["E05A", "E05B", "E06", "E07", "E08", "E09", "E10", "E12"]:
+			notice.emit("旧事件已移除。非战败进度已返回地图；已有信用点、卡牌和日期保留，未选奖励不再领取。")
 		return true
 	last_error = "存档格式不兼容或已损坏，无法继续；可以开始新游戏。"
 	notice.emit(last_error)
@@ -920,8 +922,11 @@ func _clear_training_encounter() -> void:
 	training_enemy_id = ""
 	training_battle_id = ""
 
-func start_training(battle_id: String = "B12") -> void:
+func start_training(battle_id: String = "B04") -> void:
 	if transition_locked or battle_busy or training_mode or not battles.has(battle_id): return
+	if not battles[battle_id].get("trainingOnly", false):
+		var event: Dictionary = events.get(battles[battle_id].eventId, {})
+		if event.is_empty() or not event.get("nodes", {}).has("battle") or event.nodes.battle.get("battleId") != battle_id: return
 	var fresh := initial_state(player_character_id())
 	if fresh.is_empty(): return
 	fresh.deck = state.get("deck", []).duplicate()
@@ -1056,49 +1061,41 @@ func migrate_save(data):
 	return data
 
 func migrate_mercenary_story(data: Dictionary) -> void:
-	# Removed story content is handled here only; no live allegiance remains.
+	# Retire removed content without replaying completion, rewards or day costs.
 	data.erase("faction")
-	var retired_events := ["E06", "E07", "E09", "E10"]
-	var retired_battles := ["B09", "B10"]
+	var retired_events := ["E05A", "E05B", "E06", "E07", "E08", "E09", "E10", "E12"]
+	var retired_battles := ["B05A", "B05B", "B08", "B09", "B10", "B12"]
 	var retired_characters := ["reception", "rift", "victor", "fitz", "company_robot", "ally_robot", "wolves"]
 	var active = data.get("activeEventId", "")
-	if active in retired_events:
-		var port_event := "E05A" if active in ["E06", "E09"] else "E05B"
-		if data.get("completedEventIds") is Array:
-			if not port_event in data.completedEventIds: data.completedEventIds.append(port_event)
-		if data.get("targetId", "") == "":
-			data.targetId = "richard" if port_event == "E05A" else "lumina"
-		data.activeEventId = port_event
+	var retired_context: bool = active in retired_events or data.get("battleId", "") in retired_battles
+	if retired_context:
+		# A retired encounter must never turn a failed run back into a live one.
+		var failed: bool = data.get("currentScene", "") == "defeat" or data.get("result", "") == "lose" or (data.get("currentScene", "") == "dialogue" and data.get("activeNodeId", "") == "lose")
+		var combat = data.get("combat", {})
+		if combat is Dictionary and combat.get("outcome", "") == "lose": failed = true
+		if failed: mark_run_failed(data)
+		data.activeEventId = "E01"
 		data.activeNodeId = "finish"
-		data.currentPlaceId = "port"
-		data.currentScene = "map"
+		data.currentPlaceId = "bar"
+		data.currentScene = "defeat" if failed else "map"
 		data.battleId = ""
-		data.result = ""
+		data.result = "lose" if failed else ""
 		data.combat = {}
 		data.battleStart = {}
-		# Already paid credits and selected cards stay in their original fields.
-		# An unselected reward belonging to a removed encounter is retired with it.
+		# Credits and already selected cards stay; pending retired offers are closed.
 		data.battleReward = {}
 		data.portraits = {"left":PLAYER_REFERENCE, "right":""}
-	elif active in ["E05A", "E05B"]:
-		var node = data.get("activeNodeId", "")
-		var removed_node: bool = node == "join" or (node is String and (node.begins_with("accept_") or node.begins_with("refuse_") or node in ["win_05", "win_06", "win_07"]))
-		if removed_node:
-			data.activeNodeId = "win_03"
-			data.portraits = {"left":PLAYER_REFERENCE, "right":""}
 	if data.get("completedEventIds") is Array:
 		data.completedEventIds = data.completedEventIds.filter(func(id): return not id in retired_events)
+	if data.get("refreshedEventIds") is Array:
+		data.refreshedEventIds = data.refreshedEventIds.filter(func(id): return not id in retired_events)
 	if data.get("choiceHistory") is Dictionary:
 		for key in data.choiceHistory.keys():
-			if not key is String: continue
-			if key.get_slice(":", 0) in retired_events or key in ["E05A:join", "E05B:join"]:
+			if key is String and key.get_slice(":", 0) in retired_events:
 				data.choiceHistory.erase(key)
-	if data.get("battleId", "") in retired_battles:
-		data.battleId = ""
-		data.result = ""
-		data.combat = {}
-		data.battleStart = {}
-		data.battleReward = {}
+	if data.get("flags") is Dictionary:
+		# The authored first-week finale has been removed with E12.
+		data.flags.erase("week1Complete")
 	if data.get("portraits") is Dictionary:
 		for side in ["left", "right"]:
 			if data.portraits.get(side, "") in retired_characters: data.portraits[side] = ""

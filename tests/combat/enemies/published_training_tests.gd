@@ -151,6 +151,19 @@ func test_terminal_restore() -> void:
 			check_disk(result)
 
 func test_existing_training() -> void:
+	reset(adventure())
+	var original := Game.state.duplicate(true)
+	Game.start_training()
+	check(Game.training_mode and Game.page == "battle" and Game.state.battleId == "B04", "Default practice uses retained B04")
+	Game.menu()
+	check(same(Game.state, original), "Default practice restores adventure")
+	check_catalogs("Default practice")
+	for id in ["B05A", "B05B", "B08", "B12"]:
+		reset(adventure())
+		var before := Game.state.duplicate(true)
+		Game.start_training(id)
+		check(not Game.training_mode and same(Game.state, before), "Retired " + id + " practice rejected atomically")
+		check_catalogs("Retired " + id)
 	for id in ["B02", "B04", "B11"]:
 		reset(adventure())
 		var before := Game.state.duplicate(true)
@@ -301,7 +314,7 @@ func _ready() -> void:
 		sentinel_paths.append(path)
 	original_battles = Game.battles.duplicate(true)
 	original_enemies = Game.enemy_catalog.duplicate(true)
-	check(original_battles.size() == 8 and original_enemies.size() == 11, "Formal baseline remains eight battles / eleven enemies")
+	check(original_battles.size() == 4 and original_enemies.size() == 11, "Formal baseline remains four battles / eleven enemies")
 	test_config()
 	test_start_and_restore()
 	test_rejections()
