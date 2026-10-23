@@ -106,7 +106,7 @@ static func _ensure_catalog() -> void:
 		"bar": "bar.png", "junkyard": "junkyard.png", "alley": "alley.png", "camp": "camp.png",
 		"tower": "tower.png", "port": "port.png", "block5": "block5.png", "power": "power.png",
 		"hive": "hive.png", "pump": "pump.png", "garden": "garden.png", "hotel": "hotel.png",
-		"mall": "mall-v2.png", "market": "market.png", "hospital": "hospital.png", "clinic": "clinic.png",
+		"mall": "mall-v2.png", "market": "market.png", "hospital": "laboratory.png", "clinic": "clinic.png",
 	}
 	for key in defaults:
 		if not _icons.has(key):

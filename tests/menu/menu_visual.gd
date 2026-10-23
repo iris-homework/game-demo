@@ -208,7 +208,7 @@ func input_suite() -> void:
 	var adventure: Dictionary = Game.state.duplicate(true)
 	Game.menu()
 	await settle(0.5)
-	check(app.view.progress_summary.text == "医院","summary shows only the real location")
+	check(app.view.progress_summary.text == "实验室","summary shows only the real location")
 	check(not button("continue_commission").disabled,"memory progress enables continue")
 	var revision_before := Game.revision
 	await settle(0.4)

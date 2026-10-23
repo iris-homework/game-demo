@@ -4,7 +4,7 @@ func _ready() -> void:
 	var p := Game.place_data(Game.state.currentPlaceId)
 	background(p.backgroundAssetId, 0.30)
 	chrome("地点探索")
-	tag("LOCATION / " + p.id.to_upper(), Vector2(68,137), CYAN, 300)
+	tag("LOCATION / " + str(p.get("displayCode", p.id)).to_upper(), Vector2(68,137), CYAN, 300)
 	label(self, p.name, Vector2(64,211), Vector2(745,95), 64)
 	label(self, p.description, Vector2(69,333), Vector2(650,130), 23)
 	cut_panel(self, Vector2(827,129), Vector2(542,641), Color("090b12ed"), CREAM)

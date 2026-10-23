@@ -438,9 +438,10 @@
   },
   {
     "id": "hospital",
-    "name": "医院",
+    "name": "实验室",
+    "displayCode": "laboratory",
     "backgroundAssetId": "hospital",
-    "description": "城市最大的正规医疗机构，承担急救与诊疗。原型治疗每次回复 30% 最大生命。",
+    "description": "研究生物样本、污染分析与组织修复的实验室。冷白实验台与密封培养舱之间，青色监测灯持续闪烁。组织修复装置可免费恢复 30% 最大生命值，不消耗天数。",
     "mapAnchor": [
       0.631,
       0.416
@@ -456,7 +457,8 @@
       {
         "id": "heal",
         "type": "healHpPercent",
-        "percent": 0.3
+        "percent": 0.3,
+        "displayName": "组织修复"
       }
     ],
     "mapDisplay": {

@@ -947,7 +947,7 @@ func healing_service(place_id: String) -> Dictionary:
 		elif int(state.get("credits", 0)) < cost:
 			reason = "信用点不足（需要 %d）" % cost
 		var price := "%d 信用点" % cost if cost > 0 else "免费"
-		var label_text := "治疗 %d%% · %s" % [roundi(percent * 100.0), price]
+		var label_text := "%s %d%% · %s" % [str(service.get("displayName", "治疗")), roundi(percent * 100.0), price]
 		var hint := "回复 %d%% 最大生命值；%s；不推进日期。" % [roundi(percent * 100.0), price]
 		if not reason.is_empty(): hint += "\n" + reason + "。"
 		return {"percent":percent, "credits_cost":cost, "amount":amount, "can_heal":reason.is_empty(), "reason":reason, "label":label_text, "hint":hint}

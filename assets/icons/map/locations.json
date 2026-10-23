@@ -164,9 +164,9 @@
     },
     {
       "id": "hospital",
-      "name": "医院",
-      "symbol": "医疗十字与规整建筑",
-      "icon": "hospital.png",
+      "name": "实验室",
+      "symbol": "装有青色培养液的锥形培养瓶",
+      "icon": "laboratory.png",
       "previewAnchor": [
         0.631,
         0.416

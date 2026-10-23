@@ -439,8 +439,8 @@
     },
     {
       "id": "hospital",
-      "name": "医院",
-      "file": "hospital.png",
+      "name": "实验室",
+      "file": "laboratory.png",
       "size": [
         1254,
         1254
@@ -457,13 +457,16 @@
         0
       ],
       "visible_bounds_alpha_gt_16": [
-        68,
-        90,
-        1186,
-        1106
+        129,
+        73,
+        1124,
+        1160
       ],
-      "sha256": "bce0a89b1dabadcc5da0ed39f6e2b5e6423538d65d6b81c49b8f4c1237b61f44",
-      "preserved_from_first_batch": true
+      "sha256": "3c995d538133e6100e1f60540def6036ec6b63057df78f480677ced148619eef",
+      "preserved_from_first_batch": false,
+      "updated": "2026-10-24",
+      "generation": "built-in image_gen",
+      "prompt_file": "laboratory-prompt.txt"
     },
     {
       "id": "clinic",
@@ -493,5 +496,6 @@
       "sha256": "c5b17ef641b0d79c21b9ab8a1310b2edcb384de7f4e449896fceed5addf78250",
       "preserved_from_first_batch": true
     }
-  ]
+  ],
+  "latest_update": "2026-10-24 laboratory icon integrated; hospital is retained as the saved place ID. Top-level 2026-10-07 flags describe the original batch."
 }
