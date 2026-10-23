@@ -17,7 +17,7 @@ func _ready() -> void:
 	var heading := label(self,"战斗胜利",Vector2(210,145),Vector2(920,80),58)
 	heading.add_theme_color_override("font_color",CREAM)
 	tag("VICTORY / " + reward.battleId,Vector2(214,115),CYAN,220)
-	label(self,Game.event_data().title + "  /  战利品已结算",Vector2(216,239),Vector2(980,40),20,MUTED)
+	label(self,Game.event_data().title + "  /  " + Game.battle_type_label(reward.get("battleType", "normal")) + "  /  战利品已结算",Vector2(216,239),Vector2(980,40),20,MUTED)
 	rect(self,Vector2(214,296),Vector2(1012,1),Color("3a5155"))
 	label(self,"本次战利品",Vector2(214,314),Vector2(500,35),22)
 	label(self,"REWARDS / 02",Vector2(1040,320),Vector2(195,28),14,CYAN)
@@ -48,7 +48,7 @@ func _ready() -> void:
 				open_picker())
 	else:
 		label(card_row,"✓  已领取" if reward.status == "claimed" else "已跳过",Vector2(818,61),Vector2(180,37),21,CYAN if reward.status == "claimed" else MUTED)
-	label(self,"从诺伦非初始牌中随机提供三张 · 按灰 / 蓝 / 红 / 金识别品级",Vector2(216,695),Vector2(980,32),15,MUTED)
+	label(self,"从三张不同的非初始牌中选择一张 · B 蓝 / A 红 / S 金",Vector2(216,695),Vector2(980,32),15,MUTED)
 	var complete: bool = Game.state.flags.get("week1Complete",false) and Game.state.activeEventId == "E12"
 	label(self,"第一周 · 落幕。可返回地图探索剩余支线。" if complete else "新的线索已更新到城市地图。",Vector2(216,754),Vector2(820,35),20,CYAN)
 	label(self,"离开将放弃本次未选择的卡牌。" if pending else "奖励已保存，可继续探索城市。",Vector2(216,803),Vector2(775,31),16,MUTED)

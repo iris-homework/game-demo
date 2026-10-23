@@ -3,6 +3,7 @@
     "id": "B02",
     "eventId": "E02",
     "name": "骚动的垃圾场",
+    "battleType": "normal",
     "participants": [
       "@player",
       "robot"
@@ -24,6 +25,7 @@
     "id": "B03",
     "eventId": "E03",
     "name": "蜂巢城寨的艾克",
+    "battleType": "normal",
     "participants": [
       "@player",
       "ike"
@@ -45,6 +47,7 @@
     "id": "B04",
     "eventId": "E04",
     "name": "后巷深处",
+    "battleType": "normal",
     "participants": [
       "@player",
       "gang_henchman",
@@ -71,6 +74,7 @@
     "id": "B05A",
     "eventId": "E05A",
     "name": "港口追击 · 理查德",
+    "battleType": "normal",
     "participants": [
       "@player",
       "richard"
@@ -92,6 +96,7 @@
     "id": "B05B",
     "eventId": "E05B",
     "name": "港口追击 · 卢米娜",
+    "battleType": "normal",
     "participants": [
       "@player",
       "lumina"
@@ -113,6 +118,7 @@
     "id": "B08",
     "eventId": "E08",
     "name": "赛博精神病",
+    "battleType": "normal",
     "participants": [
       "@player",
       "psycho"
@@ -134,6 +140,7 @@
     "id": "B11",
     "eventId": "E11",
     "name": "变异的鱼",
+    "battleType": "normal",
     "participants": [
       "@player",
       "fish"
@@ -157,6 +164,7 @@
     "id": "B12",
     "eventId": "E12",
     "name": "机甲复仇",
+    "battleType": "normal",
     "participants": [
       "@player",
       "gang"

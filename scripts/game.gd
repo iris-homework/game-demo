@@ -16,6 +16,7 @@ var player_characters: Dictionary
 const LEGACY_PLAYER_CHARACTER_ID := "noren"
 const PLAYER_REFERENCE := "@player"
 const TRAINING_ENEMY_HP := 100
+const BATTLE_TYPES := {"normal":"普通战斗", "elite":"精英战斗", "boss":"Boss战"}
 var places: Array
 var events: Dictionary
 var battles: Dictionary
@@ -33,6 +34,8 @@ var enemy_visuals := EnemyVisuals.new()
 var item_catalog: Dictionary
 var prototype_rules: Dictionary
 var reward_rules: Dictionary
+var card_reward_rates: Dictionary
+var card_reward_sampler := preload("res://scripts/card_reward_sampler.gd").new()
 var noren_rules: Dictionary
 var map_config: Dictionary
 var meta_profile := {"schemaVersion":1, "cyberwareState":{}}
@@ -63,6 +66,7 @@ func _ready() -> void:
 	prototype_rules = read_data("prototype/combat.json")
 	prototype_rules.cyberware = read_data("prototype/cyberware.json")
 	reward_rules = read_data("prototype/rewards.json")
+	card_reward_rates = read_data("card_reward_rates.json")
 	reward_rules.cards.merge(card_catalog, true)
 	noren_rules = read_data("combat/noren.json")
 	player_characters = read_data("player_characters.json")
@@ -507,14 +511,16 @@ func prepare_battle_reward() -> void:
 	if not {"battleId":state.battleId, "result":"win"} in state.battleHistory: return
 	var claim_id: String = state.activeEventId + ":" + state.battleId + ":victory"
 	if claim_id in state.claimedRewardIds: return
+	var kind := battle_type()
+	var rates = card_reward_rates.get(kind, {})
+	var options: Array[String] = card_reward_sampler.sample(card_catalog, rates) if rates is Dictionary else []
+	if options.size() != 3:
+		notice.emit("奖励卡牌配置错误：无法生成三个不同选项，请检查概率与卡牌池。")
+		return
 	state.credits += int(reward_rules.credits)
 	state.claimedRewardIds.append(claim_id)
-	var options: Array = card_catalog.keys().filter(func(id): return card_catalog[id].get("rarity", "C") != "C")
-	options.shuffle()
-	options = options.slice(0, 3)
-	if options.size() < 3: options = reward_rules.cards.keys().slice(0, 3)
 	state.battleReward = {"claimId":claim_id, "eventId":state.activeEventId,
-		"battleId":state.battleId, "credits":int(reward_rules.credits),
+		"battleId":state.battleId, "battleType":kind, "credits":int(reward_rules.credits),
 		"options":options, "selectedCardId":"", "status":"pending"}
 
 func has_battle_reward() -> bool:
@@ -663,6 +669,21 @@ func resume() -> void:
 func enemy_combat_visual(enemy: Dictionary) -> EnemyVisuals.Visual:
 	return enemy_visuals.resolve(enemy, enemy_catalog)
 
+func configured_battle_type(battle_id: String) -> String:
+	var value = battles.get(battle_id, {}).get("battleType", "normal")
+	return value if value is String and BATTLE_TYPES.has(value) else "normal"
+
+func battle_type(battle_id: String = "") -> String:
+	var id: String = state.get("battleId", "") if battle_id.is_empty() else battle_id
+	var combat: Dictionary = state.get("combat", {})
+	# Existing battles retain their frozen type; legacy snapshots count as normal.
+	if not combat.is_empty() and combat.get("battleId", "") == id:
+		return combat.get("profile", {}).get("battleType", "normal")
+	return configured_battle_type(id)
+
+func battle_type_label(kind: String) -> String:
+	return BATTLE_TYPES.get(kind, BATTLE_TYPES.normal)
+
 func initialize_combat() -> void:
 	var battle: Dictionary = battles[state.battleId]
 	var definitions: Array = []
@@ -675,6 +696,7 @@ func initialize_combat() -> void:
 	var rules := prototype_rules.duplicate(true)
 	var player := player_definition()
 	if player.get("combatRules", "") == "noren_v1": rules.merge(noren_rules, true)
+	rules.battleType = configured_battle_type(state.battleId)
 	rules.playerCharacterId = player_character_id()
 	rules.playerAttributes = player.attributes.duplicate(true)
 	rules.playerSkills = player.skills.duplicate(true)
@@ -918,6 +940,7 @@ func valid_battle_start(s: Dictionary) -> bool:
 func valid_battle_reward(s: Dictionary) -> bool:
 	var r: Dictionary = s.battleReward
 	if r.is_empty(): return true
+	if not r.get("battleType", "normal") is String or not BATTLE_TYPES.has(r.get("battleType", "normal")): return false
 	for key in ["claimId", "eventId", "battleId", "selectedCardId", "status"]:
 		if not r.get(key) is String: return false
 	if r.eventId != s.activeEventId or r.battleId != s.battleId: return false
@@ -944,6 +967,7 @@ func valid_combat(c: Dictionary) -> bool:
 		if not c[key] is Array: return false
 	for key in ["instances","profile","cardCatalog"]:
 		if not c[key] is Dictionary: return false
+	if not c.profile.get("battleType", "normal") is String or not BATTLE_TYPES.has(c.profile.get("battleType", "normal")): return false
 	if not c.outcome in ["", "win", "lose", "surrender"]: return false
 	if not valid_cyberware_state(c): return false
 	if c.profile.get("ruleset", "") == "noren_v1" and not valid_noren_state(c): return false

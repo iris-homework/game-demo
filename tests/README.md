@@ -41,6 +41,8 @@
 
 | 范围 | 套件 |
 | --- | --- |
+| 战斗类型、冻结与旧档（无窗口） | [battle_type_tests](combat/rules/battle_type_tests.tscn) |
+| 按战斗类型的奖励概率（无窗口） | [card_reward_rates_tests](combat/cards/card_reward_rates_tests.tscn) |
 | 战斗开局恢复 | [battle_restart_tests](battle_restart_tests.tscn) · [battle_restart_integration](battle_restart_integration.tscn) |
 | 地图科技配置与保存 | [technology_loadout_tests](technology_loadout_tests.tscn) |
 | 新科技效果 | [technology_effects_tests](technology_effects_tests.tscn) · [technology_effects_visual](technology_effects_visual.tscn) |

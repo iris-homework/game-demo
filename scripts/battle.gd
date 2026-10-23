@@ -114,7 +114,8 @@ func enter(params: Dictionary) -> void:
 		shade_view.z_index = -2
 		shade_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(shade_view)
-	chrome("战斗",false)
+	# Battle has no footer; changing the section title must retain that layout.
+	status_bar(Game.battle_type_label(Game.battle_type()),false)
 	tag("演练模式 · 不影响冒险" if Game.training_mode else ("诺伦 / 形态与弹药" if model.is_noren() else "旧版测试规则"),Vector2(760,117),CYAN,310)
 	if Game.texture(place_asset) == null:
 		label(self,"场景美术待补",Vector2(43,203),Vector2(330,26),13,MUTED)
