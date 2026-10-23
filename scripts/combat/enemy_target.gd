@@ -2,6 +2,7 @@ extends Button
 ## Visual brackets only; the full button rectangle remains the hit area.
 const BLUE := Color("3d9eff")
 var armed := false
+var brackets_enabled := true
 var tooltip_data: Dictionary = {}
 
 func _make_custom_tooltip(_text: String) -> Object:
@@ -14,7 +15,7 @@ func _ready() -> void:
 		changed.connect(queue_redraw)
 
 func _draw() -> void:
-	if disabled or (not armed and not is_hovered()): return
+	if not brackets_enabled or disabled or (not armed and not is_hovered()): return
 	var highlighted := is_hovered() or is_pressed()
 	var color := Color(BLUE, 1.0 if highlighted else 0.55)
 	var width := 3.0 if highlighted else 2.0

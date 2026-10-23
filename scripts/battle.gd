@@ -252,7 +252,9 @@ func refresh_enemy_hud() -> void:
 		var tooltip_data := preload("res://scripts/combat/intent_tooltip.gd").describe(enemy,intent_text)
 		intent.configure_tooltip(tooltip_data)
 		var target := preload("res://scripts/combat/enemy_target.gd").new()
-		target.armed = not selected_uid.is_empty()
+		# Self-targeted cards must suppress both armed and ordinary hover brackets.
+		target.brackets_enabled = selected_uid.is_empty() or model.card_target(selected_uid) != "self"
+		target.armed = not selected_uid.is_empty() and target.brackets_enabled
 		target.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		target.pressed.connect(func():
 			var front := target_at_pointer()

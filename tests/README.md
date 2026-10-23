@@ -77,6 +77,8 @@
 
 ### 战斗：表现与输入
 
+自身目标牌的敌人选择框专项见 [self_skill_targets_tests](combat/interaction/self_skill_targets_tests.tscn)：无窗口检查近远程目标判断、选牌／取消、敌人悬停和提示保留；使用视口合成事件，不移动系统鼠标，禁用保存并使用专用路径。
+
 角色 mipmap A/B 专项位于[敌人制作台测试](../enemy_asset_pipeline/test/mipmap_workbench_qa.tscn)，
 验证正式工作台的运行期纹理、四动作过滤及截图，支持`QA_OUT_DIR`。
 
