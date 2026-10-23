@@ -46,6 +46,9 @@ var transition_locked := false
 var battle_busy := false
 var training_mode := false
 var training_backup: Dictionary = {}
+var training_enemies: Array = []
+var training_enemy_id := ""
+var training_battle_id := ""
 # Session-only presentation preferences; neither field belongs to adventure saves.
 var b04_scenery_choice := ""
 var training_scenery_place_id := ""
@@ -65,6 +68,7 @@ func _ready() -> void:
 	for definition in read_data("cards/cards.json"):
 		if definition is Dictionary and definition.has("id"): card_catalog[definition.id] = definition
 	enemy_catalog = read_data("enemies/enemies.json")
+	training_enemies = read_data("training_enemies.json")
 	item_catalog = read_data("items/items.json")
 	prototype_rules = read_data("prototype/combat.json")
 	prototype_rules.cyberware = read_data("prototype/cyberware.json")
@@ -539,10 +543,11 @@ func battle_exit(result: String, expected_revision: int) -> bool:
 	if transition_locked or battle_busy or expected_revision != revision or state.currentScene != "battle": return false
 	if not training_mode and is_run_over() and result != "lose": return false
 	var b: Dictionary = battles.get(state.battleId, {})
-	if b.is_empty() or (result == "win" and not b.get("returnNodeByResult", {}).has(result)): return false
+	if b.is_empty(): return false
 	if training_mode:
 		finish_training(result)
 		return true
+	if result == "win" and not b.get("returnNodeByResult", {}).has(result): return false
 	if result == "lose":
 		mark_run_failed(state)
 		checkpoint()
@@ -881,10 +886,47 @@ func set_b04_scenery_choice(place_id: String) -> bool:
 			return true
 	return false
 
+func training_enemy_choices() -> Array[Dictionary]:
+	var choices: Array[Dictionary] = []
+	for definition in training_enemies:
+		choices.append(definition.duplicate(true))
+	return choices
+
+func start_enemy_training(id: String) -> void:
+	if page != "menu" or transition_locked or battle_busy or training_mode: return
+	for definition in training_enemies:
+		if definition.id != id: continue
+		var temporary_id := "training_" + id
+		if battles.has(temporary_id) or enemy_catalog.has(temporary_id): return
+		# Practice definitions exist only for this session, never in story content.
+		var enemy: Dictionary = definition.duplicate(true)
+		enemy.id = temporary_id
+		enemy.characterId = id
+		enemy.battlePortraitAssetId = ""
+		enemy.prototype = false
+		enemy_catalog[temporary_id] = enemy
+		battles[temporary_id] = {
+			"id":temporary_id, "eventId":"", "name":definition.displayName + "演练",
+			"battleType":"normal", "placeId":definition.placeId,
+			"enemyIds":[temporary_id], "trainingOnly":true, "trainingEnemyHp":100
+		}
+		training_enemy_id = temporary_id
+		training_battle_id = temporary_id
+		start_training(temporary_id)
+		if not training_mode: _clear_training_encounter()
+		return
+
+func _clear_training_encounter() -> void:
+	if not training_enemy_id.is_empty(): enemy_catalog.erase(training_enemy_id)
+	if not training_battle_id.is_empty(): battles.erase(training_battle_id)
+	training_enemy_id = ""
+	training_battle_id = ""
+
 func start_training(battle_id: String = "B04") -> void:
 	if transition_locked or battle_busy or training_mode or not battles.has(battle_id): return
-	var event: Dictionary = events.get(battles[battle_id].eventId, {})
-	if event.is_empty() or not event.get("nodes", {}).has("battle") or event.nodes.battle.get("battleId") != battle_id: return
+	if not battles[battle_id].get("trainingOnly", false):
+		var event: Dictionary = events.get(battles[battle_id].eventId, {})
+		if event.is_empty() or not event.get("nodes", {}).has("battle") or event.nodes.battle.get("battleId") != battle_id: return
 	var fresh := initial_state(player_character_id())
 	if fresh.is_empty(): return
 	fresh.deck = state.get("deck", []).duplicate()
@@ -902,11 +944,18 @@ func start_training(battle_id: String = "B04") -> void:
 	state.targetId = "richard"
 	state.activeEventId = battles[battle_id].eventId
 	state.currentPlaceId = battles[battle_id].placeId
-	enter_node("battle")
+	if battles[battle_id].get("trainingOnly", false):
+		state.battleId = battle_id
+		state.currentScene = "battle"
+		initialize_combat()
+		checkpoint()
+	else:
+		enter_node("battle")
 
 func restore_training() -> void:
 	state = training_backup.duplicate(true)
 	training_backup.clear()
+	_clear_training_encounter()
 	training_mode = false
 	training_scenery_place_id = ""
 

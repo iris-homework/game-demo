@@ -23,6 +23,10 @@ var training_scenery_button: Button
 var scenery_dialog: Control
 var scenery_cancel: Button
 var scenery_button_states: Dictionary = {}
+var enemy_dialog: Control
+var enemy_cancel: Button
+var enemy_picker_button: Button
+var enemy_button_states: Dictionary = {}
 var motion_button: Button
 var quit_button: Button
 var progress_summary: Label
@@ -112,7 +116,68 @@ func _build_right_column() -> void:
 	_menu_button("training_B11", "敌人测试", Vector2(185, 0), Vector2(165, 50), func(): Game.start_training("B11"), false, 16, training_container)
 	training_scenery_button = _menu_button("training_scenery", _training_scenery_label(), Vector2(0, 62), Vector2(COLUMN_WIDTH, 46), open_scenery_picker, false, 16, training_container)
 	training_scenery_button.tooltip_text = "选择 B04 战斗演练的场景"
-	_menu_button("training_B02", "机器人测试", Vector2(0, 116), Vector2(COLUMN_WIDTH, 40), func(): Game.start_training("B02"), false, 16, training_container)
+	_menu_button("training_B02", "机器人测试", Vector2(0, 116), Vector2(165, 40), func(): Game.start_training("B02"), false, 16, training_container)
+	enemy_picker_button = _menu_button("training_published_enemies", "新敌人演练", Vector2(185, 116), Vector2(165, 40), open_enemy_picker, false, 16, training_container)
+
+func open_enemy_picker() -> void:
+	if Game.page != "menu" or Game.training_mode or Game.battle_busy or Game.transition_locked: return
+	if is_instance_valid(enemy_dialog) or is_instance_valid(scenery_dialog): return
+	if is_instance_valid(confirm_dialog) and confirm_dialog.visible: return
+	enemy_dialog = Control.new()
+	enemy_dialog.name = "training_enemy_picker"
+	enemy_dialog.size = Vector2(1440, 900)
+	enemy_dialog.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(enemy_dialog)
+	var shade := rect(enemy_dialog, Vector2.ZERO, Vector2(1440, 900), Color(0, 0, 0, 0.64))
+	shade.mouse_filter = Control.MOUSE_FILTER_STOP
+	panel(enemy_dialog, Vector2(370, 125), Vector2(700, 650), PANEL, CYAN)
+	label(enemy_dialog, "选择演练敌人", Vector2(402, 152), Vector2(636, 44), 29)
+	label(enemy_dialog, "单敌人演练 · 100 HP · 每回合攻击 6", Vector2(402, 210), Vector2(636, 30), 18, MUTED)
+	var choices := Game.training_enemy_choices()
+	var focus_buttons: Array[Button] = []
+	for index in choices.size():
+		var choice: Dictionary = choices[index]
+		var id := str(choice.id)
+		var place_name := str(Game.place_data(choice.placeId).get("name", ""))
+		var choice_button := _menu_button("enemy_choice_" + id, str(choice.displayName) + " · " + place_name,
+			Vector2(402 + (index % 2) * 330, 270 + floori(index / 2.0) * 62), Vector2(306, 48),
+			_select_training_enemy.bind(id), false, 17, enemy_dialog)
+		focus_buttons.append(choice_button)
+	label(enemy_dialog, "退出或结束演练后恢复冒险进度，不保存、不发放奖励。", Vector2(402, 614), Vector2(636, 42), 17, MUTED)
+	enemy_cancel = _menu_button("enemy_cancel", "返回", Vector2(832, 690), Vector2(206, 44), close_enemy_picker, false, 18, enemy_dialog)
+	focus_buttons.append(enemy_cancel)
+	for index in focus_buttons.size():
+		var current := focus_buttons[index]
+		current.focus_next = current.get_path_to(focus_buttons[(index + 1) % focus_buttons.size()])
+		current.focus_previous = current.get_path_to(focus_buttons[posmod(index - 1, focus_buttons.size())])
+		current.focus_neighbor_left = current.focus_previous
+		current.focus_neighbor_right = current.focus_next
+		current.focus_neighbor_top = current.get_path_to(focus_buttons[index - 2] if index >= 2 and index < choices.size() else enemy_cancel if index < choices.size() else focus_buttons[choices.size() - 1])
+		current.focus_neighbor_bottom = current.get_path_to(focus_buttons[index + 2] if index + 2 < choices.size() else enemy_cancel if index < choices.size() else focus_buttons[0])
+	enemy_button_states.clear()
+	for node in ui_layer.find_children("*", "Button", true, false):
+		enemy_button_states[node] = {"disabled":node.disabled, "focus":node.focus_mode}
+		node.disabled = true
+		node.focus_mode = Control.FOCUS_NONE
+	enemy_cancel.grab_focus()
+
+func _select_training_enemy(id: String) -> void:
+	if Game.transition_locked or Game.battle_busy: return
+	close_enemy_picker()
+	Game.start_enemy_training(id)
+
+func close_enemy_picker() -> void:
+	if not is_instance_valid(enemy_dialog): return
+	get_viewport().gui_release_focus()
+	enemy_dialog.hide()
+	enemy_dialog.queue_free()
+	enemy_dialog = null
+	for node in enemy_button_states:
+		if is_instance_valid(node):
+			node.disabled = enemy_button_states[node].disabled
+			node.focus_mode = enemy_button_states[node].focus
+	enemy_button_states.clear()
+	enemy_picker_button.grab_focus()
 
 func _training_scenery_label() -> String:
 	for choice in Game.training_scenery_choices():
@@ -122,6 +187,7 @@ func _training_scenery_label() -> String:
 
 func open_scenery_picker() -> void:
 	if Game.training_mode or Game.battle_busy or Game.transition_locked: return
+	if is_instance_valid(enemy_dialog): return
 	if is_instance_valid(confirm_dialog) and confirm_dialog.visible: return
 	if is_instance_valid(scenery_dialog): return
 	scenery_dialog = Control.new()
@@ -209,6 +275,7 @@ func _summary_text() -> String:
 	return "暂无委托记录"
 
 func request_new() -> void:
+	if is_instance_valid(enemy_dialog): return
 	if is_instance_valid(scenery_dialog): return
 	if Game.has_save() or not Game.state.is_empty():
 		_open_confirm()
@@ -216,6 +283,7 @@ func request_new() -> void:
 		Game.new_game()
 
 func _open_confirm() -> void:
+	if is_instance_valid(enemy_dialog): return
 	if is_instance_valid(scenery_dialog): return
 	if is_instance_valid(confirm_dialog):
 		confirm_dialog.queue_free()
@@ -257,6 +325,17 @@ func _close_confirm() -> void:
 	new_button.refresh_feedback()
 
 func _input(event: InputEvent) -> void:
+	if is_instance_valid(enemy_dialog):
+		if event.is_action_pressed("ui_cancel"):
+			get_viewport().set_input_as_handled()
+			close_enemy_picker()
+		elif event.is_action_pressed("ui_focus_next") or event.is_action_pressed("ui_focus_prev"):
+			if get_viewport().gui_get_focus_owner() == null:
+				enemy_cancel.grab_focus()
+				get_viewport().set_input_as_handled()
+		elif event is InputEventKey and not (event.is_action("ui_accept") or event.is_action("ui_left") or event.is_action("ui_right") or event.is_action("ui_up") or event.is_action("ui_down")):
+			get_viewport().set_input_as_handled()
+		return
 	if is_instance_valid(scenery_dialog):
 		if event.is_action_pressed("ui_cancel"):
 			get_viewport().set_input_as_handled()
@@ -307,6 +386,9 @@ func _motion_label() -> String:
 
 ## 主流程 Esc 接口：先关场景选择／确认弹窗，再收演练子菜单；其余交回全局处理。
 func handle_escape() -> bool:
+	if is_instance_valid(enemy_dialog):
+		close_enemy_picker()
+		return true
 	if is_instance_valid(scenery_dialog):
 		close_scenery_picker()
 		return true

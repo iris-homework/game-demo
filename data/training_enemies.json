@@ -1,0 +1,152 @@
+[
+  {
+    "id": "warden_shield",
+    "displayName": "巡界盾手",
+    "placeId": "camp",
+    "combatVisualId": "warden_shield",
+    "maxHp": 100,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1,
+        "animation": "pierce"
+      }
+    ]
+  },
+  {
+    "id": "chip_broker",
+    "displayName": "筹码掮客",
+    "placeId": "bar",
+    "combatVisualId": "chip_broker",
+    "maxHp": 100,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1,
+        "animation": "pierce"
+      }
+    ]
+  },
+  {
+    "id": "mutant_mouse",
+    "displayName": "爬墙线鼠",
+    "placeId": "hive",
+    "combatVisualId": "mutant_mouse",
+    "maxHp": 100,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1,
+        "animation": "pierce"
+      }
+    ]
+  },
+  {
+    "id": "luggage_lurker",
+    "displayName": "行李潜伏客",
+    "placeId": "hotel",
+    "combatVisualId": "luggage_lurker",
+    "maxHp": 100,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1,
+        "animation": "bite"
+      }
+    ]
+  },
+  {
+    "id": "penitent_ascetic",
+    "displayName": "赎罪苦修者",
+    "placeId": "church",
+    "combatVisualId": "penitent_ascetic",
+    "maxHp": 100,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1,
+        "animation": "pierce"
+      }
+    ]
+  },
+  {
+    "id": "rogue_drone",
+    "displayName": "失控配送蜂",
+    "placeId": "block5",
+    "combatVisualId": "rogue_drone",
+    "maxHp": 100,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1,
+        "animation": "pierce"
+      }
+    ]
+  },
+  {
+    "id": "mirror_inspector",
+    "displayName": "镜面监察员",
+    "placeId": "tower",
+    "combatVisualId": "mirror_inspector",
+    "maxHp": 100,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1,
+        "animation": "shoot"
+      }
+    ]
+  },
+  {
+    "id": "pruning_hound",
+    "displayName": "修枝猎犬",
+    "placeId": "garden",
+    "combatVisualId": "pruning_hound",
+    "maxHp": 100,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1,
+        "animation": "pierce"
+      }
+    ]
+  },
+  {
+    "id": "powerline_repairman",
+    "displayName": "输电抢修工",
+    "placeId": "power",
+    "combatVisualId": "powerline_repairman",
+    "maxHp": 100,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1,
+        "animation": "pierce"
+      }
+    ]
+  },
+  {
+    "id": "beacon_jellyfish",
+    "displayName": "信标水母",
+    "placeId": "port",
+    "combatVisualId": "beacon_jellyfish",
+    "maxHp": 100,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1,
+        "animation": "pierce"
+      }
+    ]
+  }
+]
