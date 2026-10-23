@@ -89,7 +89,20 @@
       ],
       "date": "2026-10-19",
       "version": "比例调整_v2"
+    },
+    {
+      "placeAssetId": "power",
+      "battleAssetId": "power_battle_simplified",
+      "name": "发电厂",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/发电厂背景_2026-10-23/发电厂_战斗背景_v1.png",
+      "sha256": "8fbb781ed719b727cf8d4e2aa0f89aeed4f6a0ef70d2f8fe232b6edc7b4f922d",
+      "size": [
+        1586,
+        992
+      ],
+      "date": "2026-10-23",
+      "version": "v1"
     }
   ],
-  "updated": "2026-10-19"
+  "updated": "2026-10-23"
 }

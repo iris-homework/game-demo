@@ -49,10 +49,29 @@ func start_contract() -> void:
 	step_to_stop()
 	check(Game.choose(0, Game.revision), "E01 contract chosen")
 	step_to_stop()
-	check("E01" in Game.state.completedEventIds and Game.state.currentDay == 2, "E01 first completion spends one day")
+	check("E01" in Game.state.completedEventIds and Game.state.currentDay == 1, "E01 first completion keeps day one")
 	Game.claim_rewards(Game.revision)
 	Game.state.refreshedEventIds = ["E02", "E03"]
 	Game.refresh_event_pool()
+
+func test_opening_date() -> void:
+	for choice in [0, 1]:
+		for skip in [false, true]:
+			reset_authored()
+			Game.new_game()
+			if skip: Game.skip_dialogue(Game.revision)
+			else: step_to_stop()
+			check(Game.state.activeNodeId == "contract" and Game.state.currentDay == 1, "opening reaches choice on day one")
+			check(Game.choose(choice, Game.revision), "opening target choice accepted")
+			if skip: Game.skip_dialogue(Game.revision)
+			else: step_to_stop()
+			check(Game.state.currentScene == "result" and Game.state.completedEventIds == ["E01"] and Game.state.currentDay == 1, "both opening branches finish without spending time, skip=" + str(skip))
+			check(Game.state.targetId == ("richard" if choice == 0 else "lumina"), "opening still records selected target")
+			check(Game.claim_rewards(Game.revision) and Game.state.currentScene == "map" and Game.state.currentDay == 1, "opening returns to map on day one")
+			check(not "E01" in Game.state.refreshedEventIds, "completed opening leaves the event pool")
+			check(Game.save_game(), "day one opening checkpoint saves")
+			Game.state = {}
+			check(Game.load_game() and Game.state.currentDay == 1 and "E01" in Game.state.completedEventIds, "completed opening reloads on day one")
 
 func all_text(node: Node) -> String:
 	var result := ""
@@ -269,6 +288,7 @@ func _ready() -> void:
 	authored_events = Game.events.duplicate(true)
 	test_pool()
 	test_ranges()
+	test_opening_date()
 	test_days_and_failures()
 	test_save()
 	await test_ui()

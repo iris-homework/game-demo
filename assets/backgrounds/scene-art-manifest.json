@@ -100,6 +100,18 @@
         941
       ],
       "sha256": "ec1fa40851c12bf25db968c87d28a06044cd7d9998912a813d694c2001cbab42"
+    },
+    {
+      "assetId": "power",
+      "source": "卡牌游戏美术资源/场景/发电厂背景_2026-10-23/发电厂_场景背景_v1.png",
+      "path": "res://assets/backgrounds/power.png",
+      "size": [
+        1659,
+        948
+      ],
+      "sha256": "fdac0b98b7de1483a5bb2a493bc827f13d2e61a45d6eab3c797e0ee83dea0e1e",
+      "importedOn": "2026-10-23"
     }
-  ]
+  ],
+  "updated": "2026-10-23"
 }

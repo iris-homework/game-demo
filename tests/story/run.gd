@@ -83,7 +83,7 @@ func _ready() -> void:
 		for removed in ["E05A", "E05B", "E06", "E07", "E08", "E09", "E10", "E12"]:
 			check(not Game.start_event(removed), "Removed event cannot start " + removed)
 		complete_event("E11")
-		check(Game.state.completedEventIds.size() == 5 and Game.state.currentDay == 6, "All five events complete exactly once and each spends one day")
+		check(Game.state.completedEventIds.size() == 5 and Game.state.currentDay == 5, "All five events complete exactly once; only four regular events spend a day")
 		check(Game.state.currentWeek == 1, "No empty future week")
 		check(not Game.start_event("E11"), "Completed event cannot repeat")
 	# Disk roundtrip preserves victory story or the terminal defeat page.

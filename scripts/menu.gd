@@ -5,6 +5,7 @@ extends DemoUI
 
 const MENU_ENVIRONMENT := preload("res://scripts/menu/menu_environment.gd")
 const MENU_LOGO := preload("res://scripts/menu/menu_logo.gd")
+const FaceArt := preload("res://scripts/combat/card_face_art.gd")
 const COLUMN_X := 980.0
 const COLUMN_WIDTH := 350.0
 const MASK_LEFT := 920.0
@@ -28,6 +29,7 @@ var enemy_cancel: Button
 var enemy_picker_button: Button
 var enemy_button_states: Dictionary = {}
 var motion_button: Button
+var card_face_style_button: Button
 var quit_button: Button
 var progress_summary: Label
 var confirm_dialog: Control
@@ -249,6 +251,8 @@ func close_scenery_picker() -> void:
 	training_scenery_button.refresh_feedback()
 
 func _build_bottom_right() -> void:
+	card_face_style_button = _menu_button("card_face_style", _card_face_style_label(), Vector2(42, 828), Vector2(260, 44), _toggle_card_face_style, false, 17)
+	card_face_style_button.tooltip_text = "切换全部卡牌的卡面版本，自动记住选择。"
 	motion_button = _menu_button("motion_toggle", _motion_label(), Vector2(COLUMN_X, 828), Vector2(165, 44), _toggle_motion, false, 16)
 	quit_button = _menu_button("quit_game", "退出游戏", Vector2(COLUMN_X + 185, 828), Vector2(165, 44), Game.request_quit, false, 16)
 	var version := str(ProjectSettings.get_setting("application/config/version", "0.2.6-r1"))
@@ -383,6 +387,20 @@ func _toggle_motion() -> void:
 
 func _motion_label() -> String:
 	return "动态效果：开" if _motion_enabled() else "动态效果：关"
+
+func _card_face_style_label() -> String:
+	return "卡面：无人物版" if FaceArt.get_style() == "no_character" else "卡面：有人物版"
+
+func _toggle_card_face_style() -> void:
+	if Game.page != "menu" or Game.training_mode or Game.battle_busy or Game.transition_locked: return
+	if not is_instance_valid(card_face_style_button) or card_face_style_button.disabled: return
+	if is_instance_valid(enemy_dialog) or is_instance_valid(scenery_dialog): return
+	if is_instance_valid(confirm_dialog) and confirm_dialog.visible: return
+	var next_style := "character" if FaceArt.get_style() == "no_character" else "no_character"
+	if FaceArt.set_style(next_style):
+		card_face_style_button.text = _card_face_style_label()
+	else:
+		Game.notice.emit("卡面设置保存失败，请稍后重试。")
 
 ## 主流程 Esc 接口：先关场景选择／确认弹窗，再收演练子菜单；其余交回全局处理。
 func handle_escape() -> bool:

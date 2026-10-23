@@ -431,7 +431,9 @@ func apply_actions(actions: Array) -> bool:
 				if not events.has(a.get("id", "")): return false
 				if not a.id in draft.completedEventIds:
 					draft.completedEventIds.append(a.id)
-					draft.currentDay = mini(7, int(draft.currentDay) + 1)
+					# The opening conversation completes normally without spending a day.
+					if a.id != "E01":
+						draft.currentDay = mini(7, int(draft.currentDay) + 1)
 			"healHpPercent":
 				var percent := float(a.get("percent", -1.0))
 				if percent < 0.0 or percent > 1.0: return false

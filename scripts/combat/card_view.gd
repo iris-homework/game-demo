@@ -28,6 +28,7 @@ var effect_label: Label
 var rank_label: Label
 var face_texture: Texture2D
 var face_font: Font
+var face_template_id := FaceArt.TEMPLATE_ID
 var fixed_layer: Control
 var cost_changed := false
 var rules_changed := false
@@ -43,6 +44,7 @@ const FaceArt = preload("res://scripts/combat/card_face_art.gd")
 const FACE_SCALE := 230.0 / 1448.0
 const FACE_RECT := Rect2(3.75, 0, 172.5, 230)
 const FACE_RULES := Rect2(112, 1143, 862, 230)
+const NO_CHARACTER_RULES := Rect2(118, 956, 853, 369)
 const FACE_BACKGROUND := Color("030406")
 const FACE_RULE_COLOR := Color("f5f0e7")
 const ZOOM_SCALE := 2.2
@@ -57,6 +59,7 @@ func setup(card_uid: String, definition: Dictionary, read_only: bool = false) ->
 	var art := FaceArt.resolve(definition)
 	face_texture = art.get("texture")
 	face_font = art.get("font")
+	face_template_id = art.get("template_id", FaceArt.TEMPLATE_ID)
 	set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	size = Vector2(180,230)
 	pivot_offset = Vector2(90,115)
@@ -140,19 +143,41 @@ func build_fixed_face() -> void:
 	fixed_layer.scale = Vector2.ONE * FACE_SCALE
 	fixed_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(fixed_layer)
-	cost_label = label(fixed_layer, str(int(data.cost)), Vector2(90, 63), Vector2(166, 203), 190, rarity_color())
-	cost_label.add_theme_font_override("font", fixed_font(190))
+	var cost_bounds := face_cost_rect()
+	var cost_size: int = face_cost_sizes()[0]
+	cost_label = label(fixed_layer, str(int(data.cost)), cost_bounds.position, cost_bounds.size, cost_size, face_base_cost_color())
+	cost_label.add_theme_font_override("font", fixed_font(cost_size))
 	cost_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	cost_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	cost_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	fit_fixed_cost()
 	cost_label.hide()
-	effect_label = label(fixed_layer, data.get("cardText", data.get("description", "")), FACE_RULES.position, FACE_RULES.size, 70, FACE_RULE_COLOR)
+	var rules := face_rules_rect()
+	effect_label = label(fixed_layer, data.get("cardText", data.get("description", "")), rules.position, rules.size, 70, FACE_RULE_COLOR)
 	effect_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	effect_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	effect_label.add_theme_constant_override("line_spacing", 15)
 	fit_effect_text()
 	effect_label.hide()
+
+func is_no_character_face() -> bool:
+	return face_template_id == FaceArt.NO_CHARACTER_TEMPLATE_ID
+
+func face_rules_rect() -> Rect2:
+	return NO_CHARACTER_RULES if is_no_character_face() else FACE_RULES
+
+func face_cost_rect() -> Rect2:
+	return Rect2(39, 79, 160, 180) if is_no_character_face() else Rect2(90, 63, 166, 203)
+
+func face_cost_center() -> Vector2:
+	# The no-character master uses Pillow's text anchor; match its visible ink center.
+	return Vector2(119, 169) if is_no_character_face() else Vector2(173, 164)
+
+func face_cost_sizes() -> Array:
+	return [152, 138, 124, 108] if is_no_character_face() else [190, 174, 156, 138]
+
+func face_base_cost_color() -> Color:
+	return Color("eeeee7") if is_no_character_face() else rarity_color()
 
 func fixed_font(font_size: int) -> FontVariation:
 	var result := FontVariation.new()
@@ -166,14 +191,15 @@ func fit_fixed_cost() -> void:
 	# Center visible numeral ink, not the CJK font's asymmetric ascent/descent box.
 	var file := face_font as FontFile
 	if file == null: return
-	var font_size := 190
-	for candidate in [190, 174, 156, 138]:
+	var bounds := face_cost_rect()
+	var font_size: int = face_cost_sizes()[0]
+	for candidate in face_cost_sizes():
 		font_size = candidate
-		if file.get_string_size(cost_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, candidate).x <= 166: break
+		if file.get_string_size(cost_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, candidate).x <= bounds.size.x: break
 	var typeface := fixed_font(font_size)
 	cost_label.add_theme_font_override("font", typeface)
 	cost_label.add_theme_font_size_override("font_size", font_size)
-	cost_label.size = Vector2(166, 203)
+	cost_label.size = bounds.size
 	var ink := Rect2()
 	var pen := 0.0
 	for i in cost_label.text.length():
@@ -182,8 +208,8 @@ func fit_fixed_cost() -> void:
 		var glyph_box := Rect2(Vector2(pen, 0) + file.get_glyph_offset(0, Vector2i(font_size, 0), glyph), file.get_glyph_size(0, Vector2i(font_size, 0), glyph))
 		ink = glyph_box if i == 0 else ink.merge(glyph_box)
 		pen += file.get_glyph_advance(0, font_size, glyph).x
-	var baseline := Vector2((166 - pen) / 2.0, (203 - typeface.get_height(font_size)) / 2.0 + typeface.get_ascent(font_size))
-	cost_label.position = Vector2(173, 164) - baseline - ink.get_center()
+	var baseline := Vector2((bounds.size.x - pen) / 2.0, (bounds.size.y - typeface.get_height(font_size)) / 2.0 + typeface.get_ascent(font_size))
+	cost_label.position = face_cost_center() - baseline - ink.get_center()
 	cost_ink_bounds = Rect2(cost_label.position + baseline + ink.position, ink.size)
 
 func _draw() -> void:
@@ -191,9 +217,13 @@ func _draw() -> void:
 		draw_texture_rect(face_texture, FACE_RECT, false)
 		# Erase only baked fields whose live values changed. The static face stays exact.
 		if cost_changed:
-			draw_circle(FACE_RECT.position + Vector2(173, 165) * FACE_SCALE, 88 * FACE_SCALE, FACE_BACKGROUND)
+			var center := Vector2(119, 168) if is_no_character_face() else Vector2(173, 165)
+			var radius := 92.0 if is_no_character_face() else 88.0
+			var color := Color("b53660") if is_no_character_face() else FACE_BACKGROUND
+			draw_circle(FACE_RECT.position + center * FACE_SCALE, radius * FACE_SCALE, color)
 		if rules_changed:
-			draw_rect(Rect2(FACE_RECT.position + (FACE_RULES.position - Vector2(2, 2)) * FACE_SCALE, (FACE_RULES.size + Vector2(4, 4)) * FACE_SCALE), FACE_BACKGROUND)
+			var rules := face_rules_rect()
+			draw_rect(Rect2(FACE_RECT.position + (rules.position - Vector2(2, 2)) * FACE_SCALE, (rules.size + Vector2(4, 4)) * FACE_SCALE), Color("1c1c25") if is_no_character_face() else FACE_BACKGROUND)
 		if selected or hovered:
 			var edge := Rect2(FACE_RECT.position + Vector2(40, 36) * FACE_SCALE, Vector2(1024, 1396) * FACE_SCALE)
 			draw_style_box(face_highlight(), edge)
@@ -285,7 +315,7 @@ func show_cost(value: int) -> void:
 	if is_instance_valid(cost_label):
 		cost_label.text = str(value)
 		var discounted := value < int(data.get("cost", 0))
-		cost_label.add_theme_color_override("font_color", (CYAN if discounted else rarity_color()) if face_texture != null else (Color("07514d") if discounted else INK))
+		cost_label.add_theme_color_override("font_color", (CYAN if discounted else face_base_cost_color()) if face_texture != null else (Color("07514d") if discounted else INK))
 		cost_label.add_theme_color_override("font_outline_color", CYAN if value < int(data.get("cost", 0)) else Color.TRANSPARENT)
 		cost_label.add_theme_constant_override("outline_size", 1 if value < int(data.get("cost", 0)) else 0)
 		if face_texture != null:
@@ -312,14 +342,16 @@ func show_preview(preview: Dictionary) -> void:
 
 func fit_effect_text() -> void:
 	if face_texture != null:
-		for font_size in [70, 62, 54, 46, 40, 36]:
+		var bounds := face_rules_rect()
+		var font_sizes := [70, 66, 62, 58, 54, 50, 46, 42, 38, 36] if is_no_character_face() else [70, 62, 54, 46, 40, 36]
+		for font_size in font_sizes:
 			var typeface := fixed_font(font_size)
 			effect_label.add_theme_font_override("font", typeface)
 			effect_label.add_theme_font_size_override("font_size", font_size)
-			var measured := typeface.get_multiline_string_size(effect_label.text, HORIZONTAL_ALIGNMENT_CENTER, FACE_RULES.size.x, font_size, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE)
+			var measured := typeface.get_multiline_string_size(effect_label.text, HORIZONTAL_ALIGNMENT_CENTER, bounds.size.x, font_size, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE)
 			var lines := maxi(1, ceili(measured.y / typeface.get_height(font_size)))
-			if measured.y + (lines - 1) * 15 <= FACE_RULES.size.y: break
-		effect_label.size = FACE_RULES.size
+			if measured.y + (lines - 1) * 15 <= bounds.size.y: break
+		effect_label.size = bounds.size
 		return
 	# Initial and calculated rules use the same bounds and wrapping budget.
 	# A Label may expand to its text minimum before fitting; use the fixed design bounds.
@@ -370,6 +402,7 @@ func show_zoom_preview() -> void:
 	# Keep the same resolved source even if resources changed since this view opened.
 	zoom_card.face_texture = face_texture
 	zoom_card.face_font = face_font
+	zoom_card.face_template_id = face_template_id
 	zoom_card.pivot_offset = Vector2.ZERO
 	zoom_card.scale = Vector2.ONE * ZOOM_SCALE
 	holder.add_child(zoom_card)

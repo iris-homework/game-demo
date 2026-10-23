@@ -1,5 +1,7 @@
 # 测试目录索引
 
+有／无人物版卡面专项：[card_face_style_tests](card_face_style_tests.tscn)。以隔离用户目录及独立偏好／存档路径headless运行，覆盖两套80张实图、菜单按钮双向切换、持久化重读、无效偏好、失败写盘、模态／焦点／锁、浏览与放大复用、40牌×2形态×2风格的动态排版及快照不变。不能代替实际像素和物理输入验收；本轮结果见`artifacts/qa/card-face-style-2026-10-23/`。
+
 十种已发布敌人的菜单演练专项：[published_training_tests](combat/enemies/published_training_tests.tscn)，在隔离复制工程中headless运行；覆盖十选择、真实战斗视图及攻击回调、咬击／射击演出、胜负与退出恢复、临时注册清理、存档哨兵、原三入口及模态焦点／Esc／锁定。只验证逻辑和节点时序，不替代像素渲染或真实鼠标验收，不启动桌面窗口。
 
 ## 2026-10-23 事件删减与无前置回归
@@ -47,7 +49,7 @@
 
 | 范围 | 套件 |
 | --- | --- |
-| 事件刷新池、时间与日期（无窗口） | [event_refresh_tests](story/event_refresh_tests.tscn)：6候选全局3上限、按地点一致、入口防绕过、保留补位／失效、查询只读、区间闭边界、完成与失败事务、真实付费／战败／胜利／奖励、第7天封顶／非法日期拒绝及存读、旧档补池不追算、演练及HUD／地点刷新文案；关闭保存，save/meta专用路径 |
+| 事件刷新池、时间与日期（无窗口） | [event_refresh_tests](story/event_refresh_tests.tscn)：6候选全局3上限、按地点一致、入口防绕过、保留补位／失效、查询只读、区间闭边界、开幕双分支逐句／跳过均保持第1天及存读、完成与失败事务、真实付费／战败／胜利／奖励、第7天封顶／非法日期拒绝及存读、旧档补池不追算、演练及HUD／地点刷新文案；关闭保存，save/meta专用路径 |
 | 地图事件类型标记（无窗口） | [map_event_types_tests](map/map_event_types_tests.tscn)，覆盖类型映射、混合计数、Boss特效开关及角标点击边界；不含渲染验收 |
 | 战斗类型、冻结与旧档（无窗口） | [battle_type_tests](combat/rules/battle_type_tests.tscn) |
 | 按战斗类型的奖励概率（无窗口） | [card_reward_rates_tests](combat/cards/card_reward_rates_tests.tscn) |

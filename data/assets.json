@@ -58,8 +58,9 @@
     "battleAssetId": "block5_battle_simplified"
   },
   "power": {
-    "path": "",
-    "kind": "pending"
+    "path": "res://assets/backgrounds/power.png",
+    "kind": "background",
+    "battleAssetId": "power_battle_simplified"
   },
   "pump": {
     "path": "res://assets/backgrounds/pump.png",
@@ -293,5 +294,14 @@
       0.8277024141866431
     ],
     "note": "2026-10-21 原城市底图四周扩绘；mapContentRect 为原城市锚点区域，原图保留。"
+  },
+  "power_battle_simplified": {
+    "path": "res://assets/backgrounds/battle_simplified/power.png",
+    "kind": "battle_background",
+    "groundStart": 0.59,
+    "actorOffset": [
+      0,
+      0
+    ]
   }
 }
