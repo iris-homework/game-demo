@@ -12,7 +12,7 @@ func check(ok: bool, message: String) -> void:
 func reset_map() -> void:
 	Game.state = Game.initial_state()
 	Game.state.currentScene = "map"
-	Game.state.completedEventIds = ["E01", "E11"]
+	Game.state.completedEventIds = ["E01", "E11", "E13", "E14", "E15", "E01R"]
 	Game.state.targetId = "richard"
 	Game.state.credits = 300
 	Game.page = "map"
@@ -64,8 +64,9 @@ func _ready() -> void:
 		check(Game.page == "place" and Game.state.currentPlaceId == p.id, "initial visit succeeds " + p.id)
 	check(not Game.start_event("E12"), "retired event cannot be started from an open place")
 	Game.state.currentHp = 50
+	var clinic_expected := mini(int(Game.state.maxHp), 50 + roundi(Game.state.maxHp * 0.3))
 	Game.state.credits = 150
-	check(Game.heal_at("clinic") and Game.state.currentHp == 80 and Game.state.credits == 0, "clinic service available before E01 at configured price")
+	check(Game.heal_at("clinic") and Game.state.currentHp == clinic_expected and Game.state.credits == 0, "clinic service available before E01 at configured price")
 	var last_place: String = Game.state.currentPlaceId
 	Game.visit("unknown")
 	check(Game.state.currentPlaceId == last_place, "unknown location still rejected")
@@ -127,7 +128,7 @@ func _ready() -> void:
 			finish_event(id)
 			check(not id in target_ids(), "completed event leaves targets " + id)
 		check(Game.state.completedEventIds.size() == 4 and Game.state.currentDay == 4, "all remaining events complete without an ordered chain")
-		check(target_ids() == ["E01R"] and Game.map_place_state("bar").target, "only the earned bar return reward remains, with no retired finale or port event")
+		check(Game.meets(Game.events.E01R.unlockCondition) and target_ids().size() == 3 and target_ids().all(func(id): return id in ["E01R", "E13", "E14", "E15"]), "earned return and new commissions share the three-slot pool without retired events")
 		check(Game.map_place_state("camp").open and Game.map_place_state("tower").open, "locations remain open without allegiance")
 	reset_map()
 	for outcome in ["lose"]:
@@ -143,12 +144,13 @@ func _ready() -> void:
 		check(not Game.choose(0, Game.revision) and Game.page == "defeat" and not Game.can_continue(), "defeat is terminal " + outcome)
 		check(not "E04" in Game.state.completedEventIds and target_ids() == ["E02", "E04"], "unfinished events retained on " + outcome)
 		reset_map()
-	Game.state.currentHp = 50
+	Game.state.currentHp = roundi(Game.state.maxHp * 0.5)
+	var healed_expected := mini(int(Game.state.maxHp), int(Game.state.currentHp) + roundi(Game.state.maxHp * 0.3))
 	var current: String = Game.state.currentPlaceId
 	var day: int = Game.state.currentDay
-	check(Game.heal_at("hospital") and Game.state.currentHp == 80, "existing healing 30 percent")
+	check(Game.heal_at("hospital") and Game.state.currentHp == healed_expected, "existing healing 30 percent of configured maximum")
 	check(Game.state.currentPlaceId == current and Game.state.currentDay == day, "healing preserves place and day")
-	check(Game.heal_at("hospital") and Game.state.currentHp == 100, "healing clamps HP")
+	check(Game.heal_at("hospital") and Game.state.currentHp == Game.state.maxHp, "healing clamps HP")
 	var expected: Dictionary = Game.state.duplicate(true)
 	check(Game.save_game(), "test-path checkpoint written")
 	Game.state = {}

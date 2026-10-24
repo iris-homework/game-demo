@@ -10,14 +10,15 @@
     "generated": 10,
     "creatorVisualReview": "已逐张检查，修枝猎犬因比例与裁切返修后选用横构图版本",
     "userApproval": "pending",
-    "runtimeBinding": "未绑定characters.json/assets.json，未修改剧情或战斗",
-    "runtimeValidation": "未启动游戏或执行导入"
+    "runtimeBinding": "2026-10-24：pruning_hound、powerline_repairman、beacon_jellyfish已绑定characters/assets及E13/E14/E15对白节点，其余7种未绑定。",
+    "runtimeValidation": "2026-10-24三敌：独立复制工程无窗口对白场景检查及跳过回归共503项通过；原PNG逐张查看，未改图。未进行游戏实际像素／物理输入验收。"
   },
   "notes": [
     "保留各敌人现有形象；人形采用对白角色比例，非人形保持机械或动物结构。",
     "全部保留生成原始RGBA，未用阈值或程序重新抠图。",
     "对白视图目前无条件使用去白材质，未来接入透明立绘需同步核对高光与材质条件。",
-    "9张1024×1536，修枝猎犬1536×1024以保证横向轮廓和四足完整。"
+    "9张1024×1536，修枝猎犬1536×1024以保证横向轮廓和四足完整。",
+    "2026-10-24接入三敌时显式whiteKey=false，保留现有PNG原图与alpha；节点portraits将场上立绘与说话者分开。"
   ],
   "assets": [
     {

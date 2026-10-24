@@ -12,7 +12,7 @@ const IDLE_ART := {
 	"powerline_repairman":["11a_powerline_repairman/powerline_repairman_idle.png","输电抢修工"],
 	"beacon_jellyfish":["13b_beacon_jellyfish/beacon_jellyfish_idle.png","信标水母"]
 }
-const MOVED := {"fish":"12a_fish","robot":"02b_robot","gang_boss":"03b_gang_boss","gang_henchman":"03a_gang_henchman","finn":"Finn"}
+const MOVED := {"fish":"12a_fish","robot":"02b_robot","gang_boss":"03b_gang_boss","gang_henchman":"03a_gang_henchman"}
 
 static func prepare() -> void:
 	# The resolver is process-local; no production JSON, resource or scene is edited.

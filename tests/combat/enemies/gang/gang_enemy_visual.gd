@@ -27,7 +27,7 @@ func resolver_contract() -> void:
 	var visual := resolver.resolve(legacy,definitions)
 	check(visual.id == "gang_boss" and visual.formation_slot == "triangle_right" and legacy == before,"Legacy art/formation resolution remains read-only")
 	check(resolver.resolve({"id":"gang","formationSlot":"triangle_left_back"},definitions).formation_slot == "triangle_left_back","Saved formation takes precedence")
-	check(resolver.resolve({"combatVisualId":"finn"},{}).source_facing == -1,"Existing left-facing source convention remains the default")
+	check(resolver.resolve({"combatVisualId":"fish"},{}).source_facing == -1,"Existing left-facing source convention remains the default")
 	var original: Dictionary = resolver.catalog.gang_boss.duplicate(true)
 	for mutation in ["sourceFacing", "whiteKey"]:
 		var profile := original.duplicate(true)
@@ -36,7 +36,7 @@ func resolver_contract() -> void:
 		else: profile.poses.idle.whiteKey = "true"
 		resolver.catalog.qa_bad_gang = profile
 		var rejected := resolver.resolve({"combatVisualId":"qa_bad_gang"},{})
-		check(rejected.id == "finn" and not rejected.diagnostics.is_empty(),"Malformed optional field rejects the entire visual: "+mutation)
+		check(rejected.id == "unillustrated" and not rejected.diagnostics.is_empty(),"Malformed optional field rejects the entire visual: "+mutation)
 
 func _ready() -> void:
 	Game.save_enabled = false

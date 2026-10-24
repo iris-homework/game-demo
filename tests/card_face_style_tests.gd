@@ -1,17 +1,16 @@
 extends Node
-## Presentation preference and synthetic scene coverage, with isolated persistence.
+## Single card-art set and read-only scene coverage, with isolated persistence.
 const FaceArt = preload("res://scripts/combat/card_face_art.gd")
 const Menu = preload("res://scripts/menu.gd")
 const Library = preload("res://scripts/card_library.gd")
-const OUTPUT := "res://artifacts/qa/card-face-style-2026-10-23/"
-const PREFERENCES := OUTPUT + "isolated-card-faces.cfg"
-const STYLES := ["character", "no_character"]
-const TEMPLATE_IDS := {"character":"noren-fixed-card-v1", "no_character":"neon-comic-all-v1"}
+const OUTPUT := "res://artifacts/qa/card-title-2026-10-24/"
+const PREFERENCES := "user://card_faces.cfg"
+const STYLES := ["no_character"]
+const TEMPLATE_IDS := {"no_character":"neon-comic-title-v3"}
 var checks := 0
 var failures: Array[String] = []
 var records: Array[Dictionary] = []
 var loaded_art := 0
-var notices: Array[String] = []
 var protected_paths: Array[String] = []
 var protected_bytes: Dictionary = {}
 
@@ -55,46 +54,29 @@ func make_model(number: int, form: String) -> CombatModel:
 	return model
 
 func test_preferences() -> void:
-	if FileAccess.file_exists(PREFERENCES): DirAccess.remove_absolute(PREFERENCES)
-	FaceArt.preferences_path = PREFERENCES
-	FaceArt.reset_preferences_cache()
-	check(FaceArt.get_style() == "character", "Missing preference keeps the existing character version as default")
-	for style in STYLES:
-		check(FaceArt.set_style(style), "Save independent preference " + style)
-		check(FaceArt.get_style() == style, "Preference immediately selects " + style)
-		FaceArt.reset_preferences_cache()
-		check(FaceArt.get_style() == style, "Reload independent preference " + style)
-	var saved := file_snapshot(PREFERENCES)
-	for style in ["", "invalid", "CHARACTER", "no-character", "../character"]:
-		check(not FaceArt.set_style(style), "Reject unknown style " + style)
-		check(FaceArt.get_style() == "no_character" and file_snapshot(PREFERENCES) == saved, "Rejected preference preserves cached and durable choice")
-	write_text(OUTPUT + "write-blocker", "not a directory")
-	FaceArt.preferences_path = OUTPUT + "write-blocker/card-faces.cfg"
-	check(not FaceArt.set_style("character"), "Unwritable preference reports failure")
-	check(FaceArt.get_style() == "no_character", "Failed persistence preserves active choice")
-	FaceArt.preferences_path = PREFERENCES
-	FaceArt.reset_preferences_cache()
-	check(FaceArt.get_style() == "no_character", "Failed persistence preserves durable choice")
-	for fixture in [
-		{"name":"unknown", "content":"[cards]\nstyle=\"unknown\"\n"},
-		{"name":"wrong-type", "content":"[cards]\nstyle=17\n"},
-		{"name":"corrupt", "content":"[cards\nstyle=\"no_character\n"}
-	]:
-		FaceArt.preferences_path = OUTPUT + "preference-" + str(fixture.name) + ".cfg"
-		write_text(FaceArt.preferences_path, fixture.content)
-		FaceArt.reset_preferences_cache()
-		check(FaceArt.get_style() == "character", "Invalid preference defaults safely to character: " + str(fixture.name))
-	FaceArt.preferences_path = PREFERENCES
-	FaceArt.reset_preferences_cache()
-	check(FaceArt.get_style() == "no_character", "Invalid separate fixtures cannot replace the valid preference")
+	var original := file_snapshot(PREFERENCES)
+	for content in ["[cards]\nstyle=\"character\"\n", "[cards]\nstyle=\"no_character\"\n", "corrupt legacy preference"]:
+		write_text(PREFERENCES, content)
+		var before := file_snapshot(PREFERENCES)
+		FaceArt.cached_config.clear()
+		check(FaceArt.resolve(Game.card_catalog.noren_01).get("template_id") == "neon-comic-title-v3", "Legacy preference never selects character artwork")
+		var menu := make_menu()
+		check(menu.find_child("card_face_style", true, false) == null, "Legacy preference cannot restore the menu toggle")
+		menu.free()
+		check(file_snapshot(PREFERENCES) == before, "Retired preference is never read or rewritten by card rendering")
+	DirAccess.remove_absolute(PREFERENCES)
+	FaceArt.cached_config.clear()
+	check(FaceArt.resolve(Game.card_catalog.noren_01).get("template_id") == "neon-comic-title-v3", "Fresh installation uses no-character artwork")
+	if original.exists:
+		var file := FileAccess.open(PREFERENCES, FileAccess.WRITE)
+		file.store_buffer(original.bytes)
+		file.close()
 
 func test_bindings() -> void:
 	check(Game.card_catalog.size() == 40, "Current catalogue contains forty cards")
 	var all_paths: Dictionary = {}
 	for style in STYLES:
-		check(FaceArt.set_style(style), "Select binding style " + style)
 		var settings := FaceArt.config()
-		check(settings == FaceArt.config(style), "Implicit configuration follows selected style " + style)
 		check(settings.get("templateId") == TEMPLATE_IDS[style], "Style uses its own template " + style)
 		check(settings.get("cards", {}).size() == 40, "Style binds all forty definitions " + style)
 		for id in Game.card_catalog:
@@ -112,82 +94,32 @@ func test_bindings() -> void:
 			var frozen := definition.duplicate(true)
 			frozen.cardText += "（旧规则）"
 			check(FaceArt.resolve(frozen).is_empty(), style + ": frozen mismatched text falls back " + id)
-	check(loaded_art == 80 and all_paths.size() == 80, "Both complete sets load eighty distinct production textures")
-	var changed_settings := FaceArt.config("no_character").duplicate(true)
+	check(loaded_art == 40 and all_paths.size() == 40, "The only set loads forty distinct production textures")
+	var changed_settings := FaceArt.config().duplicate(true)
 	changed_settings.cards.noren_01.path = "res://assets/cards/missing-no-character-card.png"
 	check(FaceArt.resolve(Game.card_catalog.noren_01, changed_settings).is_empty(), "No-character configuration with missing image falls back")
-	changed_settings = FaceArt.config("no_character").duplicate(true)
+	changed_settings = FaceArt.config().duplicate(true)
 	changed_settings.font = "res://assets/fonts/missing-no-character-font.otf"
 	check(FaceArt.resolve(Game.card_catalog.noren_01, changed_settings).is_empty(), "No-character configuration with missing font falls back")
-	changed_settings = FaceArt.config("no_character").duplicate(true)
+	changed_settings = FaceArt.config().duplicate(true)
 	changed_settings.templateId = "unknown-no-character-template"
 	check(FaceArt.resolve(Game.card_catalog.noren_01, changed_settings).is_empty(), "Unknown template falls back without borrowing character geometry")
 
 func test_menu() -> void:
-	FaceArt.set_style("character")
 	Game.page = "menu"
 	var menu := make_menu()
 	await settle()
-	var control: Button = menu.card_face_style_button
-	check(control.name == "card_face_style" and control.text == "卡面：有人物版", "Menu exposes the current character choice")
-	check(control.focus_mode == Control.FOCUS_ALL, "Style toggle accepts keyboard focus")
-	check(Rect2(0, 0, 1440, 900).encloses(control.get_global_rect()), "Style toggle stays inside the logical canvas")
+	check(menu.find_child("card_face_style", true, false) == null, "Main menu has no card-art toggle")
+	check(not menu.has_method("_toggle_card_face_style"), "Retired menu callback is removed")
+	check(menu.motion_button != null and menu.quit_button != null, "Other bottom menu controls remain")
 	menu._set_training_open(true)
-	for item in menu.ui_layer.find_children("*", "Button", true, false):
-		if item != control and item.is_visible_in_tree():
-			check(not item.get_global_rect().intersects(control.get_global_rect()), "Expanded menu keeps style toggle separate from " + str(item.name))
-	menu._set_training_open(false)
-	# Follow actual engine focus traversal; no mouse or OS input is sent.
-	var focus: Control = menu.continue_button if not menu.continue_button.disabled else menu.new_button
-	var reached := false
-	for index in range(30):
-		if focus == control:
-			reached = true
-			break
-		focus = focus.find_next_valid_focus()
-		if focus == null: break
-	check(reached, "Tab traversal reaches the card face toggle")
-	control.pressed.emit()
-	check(FaceArt.get_style() == "no_character" and control.text == "卡面：无人物版", "Actual pressed signal switches to the no-character set")
-	control.pressed.emit()
-	check(FaceArt.get_style() == "character" and control.text == "卡面：有人物版", "Actual pressed signal switches back to the character set")
-	for guard in ["transition_locked", "battle_busy", "training_mode"]:
-		Game.set(guard, true)
-		control.pressed.emit()
-		check(FaceArt.get_style() == "character", "Menu guards direct activation while " + guard)
-		Game.set(guard, false)
-	Game.page = "map"
-	control.pressed.emit()
-	check(FaceArt.get_style() == "character", "Hidden old menu cannot change preference outside menu")
-	Game.page = "menu"
-	for modal in ["new_commission", "scenery", "enemy"]:
-		match modal:
-			"new_commission": menu._open_confirm()
-			"scenery": menu.open_scenery_picker()
-			"enemy": menu.open_enemy_picker()
-		check(control.disabled and control.focus_mode == Control.FOCUS_NONE, modal + ": modal disables style control")
-		control.pressed.emit()
-		check(FaceArt.get_style() == "character", modal + ": modal also blocks synthetic pressed signal")
-		menu.handle_escape()
-		await settle()
-		check(not control.disabled and control.focus_mode == Control.FOCUS_ALL, modal + ": closing restores style control")
-	FaceArt.preferences_path = OUTPUT + "write-blocker/card-faces.cfg"
-	control.pressed.emit()
-	check(FaceArt.get_style() == "character" and control.text == "卡面：有人物版", "Menu preserves its active label when persistence fails")
-	check(not notices.is_empty() and notices.back().contains("卡面设置保存失败"), "Menu reports a failed preference write")
-	FaceArt.preferences_path = PREFERENCES
-	control.pressed.emit()
-	check(FaceArt.get_style() == "no_character", "Toggle works again after write failure")
-	menu.free()
-	FaceArt.reset_preferences_cache()
-	menu = make_menu()
-	await settle()
-	check(menu.card_face_style_button.text == "卡面：无人物版", "Recreated menu shows the persisted choice")
+	check(menu.training_open and menu.motion_button.disabled, "Training panel still locks background controls")
+	menu.handle_escape()
+	check(not menu.training_open and not menu.motion_button.disabled, "Closing training restores menu controls")
 	menu.free()
 
 func test_shared_views() -> void:
 	for style in STYLES:
-		FaceArt.set_style(style)
 		var library := Library.new()
 		library.owned_only = false
 		add_child(library)
@@ -212,39 +144,39 @@ func test_shared_views() -> void:
 		card.set_enabled(true)
 		card.show_cost(0)
 		card.show_preview({"cardText":"造成99点伤害。", "description":"造成 99 点伤害。"})
-		FaceArt.set_style("no_character" if style == "character" else "character")
 		card.show_zoom_preview()
 		check(is_instance_valid(card.zoom_card), style + ": enlarged card is created")
 		if is_instance_valid(card.zoom_card):
 			check(card.zoom_card.face_texture == card.face_texture, style + ": enlarged card retains selected texture")
-			check(card.zoom_card.face_template_id == card.face_template_id and card.face_template_id == TEMPLATE_IDS[style], style + ": enlarged card keeps source template after preference changes")
+			check(card.zoom_card.face_template_id == card.face_template_id and card.face_template_id == TEMPLATE_IDS[style], style + ": enlarged card keeps source template with the fixed no-character set")
 			check(card.zoom_card.effect_label.text == "造成99点伤害。" and card.zoom_card.cost_label.text == "0", style + ": enlarged card retains dynamic values")
 			check_geometry(card.zoom_card, style, style + " enlarged source")
 		card.free()
 
 func check_geometry(card: CombatCard, style: String, tag: String) -> void:
-	var no_character := style == "no_character"
-	var rules := Rect2(118, 956, 853, 369) if no_character else Rect2(112, 1143, 862, 230)
-	var cost := Rect2(39, 79, 160, 180) if no_character else Rect2(90, 63, 166, 203)
-	var center := Vector2(119, 169) if no_character else Vector2(173, 164)
-	check(card.face_template_id == TEMPLATE_IDS[style] and card.is_no_character_face() == no_character, tag + ": source identifies the correct template")
+	var rules := Rect2(118, 956, 853, 369)
+	var cost := Rect2(39, 79, 160, 180)
+	var center := Vector2(119, 169)
+	check(card.face_template_id == TEMPLATE_IDS[style], tag + ": source identifies the correct template")
+	var c_grade: bool = card.data.rarity == "C"
+	check(card.face_base_cost_color() == (Color("eeeee7") if c_grade else CombatCard.RARITY_COLORS[card.data.rarity]), tag + ": cost numeral follows the grade, preserving C colors")
+	check(card.face_cost_background() == (Color("b53660") if c_grade else Color("101016")), tag + ": dynamic cost mask matches the new printed medallion")
 	check(card.face_rules_rect() == rules and card.face_cost_rect() == cost and card.face_cost_center() == center, tag + ": authored rules and numeral regions match template")
 	check(card.effect_label.position == rules.position and card.effect_label.size == rules.size, tag + ": effect label occupies its own template rules panel")
 	var typeface := card.effect_label.get_theme_font("font")
 	var font_size := card.effect_label.get_theme_font_size("font_size")
-	var candidates := [70, 66, 62, 58, 54, 50, 46, 42, 38, 36] if no_character else [70, 62, 54, 46, 40, 36]
+	var candidates := [70, 66, 62, 58, 54, 50, 46, 42, 38, 36]
 	var measured := typeface.get_multiline_string_size(card.effect_label.text, HORIZONTAL_ALIGNMENT_CENTER, rules.size.x, font_size, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE)
 	var lines := maxi(1, ceili(measured.y / typeface.get_height(font_size)))
 	var spacing := card.effect_label.get_theme_constant("line_spacing")
 	check(font_size in candidates and spacing == 15 and measured.x <= rules.size.x and measured.y + (lines - 1) * spacing <= rules.size.y, tag + ": measured dynamic rules including line spacing fit their panel")
 	check(card.effect_label.get_combined_minimum_size().y <= rules.size.y, tag + ": Godot label minimum height stays within rules panel")
-	var cost_candidates := [152, 138, 124, 108] if no_character else [190, 174, 156, 138]
+	var cost_candidates := [152, 138, 124, 108]
 	check(card.cost_label.get_theme_font_size("font_size") in cost_candidates and card.cost_label.size == cost.size, tag + ": numeral uses template font sizes and bounds")
 	check(card.cost_ink_bounds.get_center().distance_to(center) < 0.01 and cost.encloses(card.cost_ink_bounds), tag + ": numeral ink is centered and contained in its template region")
 
 func test_dynamic_cards() -> void:
 	for style in STYLES:
-		FaceArt.set_style(style)
 		for form in ["melee", "ranged"]:
 			for number in range(1, 41):
 				var tag := "%s %s %02d" % [style, form, number]
@@ -275,8 +207,12 @@ func test_dynamic_cards() -> void:
 				card.free()
 
 func _ready() -> void:
+	if not OS.get_user_data_dir().get_file().begins_with("MidnightSingleCardFaceQA-"):
+		push_error("Refusing to write preference fixtures outside the isolated QA user directory")
+		get_tree().quit(2)
+		return
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUTPUT))
-	for path in [Game.save_path, Game.save_path + ".bak", Game.save_path + ".tmp", Game.meta_path, FaceArt.preferences_path]:
+	for path in [Game.save_path, Game.save_path + ".bak", Game.save_path + ".tmp", Game.meta_path, PREFERENCES]:
 		protected_paths.append(path)
 		protected_bytes[path] = file_snapshot(path)
 	Game.save_enabled = false
@@ -293,7 +229,6 @@ func _ready() -> void:
 	var original_state: Dictionary = Game.state.duplicate(true)
 	var original_catalog: Dictionary = Game.card_catalog.duplicate(true)
 	var original_revision: int = Game.revision
-	Game.notice.connect(func(message: String): notices.append(message))
 	test_preferences()
 	test_bindings()
 	await test_menu()
@@ -305,8 +240,8 @@ func _ready() -> void:
 	check(Game.card_catalog == original_catalog, "Style operations never rewrite authored card definitions")
 	for path in protected_paths:
 		check(file_snapshot(path) == protected_bytes[path], "Protected save or original preference remains byte-identical: " + path)
-	var report := {"checks":checks, "failures":failures, "records":records, "loadedArt":loaded_art, "userDataDirectory":OS.get_user_data_dir(), "preferencePath":PREFERENCES, "scope":"isolated headless textures, synthetic pressed/focus/modal signals and read-only dynamic cards; no visible window, mouse movement, physical-input or visual acceptance"}
+	var report := {"checks":checks, "failures":failures, "records":records, "loadedArt":loaded_art, "userDataDirectory":OS.get_user_data_dir(),  "scope":"isolated headless textures, synthetic modal signals and read-only dynamic cards; no visible window, mouse movement, physical-input or visual acceptance"}
 	var file := FileAccess.open(OUTPUT + "result.json", FileAccess.WRITE)
 	if file != null: file.store_string(JSON.stringify(report, "\t"))
-	print("CARD FACE STYLES: %d checks, %d failures; production artwork loaded %d/80" % [checks, failures.size(), loaded_art])
+	print("CARD FACE STYLES: %d checks, %d failures; production artwork loaded %d/40" % [checks, failures.size(), loaded_art])
 	get_tree().quit(0 if failures.is_empty() else 1)

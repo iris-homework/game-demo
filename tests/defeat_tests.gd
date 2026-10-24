@@ -75,7 +75,7 @@ func assert_ended(label: String) -> void:
 	check(Game.is_run_over() and not Game.can_continue(), label + ": run over and continue unavailable")
 
 func test_all_battles() -> void:
-	check(Game.battles.size() == 3, "Fixture covers the three currently authored battles")
+	check(Game.battles.size() == 6, "Fixture covers the six currently authored battles")
 	for battle_id in Game.battles:
 		var label := "loss-" + str(battle_id)
 		var model := begin_battle(label, battle_id)
@@ -229,7 +229,7 @@ func test_victory_training_new_game() -> void:
 	check(not Game.is_run_over() and Game.can_continue(), "Winning battle is resumable")
 	check(Game.battle_exit("win", Game.revision) and Game.state.currentScene == "dialogue", "Victory retains authored post-battle story")
 	finish_story()
-	check(Game.page == "result" and Game.has_battle_reward() and Game.state.credits == int(Game.config.initialCredits) + 1000, "Victory still pays credit and offers cards")
+	check(Game.page == "result" and Game.has_battle_reward() and Game.state.credits == int(Game.config.initialCredits) + 50, "Victory still pays credit and offers cards")
 	var options: Array = Game.state.battleReward.options.duplicate()
 	check(Game.choose_reward_card(options[0], Game.revision), "Victory card remains claimable")
 	check(not Game.choose_reward_card(options[1], Game.revision), "Victory rewards still claimed once")

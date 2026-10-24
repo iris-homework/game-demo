@@ -49,5 +49,39 @@
     "displayName": "变异的鱼",
     "portraitAssetId": "fish",
     "battlePortraitAssetId": ""
+  },
+  "pruning_hound": {
+    "displayName": "修枝猎犬",
+    "portraitAssetId": "pruning_hound_dialogue",
+    "portraitOffsetY": 120,
+    "battlePortraitAssetId": ""
+  },
+  "powerline_repairman": {
+    "displayName": "输电抢修工",
+    "portraitAssetId": "powerline_repairman_dialogue",
+    "battlePortraitAssetId": ""
+  },
+  "beacon_jellyfish": {
+    "displayName": "信标水母",
+    "portraitAssetId": "beacon_jellyfish_dialogue",
+    "battlePortraitAssetId": ""
+  },
+  "gardener": {
+    "displayName": "园丁",
+    "portraitAssetId": "",
+    "battlePortraitAssetId": "",
+    "portraitMode": "none"
+  },
+  "plant_electrician": {
+    "displayName": "值班电工",
+    "portraitAssetId": "",
+    "battlePortraitAssetId": "",
+    "portraitMode": "none"
+  },
+  "dock_keeper": {
+    "displayName": "码头值守员",
+    "portraitAssetId": "",
+    "battlePortraitAssetId": "",
+    "portraitMode": "none"
   }
 }

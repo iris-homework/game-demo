@@ -43,9 +43,7 @@ const RARITY_COLORS := {"C": Color("a6adb7"), "B": Color("5aa9ff"), "A": Color("
 const FaceArt = preload("res://scripts/combat/card_face_art.gd")
 const FACE_SCALE := 230.0 / 1448.0
 const FACE_RECT := Rect2(3.75, 0, 172.5, 230)
-const FACE_RULES := Rect2(112, 1143, 862, 230)
-const NO_CHARACTER_RULES := Rect2(118, 956, 853, 369)
-const FACE_BACKGROUND := Color("030406")
+const FACE_RULES := Rect2(118, 956, 853, 369)
 const FACE_RULE_COLOR := Color("f5f0e7")
 const ZOOM_SCALE := 2.2
 
@@ -160,24 +158,24 @@ func build_fixed_face() -> void:
 	fit_effect_text()
 	effect_label.hide()
 
-func is_no_character_face() -> bool:
-	return face_template_id == FaceArt.NO_CHARACTER_TEMPLATE_ID
-
 func face_rules_rect() -> Rect2:
-	return NO_CHARACTER_RULES if is_no_character_face() else FACE_RULES
+	return FACE_RULES
 
 func face_cost_rect() -> Rect2:
-	return Rect2(39, 79, 160, 180) if is_no_character_face() else Rect2(90, 63, 166, 203)
+	return Rect2(39, 79, 160, 180)
 
 func face_cost_center() -> Vector2:
 	# The no-character master uses Pillow's text anchor; match its visible ink center.
-	return Vector2(119, 169) if is_no_character_face() else Vector2(173, 164)
+	return Vector2(119, 169)
 
 func face_cost_sizes() -> Array:
-	return [152, 138, 124, 108] if is_no_character_face() else [190, 174, 156, 138]
+	return [152, 138, 124, 108]
 
 func face_base_cost_color() -> Color:
-	return Color("eeeee7") if is_no_character_face() else rarity_color()
+	return Color("eeeee7") if data.get("rarity") == "C" else rarity_color()
+
+func face_cost_background() -> Color:
+	return Color("b53660") if data.get("rarity") == "C" else Color("101016")
 
 func fixed_font(font_size: int) -> FontVariation:
 	var result := FontVariation.new()
@@ -217,13 +215,13 @@ func _draw() -> void:
 		draw_texture_rect(face_texture, FACE_RECT, false)
 		# Erase only baked fields whose live values changed. The static face stays exact.
 		if cost_changed:
-			var center := Vector2(119, 168) if is_no_character_face() else Vector2(173, 165)
-			var radius := 92.0 if is_no_character_face() else 88.0
-			var color := Color("b53660") if is_no_character_face() else FACE_BACKGROUND
+			var center := Vector2(119, 168)
+			var radius := 92.0
+			var color := face_cost_background()
 			draw_circle(FACE_RECT.position + center * FACE_SCALE, radius * FACE_SCALE, color)
 		if rules_changed:
 			var rules := face_rules_rect()
-			draw_rect(Rect2(FACE_RECT.position + (rules.position - Vector2(2, 2)) * FACE_SCALE, (rules.size + Vector2(4, 4)) * FACE_SCALE), Color("1c1c25") if is_no_character_face() else FACE_BACKGROUND)
+			draw_rect(Rect2(FACE_RECT.position + (rules.position - Vector2(2, 2)) * FACE_SCALE, (rules.size + Vector2(4, 4)) * FACE_SCALE), Color("1c1c25"))
 		if selected or hovered:
 			var edge := Rect2(FACE_RECT.position + Vector2(40, 36) * FACE_SCALE, Vector2(1024, 1396) * FACE_SCALE)
 			draw_style_box(face_highlight(), edge)
@@ -343,7 +341,7 @@ func show_preview(preview: Dictionary) -> void:
 func fit_effect_text() -> void:
 	if face_texture != null:
 		var bounds := face_rules_rect()
-		var font_sizes := [70, 66, 62, 58, 54, 50, 46, 42, 38, 36] if is_no_character_face() else [70, 62, 54, 46, 40, 36]
+		var font_sizes := [70, 66, 62, 58, 54, 50, 46, 42, 38, 36]
 		for font_size in font_sizes:
 			var typeface := fixed_font(font_size)
 			effect_label.add_theme_font_override("font", typeface)

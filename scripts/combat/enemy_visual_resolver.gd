@@ -5,7 +5,7 @@ const CATALOG_PATH := "res://data/enemies/combat_visuals.json"
 const PipelineCatalogScript := preload("res://enemy_asset_pipeline/runtime/pipeline_catalog.gd")
 const PipelineRuntimeProfileScript := preload("res://enemy_asset_pipeline/runtime/pipeline_runtime_profile.gd")
 const PipelineImageScript := preload("res://enemy_asset_pipeline/runtime/pipeline_image.gd")
-const EMERGENCY_IDLE := preload("res://assets/combat_test/Finn/finn_idle.webp")
+const UNILLUSTRATED := "unillustrated"
 const ATTACK_STYLES := ["", "hit", "slash", "pierce", "bite", "shoot", "laser"]
 const FORMATION_SLOTS := ["", "triangle_left_back", "triangle_left_front", "triangle_right"]
 
@@ -60,7 +60,7 @@ func resolve(enemy: Dictionary, enemies: Dictionary) -> Visual:
 		# Record malformed saved references even if the current binding resolves first.
 		problems.append("combatVisualId must be a non-empty string")
 	var current_id = current.get("combatVisualId", "") if current is Dictionary else ""
-	var fallback_id := "finn"
+	var fallback_id := UNILLUSTRATED
 	if explicit_id is String and not explicit_id.is_empty():
 		fallback_id = explicit_id
 	elif current_id is String and not current_id.is_empty():
@@ -75,7 +75,7 @@ func resolve(enemy: Dictionary, enemies: Dictionary) -> Visual:
 	if valid_explicit: candidates.append(explicit_id)
 	if current is Dictionary and current.has("combatVisualId"):
 		candidates.append(current.combatVisualId)
-	candidates.append("finn")
+	candidates.append(UNILLUSTRATED)
 	var visited: Array[String] = []
 	for id in candidates:
 		if not id is String or id.is_empty():
@@ -83,14 +83,20 @@ func resolve(enemy: Dictionary, enemies: Dictionary) -> Visual:
 			continue
 		if id in visited: continue
 		visited.append(id)
+		# Retired art must not reappear through old snapshots or pipeline overlays.
+		if id.to_lower() in ["finn", "fallback_finn"]: continue
+		if id == UNILLUSTRATED:
+			return _finish(_unillustrated(), problems, enemy, current)
 		var visual := _parse(id, catalog.get(id), problems)
 		if visual != null: return _finish(visual, problems, enemy, current)
-	# This single code-owned pose survives a missing/broken Finn catalog entry.
-	var emergency := Visual.new()
-	emergency.id = "fallback_finn"
-	emergency.poses = {"idle":EMERGENCY_IDLE}
-	emergency.calibrations = {"idle":[Vector2(150,237),0.495]}
-	return _finish(emergency, problems, enemy, current)
+	return _finish(_unillustrated(), problems, enemy, current)
+
+func _unillustrated() -> Visual:
+	# Keep the enemy's target/HUD and battle logic without substituting character art.
+	var visual := Visual.new()
+	visual.id = UNILLUSTRATED
+	visual.pipeline_shadow = {"enabled":false}
+	return visual
 
 func _finish(visual: Visual, problems: Array[String], enemy: Dictionary, current) -> Visual:
 	# Formation belongs to the encounter's enemy instance, never to the art profile.

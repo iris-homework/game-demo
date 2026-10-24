@@ -47,7 +47,7 @@ func test_bindings() -> void:
 		var definition: Dictionary = Game.card_catalog[id]
 		check(FaceArt.matches_definition(definition, settings.cards[id]), id + " binds the complete current definition")
 		check(FaceArt.matches_definition(JSON.parse_string(JSON.stringify(definition)), settings.cards[id]), id + " survives snapshot JSON round-trip")
-		check(settings.cards[id].path == "res://assets/cards/noren_fixed_v1/%s.png" % id, id + " has the agreed path")
+		check(settings.cards[id].path == "res://assets/cards/noren_no_character_v3/%s.png" % id, id + " has the agreed path")
 		var art := FaceArt.resolve(definition)
 		if not art.is_empty():
 			available_art += 1
@@ -93,11 +93,11 @@ func test_dynamic_faces() -> void:
 			var font_size := card.effect_label.get_theme_font_size("font_size")
 			var measured := font.get_multiline_string_size(card.effect_label.text, HORIZONTAL_ALIGNMENT_CENTER, card.effect_label.size.x, font_size, -1, TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE)
 			var lines := maxi(1, ceili(measured.y / font.get_height(font_size)))
-			check(font_size in [70, 62, 54, 46, 40, 36] and measured.y + (lines - 1) * 15 <= 230, "%02d %s calculated rules fit fixed template" % [number, form])
-			check(card.effect_label.get_combined_minimum_size().y <= 230, "%02d %s label stays within rule panel" % [number, form])
-			check(card.cost_label.get_combined_minimum_size().y <= 203, "Cost label stays within cost circle region")
-			check(card.cost_ink_bounds.get_center().distance_to(Vector2(173, 164)) < 0.01, "Dynamic cost ink is centered like the template")
-			check(Rect2(90, 63, 166, 203).encloses(card.cost_ink_bounds), "Dynamic cost visible ink stays within template region")
+			check(font_size in [70, 66, 62, 58, 54, 50, 46, 42, 38, 36] and measured.y + (lines - 1) * 15 <= 369, "%02d %s calculated rules fit fixed template" % [number, form])
+			check(card.effect_label.get_combined_minimum_size().y <= 369, "%02d %s label stays within rule panel" % [number, form])
+			check(card.cost_label.get_combined_minimum_size().y <= 180, "Cost label stays within cost circle region")
+			check(card.cost_ink_bounds.get_center().distance_to(Vector2(119, 169)) < 0.01, "Dynamic cost ink is centered like the template")
+			check(Rect2(39, 79, 160, 180).encloses(card.cost_ink_bounds), "Dynamic cost visible ink stays within template region")
 			check(model.snapshot() == before, "Rendering does not mutate battle snapshot")
 			card.show_preview({"cardText": card.data.cardText, "description": card.data.description})
 			card.show_cost(int(card.data.cost))
@@ -184,7 +184,7 @@ func _ready() -> void:
 	Game.meta_path = "user://fixed_card_face_test_meta.json"
 	Game.state = Game.initial_state()
 	var image := Image.create(1086, 1448, false, Image.FORMAT_RGBA8)
-	image.fill(CombatCard.FACE_BACKGROUND)
+	image.fill(Color("1c1c25"))
 	synthetic_texture = ImageTexture.create_from_image(image)
 	test_bindings()
 	test_dynamic_faces()

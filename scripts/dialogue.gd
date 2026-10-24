@@ -19,8 +19,18 @@ func _ready() -> void:
 	var e := Game.event_data()
 	background(Game.place_data(e.placeId).backgroundAssetId, 0.19)
 	var side: String = node.get("speakerSide", "")
-	portrait(Game.state.portraits.left, "left", side == "left", 173, 642)
-	portrait(Game.state.portraits.right, "right", side == "right", 173, 642)
+	# Visible characters can differ from the speaker (creatures and off-screen NPCs).
+	# Resolve from the current node so continuing an old dialogue save also shows them.
+	var shown: Dictionary = Game.state.portraits.duplicate()
+	var overrides = node.get("portraits", {})
+	if overrides is Dictionary:
+		for portrait_side in ["left", "right"]:
+			var id = overrides.get(portrait_side)
+			if id is String and (id.is_empty() or Game.characters.has(Game.resolve_character_id(id))):
+				shown[portrait_side] = id
+	var speaker := Game.resolve_character_id(node.get("speakerId", ""))
+	portrait(shown.left, "left", side == "left" and Game.resolve_character_id(shown.left) == speaker, 173, 642)
+	portrait(shown.right, "right", side == "right" and Game.resolve_character_id(shown.right) == speaker, 173, 642)
 	map_chrome(e.title, Callable(), true) # Keep the skip-story slot between deck and menu.
 	history_button = button(self, "对话记录", Vector2(856,16), Vector2(108,44), open_history)
 	history_button.add_theme_font_size_override("font_size", 17)

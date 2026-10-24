@@ -179,16 +179,16 @@ func test_terminal_results() -> void:
 		check(not Game.battle_exit(outcome, revision), outcome + ": rejects duplicate battle exit")
 		if outcome == "win":
 			finish_story()
-			check(Game.state.credits == int(Game.config.initialCredits) + 1000 and Game.has_battle_reward(), "Victory pays exactly once after story")
+			check(Game.state.credits == int(Game.config.initialCredits) + 50 and Game.has_battle_reward(), "Victory pays exactly once after story")
 			var options: Array = Game.state.battleReward.options.duplicate()
 			Game.menu()
 			Game.resume()
 			Game.enter_node("finish")
-			check(Game.state.credits == int(Game.config.initialCredits) + 1000 and Game.state.battleReward.options == options, "Finish and menu reentry do not repay or reroll")
+			check(Game.state.credits == int(Game.config.initialCredits) + 50 and Game.state.battleReward.options == options, "Finish and menu reentry do not repay or reroll")
 			check(Game.choose_reward_card(options[0], Game.revision), "Claim one victory card")
 			check(not Game.choose_reward_card(options[1], Game.revision), "Second victory card is rejected")
 			Game.state = {}
-			check(Game.load_game() and Game.state.credits == int(Game.config.initialCredits) + 1000 and Game.state.deck == [options[0]], "Claimed reward survives cold continue exactly once")
+			check(Game.load_game() and Game.state.credits == int(Game.config.initialCredits) + 50 and Game.state.deck == [options[0]], "Claimed reward survives cold continue exactly once")
 		else:
 			check(Game.state.currentHp == 0 and Game.state.battleReward.is_empty() and Game.state.credits == int(Game.config.initialCredits), "Defeat retains zero HP without rewards")
 			check(not Game.choose(0, Game.revision) and Game.page == "defeat", "Defeat cannot choose the legacy map exit")

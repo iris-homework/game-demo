@@ -139,7 +139,13 @@ func menu_suite() -> void:
 	menu._set_training_open(true)
 	for node in menu.training_container.find_children("*", "Button", true, false):
 		check(not quit_button.get_global_rect().intersects(node.get_global_rect()), "Exit does not overlap expanded training button " + str(node.name))
-	menu._set_training_open(false)
+	Game.request_quit()
+	check(not modal_open() and menu.training_open, "Unified practice modal blocks exit confirmation stacking")
+	await key(KEY_F1)
+	await key(KEY_A, true, true)
+	check(not is_instance_valid(app.debug_panel) and not is_instance_valid(app.card_console), "Practice modal blocks developer keyboard shortcuts")
+	await key(KEY_ESCAPE)
+	check(not menu.training_open and Game.page == "menu", "Escape closes unified practice before global navigation")
 	Game.transition_locked = true
 	Game.request_quit()
 	check(not modal_open(), "Transition lock blocks opening exit-game confirmation")

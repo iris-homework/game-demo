@@ -118,8 +118,9 @@
     "kind": "pending"
   },
   "robot": {
-    "path": "",
-    "kind": "pending"
+    "path": "res://assets/characters/robot_dialogue_v2.png",
+    "kind": "portrait",
+    "whiteKey": false
   },
   "psycho": {
     "path": "",
@@ -319,5 +320,20 @@
   "woss_mall_shop": {
     "path": "res://assets/market/woss-mall-shop-v1.png",
     "kind": "background"
+  },
+  "pruning_hound_dialogue": {
+    "path": "res://assets/characters/enemies_dialogue_v1/pruning_hound_dialogue_v1.png",
+    "kind": "portrait",
+    "whiteKey": false
+  },
+  "powerline_repairman_dialogue": {
+    "path": "res://assets/characters/enemies_dialogue_v1/powerline_repairman_dialogue_v1.png",
+    "kind": "portrait",
+    "whiteKey": false
+  },
+  "beacon_jellyfish_dialogue": {
+    "path": "res://assets/characters/enemies_dialogue_v1/beacon_jellyfish_dialogue_v1.png",
+    "kind": "portrait",
+    "whiteKey": false
   }
 }

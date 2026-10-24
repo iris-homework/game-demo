@@ -2,9 +2,7 @@ extends DemoUI
 var checks := 0
 var failures := 0
 var output := "res://artifacts/qa/noren-fixed-cards-2026-10-22/integration/visual"
-var fixture_examples := false
 var content: Control
-const EXAMPLES := {13: "重弹射击", 29: "撕裂斩", 6: "战术补弹", 26: "终结弹"}
 
 func check(ok: bool, message: String) -> void:
 	checks += 1
@@ -33,12 +31,6 @@ func card_at(number: int, point: Vector2, card_scale: float, dynamic: bool = fal
 	var card := CombatCard.new()
 	card.allow_zoom_preview = false
 	card.setup(definition.id, definition, true)
-	if fixture_examples:
-		var path := ProjectSettings.globalize_path("res://../卡牌游戏美术资源/卡牌/固定排版模板_v1/outputs/examples/noren_%02d_%s_旧插画套模板.png" % [number, EXAMPLES[number]])
-		var image := Image.load_from_file(path)
-		check(image != null, "Fixture example loads")
-		card.face_texture = ImageTexture.create_from_image(image)
-		card.face_font = load("res://assets/fonts/NotoSerifCJKsc-Bold.otf")
 	check(card.face_texture != null, "Artwork is present: " + definition.id)
 	card.position = point
 	card.pivot_offset = Vector2.ZERO
@@ -65,7 +57,6 @@ func _ready() -> void:
 		print("FIXED CARD FACE VISUAL: skipped; this build's headless driver has no rendered viewport. No screenshots or visual pass claimed.")
 		get_tree().quit(2)
 		return
-	fixture_examples = "--fixture-examples" in OS.get_cmdline_user_args()
 	if not OS.get_environment("QA_OUT_DIR").is_empty(): output = OS.get_environment("QA_OUT_DIR")
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output))
 	Game.save_enabled = false
@@ -73,17 +64,16 @@ func _ready() -> void:
 	Game.meta_path = "user://fixed_card_face_visual_meta.json"
 	Game.state = Game.initial_state()
 	rect(self, Vector2.ZERO, Vector2(1440, 900), Color("111523"))
-	var prefix := "UI测试夹具（旧插画模板，不是本轮40张正式图）" if fixture_examples else "诺伦固定卡面 · 正式资源"
-	if not fixture_examples:
-		for page in 5:
-			reset_content(prefix + " · %d/5" % (page + 1))
-			for index in 8:
-				card_at(page * 8 + index + 1, Vector2(55 + (index % 4) * 345, 80 + (index / 4) * 395), 1.5)
-			await shot("catalog-%02d" % (page + 1))
+	var prefix := "诺伦无人物版卡面 · 正式资源"
+	for page in 5:
+		reset_content(prefix + " · %d/5" % (page + 1))
+		for index in 8:
+			card_at(page * 8 + index + 1, Vector2(55 + (index % 4) * 345, 80 + (index / 4) * 395), 1.5)
+		await shot("catalog-%02d" % (page + 1))
 	reset_content(prefix + " · 上：原始卡面 / 下：远程、下次攻击+3、减费1")
 	var index := 0
 	var cards: Array[CombatCard] = []
-	for number in EXAMPLES:
+	for number in [13, 29, 6, 26]:
 		card_at(number, Vector2(55 + index * 345, 80), 1.5)
 		cards.append(card_at(number, Vector2(55 + index * 345, 490), 1.5, true))
 		index += 1
@@ -96,5 +86,5 @@ func _ready() -> void:
 	await shot("zoom")
 	preview.hide_zoom_preview()
 	await settle()
-	print("FIXED CARD FACE VISUAL: %d checks, %d failures; fixture_examples=%s" % [checks, failures, fixture_examples])
+	print("FIXED CARD FACE VISUAL: %d checks, %d failures" % [checks, failures])
 	get_tree().quit(0 if failures == 0 else 1)

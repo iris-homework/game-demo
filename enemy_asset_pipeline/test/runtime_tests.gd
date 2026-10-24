@@ -13,9 +13,9 @@ const Stage := preload("res://scripts/combat/test_stage.gd")
 const TEST_DIR := "user://enemy_asset_pipeline_runtime_tests"
 const TEST_RUNTIME := "res://enemy_asset_pipeline/test/runtime"
 const RAW_WAV := TEST_RUNTIME+"/raw_probe.wav"
-const IDLE_TEXTURE := "res://assets/combat_test/Finn/finn_idle.webp"
-const MOVE_TEXTURE := "res://assets/combat_test/Finn/finn_move.webp"
-const ATTACHMENT_TEXTURE := "res://assets/combat_test/Finn/finn_block.webp"
+const IDLE_TEXTURE := "res://assets/combat_test/03a_gang_henchman/gang_henchman_idle.png"
+const MOVE_TEXTURE := "res://assets/combat_test/03a_gang_henchman/gang_henchman_move.png"
+const ATTACHMENT_TEXTURE := "res://assets/combat_test/03a_gang_henchman/gang_henchman_damaged.png"
 const AUDIO_PATH := "res://assets/audio/combat/slash.wav"
 const TRAIL_SHADER := "res://enemy_asset_pipeline/runtime/xsxb_attack_trail.gdshader"
 
@@ -165,7 +165,7 @@ func _test_merged_preview() -> void:
 		_frame(IDLE_TEXTURE,[0.4,0.0,0.0,0.4,4.0,6.0],0.05,false),
 		_frame(MOVE_TEXTURE,[0.4,0.0,0.0,0.4,5.0,7.0],0.05,false),
 	]
-	var profile := _visual_profile("finn",{
+	var profile := _visual_profile("gang_henchman",{
 		"idle":idle_frames,
 		"block":{"frames":[pose_loop_frame],"loop":true},
 		"damaged":single_frames,
@@ -173,12 +173,16 @@ func _test_merged_preview() -> void:
 		"pipelineShadow":{"enabled":true,"size":[40,12],"offset":[2,3],"opacity":0.45},
 		"pipelineMotion":{"speed":1800,"reach":125,"windup":0.07,"recovery":0.18},
 		"pipelineEffects":{"scale":1.25,"offset":[4,-3],"hitStop":0.06,"shake":{"strength":11,"duration":0.3}},
-		"pipelineXsxb":{"profileId":"finn","profiles":[{"id":"finn","animations":[{"id":"idle","attackTrails":[{"enabled":true,"sticks":[]}]}]}]},
+		"pipelineXsxb":{"profileId":"gang_henchman","profiles":[{"id":"gang_henchman","animations":[{"id":"idle","attackTrails":[{"enabled":true,"sticks":[]}]}]}]},
 	})
-	var path := _write_preview("merged",{"finn":profile})
+	var path := _write_preview("merged",{"gang_henchman":profile})
 	var resolver := Resolver.new()
-	var visual := resolver.resolve({"id":"ike","combatVisualId":"finn"},{"ike":{"combatVisualId":"finn"}})
-	check(visual.id == "finn" and visual.pipeline_active,"formal enemy receives preview pipeline")
+	# This fixture authors a real block sequence; remove the base art's idle alias
+	# only from this resolver so set_pose("block") exercises its pose-level loop.
+	resolver.catalog.gang_henchman = resolver.catalog.gang_henchman.duplicate(true)
+	resolver.catalog.gang_henchman.poseAliases.erase("block")
+	var visual := resolver.resolve({"id":"ike","combatVisualId":"gang_henchman"},{"ike":{"combatVisualId":"gang_henchman"}})
+	check(visual.id == "gang_henchman" and visual.pipeline_active,"formal enemy receives preview pipeline")
 	check(visual.pipeline_source == "preview","resolved profile reports preview source")
 	check(visual.pipeline_frames.has("idle") and visual.pipeline_frames.idle.size() == 2,"multi-frame sequence validates")
 	check(not visual.pipeline_xsxb.is_empty(),"raw XSXB profile is preserved")
@@ -230,11 +234,11 @@ func _test_merged_preview() -> void:
 
 func _test_invalid_preview_fallback() -> void:
 	var invalid_frame := _frame(IDLE_TEXTURE,[0.5,0.0],0.05,false)
-	var profile := _visual_profile("finn",{"idle":[invalid_frame]})
-	var path := _write_preview("invalid",{"finn":profile})
+	var profile := _visual_profile("gang_henchman",{"idle":[invalid_frame]})
+	var path := _write_preview("invalid",{"gang_henchman":profile})
 	var resolver := Resolver.new()
-	var visual := resolver.resolve({"id":"ike","combatVisualId":"finn"},{"ike":{"combatVisualId":"finn"}})
-	check(visual.id == "finn" and not visual.pipeline_active,"invalid pipeline keeps the original visual")
+	var visual := resolver.resolve({"id":"ike","combatVisualId":"gang_henchman"},{"ike":{"combatVisualId":"gang_henchman"}})
+	check(visual.id == "gang_henchman" and not visual.pipeline_active,"invalid pipeline keeps the original visual")
 	check(not visual.diagnostics.is_empty() and "pipeline overlay rejected" in "; ".join(visual.diagnostics),"invalid pipeline leaves diagnostics")
 	_remove_fixture(path)
 	PipelineCatalogScript.clear_preview()
@@ -260,26 +264,26 @@ func _test_enemy_bindings() -> void:
 	PipelineCatalogScript.set_published_path(published_path)
 	var preview_path := _write_catalog("bindings_preview",{"bound_b":profile_b,"visual_only":visual_only},{"ike":"bound_b","preview_visual_only":"bound_a"})
 	PipelineCatalogScript.set_preview_path(preview_path)
-	var enemies := {"ike":{"combatVisualId":"finn"},"robot":{"combatVisualId":"finn"}}
+	var enemies := {"ike":{"combatVisualId":"gang_henchman"},"robot":{"combatVisualId":"gang_henchman"}}
 	var resolver := Resolver.new()
-	check(PipelineCatalogScript.get_bound_profile_id("ike","finn") == "bound_b","preview binding overrides published binding")
-	var bound := resolver.resolve({"id":"ike","combatVisualId":"finn"},enemies)
+	check(PipelineCatalogScript.get_bound_profile_id("ike","gang_henchman") == "bound_b","preview binding overrides published binding")
+	var bound := resolver.resolve({"id":"ike","combatVisualId":"gang_henchman"},enemies)
 	check(bound.id == "bound_b","binding wins over the original combatVisualId")
 	var unbound := resolver.resolve({"id":"robot","combatVisualId":"bound_a"},enemies)
 	check(unbound.id == "bound_a","unbound enemy keeps its combatVisualId")
 	var preview_visual := resolver.resolve({"id":"preview_visual_only","combatVisualId":"visual_only"},enemies)
 	check(preview_visual.id == "visual_only","single visual preview is not swallowed by an enemy-id binding")
 	PipelineCatalogScript.clear_preview()
-	var restored := resolver.resolve({"id":"ike","combatVisualId":"finn"},enemies)
-	check(PipelineCatalogScript.get_bound_profile_id("ike","finn") == "bound_a","removing preview restores the published binding")
+	var restored := resolver.resolve({"id":"ike","combatVisualId":"gang_henchman"},enemies)
+	check(PipelineCatalogScript.get_bound_profile_id("ike","gang_henchman") == "bound_a","removing preview restores the published binding")
 	check(restored.id == "bound_a","restored binding is used by the resolver")
-	var none := resolver.resolve({"id":"robot","combatVisualId":"finn"},enemies)
-	check(none.id == "finn","missing binding keeps the original combatVisualId")
+	var none := resolver.resolve({"id":"robot","combatVisualId":"gang_henchman"},enemies)
+	check(none.id == "gang_henchman","missing binding keeps the original combatVisualId")
 	PipelineCatalogScript.set_published_path(published_path)
 	check(FileAccess.get_file_as_bytes(published_path) == published_bytes,"catalog reads never rewrite the published fixture")
 	var dangling_path := _write_catalog("bindings_dangling",{"bound_a":profile_a},{"ike":"missing_profile"})
 	PipelineCatalogScript.set_published_path(dangling_path)
-	check(PipelineCatalogScript.get_bound_profile_id("ike","finn") == "finn","dangling binding falls back to the visual id")
+	check(PipelineCatalogScript.get_bound_profile_id("ike","gang_henchman") == "gang_henchman","dangling binding falls back to the visual id")
 	check("has no profile" in "; ".join(PipelineCatalogScript.get_diagnostics()),"dangling binding is diagnosed")
 	PipelineCatalogScript.clear_preview()
 	PipelineCatalogScript.clear_published_path()
@@ -331,8 +335,8 @@ func _test_catalog_refresh_before_new_battle() -> void:
 	var published_path := _write_catalog("refresh_published",{"cache_a":profile_a},{"ike":"cache_a"})
 	PipelineCatalogScript.set_published_path(published_path)
 	PipelineCatalogScript.clear_preview()
-	var enemies := {"ike":{"combatVisualId":"finn"}}
-	var first := Resolver.new().resolve({"id":"ike","combatVisualId":"finn"},enemies)
+	var enemies := {"ike":{"combatVisualId":"gang_henchman"}}
+	var first := Resolver.new().resolve({"id":"ike","combatVisualId":"gang_henchman"},enemies)
 	check(first.id == "cache_a","first battle resolves the current catalog")
 	var preview_path := _write_preview("refresh_preview",{"cache_a":profile_a})
 	PipelineCatalogScript.refresh()
@@ -341,7 +345,7 @@ func _test_catalog_refresh_before_new_battle() -> void:
 	PipelineCatalogScript.clear_preview()
 	var profile_b := _visual_profile("cache_bb",{"idle":[_frame(MOVE_TEXTURE,[1,0,0,1,0,0],0.1,true)]})
 	_write_catalog("refresh_published",{"cache_bb":profile_b},{"ike":"cache_bb"})
-	var second := Resolver.new().resolve({"id":"ike","combatVisualId":"finn"},enemies)
+	var second := Resolver.new().resolve({"id":"ike","combatVisualId":"gang_henchman"},enemies)
 	check(second.id == "cache_bb","new battle resolution refreshes a changed catalog")
 	check(first.id == "cache_a","existing parsed visual is not mutated by refresh")
 	PipelineCatalogScript.clear_published_path()

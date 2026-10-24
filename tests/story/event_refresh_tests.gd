@@ -223,7 +223,7 @@ func test_days_and_failures() -> void:
 
 func test_save() -> void:
 	reset_authored()
-	check(Game.eligible_events().size() == 4 and Game.state.refreshedEventIds.size() == 3, "new adventure has four ungated candidates and three refreshed events")
+	check(Game.eligible_events().size() == 7 and Game.state.refreshedEventIds.size() == 3, "new adventure has seven ungated candidates and three refreshed events")
 	for event in Game.events.values():
 		check(not event.has("optional") and event.get("refreshTimeRange") == {"startDay":null,"endDay":null}, "authored event uses anytime range and no category " + event.id)
 	Game.state.currentDay = 7
@@ -245,10 +245,10 @@ func test_save() -> void:
 	legacy.currentDay = 4
 	var migrated = Game.migrate_save(legacy)
 	check(Game.valid_save(migrated) and migrated.currentDay == 4, "old schema two fills fields without replaying completed event dates")
-	check(migrated.refreshedEventIds.size() == 2 and migrated.refreshedEventIds.all(func(id): return id in ["E04", "E11"]) and not legacy.has("refreshedEventIds"), "legacy pool initialized without modifying source")
+	check(migrated.refreshedEventIds.size() == 3 and migrated.refreshedEventIds.all(func(id): return id in ["E04", "E11", "E13", "E14", "E15"]) and not legacy.has("refreshedEventIds"), "legacy pool initialized without modifying source")
 	var file := FileAccess.open(Game.save_path, FileAccess.WRITE)
 	file.store_string(JSON.stringify(legacy)); file.close()
-	check(Game.load_game() and Game.state.currentDay == 4 and Game.state.refreshedEventIds.size() == 2 and Game.state.refreshedEventIds.all(func(id): return id in ["E04", "E11"]), "old schema two migrates on actual load")
+	check(Game.load_game() and Game.state.currentDay == 4 and Game.state.refreshedEventIds.size() == 3 and Game.state.refreshedEventIds.all(func(id): return id in ["E04", "E11", "E13", "E14", "E15"]), "old schema two migrates on actual load")
 
 func test_ui() -> void:
 	start_contract()

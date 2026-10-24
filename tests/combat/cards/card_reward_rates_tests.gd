@@ -103,7 +103,7 @@ func test_flow() -> void:
 	var actual_rates: Dictionary = Game.card_reward_rates.duplicate(true)
 	Game.card_reward_rates.boss = {"B":100,"A":0,"S":0}
 	Game.enter_node("finish")
-	check(same(Game.state.battleReward, pending) and Game.state.credits == 1000, "Changing rates and finish reentry preserve existing reward")
+	check(same(Game.state.battleReward, pending) and Game.state.credits == int(Game.config.initialCredits) + 50, "Changing rates and finish reentry preserve existing reward")
 	Game.state.battleReward.erase("battleType")
 	check(Game.save_game(), "Persist legacy-style pending reward")
 	Game.state = {}
@@ -116,11 +116,11 @@ func test_flow() -> void:
 		if fault == "rates": Game.card_reward_rates.boss = {"B":0,"A":0,"S":0}
 		else: Game.card_catalog = {"only_s":{"rarity":"S"}}
 		finish_battle()
-		check(Game.state.credits == 0 and Game.state.claimedRewardIds.is_empty() and Game.state.battleReward.is_empty(), "Bad " + fault + " cannot grant partial reward or consume claim")
+		check(Game.state.credits == int(Game.config.initialCredits) and Game.state.claimedRewardIds.is_empty() and Game.state.battleReward.is_empty(), "Bad " + fault + " cannot grant partial reward or consume claim")
 		Game.card_catalog = catalog
 		Game.card_reward_rates = actual_rates.duplicate(true)
 		Game.prepare_battle_reward()
-		check(Game.has_battle_reward() and Game.state.credits == 1000, "Corrected configuration can retry reward exactly once")
+		check(Game.has_battle_reward() and Game.state.credits == int(Game.config.initialCredits) + 50, "Corrected configuration can retry reward exactly once")
 	begin_battle("elite")
 	var adventure: Dictionary = Game.state.duplicate(true)
 	Game.start_training("B04")

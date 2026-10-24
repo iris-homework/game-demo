@@ -245,14 +245,18 @@ func tag(text: String, pos: Vector2, color: Color = CYAN, width: float = 180) ->
 
 func portrait(id: String, side: String, active: bool = true, top: float = 150, height: float = 590) -> void:
 	if id.is_empty(): return
+	# Authored voice-only roles keep their dialogue name without a missing-art panel.
+	if Game.characters.get(Game.resolve_character_id(id), {}).get("portraitMode", "") == "none": return
 	var x := 120.0 if side == "left" else 900.0
 	var aid: String = Game.characters.get(Game.resolve_character_id(id), {}).get("portraitAssetId", "")
+	top += float(Game.characters.get(Game.resolve_character_id(id), {}).get("portraitOffsetY", 0.0))
 	var pic := image_asset(self, aid, Vector2(x,top), Vector2(390,height), false)
 	if pic:
-		# Original RGB art is preserved; white paper is keyed only at render time.
-		var mat := ShaderMaterial.new()
-		mat.shader = preload("res://shaders/white_key.gdshader")
-		pic.material = mat
+		# Legacy white-background art keeps its default; RGBA portraits opt out.
+		if Game.assets.get(aid, {}).get("whiteKey", true):
+			var mat := ShaderMaterial.new()
+			mat.shader = preload("res://shaders/white_key.gdshader")
+			pic.material = mat
 		pic.modulate = Color.WHITE if active else Color(0.72,0.66,0.79,0.95)
 		pic.position.x += -20 if side == "left" else 20
 		var tween := create_tween()

@@ -80,7 +80,7 @@ func _ready() -> void:
 	var toggle: Button = app.view.find_child("training_toggle",true,false)
 	await click_at(toggle.get_global_rect().get_center())
 	var entrance: Button = app.view.find_child("training_B11",true,false)
-	check(entrance != null and entrance.text == "敌人测试" and entrance.is_visible_in_tree(),"Menu exposes the renamed enemy test")
+	check(entrance != null and entrance.text == "双变异鱼" and entrance.is_visible_in_tree(),"Menu exposes the renamed enemy test")
 	check(app.view.find_child("training_B12",true,false) == null,"Old mech training button is replaced")
 	await shot("menu")
 	await click_at(entrance.get_global_rect().get_center())
@@ -141,7 +141,7 @@ func _ready() -> void:
 	for battle_id in ["B04","QA_MECH"]:
 		Game.start_training(battle_id)
 		await idle()
-		check(app.view.stage.enemies[0].kind == ("gang_henchman" if battle_id == "B04" else "finn"),"Other battle uses its configured presentation: "+battle_id)
+		check(app.view.stage.enemies[0].kind == ("gang_henchman" if battle_id == "B04" else "unillustrated"),"Other battle uses its configured presentation: "+battle_id)
 		Game.finish_training("lose")
 		await idle()
 		check(Game.state == adventure,"Other training still restores adventure: "+battle_id)

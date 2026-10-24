@@ -71,5 +71,74 @@
       "fish_second"
     ],
     "trainingEnemyHp": null
+  },
+  "B13": {
+    "id": "B13",
+    "eventId": "E13",
+    "name": "留在工具房的人",
+    "battleType": "normal",
+    "participants": [
+      "@player",
+      "pruning_hound"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null,
+    "placeId": "garden",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "pruning_hound"
+    ],
+    "trainingEnemyHp": null
+  },
+  "B14": {
+    "id": "B14",
+    "eventId": "E14",
+    "name": "被截走的电",
+    "battleType": "normal",
+    "participants": [
+      "@player",
+      "powerline_repairman"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null,
+    "placeId": "power",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "powerline_repairman"
+    ],
+    "trainingEnemyHp": null
+  },
+  "B15": {
+    "id": "B15",
+    "eventId": "E15",
+    "name": "靠岸的假灯",
+    "battleType": "normal",
+    "participants": [
+      "@player",
+      "beacon_jellyfish"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null,
+    "placeId": "port",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "beacon_jellyfish"
+    ],
+    "trainingEnemyHp": null
   }
 }

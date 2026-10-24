@@ -3,7 +3,7 @@ extends Node
 const Stage := preload("res://scripts/combat/test_stage.gd")
 const AuthoredEffect := preload("res://scripts/combat/authored_attack_fx.gd")
 const IDS := ["warden_shield", "chip_broker", "mutant_mouse", "luggage_lurker", "penitent_ascetic", "rogue_drone", "mirror_inspector", "pruning_hound", "powerline_repairman", "beacon_jellyfish"]
-const OUTPUT := "res://artifacts/qa/published-training-2026-10-23/"
+const OUTPUT := "res://artifacts/qa/unified-training-2026-10-24/"
 var checks := 0
 var failures: Array[String] = []
 var records: Array[Dictionary] = []
@@ -230,73 +230,83 @@ func test_menu() -> void:
 	menu = load("res://scenes/menu.tscn").instantiate()
 	add_child(menu)
 	await get_tree().process_frame
-	menu.find_child("training_toggle", true, false).pressed.emit()
-	var entry := menu.find_child("training_published_enemies", true, false) as Button
-	check(entry != null and entry.is_visible_in_tree() and entry.text == "新敌人演练", "Visible new enemy practice entry in expanded group")
-	if entry == null:
-		menu.queue_free()
-		return
+	var entry: Button = menu.training_toggle
+	check(entry.text == "战斗演练" and not menu.training_open, "Single battle practice entry; modal starts hidden")
+	check(menu.find_child("training_published_enemies", true, false) == null, "No separate new-enemy submenu entry")
 	var original_states: Dictionary = {}
 	for button in menu.ui_layer.find_children("*", "Button", true, false): original_states[button] = [button.disabled, button.focus_mode]
 	entry.pressed.emit()
 	await get_tree().process_frame
-	check(is_instance_valid(menu.enemy_dialog), "Actual entry callback opens enemy modal")
-	if not is_instance_valid(menu.enemy_dialog):
-		menu.queue_free()
-		return
-	var modal: Control = menu.enemy_dialog
+	var modal: Control = menu.training_container
+	check(menu.training_open and modal.is_visible_in_tree(), "Single entry opens unified practice modal")
 	var buttons := modal.find_children("*", "Button", true, false)
-	check(buttons.size() == 11, "Enemy modal has ten choices plus cancel")
+	check(buttons.size() == 15, "Unified panel contains three battles, ten enemies, scenery and return")
 	var choice_rects: Array[Rect2] = []
 	var canvas := Rect2(Vector2.ZERO, Vector2(1440, 900))
-	var cancel_rect: Rect2 = menu.enemy_cancel.get_global_rect()
-	for id in IDS:
-		var choice := modal.find_child("enemy_choice_" + id, true, false) as Button
-		if choice == null: continue
-		var dimensions := choice.get_minimum_size()
-		var bounds := choice.get_global_rect()
-		check(dimensions.x <= choice.size.x and dimensions.y <= choice.size.y, "Enemy choice fits its minimum content size: " + id)
-		check(canvas.encloses(bounds), "Enemy choice lies within 1440x900 canvas: " + id)
-		check(not bounds.intersects(cancel_rect), "Enemy choice does not overlap return button: " + id)
-		for previous in choice_rects: check(not bounds.intersects(previous), "Enemy choice rows and columns do not overlap: " + id + "/" + str(previous.position))
-		for label_node in modal.find_children("*", "Label", true, false):
-			if label_node.get_global_rect().position.y < bounds.position.y and label_node.text.contains("选择演练敌人"):
-				check(not bounds.intersects(label_node.get_global_rect()), "Enemy choice does not overlap modal title: " + id)
-		choice_rects.append(bounds)
-	check(modal.is_ancestor_of(get_viewport().gui_get_focus_owner()), "Modal initially owns keyboard focus")
-	for button in original_states:
-		check(button.disabled and button.focus_mode == Control.FOCUS_NONE, "Modal disables underlying control: " + button.name)
 	for button in buttons:
+		var bounds: Rect2 = button.get_global_rect()
+		check(button.get_minimum_size().x <= button.size.x and button.get_minimum_size().y <= button.size.y, "Button content fits: " + button.name)
+		check(canvas.encloses(bounds), "Button lies within logical canvas: " + button.name)
+		for previous in choice_rects: check(not bounds.intersects(previous), "Practice buttons do not overlap: " + button.name + "/" + str(previous.position))
+		for label_node in modal.find_children("*", "Label", true, false):
+			check(not bounds.intersects(label_node.get_global_rect()), "Practice button clears label: " + button.name + "/" + label_node.text)
+		choice_rects.append(bounds)
 		for path in [button.focus_next, button.focus_previous, button.focus_neighbor_left, button.focus_neighbor_right, button.focus_neighbor_top, button.focus_neighbor_bottom]:
-			check(not path.is_empty() and button.get_node_or_null(path) in buttons, "Modal keyboard focus remains inside: " + button.name + "/" + str(path))
-	menu.open_scenery_picker()
-	menu.request_new()
-	check(not is_instance_valid(menu.scenery_dialog) and not is_instance_valid(menu.confirm_dialog), "Enemy modal excludes other overlays")
-	await key(KEY_ESCAPE)
-	check(not is_instance_valid(menu.enemy_dialog) and not Game.training_mode, "Escape closes modal without starting battle")
+			check(not path.is_empty() and button.get_node_or_null(path) in buttons, "Keyboard focus remains inside: " + button.name + "/" + str(path))
+	check(modal.is_ancestor_of(get_viewport().gui_get_focus_owner()), "Practice modal initially owns keyboard focus")
 	for button in original_states:
-		check([button.disabled, button.focus_mode] == original_states[button], "Cancel restores underlying control state: " + button.name)
+		check(button.disabled and button.focus_mode == Control.FOCUS_NONE, "Practice modal disables background: " + button.name)
+	menu.request_new()
+	check(not is_instance_valid(menu.confirm_dialog), "Practice modal blocks new commission overlay")
+	menu.training_scenery_button.pressed.emit()
+	await get_tree().process_frame
+	check(is_instance_valid(menu.scenery_dialog), "Scenery opens above unified practice panel")
+	for button in buttons: check(button.disabled and button.focus_mode == Control.FOCUS_NONE, "Scenery disables practice control: " + button.name)
+	menu.find_child("training_B04", true, false).pressed.emit()
+	menu.find_child("enemy_choice_" + IDS[0], true, false).pressed.emit()
+	check(not Game.training_mode, "Covered practice buttons reject synthetic launches")
+	await key(KEY_ESCAPE)
+	check(not is_instance_valid(menu.scenery_dialog) and menu.training_open, "First Escape closes only scenery")
+	check(get_viewport().gui_get_focus_owner() == menu.training_scenery_button, "Scenery returns focus to practice scenery button")
+	for button in buttons: check(not button.disabled and button.focus_mode == Control.FOCUS_ALL, "Scenery restores practice control: " + button.name)
+	menu.open_scenery_picker()
+	menu.find_child("scenery_choice_hive", true, false).pressed.emit()
+	check(Game.b04_scenery_choice == "hive" and menu.training_scenery_button.text.contains("蜂巢"), "Scenery selection updates unified panel")
+	await key(KEY_ESCAPE)
+	check(not menu.training_open and not Game.training_mode, "Second Escape closes practice without starting battle")
+	for button in original_states:
+		check([button.disabled, button.focus_mode] == original_states[button], "Return restores background control: " + button.name)
 	for id in IDS:
 		reset(adventure())
 		entry.pressed.emit()
-		var choice := menu.find_child("enemy_choice_" + id, true, false) as Button
-		check(choice != null, "Menu contains choice: " + id)
+		var choice := modal.find_child("enemy_choice_" + id, true, false) as Button
+		check(choice != null, "Unified panel contains choice: " + id)
 		if choice != null: choice.pressed.emit()
-		check(Game.training_mode and Game.state.get("battleId", "") == "training_" + id, "Actual choice callback launches selected enemy: " + id)
-		check(not is_instance_valid(menu.enemy_dialog), "Selected enemy closes modal: " + id)
+		check(Game.training_mode and Game.state.get("battleId", "") == "training_" + id, "Actual unified callback launches enemy: " + id)
+		check(not menu.training_open, "Enemy selection closes practice panel: " + id)
 		Game.menu()
 		check_catalogs("UI " + id)
 		await get_tree().process_frame
+	for id in ["B04", "B11", "B02"]:
+		reset(adventure())
+		var original := Game.state.duplicate(true)
+		entry.pressed.emit()
+		modal.find_child("training_" + id, true, false).pressed.emit()
+		check(Game.training_mode and Game.state.battleId == id and not menu.training_open, "Unified classic battle callback: " + id)
+		check(Game.training_scenery_place_id == ("hive" if id == "B04" else ""), "Scenery override is confined to B04: " + id)
+		Game.menu()
+		check(same(Game.state, original), "Unified classic battle restores exact adventure: " + id)
 	entry.pressed.emit()
-	menu.find_child("enemy_cancel", true, false).pressed.emit()
-	check(not is_instance_valid(menu.enemy_dialog) and not Game.training_mode, "Actual cancel callback closes modal without entering battle")
+	menu.training_cancel.pressed.emit()
+	check(not menu.training_open and not Game.training_mode, "Return callback closes unified panel")
 	for lock in ["transition", "busy"]:
 		Game.transition_locked = lock == "transition"
 		Game.battle_busy = lock == "busy"
-		menu.open_enemy_picker()
-		check(not is_instance_valid(menu.enemy_dialog), "Menu rejects picker during " + lock + " lock")
+		entry.pressed.emit()
+		check(not menu.training_open, "Practice panel rejects " + lock + " lock")
 	Game.transition_locked = false
 	Game.battle_busy = false
+	Game.set_b04_scenery_choice("")
 	check_disk("Menu interactions")
 	menu.queue_free()
 	await get_tree().process_frame
@@ -314,7 +324,7 @@ func _ready() -> void:
 		sentinel_paths.append(path)
 	original_battles = Game.battles.duplicate(true)
 	original_enemies = Game.enemy_catalog.duplicate(true)
-	check(original_battles.size() == 4 and original_enemies.size() == 11, "Formal baseline remains four battles / eleven enemies")
+	check(original_battles.size() == 6 and original_enemies.size() == 14, "Formal baseline has six battles / fourteen enemies")
 	test_config()
 	test_start_and_restore()
 	test_rejections()

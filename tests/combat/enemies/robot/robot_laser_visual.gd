@@ -120,7 +120,7 @@ func _ready() -> void:
 		bad.id = "bad_robot"
 		bad.erase(field)
 		resolver.catalog.bad_robot = bad
-		check(resolver.resolve({"combatVisualId":"bad_robot"},{}).id == "finn", "Missing laser calibration rejects profile: " + field)
+		check(resolver.resolve({"combatVisualId":"bad_robot"},{}).id == "unillustrated", "Missing laser calibration rejects profile: " + field)
 	var curve := Laser.new()
 	curve.max_width = 13.5
 	check(curve.width_at(Laser.CHARGE_TIME) < curve.width_at(Laser.CHARGE_TIME + Laser.GROW_TIME * 0.5) and curve.width_at(Laser.CHARGE_TIME + Laser.GROW_TIME * 0.5) < curve.width_at(Laser.CHARGE_TIME + Laser.GROW_TIME), "Width grows progressively during firing")

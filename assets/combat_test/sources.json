@@ -1,5 +1,5 @@
 {
-  "note": "Existing user-provided test poses. Finn is a Library of Ruina reference proxy, not final enemy art. Original bytes preserved.",
+  "note": "Existing user-provided Noren test poses. Original bytes preserved. Finn reference assets removed from the game on 2026-10-24.",
   "files": [
     {
       "file": "noren/noren_slash.png",
@@ -36,46 +36,6 @@
       "file": "noren/noren_block.png",
       "source": "../动作参考_2026-10-13/诺伦/06_格挡_block.png",
       "sha256": "dca43a3212f5907ea32a03eafb804548768c1884407e72b43a108e5375e1e163"
-    },
-    {
-      "file": "finn/finn_damaged.webp",
-      "source": "../动作参考_2026-10-13/敌方/136px-Finn_combat_sprite_damaged.webp",
-      "sha256": "3aa89ef5e8e203e02ee879017c1b73ad87f3b7d444c838463557d071f01860b2"
-    },
-    {
-      "file": "finn/finn_blunt.webp",
-      "source": "../动作参考_2026-10-13/敌方/240px-Finn_combat_sprite_blunt.webp",
-      "sha256": "8075a505eb3e804c93390182626199f4cfad8146810247d15f03ce5dd1aa7bf1"
-    },
-    {
-      "file": "finn/finn_evade.webp",
-      "source": "../动作参考_2026-10-13/敌方/179px-Finn_combat_sprite_evade.webp",
-      "sha256": "ac47a6c17f7de20987f09bc8d1a3d1c6bb60a4200e441f2600644f3dd86120ab"
-    },
-    {
-      "file": "finn/finn_idle.webp",
-      "source": "../动作参考_2026-10-13/敌方/211px-Finn_combat_sprite_idle.webp",
-      "sha256": "5858d607cff776e551c8f7543ef5cdb1a54287f9b6310905636b820d082de742"
-    },
-    {
-      "file": "finn/finn_slash.webp",
-      "source": "../动作参考_2026-10-13/敌方/126px-Finn_combat_sprite_slash.webp",
-      "sha256": "a8e484cbe6691bd677320236b5896316e2abdf22ef9d1d51f654bae82c9c6f1b"
-    },
-    {
-      "file": "finn/finn_pierce.webp",
-      "source": "../动作参考_2026-10-13/敌方/240px-Finn_combat_sprite_pierce.webp",
-      "sha256": "00bd8ab80e5020c39991fabbe44bef7b446f4c309b68d25d347f35a57b5987c6"
-    },
-    {
-      "file": "finn/finn_move.webp",
-      "source": "../动作参考_2026-10-13/敌方/193px-Finn_combat_sprite_move.webp",
-      "sha256": "17df4fa8449d6a463a2ffff99be6f4c6525c87ee1f1e1f0dc863bd2c7a4d06e8"
-    },
-    {
-      "file": "finn/finn_block.webp",
-      "source": "../动作参考_2026-10-13/敌方/167px-Finn_combat_sprite_block.webp",
-      "sha256": "32d9dde75a308c612099aa21ddddf10010cc3459b632c4c96d39ad9dfc04cc0c"
     }
   ]
 }

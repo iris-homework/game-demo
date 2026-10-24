@@ -4,7 +4,7 @@ extends RefCounted
 
 const ROOT := "res://assets/combat_test"
 const SKIPPED_PREFIX := "reference"
-const FIXED_NAMES := {"noren":"noren", "finn":"finn"}
+const FIXED_NAMES := {"noren":"noren", "unillustrated":"无立绘"}
 
 static var _names: Dictionary = {}
 static var _scanned := false

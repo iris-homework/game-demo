@@ -702,10 +702,11 @@ func prepare_battle_reward() -> void:
 	if options.size() != 3:
 		notice.emit("奖励卡牌配置错误：无法生成三个不同选项，请检查概率与卡牌池。")
 		return
-	state.credits += int(reward_rules.credits)
+	var credits := int(reward_rules.credits)
+	state.credits += credits
 	state.claimedRewardIds.append(claim_id)
 	state.battleReward = {"claimId":claim_id, "eventId":state.activeEventId,
-		"battleId":state.battleId, "battleType":kind, "credits":int(reward_rules.credits),
+		"battleId":state.battleId, "battleType":kind, "credits":credits,
 		"options":options, "selectedCardId":"", "status":"pending"}
 	if event_reward: state.battleReward.source = "event"
 
@@ -1309,7 +1310,9 @@ func valid_battle_reward(s: Dictionary) -> bool:
 		if not battles.has(r.battleId) or battles[r.battleId].eventId != r.eventId: return false
 		if r.claimId != r.eventId + ":" + r.battleId + ":victory": return false
 	else: return false
-	if not (r.get("credits") is int or r.get("credits") is float) or r.credits != int(reward_rules.credits): return false
+	# Preserve receipts already paid before the battle reward changed from 1000 to 50.
+	if not (r.get("credits") is int or r.get("credits") is float): return false
+	if r.credits != int(reward_rules.credits) and r.credits != 1000: return false
 	if not r.get("options") is Array or r.options.size() != 3: return false
 	var seen := []
 	for id in r.options:

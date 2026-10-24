@@ -44,12 +44,12 @@ func _ready() -> void:
 	Game.meta_path = "user://automated_test_meta.json"
 	# Validate authored references, including legacy saved result nodes.
 	check(Game.places.size() == 17, "17 places including church")
-	check(Game.events.size() == 5 and Game.events.has("E01R"), "opening, three commissions, and gated return reward event")
+	check(Game.events.size() == 8 and Game.events.has("E01R"), "opening, six commissions, and gated return reward event")
 	for e in Game.events.values():
 		check(not Game.place_data(e.placeId).is_empty(), e.id + " place exists")
 		for n in e.nodes.values():
 			if n.has("speakerId") and n.speakerId != "": check(Game.characters.has(Game.resolve_character_id(n.speakerId)), "Known character " + n.speakerId)
-			if n.has("next"): check(e.nodes.has(n.next), e.id + " next exists")
+			if n.has("next"): check(n.next == "@map" or e.nodes.has(n.next), e.id + " next exists")
 			for c in n.get("choices", []): check(c.next == "@map" or e.nodes.has(c.next), "Choice target exists")
 		for id in e.rewardIds: check(Game.rewards.has(id), "Reward exists")
 	for b in Game.battles.values():

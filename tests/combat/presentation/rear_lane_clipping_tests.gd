@@ -21,7 +21,10 @@ func _ready() -> void:
 	var resolver := EnemyVisualResolver.new()
 	var visuals: Array[EnemyVisualResolver.Visual] = []
 	for i in 3:
-		visuals.append(resolver.resolve({"id":"qa_finn", "combatVisualId":"finn"},{}))
+		var visual := resolver.resolve({"id":"qa_henchman", "combatVisualId":"gang_henchman"},{})
+		# Keep this clipping regression's original body geometry independent of the art fixture.
+		visual.target_bounds = Rect2(-58,-130,116,145)
+		visuals.append(visual)
 	for feet_y in [557.0, 577.0, 637.0]:
 		var stage = Stage.new()
 		add_child(stage)

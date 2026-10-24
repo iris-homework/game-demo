@@ -257,7 +257,7 @@ func _build_enemy_choices() -> void:
 	var seen: Dictionary = {}
 	for id in Game.enemy_catalog:
 		var definition: Dictionary = Game.enemy_catalog[id]
-		var visual: String = str(definition.get("combatVisualId","finn")).to_lower()
+		var visual: String = str(definition.get("combatVisualId","unillustrated")).to_lower()
 		enemy_choices.append({"id":id,"name":CharacterNames.name_for_visual(visual),"tooltip":str(id)})
 		seen[visual] = true
 	for visual in Game.enemy_visuals.catalog:
@@ -278,7 +278,7 @@ func _enemy_name(key: String) -> String:
 	for choice in enemy_choices:
 		if choice.id == key: return str(choice.name)
 	if Game.enemy_catalog.has(key):
-		return CharacterNames.name_for_visual(str(Game.enemy_catalog[key].get("combatVisualId","finn")))
+		return CharacterNames.name_for_visual(str(Game.enemy_catalog[key].get("combatVisualId","unillustrated")))
 	return CharacterNames.name_for_visual(key.trim_prefix("visual:"))
 
 func _panel(pos: Vector2, dimensions: Vector2) -> VBoxContainer:

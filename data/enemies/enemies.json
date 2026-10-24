@@ -23,7 +23,7 @@
     "maxHp": null,
     "intentSequence": [],
     "prototype": true,
-    "combatVisualId": "finn"
+    "combatVisualId": "unillustrated"
   },
   "gang": {
     "id": "gang",
@@ -75,7 +75,7 @@
     "maxHp": null,
     "intentSequence": [],
     "prototype": true,
-    "combatVisualId": "finn"
+    "combatVisualId": "unillustrated"
   },
   "lumina": {
     "id": "lumina",
@@ -85,7 +85,7 @@
     "maxHp": null,
     "intentSequence": [],
     "prototype": true,
-    "combatVisualId": "finn"
+    "combatVisualId": "unillustrated"
   },
   "psycho": {
     "id": "psycho",
@@ -95,7 +95,7 @@
     "maxHp": null,
     "intentSequence": [],
     "prototype": true,
-    "combatVisualId": "finn"
+    "combatVisualId": "unillustrated"
   },
   "fish": {
     "id": "fish",
@@ -132,7 +132,7 @@
     "maxHp": null,
     "intentSequence": [],
     "prototype": true,
-    "combatVisualId": "finn"
+    "combatVisualId": "unillustrated"
   },
   "fish_second": {
     "id": "fish_second",
@@ -194,5 +194,56 @@
     "prototype": false,
     "combatVisualId": "gang_henchman",
     "formationSlot": "triangle_left_front"
+  },
+  "pruning_hound": {
+    "id": "pruning_hound",
+    "characterId": "pruning_hound",
+    "displayName": "修枝猎犬",
+    "battlePortraitAssetId": "",
+    "maxHp": 36,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1,
+        "animation": "pierce"
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "pruning_hound"
+  },
+  "powerline_repairman": {
+    "id": "powerline_repairman",
+    "characterId": "powerline_repairman",
+    "displayName": "输电抢修工",
+    "battlePortraitAssetId": "",
+    "maxHp": 48,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 8,
+        "hits": 1,
+        "animation": "pierce"
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "powerline_repairman"
+  },
+  "beacon_jellyfish": {
+    "id": "beacon_jellyfish",
+    "characterId": "beacon_jellyfish",
+    "displayName": "信标水母",
+    "battlePortraitAssetId": "",
+    "maxHp": 36,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1,
+        "animation": "pierce"
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "beacon_jellyfish"
   }
 }

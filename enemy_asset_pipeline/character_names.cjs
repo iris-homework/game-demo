@@ -4,12 +4,12 @@ const {roleForDirectory}=require("./asset_discovery.cjs");
 const DEFAULT_ROOT=path.resolve(__dirname,"../assets/combat_test");
 
 function characterNames(root=DEFAULT_ROOT){
-  const names={noren:"noren",finn:"finn"};
+  const names={noren:"noren",unillustrated:"无立绘"};
   if(!fs.existsSync(root))return names;
   for(const entry of fs.readdirSync(root,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name,"en"))){
     if(!entry.isDirectory()||entry.isSymbolicLink())continue;
     const id=roleForDirectory(entry.name);
-    if(!id||id==="noren"||id==="finn"||Object.hasOwn(names,id))continue;
+    if(!id||id==="noren"||Object.hasOwn(names,id))continue;
     names[id]=entry.name.toLowerCase();
   }
   return names;

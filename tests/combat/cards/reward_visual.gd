@@ -95,7 +95,7 @@ func _ready() -> void:
 		await click(Vector2(1257,792))
 		advances += 1
 	await settle()
-	check(Game.page == "result" and Game.has_battle_reward() and Game.state.credits == 1000,"Finish dialogue via button opens reward")
+	check(Game.page == "result" and Game.has_battle_reward() and Game.state.credits == int(Game.config.initialCredits) + 50,"Finish dialogue via button opens reward")
 	if not Game.has_battle_reward():
 		get_tree().quit(1)
 		return
@@ -145,7 +145,7 @@ func _ready() -> void:
 	check(Game.state.deck == ["test_reward_02"] and Game.state.battleReward.status == "claimed","Mouse picks only second card")
 	await shot("claimed")
 	await click(Vector2(1246,813))
-	check(Game.page == "map" and Game.state.credits == 1000,"Lower-right button returns to map with rewards")
+	check(Game.page == "map" and Game.state.credits == int(Game.config.initialCredits) + 50,"Lower-right button returns to map with rewards")
 	# Keyboard selection and reload while the card is still pending.
 	Game.state.activeEventId = "E11"
 	Game.state.currentPlaceId = "pump"

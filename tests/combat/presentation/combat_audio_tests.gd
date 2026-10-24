@@ -15,7 +15,7 @@ func check(ok: bool, message: String) -> void:
 		failures.append(message)
 		push_error(message)
 
-func fixture(profile: String = "finn", count: int = 1) -> void:
+func fixture(profile: String = "gang_henchman", count: int = 1) -> void:
 	stage = Stage.new()
 	add_child(stage)
 	var resolver := EnemyVisualResolver.new()
@@ -109,7 +109,7 @@ func test_bite_and_invalid_attacks() -> void:
 	await destroy_stage()
 
 func test_return() -> void:
-	fixture("finn",2)
+	fixture("gang_henchman",2)
 	await stage.return_home()
 	check(cues.size() == 1 and cues[0].cue == "snap","Stationary survivors share one return snap")
 	cues.clear()

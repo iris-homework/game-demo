@@ -119,7 +119,8 @@ func enter(params: Dictionary) -> void:
 		add_child(shade_view)
 	# Battle has no footer; changing the section title must retain that layout.
 	status_bar(Game.battle_type_label(Game.battle_type()),false,Callable(),false)
-	tag("演练模式 · 不影响冒险" if Game.training_mode else ("诺伦 / 形态与弹药" if model.is_noren() else "旧版测试规则"),Vector2(760,117),CYAN,310)
+	if not Game.training_mode and not model.is_noren():
+		tag("旧版测试规则",Vector2(760,117),CYAN,310)
 	if Game.texture(place_asset) == null:
 		label(self,"场景美术待补",Vector2(43,203),Vector2(330,26),13,MUTED)
 	cut_panel(self,Vector2(596,14),Vector2(248,48),INK,Color("3d9eff"),12)
@@ -132,7 +133,7 @@ func enter(params: Dictionary) -> void:
 	player_hover = preload("res://scripts/combat/stance_hover.gd").new()
 	add_child(player_hover)
 	ammo_panel = AmmoHUD.new()
-	ammo_panel.position = Vector2(30,637-AmmoHUD.DIMENSIONS.y-16)
+	ammo_panel.position = Vector2(30,667-AmmoHUD.DIMENSIONS.y-22)
 	add_child(ammo_panel)
 	resources_label = label(ammo_panel,"",Vector2(6,3),Vector2(AmmoHUD.DIMENSIONS.x-12,22),15,AmmoHUD.ORANGE)
 	resources_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

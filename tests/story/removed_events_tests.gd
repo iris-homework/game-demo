@@ -18,10 +18,10 @@ func test_catalog() -> void:
 	Game.state = Game.initial_state()
 	var event_ids: Array = Game.events.keys()
 	event_ids.sort()
-	check(event_ids == ["E01", "E01R", "E02", "E04", "E11"], "four retained events plus the gated return reward are authored")
-	check(Game.battles.keys() == ["B02", "B04", "B11"], "only three retained battles are authored")
+	check(event_ids == ["E01", "E01R", "E02", "E04", "E11", "E13", "E14", "E15"], "retained events, three new commissions and the gated return reward are authored")
+	check(Game.battles.keys() == ["B02", "B04", "B11", "B13", "B14", "B15"], "three retained and three new battles are authored")
 	check(Game.read_data("weeks/week1/week.json").eventIds == Game.events.keys(), "week index matches event catalog")
-	check(ids(Game.eligible_events()) == ["E01", "E02", "E04", "E11"], "four original events remain eligible before E01, but return reward is gated")
+	check(ids(Game.eligible_events()) == ["E01", "E02", "E04", "E11", "E13", "E14", "E15"], "seven events eligible before E01, return reward stays gated")
 	for event in Game.events.values():
 		if event.id == "E01R":
 			check(not event.unlockCondition.is_empty(), "return reward requires completed commissions")
@@ -30,7 +30,7 @@ func test_catalog() -> void:
 		check(event.refreshTimeRange == {"startDay":null, "endDay":null}, "anytime range " + event.id)
 		check(event.nodes.has(event.startNodeId), "valid start node " + event.id)
 		for node in event.nodes.values():
-			if node.has("next"): check(event.nodes.has(node.next), "valid next node " + event.id)
+			if node.has("next"): check(node.next == "@map" or event.nodes.has(node.next), "valid next node " + event.id)
 			for choice in node.get("choices", []):
 				check(choice.next == "@map" or event.nodes.has(choice.next), "valid choice route " + event.id)
 			if node.get("type") == "battle":
@@ -95,7 +95,7 @@ func test_retired_checkpoints() -> void:
 			check(not migrated.has("faction") and not migrated.flags.has("week1Complete"), "cleans retired allegiance and finale flag " + label)
 			check(migrated.completedEventIds == ["E02"], "filters retired completion without completing E01 " + label)
 			if event_id == "E03":
-				check(migrated.refreshedEventIds.size() == 3 and migrated.refreshedEventIds.all(func(id): return id in ["E01", "E04", "E11"]), "retiring Ike refills its removed pool slot " + label)
+				check(migrated.refreshedEventIds.size() == 3 and migrated.refreshedEventIds.all(func(id): return id in ["E01", "E04", "E11", "E13", "E14", "E15"]), "retiring Ike refills its removed pool slot " + label)
 			else:
 				check(migrated.refreshedEventIds == ["E04", "E11"], "unrelated retired migration preserves retained pool " + label)
 			check(migrated.choiceHistory == {"E01:contract":"richard"}, "retains only live choices " + label)

@@ -1,0 +1,9 @@
+{
+  "source": "卡牌游戏美术资源/角色/故障机器人_对话立绘_v2.png",
+  "runtime": "res://assets/characters/robot_dialogue_v2.png",
+  "characterId": "robot",
+  "assetId": "robot",
+  "sha256": "fa652015513c3806101c3423468311d59f28bd9a4fee5d1eee193d4ccc122fcd",
+  "whiteKey": false,
+  "note": "Source-byte copy. Dialogue only; battle robot pose assets unchanged."
+}

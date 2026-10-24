@@ -121,7 +121,7 @@ func _ready() -> void:
 	stage = Stage.new()
 	add_child(stage)
 	var resolver := EnemyVisualResolver.new()
-	var visuals: Array[EnemyVisualResolver.Visual] = [resolver.resolve({"id":"qa_finn","combatVisualId":"finn"},{})]
+	var visuals: Array[EnemyVisualResolver.Visual] = [resolver.resolve({"id":"qa_henchman","combatVisualId":"gang_henchman"},{})]
 	stage.setup(577,visuals)
 	stage.phase_changed.connect(on_phase)
 	await get_tree().process_frame

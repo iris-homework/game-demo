@@ -107,20 +107,59 @@ func fallback_order() -> void:
 		var visual := resolver.resolve(snapshot,enemies)
 		check(visual.id == "fish" and not visual.diagnostics.is_empty(), "Invalid stored reference uses current enemy: "+str(bad_id))
 		check(snapshot == before, "Fallback never rewrites stored reference: "+str(bad_id))
-	check(resolver.resolve({"id":"fish","combatVisualId":"finn"},enemies).id == "finn", "Valid stored reference retains precedence")
+	check(resolver.resolve({"id":"fish","combatVisualId":"gang_henchman"},enemies).id == "gang_henchman", "Valid stored reference retains precedence")
+	for retired in ["finn", "Finn", "fallback_finn"]:
+		var snapshot := {"id":"fish", "combatVisualId":retired}
+		var before := snapshot.duplicate(true)
+		check(resolver.resolve(snapshot,enemies).id == "fish" and snapshot == before, "Retired stored art uses current art without changing snapshot: "+retired)
+		check(resolver.resolve({"combatVisualId":retired},{}).id == "unillustrated", "Retired art without current replacement stays unillustrated: "+retired)
 	check(resolver.resolve({"id":"fish"},enemies).id == "fish", "Absent stored field uses current catalog")
-	check(resolver.resolve({"id":"missing"},{}).id == "finn", "Unknown enemy uses validated Finn")
+	check(resolver.resolve({"id":"missing"},{}).id == "unillustrated", "Unknown enemy has no character art")
 	resolver.catalog["broken"] = {"id":"broken"}
 	check(resolver.resolve({"id":"fish","combatVisualId":"broken"},enemies).id == "fish", "Broken stored profile uses current valid profile")
-	check(resolver.resolve({"id":"fish"},{"fish":{"combatVisualId":"broken"}}).id == "finn", "Broken current profile uses Finn")
-	resolver.catalog.finn = null
+	check(resolver.resolve({"id":"fish"},{"fish":{"combatVisualId":"broken"}}).id == "unillustrated", "Broken current profile has no character art")
+	resolver.catalog.clear()
 	var emergency := resolver.resolve({"id":"missing"},{})
 	var actor = actor_for(emergency)
 	for pose in ["idle","move","block","damaged","pierce"]:
 		actor.set_pose(pose)
-		check(actor.pose == "idle" and actor.sprite.texture != null, "Broken final catalog still has a visible safe pose: "+pose)
-	check(emergency.id == "fallback_finn" and emergency.target_bounds.size.x > 0, "Emergency visual has usable targeting")
+		check(actor.pose == "idle" and actor.sprite.texture == null, "Broken final catalog stays unillustrated for pose: "+pose)
+	check(emergency.id == "unillustrated" and emergency.target_bounds.size.x > 0, "Emergency visual has usable targeting")
 	actor.free()
+
+func unillustrated_combat() -> void:
+	check(not Game.enemy_visuals.catalog.has("finn"), "Retired profile removed from catalog")
+	check(not DirAccess.dir_exists_absolute("res://assets/combat_test/Finn"), "Retired asset directory removed")
+	check(not FileAccess.file_exists("res://assets/combat_test/reference_idle/finn_idle.webp"), "Retired reference idle removed")
+	var resolver := Resolver.new()
+	# Even a previously valid catalog entry cannot reactivate retired art.
+	resolver.catalog.finn = resolver.catalog.gang_henchman.duplicate(true)
+	resolver.catalog.finn.id = "finn"
+	check(resolver.resolve({"combatVisualId":"finn"},{}).poses.is_empty(), "Retired profile is blocked even when reintroduced in a catalog")
+	for id in ["ike", "richard", "lumina", "psycho", "mech_boss"]:
+		var enemy: Dictionary = Game.enemy_catalog[id]
+		var before := enemy.duplicate(true)
+		var visual := Game.enemy_combat_visual(enemy)
+		check(visual.id == "unillustrated" and visual.poses.is_empty() and visual.diagnostics.is_empty(), "Former placeholder is explicitly unillustrated: "+id)
+		var legacy := enemy.duplicate(true)
+		legacy.combatVisualId = "finn"
+		check(Game.enemy_combat_visual(legacy).poses.is_empty() and enemy == before, "Old placeholder snapshot stays unillustrated: "+id)
+	var visual := resolver.resolve({"combatVisualId":"unillustrated"},{})
+	var stage := Stage.new()
+	add_child(stage)
+	var visuals: Array[Resolver.Visual] = [visual]
+	stage.setup(533,visuals)
+	var enemy = stage.enemies[0]
+	check(enemy.sprite.texture == null and enemy.target_bounds.has_point(Vector2(0,-60)), "Unillustrated enemy retains usable target bounds")
+	var contacts := {"count":0}
+	await stage.attack(stage.player,enemy,"slash",[{"damage":1,"blocked":0,"killed":false}],func(_hit,_index): contacts.count += 1)
+	check(contacts.count == 1 and enemy.sprite.texture == null, "Player attack still hits the unillustrated target once")
+	await stage.attack(enemy,stage.player,"pierce",[{"damage":1,"blocked":0,"killed":false}],func(_hit,_index): contacts.count += 1)
+	check(contacts.count == 2 and enemy.sprite.texture == null, "Unillustrated enemy attack still hits once")
+	await stage.return_home()
+	check(enemy.position == enemy.home and enemy.sprite.texture == null, "Unillustrated enemy returns without restoring art")
+	stage.queue_free()
+	await get_tree().process_frame
 
 func malformed_profiles() -> void:
 	var resolver := Resolver.new()
@@ -169,10 +208,10 @@ func malformed_profiles() -> void:
 		mutations[label].call(profile)
 		resolver.catalog.qa_broken = profile
 		var visual := resolver.resolve({"combatVisualId":"qa_broken"},{})
-		check(visual.id == "finn" and not visual.diagnostics.is_empty(), "Invalid profile rejected as a whole: "+label)
+		check(visual.id == "unillustrated" and not visual.diagnostics.is_empty(), "Invalid profile rejected as a whole: "+label)
 		var actor = actor_for(visual)
 		actor.set_pose("damaged")
-		check(actor.sprite.texture != null and actor.attack_style_override.is_empty() and actor.hit_effect_texture == null, "No partial bad profile reaches actor: "+label)
+		check(actor.sprite.texture == null and actor.attack_style_override.is_empty() and actor.hit_effect_texture == null, "No partial bad profile reaches actor: "+label)
 		actor.free()
 
 func catalog_loading() -> void:
@@ -182,9 +221,9 @@ func catalog_loading() -> void:
 		file.store_string(text)
 		file.close()
 		var resolver := Resolver.new(path)
-		check(resolver.resolve({},{}).id == "fallback_finn" and not resolver.load_error.is_empty(), "Broken catalog file falls back: "+text)
+		check(resolver.resolve({},{}).id == "unillustrated" and not resolver.load_error.is_empty(), "Broken catalog file falls back: "+text)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
-	check(Resolver.new(path).resolve({},{}).id == "fallback_finn", "Missing catalog file falls back")
+	check(Resolver.new(path).resolve({},{}).id == "unillustrated", "Missing catalog file falls back")
 
 func identity_and_isolation() -> void:
 	var resolver := Resolver.new()
@@ -234,6 +273,7 @@ func _ready() -> void:
 	published_content()
 	await configured_attack_effects()
 	fallback_order()
+	await unillustrated_combat()
 	malformed_profiles()
 	catalog_loading()
 	await identity_and_isolation()
