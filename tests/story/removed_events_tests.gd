@@ -2,8 +2,8 @@ extends Node
 
 var checks := 0
 var failures := 0
-const REMOVED_EVENTS := ["E05A", "E05B", "E08", "E12"]
-const REMOVED_BATTLES := ["B05A", "B05B", "B08", "B12"]
+const REMOVED_EVENTS := ["E03", "E05A", "E05B", "E08", "E12"]
+const REMOVED_BATTLES := ["B03", "B05A", "B05B", "B08", "B12"]
 
 func check(ok: bool, message: String) -> void:
 	checks += 1
@@ -18,10 +18,10 @@ func test_catalog() -> void:
 	Game.state = Game.initial_state()
 	var event_ids: Array = Game.events.keys()
 	event_ids.sort()
-	check(event_ids == ["E01", "E01R", "E02", "E03", "E04", "E11"], "five retained events plus the gated return reward are authored")
-	check(Game.battles.keys() == ["B02", "B03", "B04", "B11"], "only four retained battles are authored")
+	check(event_ids == ["E01", "E01R", "E02", "E04", "E11"], "four retained events plus the gated return reward are authored")
+	check(Game.battles.keys() == ["B02", "B04", "B11"], "only three retained battles are authored")
 	check(Game.read_data("weeks/week1/week.json").eventIds == Game.events.keys(), "week index matches event catalog")
-	check(ids(Game.eligible_events()) == ["E01", "E02", "E03", "E04", "E11"], "five original events remain eligible before E01, but return reward is gated")
+	check(ids(Game.eligible_events()) == ["E01", "E02", "E04", "E11"], "four original events remain eligible before E01, but return reward is gated")
 	for event in Game.events.values():
 		if event.id == "E01R":
 			check(not event.unlockCondition.is_empty(), "return reward requires completed commissions")
@@ -46,19 +46,17 @@ func test_catalog() -> void:
 		check(Game.render_text("{目标姓名}") == Game.display_name(target), "selected target still renders " + target)
 	Game.state.targetId = ""
 	check(Game.available_events().size() == 3, "ungated catalog still has three-event cap")
-	Game.state.refreshedEventIds = ["E11", "E03", "E04"]
+	Game.state.refreshedEventIds = ["E11", "E02", "E04"]
 	check(Game.start_event("E11"), "fish event can start without E01 or a target")
 	check(not "E01" in Game.state.completedEventIds, "starting fish did not silently complete E01")
 	Game.state = Game.initial_state()
-	Game.state.refreshedEventIds = ["E03", "E02", "E04"]
-	check(Game.start_event("E03"), "payment event has no prerequisite")
-	Game.skip_dialogue(Game.revision)
+	check(Game.available_events("hive").is_empty(), "retired hive commission no longer appears at its location")
 	var before := Game.state.duplicate(true)
-	check(not Game.choose(0, Game.revision) and Game.state == before, "payment option still requires its own 300 credits")
+	check(not Game.start_event("E03") and Game.state == before, "direct entry cannot restore retired payment event")
 
 func test_retired_checkpoints() -> void:
-	var retired_events := ["E05A", "E05B", "E06", "E07", "E08", "E09", "E10", "E12"]
-	var retired_battles := ["B05A", "B05B", "B09", "B10", "B08", "B09", "B10", "B12"]
+	var retired_events := ["E03", "E05A", "E05B", "E06", "E07", "E08", "E09", "E10", "E12"]
+	var retired_battles := ["B03", "B05A", "B05B", "B09", "B10", "B08", "B09", "B10", "B12"]
 	for index in retired_events.size():
 		var event_id: String = retired_events[index]
 		var battle_id: String = retired_battles[index]
@@ -66,7 +64,7 @@ func test_retired_checkpoints() -> void:
 			var old := Game.initial_state()
 			old.activeEventId = event_id
 			old.activeNodeId = "lose" if scene == "defeat" else "win_01"
-			old.currentPlaceId = "port"
+			old.currentPlaceId = "hive" if event_id == "E03" else "port"
 			old.currentScene = scene
 			old.battleId = battle_id
 			old.result = "lose" if scene == "defeat" else "win"
@@ -95,7 +93,11 @@ func test_retired_checkpoints() -> void:
 			for key in ["credits", "deck", "currentDay", "currentHp", "claimedRewardIds", "dialogueHistory", "battleHistory"]:
 				check(migrated[key] == frozen[key], "preserves " + key + " " + label)
 			check(not migrated.has("faction") and not migrated.flags.has("week1Complete"), "cleans retired allegiance and finale flag " + label)
-			check(migrated.completedEventIds == ["E02"] and migrated.refreshedEventIds == ["E04", "E11"], "filters retired IDs without completing E01 " + label)
+			check(migrated.completedEventIds == ["E02"], "filters retired completion without completing E01 " + label)
+			if event_id == "E03":
+				check(migrated.refreshedEventIds.size() == 3 and migrated.refreshedEventIds.all(func(id): return id in ["E01", "E04", "E11"]), "retiring Ike refills its removed pool slot " + label)
+			else:
+				check(migrated.refreshedEventIds == ["E04", "E11"], "unrelated retired migration preserves retained pool " + label)
 			check(migrated.choiceHistory == {"E01:contract":"richard"}, "retains only live choices " + label)
 			check(migrated.combat.is_empty() and migrated.battleStart.is_empty() and migrated.battleReward.is_empty(), "closes retired encounter and unchosen offer " + label)
 			check(Game.migrate_save(migrated) == migrated, "migration is idempotent " + label)
@@ -138,11 +140,36 @@ func test_retired_checkpoints() -> void:
 	var pool: Array = Game.state.refreshedEventIds.duplicate()
 	check(Game.save_game() and Game.load_game() and Game.state.refreshedEventIds == pool, "migrated pool persists without reroll")
 
+func test_retired_ike_nodes() -> void:
+	var nodes := ["intro_01", "intro_02", "payment", "paid_01", "paid_02", "paid_03", "refuse_01", "refuse_02", "refuse_03", "win_01", "win_02", "battle", "lose", "surrender", "finish"]
+	for node_id in nodes:
+		var old := Game.initial_state()
+		old.activeEventId = "E03"
+		old.activeNodeId = node_id
+		old.currentPlaceId = "hive"
+		old.currentScene = "battle" if node_id == "battle" else ("result" if node_id == "finish" else "dialogue")
+		old.battleId = "B03" if node_id in ["battle", "win_01", "win_02", "lose", "surrender", "finish"] else ""
+		old.result = "lose" if node_id == "lose" else ""
+		old.credits = 4321
+		old.deck = ["noren_01"]
+		old.claimedRewardIds = ["E03:B03:victory"]
+		old.completedEventIds = ["E01", "E03"]
+		old.choiceHistory = {"E03:payment":"pay"}
+		old.dialogueHistory = [{"eventId":"E03", "title":"旧艾克事件", "speaker":"艾克", "text":"历史对白", "kind":"dialogue"}]
+		var migrated: Dictionary = Game.migrate_save(old)
+		check(Game.valid_save(migrated), "each retired Ike node remains loadable: " + node_id)
+		check(migrated.activeEventId == "E01" and migrated.activeNodeId == "finish" and migrated.currentScene == ("defeat" if node_id == "lose" else "map"), "retired Ike node returns to safe map or terminal defeat: " + node_id)
+		check(migrated.credits == old.credits and migrated.deck == old.deck and migrated.claimedRewardIds == old.claimedRewardIds and migrated.dialogueHistory == old.dialogueHistory, "retiring Ike preserves already awarded assets and history: " + node_id)
+		check(not "E03" in migrated.completedEventIds and not migrated.choiceHistory.has("E03:payment"), "retired Ike IDs cannot count toward new commissions: " + node_id)
+		Game.state = migrated
+		check(Game.save_game() and Game.load_game(), "retired Ike node survives actual isolated save load: " + node_id)
+
 func _ready() -> void:
 	Game.save_enabled = false
 	Game.save_path = "user://removed-events-test-checkpoint.json"
 	Game.meta_path = "user://removed-events-test-meta.json"
 	test_catalog()
 	test_retired_checkpoints()
+	test_retired_ike_nodes()
 	print("REMOVED EVENTS: %d checks, %d failures" % [checks, failures])
 	get_tree().quit(0 if failures == 0 else 1)

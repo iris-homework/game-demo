@@ -96,7 +96,9 @@ func _ready() -> void:
 	check(Game.state != before and Game.state.flags.get("openingSupportChipId") == "money_chip", "Choice click still selects the intended branch")
 	Game.state.completedEventIds = ["E01"]
 	Game.visit("hive")
-	Game.start_event("E03")
+	preload("res://tests/fixtures/payment_choice.gd").install(Game)
+	Game.state.refreshedEventIds = ["QA_PAYMENT"]
+	Game.start_event("QA_PAYMENT")
 	Game.enter_node("payment")
 	await capture("disabled-choice")
 	before = Game.state.duplicate(true)

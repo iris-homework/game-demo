@@ -11,6 +11,7 @@ func capture(label_text: String) -> void:
 	img.save_png(OS.get_temp_dir().path_join("midnight_" + label_text + ".png"))
 
 func _ready() -> void:
+	preload("res://tests/fixtures/payment_choice.gd").install(Game)
 	Game.save_enabled = false
 	app = load("res://scenes/main.tscn").instantiate()
 	add_child(app)
@@ -24,7 +25,8 @@ func _ready() -> void:
 	await capture("map")
 	Game.visit("hive")
 	await capture("place")
-	Game.start_event("E03")
+	Game.state.refreshedEventIds = ["QA_PAYMENT"]
+	Game.start_event("QA_PAYMENT")
 	Game.enter_node("payment")
 	await capture("choice")
 	Game.enter_node("battle")

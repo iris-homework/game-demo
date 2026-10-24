@@ -180,8 +180,62 @@ func _ready() -> void:
 	app.queue_free()
 	await settle()
 	check(not FileAccess.file_exists(Game.save_path) and not FileAccess.file_exists(Game.meta_path), "Browser creates no save or meta files")
+	await test_reward_deck()
 	print("CARD LIBRARY FILTERS: %d checks, %d failures" % [checks, failures.size()])
 	var report := FileAccess.open(output.path_join("result-%s.json" % ("%dx%d" % [get_window().size.x,get_window().size.y] if visual else "headless")), FileAccess.WRITE)
 	report.store_string(JSON.stringify({"checks":checks,"failures":failures,"visual":visual}, "\t"))
 	report.close()
 	get_tree().quit(0 if failures.is_empty() else 1)
+
+# Result wraps reward.gd in a child view; exercise the real nested toolbar.
+func test_reward_deck() -> void:
+	for source in ["battle", "event"]:
+		Game.state = Game.initial_state()
+		Game.state.activeEventId = "E02" if source == "battle" else "E01R"
+		Game.state.battleId = "B02" if source == "battle" else ""
+		Game.state.currentScene = "result"
+		Game.state.result = "win"
+		Game.state.completedEventIds = ["E01", "E02", "E04", "E11"]
+		if source == "battle": Game.state.battleHistory = [{"battleId":"B02", "result":"win"}]
+		Game.prepare_battle_reward()
+		Game.page = "result"
+		check(Game.has_battle_reward(), source + " reward fixture prepared")
+		var app: Control = load("res://scenes/main.tscn").instantiate()
+		add_child(app)
+		await settle()
+		for status in ["pending", "claimed", "skipped"]:
+			if status == "claimed":
+				check(Game.choose_reward_card(Game.state.battleReward.options[0], Game.revision), source + " claims selected card after browsing")
+			elif status == "skipped":
+				Game.state.battleReward.status = "skipped"
+				Game.state.battleReward.selectedCardId = ""
+				Game.changed.emit()
+			await settle()
+			var reward: Control = app.view.reward_view
+			var trigger: Button = reward.get_node("current_deck_button")
+			var before: Dictionary = Game.state.duplicate(true)
+			var revision: int = Game.revision
+			trigger.grab_focus()
+			trigger.pressed.emit()
+			await settle()
+			check(is_instance_valid(app.deck_browser), source + ": " + status + " nested toolbar opens deck")
+			if is_instance_valid(app.deck_browser):
+				check(app.deck_browser.display_counts == Game.owned_card_counts(), "Reward browser shows current owned cards")
+				check(app.view.process_mode == Node.PROCESS_MODE_DISABLED and reward.exit_button.disabled, "Browsing suspends reward controls")
+				await key(KEY_1)
+				if status == "claimed": app.deck_browser.close_button.pressed.emit()
+				else: await key(KEY_ESCAPE)
+				await settle()
+				check(not is_instance_valid(app.deck_browser) and app.view.reward_view == reward, "Close restores same reward view")
+				check(not trigger.disabled and not reward.exit_button.disabled and trigger.has_focus(), "Close restores reward buttons and focus")
+			check(Game.state == before and Game.revision == revision, "Browsing does not mutate rewards or adventure")
+			if status == "pending":
+				reward.open_picker()
+				Game.open_current_deck()
+				check(trigger.disabled and not is_instance_valid(app.deck_browser), "Picker blocks underlying deck entry")
+				reward.close_picker()
+				check(not trigger.disabled and not reward.exit_button.disabled, "Picker close restores toolbar")
+		check(Game.claim_rewards(Game.revision) and Game.page == "map", source + " can leave rewards after browsing")
+		remove_child(app)
+		app.queue_free()
+		await settle()

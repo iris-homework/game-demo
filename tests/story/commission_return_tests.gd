@@ -20,14 +20,11 @@ func fresh() -> void:
 	Game.skip_dialogue(Game.revision)
 	Game.claim_rewards(Game.revision)
 
-func finish_commission(id: String, pay := false) -> void:
+func finish_commission(id: String) -> void:
 	Game.state.refreshedEventIds = [id]
 	Game.refresh_event_pool()
 	check(Game.start_event(id), "start " + id)
 	Game.skip_dialogue(Game.revision)
-	if id == "E03":
-		check(Game.choose(0 if pay else 1, Game.revision), "choose payment route")
-		Game.skip_dialogue(Game.revision)
 	if Game.state.currentScene == "battle":
 		check(Game.battle_exit("win", Game.revision), "finish real battle route " + id)
 		Game.skip_dialogue(Game.revision)
@@ -41,22 +38,22 @@ func texts(node: Node) -> String:
 	return result
 
 func test_unlock() -> void:
-	for omitted in ["E02", "E03", "E04", "E11"]:
+	for last in ["E02", "E04", "E11"]:
 		fresh()
 		check(not Game.start_event("E01R"), "return unavailable before three commissions")
-		var others := ["E02", "E03", "E04", "E11"]
-		others.erase(omitted)
+		var others := ["E02", "E04", "E11"]
+		others.erase(last)
 		Game.state.completedEventIds.append_array(others.slice(0, 2))
 		Game.refresh_event_pool()
 		check(not "E01R" in Game.state.refreshedEventIds, "opening plus two does not count as three")
-		Game.state.completedEventIds.append(others[2])
+		Game.state.completedEventIds.append(last)
 		Game.refresh_event_pool()
-		check("E01R" in Game.state.refreshedEventIds and Game.available_events("bar").size() == 1, "any three unique commissions unlock return")
+		check("E01R" in Game.state.refreshedEventIds and Game.available_events("bar").size() == 1, "all three remaining unique commissions unlock return")
 		check(Game.start_event("E01R"), "return can start")
 	fresh()
 	Game.state.completedEventIds = ["E01", "E02", "E02", "E02"]
 	check(not Game.meets(Game.events.E01R.unlockCondition), "duplicates cannot satisfy count")
-	Game.state.completedEventIds = ["E02", "E03", "E04"]
+	Game.state.completedEventIds = ["E02", "E04", "E11"]
 	check(not Game.meets(Game.events.E01R.unlockCondition), "opening agreement is required")
 	Game.state.completedEventIds.append("E01")
 	Game.state.refreshedEventIds = ["E11"]
@@ -66,10 +63,10 @@ func test_unlock() -> void:
 func test_real_flow() -> void:
 	fresh()
 	finish_commission("E02")
-	finish_commission("E03", true)
+	finish_commission("E04")
 	check(not "E01R" in Game.state.refreshedEventIds, "two actual completions are insufficient")
 	finish_commission("E11")
-	check(Game.state.currentDay == 4 and "E01R" in Game.state.refreshedEventIds, "paid route counts; third completion reveals return")
+	check(Game.state.currentDay == 4 and "E01R" in Game.state.refreshedEventIds, "third remaining commission reveals return")
 	Game.state.currentHp = 42
 	var history: Array = Game.state.battleHistory.duplicate(true)
 	var credits: int = Game.state.credits
@@ -119,14 +116,14 @@ func test_real_flow() -> void:
 	bad.battleReward.erase("battleType")
 	check(not Game.valid_save(bad), "event reward without its configured type is rejected")
 	bad = Game.state.duplicate(true)
-	bad.completedEventIds.erase("E03")
-	check(not Game.valid_save(bad), "return receipt requires actual eligibility")
+	bad.completedEventIds.erase("E01R")
+	check(not Game.valid_save(bad), "return receipt requires its own completion record")
 	check(Game.claim_rewards(Game.revision), "leave return reward")
 	check(not Game.start_event("E01R") and not "E01R" in Game.state.refreshedEventIds, "return cannot be farmed")
 
 func test_skip_card() -> void:
 	fresh()
-	Game.state.completedEventIds.append_array(["E02", "E03", "E04"])
+	Game.state.completedEventIds.append_array(["E02", "E04", "E11"])
 	Game.refresh_event_pool()
 	check(Game.start_event("E01R"), "start skip-card return")
 	Game.skip_dialogue(Game.revision)
@@ -138,11 +135,65 @@ func test_skip_card() -> void:
 	check(Game.save_game() and Game.load_game(), "skipped return roundtrips")
 	check(Game.state.credits == credits and Game.state.deck == cards and not Game.choose_reward_card(options[0], Game.revision), "skipped card cannot be reclaimed after reload")
 
+func test_historical_return_receipts() -> void:
+	for status in ["pending", "claimed", "skipped"]:
+		fresh()
+		Game.state.completedEventIds.append_array(["E02", "E04", "E11"])
+		Game.refresh_event_pool()
+		check(Game.start_event("E01R"), "prepare historical return reward")
+		Game.skip_dialogue(Game.revision)
+		check(Game.choose(0, Game.revision), "generate historical return reward receipt")
+		var card: String = Game.state.battleReward.options[0]
+		if status == "claimed": check(Game.choose_reward_card(card, Game.revision), "historical card already claimed")
+		elif status == "skipped": check(Game.claim_rewards(Game.revision), "historical card already skipped")
+		# This reward was earned when E03 counted. E11 was not completed then.
+		Game.state.completedEventIds = ["E01", "E02", "E03", "E04", "E01R"]
+		var old := Game.state.duplicate(true)
+		var migrated: Dictionary = Game.migrate_save(old)
+		check(Game.valid_save(migrated) and not "E03" in migrated.completedEventIds and not "E11" in migrated.completedEventIds, "historical return stays valid without newly required third commission: " + status)
+		check(migrated.credits == old.credits and migrated.deck == old.deck and migrated.battleReward == old.battleReward and migrated.claimedRewardIds == old.claimedRewardIds, "historical return assets, receipt and options remain exact: " + status)
+		var file := FileAccess.open(Game.save_path, FileAccess.WRITE)
+		file.store_string(JSON.stringify(old)); file.close()
+		check(Game.load_game() and Game.state.battleReward.status == status, "historical return loads from old disk checkpoint: " + status)
+		var credits: int = Game.state.credits
+		var cards: Array = Game.state.deck.duplicate()
+		var options: Array = Game.state.battleReward.options.duplicate()
+		Game.prepare_battle_reward()
+		check(Game.state.credits == credits and Game.state.deck == cards and Game.state.battleReward.options == options, "historical receipt prevents new credits or option reroll: " + status)
+		if status == "pending":
+			check(Game.choose_reward_card(card, Game.revision), "historical pending card remains claimable once")
+			check(not Game.choose_reward_card(card, Game.revision), "historical pending card cannot be claimed twice")
+		else:
+			check(not Game.choose_reward_card(card, Game.revision) and Game.state.deck == cards, "historical finished card cannot be reclaimed: " + status)
+		check(not Game.start_event("E01R"), "historical completed return cannot restart")
+
+func test_uncollected_old_return_dialogue() -> void:
+	for node_id in ["return_01", "return_02", "collect"]:
+		fresh()
+		Game.state.completedEventIds = ["E01", "E02", "E03", "E04"]
+		Game.state.activeEventId = "E01R"
+		Game.state.activeNodeId = node_id
+		Game.state.currentPlaceId = "bar"
+		Game.state.currentScene = "dialogue"
+		Game.state.currentDay = 4
+		var old := Game.state.duplicate(true)
+		var migrated: Dictionary = Game.migrate_save(old)
+		check(Game.valid_save(migrated) and migrated.activeEventId == "E01" and migrated.activeNodeId == "finish" and migrated.currentScene == "map" and migrated.currentPlaceId == "bar", "uncollected old return returns safely to map: " + node_id)
+		for field in ["credits", "deck", "currentDay", "dialogueHistory", "ownedCyberwareIds", "equippedCyberwareIds"]:
+			check(migrated[field] == old[field], "uncollected return migration preserves " + field + ": " + node_id)
+		check(not "E01R" in migrated.completedEventIds and not "E01R:commission" in migrated.claimedRewardIds and migrated.battleReward.is_empty(), "uncollected return grants no premature reward: " + node_id)
+		check("E11" in migrated.refreshedEventIds and not "E01R" in migrated.refreshedEventIds, "remaining pump commission is available before return can unlock: " + node_id)
+		var file := FileAccess.open(Game.save_path, FileAccess.WRITE)
+		file.store_string(JSON.stringify(old)); file.close()
+		check(Game.load_game() and Game.page == "map" and Game.start_event("E11"), "old return disk load allows continuing the remaining commission: " + node_id)
+
 func _ready() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output))
 	save_file = output.path_join("checkpoint.json")
 	test_unlock()
 	test_real_flow()
 	test_skip_card()
+	test_historical_return_receipts()
+	test_uncollected_old_return_dialogue()
 	print("COMMISSION RETURN: %d checks, %d failures" % [checks, failures])
 	get_tree().quit(0 if failures == 0 else 1)

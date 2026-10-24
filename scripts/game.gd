@@ -879,7 +879,7 @@ func load_game() -> bool:
 		revision += 1
 		changed.emit()
 		if path.ends_with(".bak"): notice.emit("已从备用检查点恢复进度。")
-		if parser.data.get("activeEventId", "") in ["E05A", "E05B", "E06", "E07", "E08", "E09", "E10", "E12"]:
+		if parser.data.get("activeEventId", "") in ["E03", "E05A", "E05B", "E06", "E07", "E08", "E09", "E10", "E12"]:
 			notice.emit("旧事件已移除。非战败进度已返回地图；已有信用点、卡牌和日期保留，未选奖励不再领取。")
 		return true
 	last_error = "存档格式不兼容或已损坏，无法继续；可以开始新游戏。"
@@ -1194,7 +1194,10 @@ func migrate_save(data):
 		data.inventory = {}
 	if not data.has("removedStartingCards"): data.removedStartingCards = []
 	black_market_model.refresh(data, card_catalog, black_market_rules)
+	var retired_ike: bool = data.get("activeEventId") == "E03" or data.get("battleId") == "B03" or (data.get("refreshedEventIds") is Array and "E03" in data.refreshedEventIds)
 	migrate_mercenary_story(data)
+	if retired_ike and data.get("refreshedEventIds") is Array and data.get("completedEventIds") is Array and data.get("flags") is Dictionary:
+		refresh_event_pool(data)
 	# Keep an existing draw across reloads; legacy saves get a pool without
 	# retroactively charging days for events they completed before this rule.
 	if not data.has("refreshedEventIds"):
@@ -1218,8 +1221,8 @@ func migrate_save(data):
 func migrate_mercenary_story(data: Dictionary) -> void:
 	# Retire removed content without replaying completion, rewards or day costs.
 	data.erase("faction")
-	var retired_events := ["E05A", "E05B", "E06", "E07", "E08", "E09", "E10", "E12"]
-	var retired_battles := ["B05A", "B05B", "B08", "B09", "B10", "B12"]
+	var retired_events := ["E03", "E05A", "E05B", "E06", "E07", "E08", "E09", "E10", "E12"]
+	var retired_battles := ["B03", "B05A", "B05B", "B08", "B09", "B10", "B12"]
 	var retired_characters := ["reception", "rift", "victor", "fitz", "company_robot", "ally_robot", "wolves"]
 	var active = data.get("activeEventId", "")
 	var retired_context: bool = active in retired_events or data.get("battleId", "") in retired_battles
@@ -1255,6 +1258,16 @@ func migrate_mercenary_story(data: Dictionary) -> void:
 	if data.get("portraits") is Dictionary:
 		for side in ["left", "right"]:
 			if data.portraits.get(side, "") in retired_characters: data.portraits[side] = ""
+	# A return visit entered under the old catalog may no longer be eligible.
+	# Keep earned rewards, but let an unclaimed conversation resume exploration.
+	if data.get("activeEventId") == "E01R" and data.get("currentScene") == "dialogue" and data.get("completedEventIds") is Array and data.get("flags") is Dictionary:
+		if not "E01R" in data.completedEventIds and events.has("E01R") and not meets(events.E01R.unlockCondition, data):
+			data.currentScene = "map"
+			data.activeEventId = "E01"
+			data.activeNodeId = "finish"
+			data.currentPlaceId = "bar"
+			data.portraits = {"left":PLAYER_REFERENCE, "right":""}
+			if data.get("refreshedEventIds") is Array: refresh_event_pool(data)
 
 func valid_battle_start(s: Dictionary) -> bool:
 	var opening = s.get("battleStart", {})
@@ -1289,7 +1302,9 @@ func valid_battle_reward(s: Dictionary) -> bool:
 		var event: Dictionary = events.get(r.eventId, {})
 		if not event.has("rewardBattleType") or not r.battleId.is_empty(): return false
 		if r.get("battleType") != event.rewardBattleType or r.claimId != r.eventId + ":commission": return false
-		if not r.eventId in s.completedEventIds or not meets(event.unlockCondition, s): return false
+		# A completed reward is a historical receipt. Retiring one prerequisite
+		# must not invalidate a reward already earned under the old event catalog.
+		if not r.eventId in s.completedEventIds: return false
 	elif r.get("source", "battle") == "battle":
 		if not battles.has(r.battleId) or battles[r.battleId].eventId != r.eventId: return false
 		if r.claimId != r.eventId + ":" + r.battleId + ":victory": return false

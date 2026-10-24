@@ -54,6 +54,7 @@ func stage() -> void:
 	Game.state = Game.initial_state()
 	Game.state.currentScene = "map"
 	Game.state.completedEventIds = ["E01"]
+	Game.state.refreshedEventIds = ["QA_PAYMENT", "E02", "E04"]
 	Game.state.targetId = "richard"
 	Game.state.credits = 300
 	Game.page = "map"
@@ -157,6 +158,7 @@ func header_labels_inside(card: Control) -> bool:
 	return true
 
 func _ready() -> void:
+	preload("res://tests/fixtures/payment_choice.gd").install(Game)
 	var args := OS.get_cmdline_user_args()
 	for i in args.size():
 		if args[i] == "--output-dir" and i + 1 < args.size(): output_dir = args[i + 1]
@@ -187,20 +189,20 @@ func _ready() -> void:
 		app.view.select_place("hive")
 		await settle()
 		check(card_inside(app.view.detail) and header_labels_inside(app.view.detail), "captured fixed header stays inside card")
-		check(app.view.detail.get_node("detail_scroll").get_global_rect().grow(1.0).encloses(map_button("event_E03").get_global_rect()), "captured single-task action is fully visible without scrolling")
+		check(app.view.detail.get_node("detail_scroll").get_global_rect().grow(1.0).encloses(map_button("event_QA_PAYMENT").get_global_rect()), "captured single-task action is fully visible without scrolling")
 		await shot("02-task-detail")
 		app.view.close_detail()
 		Game.state.currentPlaceId = "hive"
 		Game.changed.emit()
 		await settle()
 		await shot("03-current-target")
-		Game.state.completedEventIds = ["E01", "E03", "E04", "E05A"]
+		Game.state.completedEventIds = ["E01", "QA_PAYMENT", "E04", "E05A"]
 		Game.state.flags = {"alleyClue":true, "portClue":true}
 		Game.changed.emit()
 		await settle()
 		await shot("04-richard-contract")
 		Game.state.targetId = "lumina"
-		Game.state.completedEventIds = ["E01", "E03", "E04", "E05B"]
+		Game.state.completedEventIds = ["E01", "QA_PAYMENT", "E04", "E05B"]
 		Game.changed.emit()
 		await settle()
 		await shot("05-lumina-contract")
@@ -255,7 +257,7 @@ func _ready() -> void:
 	if is_instance_valid(app.view.detail):
 		check(card_inside(app.view.detail), "task detail stays inside map window")
 		check(header_labels_inside(app.view.detail), "fixed card title and status text stay inside card")
-		check(app.view.detail.get_node("detail_scroll").get_global_rect().grow(1.0).encloses(map_button("event_E03").get_global_rect()), "single-task action is fully visible without scrolling")
+		check(app.view.detail.get_node("detail_scroll").get_global_rect().grow(1.0).encloses(map_button("event_QA_PAYMENT").get_global_rect()), "single-task action is fully visible without scrolling")
 		var card_pos: Vector2 = app.view.detail.position
 		await motion(app.view.detail.get_global_rect().get_center())
 		await settle(1.0)
@@ -328,15 +330,15 @@ func _ready() -> void:
 	check(app.view.selected_id == "clinic", "clinic heal rebuild preserves fixed card")
 	await stage()
 	await click(app.view.get_marker_center("hive"))
-	var event_action := map_button("event_E03")
-	check(event_action != null, "authored task action exists")
+	var event_action := map_button("event_QA_PAYMENT")
+	check(event_action != null, "isolated payment fixture task action exists")
 	if event_action != null:
 		Game.battle_busy = true
 		await click(button_center(event_action))
 		check(Game.page == "map" and Game.state.activeEventId == "E01", "busy lock rejects map task action")
 		Game.battle_busy = false
 		await click(button_center(event_action))
-		check(Game.page == "dialogue" and Game.state.activeEventId == "E03" and Game.state.currentPlaceId == "hive", "explicit event action starts correct event and updates current place")
+		check(Game.page == "dialogue" and Game.state.activeEventId == "QA_PAYMENT" and Game.state.currentPlaceId == "hive", "explicit event action starts correct event and updates current place")
 	await stage()
 	Game.state.currentPlaceId = "hive"
 	Game.changed.emit()
@@ -400,9 +402,9 @@ func _ready() -> void:
 	Game.events.erase(locked_fixture.id)
 	await stage()
 	await click(app.view.get_marker_center("hive"))
-	await click(button_center(map_button("event_E03")))
+	await click(button_center(map_button("event_QA_PAYMENT")))
 	await play_dialogue()
-	check(Game.page == "result" and "E03" in Game.state.completedEventIds, "real task and dialogue clicks complete E03")
+	check(Game.page == "result" and "QA_PAYMENT" in Game.state.completedEventIds, "real task and dialogue clicks complete QA_PAYMENT")
 	if Game.page == "result":
 		await click(button_center(text_button("返回城市地图")))
 	check(Game.page == "map" and Game.map_place_state("alley").target and not Game.map_place_state("hive").target, "result button rebuilds correct next target")
@@ -413,7 +415,7 @@ func _ready() -> void:
 	for outcome in ["lose"]:
 		await stage()
 		await click(app.view.get_marker_center("hive"))
-		await click(button_center(map_button("event_E03")))
+		await click(button_center(map_button("event_QA_PAYMENT")))
 		await play_dialogue(1)
 		await wait_unlocked()
 		check(Game.page == "battle", "real dialogue reaches battle for " + outcome)
@@ -421,14 +423,14 @@ func _ready() -> void:
 		check(Game.battle_exit(outcome, Game.revision), "battle outcome submitted " + outcome)
 		await wait_unlocked()
 		await play_dialogue()
-		check(Game.page == "map" and Game.map_place_state("hive").target and not "E03" in Game.state.completedEventIds, "real return choice preserves unfinished target " + outcome)
+		check(Game.page == "map" and Game.map_place_state("hive").target and not "QA_PAYMENT" in Game.state.completedEventIds, "real return choice preserves unfinished target " + outcome)
 		check(Game.save_game() and Game.load_game(), "battle-return checkpoint round-trip " + outcome)
 		await settle()
 		check(Game.page == "map" and Game.map_place_state("hive").target, "battle-return reload keeps target " + outcome)
 		await shot("14-return-" + outcome)
 	await stage()
 	Game.state.flags.week1Complete = true
-	Game.state.completedEventIds = ["E01", "E03", "E04", "E05A", "E12"]
+	Game.state.completedEventIds = ["E01", "QA_PAYMENT", "E04", "E05A", "E12"]
 	Game.changed.emit()
 	await settle()
 	check(Game.map_target_events().is_empty(), "completed week has no false target")

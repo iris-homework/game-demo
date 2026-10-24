@@ -15,7 +15,7 @@ func _ready() -> void:
 	Game.meta_path = "user://qa-map-event-types/meta.json"
 	Game.state = Game.initial_state()
 	Game.state.currentScene = "map"
-	Game.state.completedEventIds = ["E01", "E04", "E11"]
+	Game.state.completedEventIds = ["E01", "E11"]
 	Game.state.currentPlaceId = "junkyard"
 	Game.refresh_event_pool()
 	Game.page = "map"
@@ -45,8 +45,8 @@ func _ready() -> void:
 		marker.free()
 	check(MidnightMapBadge.STATUS_ICONS.normal == MidnightMapBadge.STATUS_ICONS.elite, "normal and elite share exclamation")
 	check(MidnightMapBadge.STATUS_ICONS.boss != MidnightMapBadge.STATUS_ICONS.normal, "boss has separate skull")
-	Game.battles.B03.battleType = "elite"
-	var main: Dictionary = view._make_spec(Game.place_data("hive"), null)
+	Game.battles.B04.battleType = "elite"
+	var main: Dictionary = view._make_spec(Game.place_data("alley"), null)
 	check(main.target and main.badges[0].kind == "elite" and main.accent == view.EVENT_COLORS.elite, "event target uses elite red")
 	Game.events["QA_MAP_NORMAL"] = {"id": "QA_MAP_NORMAL", "placeId": "junkyard", "unlockCondition": {}}
 	Game.events["QA_MAP_ELITE"] = {"id": "QA_MAP_ELITE", "placeId": "junkyard", "unlockCondition": {}}
@@ -70,8 +70,8 @@ func _ready() -> void:
 	count_badge.setup("normal", 2, view.EVENT_COLORS.normal, null)
 	check(count_badge.badge_size().x > 28 and count_badge.badge_size().y == 28, "count sits beside fixed circle")
 	count_badge.free()
-	Game.battles["QA_MAP_BRANCH"] = {"id": "QA_MAP_BRANCH", "eventId": "E03", "battleType": "boss"}
-	check(Game.map_event_type("E03") == "boss", "highest branch battle wins")
+	Game.battles["QA_MAP_BRANCH"] = {"id": "QA_MAP_BRANCH", "eventId": "E04", "battleType": "boss"}
+	check(Game.map_event_type("E04") == "boss", "highest branch battle wins")
 	Game.battles.B02.battleType = "invalid"
 	check(Game.map_event_type("E02") == "normal", "invalid type uses existing normal fallback")
 	Game.battles.B02.erase("battleType")

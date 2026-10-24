@@ -75,7 +75,7 @@ func assert_ended(label: String) -> void:
 	check(Game.is_run_over() and not Game.can_continue(), label + ": run over and continue unavailable")
 
 func test_all_battles() -> void:
-	check(Game.battles.size() == 4, "Fixture covers the four currently authored battles")
+	check(Game.battles.size() == 3, "Fixture covers the three currently authored battles")
 	for battle_id in Game.battles:
 		var label := "loss-" + str(battle_id)
 		var model := begin_battle(label, battle_id)
@@ -130,7 +130,7 @@ func assert_navigation_blocked(subject: Dictionary, label: String) -> void:
 	check(same(Game.state, before) and Game.revision == revision, label + ": go_map cannot revive run")
 	Game.visit("bar")
 	check(same(Game.state, before) and Game.revision == revision, label + ": visit cannot bypass terminal state")
-	var candidate := "E02" if not "E02" in before.completedEventIds else "E03"
+	var candidate := "E02" if not "E02" in before.completedEventIds else "E04"
 	check(not Game.start_event(candidate) and same(Game.state, before), label + ": start_event rejects terminal run")
 	for node_id in ["@map", "intro_01", "lose", "battle", "finish"]:
 		Game.enter_node(node_id)

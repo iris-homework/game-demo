@@ -65,7 +65,9 @@ func _ready() -> void:
 	Game.skip_dialogue(Game.revision)
 	check(Game.state.currentScene == "result" and "E01" in Game.state.completedEventIds, "Selected branch finishes normally")
 	Game.claim_rewards(Game.revision)
-	Game.start_event("E03")
+	preload("res://tests/fixtures/payment_choice.gd").install(Game)
+	Game.state.refreshedEventIds = ["QA_PAYMENT"]
+	Game.start_event("QA_PAYMENT")
 	Game.skip_dialogue(Game.revision)
 	check(Game.state.activeNodeId == "payment" and Game.state.credits == int(Game.config.initialCredits), "Payment choice preserved")
 	check(not Game.choose(0, Game.revision), "Insufficient funds still reject payment")

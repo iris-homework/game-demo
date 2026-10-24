@@ -163,8 +163,8 @@ func test_victory() -> void:
 		Game.state.currentScene = "battle"
 		Game.page = "battle"
 		check(Game.battle_exit("win",Game.revision) and Game.state.credits == after and Game.state.currentHp == hp+heal, "independent claim prevents regrant even if victory route is replayed")
-		Game.state.activeEventId = "E03"
-		Game.state.currentPlaceId = "hive"
+		Game.state.activeEventId = "E04"
+		Game.state.currentPlaceId = "alley"
 		Game.enter_node("battle")
 		check(Game.battle_passive_summary() == {"credits":0,"healing":0}, "new battle clears previous chip summary")
 	reset([])
@@ -244,10 +244,10 @@ func test_record_validation() -> void:
 			invalid.battlePassiveReward[key] = bad
 			check(not Game.valid_save(invalid), "invalid receipt amount rejected")
 	Game.state = saved.duplicate(true)
-	Game.state.refreshedEventIds = ["E03"]
+	Game.state.refreshedEventIds = ["E04"]
 	Game.state.currentScene = "map"
 	Game.page = "map"
-	check(Game.start_event("E03") and Game.state.battlePassiveReward.is_empty() and Game.battle_passive_summary() == {"credits":0,"healing":0} and Game.valid_save(Game.state), "starting another event clears old receipt and remains a valid save")
+	check(Game.start_event("E04") and Game.state.battlePassiveReward.is_empty() and Game.battle_passive_summary() == {"credits":0,"healing":0} and Game.valid_save(Game.state), "starting another event clears old receipt and remains a valid save")
 	var legacy := saved.duplicate(true)
 	legacy.erase("battlePassiveReward")
 	check(Game.valid_save(Game.migrate_save(legacy)), "missing receipt field migrates without retroactive reward")

@@ -51,7 +51,7 @@ func start_contract() -> void:
 	step_to_stop()
 	check("E01" in Game.state.completedEventIds and Game.state.currentDay == 1, "E01 first completion keeps day one")
 	Game.claim_rewards(Game.revision)
-	Game.state.refreshedEventIds = ["E02", "E03"]
+	Game.state.refreshedEventIds = ["E02", "E04"]
 	Game.refresh_event_pool()
 
 func test_opening_date() -> void:
@@ -163,16 +163,19 @@ func test_days_and_failures() -> void:
 	check(Game.state.currentDay == before, "duplicate completion does not spend another day")
 	check(not Game.apply_actions([{"op":"completeEvent", "id":"E02"}, {"op":"spendCredits", "amount":999999}]), "rejected completion batch stays atomic")
 	check(Game.state.currentDay == before and not "E02" in Game.state.completedEventIds, "rejected batch consumes no date or completion")
-	check(Game.start_event("E03"), "E03 available after E01")
+	preload("res://tests/fixtures/payment_choice.gd").install(Game)
+	Game.state.refreshedEventIds = ["QA_PAYMENT"]
+	check(Game.start_event("QA_PAYMENT"), "payment fixture available after E01")
 	step_to_stop()
 	var rev := Game.revision
 	check(not Game.choose(0, rev) and Game.state.currentDay == before, "failed payment spends no time")
 	Game.state.credits = 300
-	check(Game.choose(0, rev), "paid E03 route commits")
+	check(Game.choose(0, rev), "paid fixture route commits")
 	step_to_stop()
-	check(Game.state.currentDay == before + 1 and "E03" in Game.state.completedEventIds, "paid E03 completion spends one day")
+	check(Game.state.currentDay == before + 1 and "QA_PAYMENT" in Game.state.completedEventIds, "paid fixture completion spends one day")
 	Game.claim_rewards(Game.revision)
 	check(Game.state.currentDay == before + 1, "noncombat reward exit does not add date")
+	preload("res://tests/fixtures/payment_choice.gd").uninstall(Game)
 	start_contract()
 	before = int(Game.state.currentDay)
 	check(Game.start_event("E02"), "start real battle event")
@@ -220,7 +223,7 @@ func test_days_and_failures() -> void:
 
 func test_save() -> void:
 	reset_authored()
-	check(Game.eligible_events().size() == 5 and Game.state.refreshedEventIds.size() == 3, "new adventure has five ungated candidates and three refreshed events")
+	check(Game.eligible_events().size() == 4 and Game.state.refreshedEventIds.size() == 3, "new adventure has four ungated candidates and three refreshed events")
 	for event in Game.events.values():
 		check(not event.has("optional") and event.get("refreshTimeRange") == {"startDay":null,"endDay":null}, "authored event uses anytime range and no category " + event.id)
 	Game.state.currentDay = 7
@@ -228,7 +231,7 @@ func test_save() -> void:
 	Game.state.targetId = "richard"
 	Game.state.currentScene = "map"
 	Game.refresh_event_pool()
-	for bad_pool in ["E03", ["E03", "E03"], ["E01", "E02", "E03", "E04"], ["UNKNOWN_REFRESH_ID"]]:
+	for bad_pool in ["E04", ["E04", "E04"], ["E01", "E02", "E04", "E11"], ["UNKNOWN_REFRESH_ID"]]:
 		var invalid := Game.state.duplicate(true)
 		invalid.refreshedEventIds = bad_pool
 		check(not Game.valid_save(invalid), "invalid persisted pool rejected " + str(bad_pool))
@@ -242,10 +245,10 @@ func test_save() -> void:
 	legacy.currentDay = 4
 	var migrated = Game.migrate_save(legacy)
 	check(Game.valid_save(migrated) and migrated.currentDay == 4, "old schema two fills fields without replaying completed event dates")
-	check(migrated.refreshedEventIds.size() == 3 and migrated.refreshedEventIds.all(func(id): return id in ["E03", "E04", "E11"]) and not legacy.has("refreshedEventIds"), "legacy pool initialized without modifying source")
+	check(migrated.refreshedEventIds.size() == 2 and migrated.refreshedEventIds.all(func(id): return id in ["E04", "E11"]) and not legacy.has("refreshedEventIds"), "legacy pool initialized without modifying source")
 	var file := FileAccess.open(Game.save_path, FileAccess.WRITE)
 	file.store_string(JSON.stringify(legacy)); file.close()
-	check(Game.load_game() and Game.state.currentDay == 4 and Game.state.refreshedEventIds.size() == 3 and Game.state.refreshedEventIds.all(func(id): return id in ["E03", "E04", "E11"]), "old schema two migrates on actual load")
+	check(Game.load_game() and Game.state.currentDay == 4 and Game.state.refreshedEventIds.size() == 2 and Game.state.refreshedEventIds.all(func(id): return id in ["E04", "E11"]), "old schema two migrates on actual load")
 
 func test_ui() -> void:
 	start_contract()

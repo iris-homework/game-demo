@@ -328,7 +328,8 @@ func open_current_deck() -> void:
 	if Game.state.is_empty() or Game.battle_busy or Game.transition_locked: return
 	if is_instance_valid(technology_browser) or is_instance_valid(deck_browser) or is_instance_valid(card_console) or is_instance_valid(debug_panel): return
 	if "pile_overlay" in view and is_instance_valid(view.pile_overlay): return
-	var trigger := view.get_node_or_null("current_deck_button") as Button
+	# Result pages nest their toolbar inside reward_view, created at runtime.
+	var trigger := view.find_child("current_deck_button", true, false) as Button
 	if trigger == null or trigger.disabled: return
 	if view.has_method("cancel_selection"): view.cancel_selection()
 	deck_previous_focus = get_viewport().gui_get_focus_owner()

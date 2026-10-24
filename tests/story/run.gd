@@ -44,7 +44,7 @@ func _ready() -> void:
 	Game.meta_path = "user://automated_test_meta.json"
 	# Validate authored references, including legacy saved result nodes.
 	check(Game.places.size() == 17, "17 places including church")
-	check(Game.events.size() == 6 and Game.events.has("E01R"), "opening, four commissions, and gated return reward event")
+	check(Game.events.size() == 5 and Game.events.has("E01R"), "opening, three commissions, and gated return reward event")
 	for e in Game.events.values():
 		check(not Game.place_data(e.placeId).is_empty(), e.id + " place exists")
 		for n in e.nodes.values():
@@ -56,10 +56,11 @@ func _ready() -> void:
 		for result in ["win", "lose", "surrender"]:
 			check(Game.events[b.eventId].nodes.has(b.returnNodeByResult[result]), b.id + " return " + result)
 	# Payment rejection is atomic; payment is committed once even under duplicate click.
+	preload("res://tests/fixtures/payment_choice.gd").install(Game)
 	start_contract(0)
 	check(Game.events.E04.unlockCondition.is_empty(), "E04 no longer requires a clue")
-	offer_event("E03")
-	Game.start_event("E03")
+	offer_event("QA_PAYMENT")
+	Game.start_event("QA_PAYMENT")
 	step_to_stop()
 	var rev := Game.revision
 	var credits_before := int(Game.state.credits)
@@ -70,20 +71,18 @@ func _ready() -> void:
 	check(not Game.choose(0, rev), "Double click rejected")
 	check(Game.state.credits == 0 and not Game.state.flags.has("alleyClue"), "Payment applied once without a retired clue")
 	step_to_stop()
-	check("E03" in Game.state.completedEventIds, "Payment finishes E03")
+	check("QA_PAYMENT" in Game.state.completedEventIds, "Payment finishes QA_PAYMENT")
+	preload("res://tests/fixtures/payment_choice.gd").uninstall(Game)
 	# All three support choices allow completing every independent commission.
 	for support in [0,1,2]:
 		start_contract(support)
-		offer_event("E03")
-		Game.start_event("E03"); step_to_stop(); Game.choose(1,Game.revision); step_to_stop()
-		Game.battle_exit("win",Game.revision); step_to_stop(); Game.claim_rewards(Game.revision)
 		complete_event("E02")
 		complete_event("E04")
 		check(not Game.state.has("faction"), "No allegiance after contract completion")
-		for removed in ["E05A", "E05B", "E06", "E07", "E08", "E09", "E10", "E12"]:
+		for removed in ["E03", "E05A", "E05B", "E06", "E07", "E08", "E09", "E10", "E12"]:
 			check(not Game.start_event(removed), "Removed event cannot start " + removed)
 		complete_event("E11")
-		check(Game.state.completedEventIds.size() == 5 and Game.state.currentDay == 5, "All five events complete exactly once; only four regular events spend a day")
+		check(Game.state.completedEventIds.size() == 4 and Game.state.currentDay == 4, "Opening and three commissions complete exactly once; only three commissions spend a day")
 		check(Game.state.currentWeek == 1, "No empty future week")
 		check(not Game.start_event("E11"), "Completed event cannot repeat")
 	# Disk roundtrip preserves victory story or the terminal defeat page.

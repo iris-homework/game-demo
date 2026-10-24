@@ -21,28 +21,6 @@
       "robot"
     ]
   },
-  "B03": {
-    "id": "B03",
-    "eventId": "E03",
-    "name": "蜂巢城寨的艾克",
-    "battleType": "normal",
-    "participants": [
-      "@player",
-      "ike"
-    ],
-    "returnNodeByResult": {
-      "win": "win_01",
-      "lose": "lose",
-      "surrender": "surrender"
-    },
-    "rules": null,
-    "enemyStats": null,
-    "placeId": "hive",
-    "prototypeProfileId": "attack_flow_v1",
-    "enemyIds": [
-      "ike"
-    ]
-  },
   "B04": {
     "id": "B04",
     "eventId": "E04",
