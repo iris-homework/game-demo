@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://carapar16kq7n"
+path="res://.godot/imported/paper-turnpage1.wav-64fd7a2a2edccdfa4a46a23554ab0a95.sample"
+
+[deps]
+
+source_file="res://assets/audio/reference/Paper, Please/paper-turnpage1.wav"
+dest_files=["res://.godot/imported/paper-turnpage1.wav-64fd7a2a2edccdfa4a46a23554ab0a95.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

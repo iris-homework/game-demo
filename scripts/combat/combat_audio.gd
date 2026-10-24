@@ -9,9 +9,10 @@ const CLIPS := {
 }
 # Leave headroom for repeated attacks overlapping their longer sampled tails.
 const LEVELS := {"slash": -12.0, "shoot": -13.0, "snap": -10.0}
+var muted_cues: Array[String] = []
 
 func play_cue(cue: String) -> void:
-	if not CLIPS.has(cue): return
+	if not CLIPS.has(cue) or cue in muted_cues: return
 	var voice := AudioStreamPlayer.new()
 	voice.stream = CLIPS[cue]
 	voice.volume_db = LEVELS[cue]

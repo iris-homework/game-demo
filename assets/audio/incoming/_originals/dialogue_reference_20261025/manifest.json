@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-25",
+  "entries": [
+    {
+      "source": "assets/audio/reference/cozy-story-sfx/sfx/text-soft.wav",
+      "target": "assets/audio/incoming/dialogue/dialogue_blip_cozy_soft_01.wav",
+      "sha256": "95082b77addb696fba5a37a2002117015cbaff092047a8ea937c410ffb56cc05",
+      "role": "default",
+      "processing": "unchanged",
+      "status": "workbench_only_pending_user_audition",
+      "license": "assets/audio/reference/cozy-story-sfx/LICENSE.txt"
+    },
+    {
+      "source": "assets/audio/reference/cozy-story-sfx/sfx/text-low.wav",
+      "target": "assets/audio/incoming/dialogue/dialogue_blip_cozy_low_01.wav",
+      "sha256": "f744370ed4dba7c076515edd40a77b2c24753619d8e8cf9a7fd3ee0176406370",
+      "role": "alternative",
+      "processing": "unchanged",
+      "status": "workbench_only_pending_user_audition",
+      "license": "assets/audio/reference/cozy-story-sfx/LICENSE.txt"
+    },
+    {
+      "source": "assets/audio/reference/cozy-story-sfx/sfx/text-high.wav",
+      "target": "assets/audio/incoming/dialogue/dialogue_blip_cozy_high_01.wav",
+      "sha256": "e4689bf8b90c336694dcd7bcdca07ac5e9886bb6bc9ae86f6f6248e7bd9264d4",
+      "role": "alternative",
+      "processing": "unchanged",
+      "status": "workbench_only_pending_user_audition",
+      "license": "assets/audio/reference/cozy-story-sfx/LICENSE.txt"
+    },
+    {
+      "source": "assets/audio/reference/cozy-story-sfx/sfx/text-wood.wav",
+      "target": "assets/audio/incoming/dialogue/dialogue_blip_cozy_wood_01.wav",
+      "sha256": "36713467cfdd6b6c3a98392711204b1211e81691863489f28049f966d881c57b",
+      "role": "alternative",
+      "processing": "unchanged",
+      "status": "workbench_only_pending_user_audition",
+      "license": "assets/audio/reference/cozy-story-sfx/LICENSE.txt"
+    },
+    {
+      "source": "assets/audio/reference/Omori/SYS_text.ogg",
+      "target": "assets/audio/incoming/dialogue/dialogue_blip_omori_sys_01.ogg",
+      "sha256": "e90a81a98a5c8b28844445af29c1e0f45bd90f7269e2d59254837678347a38ef",
+      "role": "alternative",
+      "processing": "unchanged",
+      "status": "workbench_only_pending_user_audition",
+      "license": "not_included_in_local_pack"
+    },
+    {
+      "source": "assets/audio/reference/Phoenix Wright_ce Attorney/sfx-blipmale.wav",
+      "target": "assets/audio/incoming/dialogue/dialogue_blip_ace_attorney_male_01.wav",
+      "sha256": "746336adb77a88ca3c7b6b3a1e18ea6c685a52719a192b66ac64cbcd70cf547a",
+      "role": "alternative",
+      "processing": "unchanged",
+      "status": "workbench_only_pending_user_audition",
+      "license": "not_included_in_local_pack"
+    },
+    {
+      "source": "assets/audio/reference/Phoenix Wright_ce Attorney/sfx-blipfemale.wav",
+      "target": "assets/audio/incoming/dialogue/dialogue_blip_ace_attorney_female_01.wav",
+      "sha256": "d25cc20af069ca23f0da421c4e37d666c0ecdac261d3ace85719a00c2577a0b1",
+      "role": "alternative",
+      "processing": "unchanged",
+      "status": "workbench_only_pending_user_audition",
+      "license": "not_included_in_local_pack"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://5ae83vf36cde"
+path="res://.godot/imported/inspect-diagramon.wav-12baeb5b18d3eb5534c2b57761d06fd0.sample"
+
+[deps]
+
+source_file="res://assets/audio/reference/Paper, Please/inspect-diagramon.wav"
+dest_files=["res://.godot/imported/inspect-diagramon.wav-12baeb5b18d3eb5534c2b57761d06fd0.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

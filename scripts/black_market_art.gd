@@ -24,7 +24,7 @@ func _ready() -> void:
 	var foreground := Polygon2D.new()
 	foreground.name = "black_market_counter"
 	foreground.texture = backdrop
-	foreground.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	foreground.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	var vertices := PackedVector2Array()
 	var coordinates := PackedVector2Array()
 	for point in COUNTER_EDGE:
@@ -43,7 +43,7 @@ func add_picture(node_name: String, texture: Texture2D, area: Rect2) -> TextureR
 	picture.texture = texture
 	picture.position = area.position
 	picture.size = area.size
-	picture.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	picture.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(picture)
 	return picture

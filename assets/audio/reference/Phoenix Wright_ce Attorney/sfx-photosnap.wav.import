@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://l4gqr58r5jk2"
+path="res://.godot/imported/sfx-photosnap.wav-b69da3ac4d1d59ee2adcfb3f6b375ca3.sample"
+
+[deps]
+
+source_file="res://assets/audio/reference/Phoenix Wright_ce Attorney/sfx-photosnap.wav"
+dest_files=["res://.godot/imported/sfx-photosnap.wav-b69da3ac4d1d59ee2adcfb3f6b375ca3.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

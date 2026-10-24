@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://crxh2a86heg5r"
+path="res://.godot/imported/smack.ogg-2d9d600891fa3436e587380123dc5cca.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/audio/reference/Doki Doki Literature Club/SFX/smack.ogg"
+dest_files=["res://.godot/imported/smack.ogg-2d9d600891fa3436e587380123dc5cca.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

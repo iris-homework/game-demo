@@ -1,0 +1,61 @@
+午夜委托音效候选登记
+
+使用说明：
+1. 按用途将候选副本放到本目录的分类文件夹。
+2. 下载原件、压缩包及许可放在 _originals/，保留原始名称。
+3. 每个候选复制下方一组字段；同一素材覆盖多个用途时填写多个清单编号。
+4. 本目录的 .gdignore 让 Godot 跳过候选文件；放入文件后仍需另行接入。
+5. 完整分类及命名规则见 docs/音效补齐清单.md。
+
+清单编号：
+用途：
+候选相对路径（例如 cards/card_select_01.wav）：
+原始文件名／原件相对路径：
+来源页面／素材包名：
+作者：
+许可或许可文件位置：
+候选偏好（首选／备选）：
+试听状态（待试听／试听认可）：
+加工说明（原样／裁剪／降噪等）：
+接入状态：未接入
+备注：
+
+
+[balatro_452647]
+清单编号：见 _originals/balatro_452647/manifest.json 的 checklist_ids。
+来源：https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/
+候选：75个，按总分类分入ui/cards/dialogue/world/combat/ambience。
+原件：_originals/balatro_452647/，下载原目录保持原样。
+中文用途对照：docs/Balatro音效对照与分类.md。
+试听状态：全部待用户试听；接入状态：2026-10-25测试台可用，正式未接入。
+许可：下载页未附许可文本，状态未核实。
+
+
+[dialogue_reference_20261025]
+用途：测试台对话逐字短音；默认cozy soft，其余六个为备选。
+候选：4个Cozy Story SFX、1个Omori、2个Phoenix Wright，共7个；均为原字节复制。
+来源、目标、SHA256、许可位置：_originals/dialogue_reference_20261025/manifest.json。
+原文件保留于assets/audio/reference/；Cozy说明及许可另存本登记目录。
+试听状态：待用户试听；接入状态：仅开发测试台，正式游戏未发布。
+用途与替换说明：docs/测试台音效用途与替换表.md。
+
+
+[reference_refresh_20261025]
+用途：替换测试台13个默认动作，包含胜利、场景切换、回合开始、按钮、对白推进、抽弃洗出牌、消耗牌和治疗。
+来源：本地Omori、Cozy Story SFX、OneShot、ShuffleAndTell参考包；原文件保留。
+文件、旧新映射、时长、SHA256和许可登记：_originals/reference_refresh_20261025/manifest.json。
+处理：全部原字节复制，无裁剪和重编码。
+状态：测试台默认已接入，待用户试听；正式游戏未发布。
+逐项用途：docs/测试台音效用途与替换表.md。
+
+[reference_refresh_20261025_rollback]
+用户要求仅保留victory、transition、turn_start新默认；其余十项恢复上一版默认。
+13份复制文件保留，其中十份只作为手动候选；当前默认状态见manifest.json的default_enabled。
+
+[audio_disabled_20261025]
+按用户要求，测试台reward、transition、turn_start、victory、defeat默认静音；回合结束归位snap在测试台实例静音。
+其他动作及源文件保留，正式入口不受此方案影响。
+
+[audio_turn_dialogue_20261025]
+能量恢复energy默认整体静音；回合重置不发资源效果声，结束回合按钮不发通用点击声。
+对话仍用同一柔和短音，诺伦/NPC/旁白pitch分别0.88/1.18/1.0，按speakerId自动分类；手动试听保持原音调。

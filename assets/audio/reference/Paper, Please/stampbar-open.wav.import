@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://bnxfm8eebptct"
+path="res://.godot/imported/stampbar-open.wav-3b07481f98c281c9704ea7be4dc8724f.sample"
+
+[deps]
+
+source_file="res://assets/audio/reference/Paper, Please/stampbar-open.wav"
+dest_files=["res://.godot/imported/stampbar-open.wav-3b07481f98c281c9704ea7be4dc8724f.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

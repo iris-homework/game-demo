@@ -43,7 +43,7 @@ var frame_profile_id := ""
 var _current_frame := 0
 var pipeline_pose_elapsed := 0.0
 var _runtime_animation_frames_cache: Dictionary = {}
-var use_mipmapped_textures := false
+var use_mipmapped_textures := true
 var _mipmapped_textures: Dictionary = {}
 const WeaponShift := preload("res://scripts/combat/weapon_shift_fx.gd")
 const PipelineCatalogScript := preload("res://enemy_asset_pipeline/runtime/pipeline_catalog.gd")
@@ -110,7 +110,7 @@ func _place(origin: Vector2, direction: float) -> void:
 	tint = Color("ff4c9b") if is_player else Color("6ae4f2")
 	add_child(sprite)
 	sprite.centered = false
-	if use_mipmapped_textures: sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS if use_mipmapped_textures else CanvasItem.TEXTURE_FILTER_LINEAR
 	set_pose("idle")
 	queue_redraw()
 
@@ -262,7 +262,7 @@ func _show_attachments(attachments: Array, _frame_transform: Transform2D = Trans
 	for attachment in sorted:
 		var node := Sprite2D.new()
 		node.texture = _display_texture(attachment.texture)
-		if use_mipmapped_textures: node.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		node.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS if use_mipmapped_textures else CanvasItem.TEXTURE_FILTER_LINEAR
 		node.centered = attachment.centered
 		if attachment.use_affine:
 			node.transform = owner*attachment.transform

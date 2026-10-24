@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://x4mvsnpink7y"
+path="res://.godot/imported/inspect-close.wav-222c32bd4980124ca5b8b4c1d285e61b.sample"
+
+[deps]
+
+source_file="res://assets/audio/reference/Paper, Please/inspect-close.wav"
+dest_files=["res://.godot/imported/inspect-close.wav-222c32bd4980124ca5b8b4c1d285e61b.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

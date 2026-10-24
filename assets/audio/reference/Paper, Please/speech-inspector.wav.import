@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://doasc1j31f26q"
+path="res://.godot/imported/speech-inspector.wav-fc5d305739b49c156fea4d04c870935d.sample"
+
+[deps]
+
+source_file="res://assets/audio/reference/Paper, Please/speech-inspector.wav"
+dest_files=["res://.godot/imported/speech-inspector.wav-fc5d305739b49c156fea4d04c870935d.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

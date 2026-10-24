@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://nn50bhqj3fcb"
+path="res://.godot/imported/traveler-walkout.wav-4d73f26db22c18eaf1a4a7412ae88266.sample"
+
+[deps]
+
+source_file="res://assets/audio/reference/Paper, Please/traveler-walkout.wav"
+dest_files=["res://.godot/imported/traveler-walkout.wav-4d73f26db22c18eaf1a4a7412ae88266.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

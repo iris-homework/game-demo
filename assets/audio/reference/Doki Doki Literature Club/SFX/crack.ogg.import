@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://bevj7mq2qchu6"
+path="res://.godot/imported/crack.ogg-bd1a3ff4c607d4209b95c400ae539b84.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/audio/reference/Doki Doki Literature Club/SFX/crack.ogg"
+dest_files=["res://.godot/imported/crack.ogg-bd1a3ff4c607d4209b95c400ae539b84.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

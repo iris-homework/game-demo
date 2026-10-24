@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://bivyluj4e6qtm"
+path="res://.godot/imported/closet-open.ogg-a04bcd43e01e8280ba2daf0b399cb3ed.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/audio/reference/Doki Doki Literature Club/SFX/closet-open.ogg"
+dest_files=["res://.godot/imported/closet-open.ogg-a04bcd43e01e8280ba2daf0b399cb3ed.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

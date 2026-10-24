@@ -27,7 +27,7 @@ static func create(parent: Node, id: String, pos: Vector2, dimensions: Vector2) 
 	view.name = "technology_icon"
 	view.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	view.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	view.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	view.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	view.position = pos
 	view.size = dimensions
 	view.mouse_filter = Control.MOUSE_FILTER_IGNORE

@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://do80ht28hklqn"
+path="res://.godot/imported/paper-spit.wav-d42122d83ab8b3a06cf28e25e8435541.sample"
+
+[deps]
+
+source_file="res://assets/audio/reference/Paper, Please/paper-spit.wav"
+dest_files=["res://.godot/imported/paper-spit.wav-d42122d83ab8b3a06cf28e25e8435541.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

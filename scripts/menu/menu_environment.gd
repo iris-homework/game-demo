@@ -30,7 +30,7 @@ func _ready() -> void:
 	size = CANVAS
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	clip_contents = true
-	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	focused = DisplayServer.window_is_focused()
 	motion_enabled = bool(get_tree().root.get_meta("menu_motion_enabled", true))
 	source_texture = load(SOURCE_ART)

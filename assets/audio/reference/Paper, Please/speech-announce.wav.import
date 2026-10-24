@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://chxook4xc2hkd"
+path="res://.godot/imported/speech-announce.wav-fa0e0033fe6859d5c66429d98a5921de.sample"
+
+[deps]
+
+source_file="res://assets/audio/reference/Paper, Please/speech-announce.wav"
+dest_files=["res://.godot/imported/speech-announce.wav-fa0e0033fe6859d5c66429d98a5921de.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

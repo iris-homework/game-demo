@@ -7,6 +7,11 @@ var pipeline_label: Label
 var owned_server := -1
 var editor_opening := false
 var server_conflict := false
+var audio_lab: Control
+var audio_bank: Node
+var audio_hooks: Node
+var audio_previous_process_mode := Node.PROCESS_MODE_INHERIT
+var audio_close_pending := false
 
 func _ready() -> void:
 	profile_path = "res://enemy_asset_pipeline/test/background_profiles.json" if test_mode else "res://enemy_asset_pipeline/background_profiles.json"
@@ -26,6 +31,7 @@ func _ready() -> void:
 	_button(row,"打开PNG制作工具",open_editor,false)
 	_button(row,"刷新草稿",refresh_draft)
 	_button(row,"查看正式版本",refresh_published)
+	_button(row,"音效与场景模拟",open_audio_lab)
 	var mode_text := "测试版 · 应用只写测试目录" if test_mode else "正式制作台 · 先保存草稿，再预览或应用"
 	if character_mipmaps: mode_text += " · 角色Mipmap平滑"
 	pipeline_label = _text(column,mode_text,13,DemoUI.CYAN)
@@ -33,6 +39,57 @@ func _ready() -> void:
 	editor_request.timeout = 3.0
 	add_child(editor_request)
 	_sync_actor_tabs()
+	audio_bank = preload("res://enemy_asset_pipeline/runtime/audio_preview_bank.gd").new()
+	audio_bank.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(audio_bank)
+	_load_audio_bindings()
+	audio_hooks = preload("res://enemy_asset_pipeline/runtime/audio_scene_hooks.gd").new()
+	audio_hooks.bank = audio_bank
+	add_child(audio_hooks)
+	audio_hooks.attach(view)
+
+func _load_audio_bindings() -> void:
+	var path := "res://enemy_asset_pipeline/test/session/audio_preview_bindings.json" if test_mode else "res://enemy_asset_pipeline/audio_preview_bindings.json"
+	if not FileAccess.file_exists(path): return
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if not data is Dictionary or data.get("schemaVersion") != 1 or not data.get("bindings") is Dictionary: return
+	for cue in data.bindings:
+		if data.bindings[cue] is String: audio_bank.bind(str(cue),data.bindings[cue])
+	var level: Variant = data.get("volumeDb",-12.0)
+	if (level is float or level is int) and is_finite(float(level)): audio_bank.master_volume_db = clampf(float(level),-40,0)
+
+func _replace_view() -> void:
+	await super._replace_view()
+	if is_instance_valid(audio_hooks): audio_hooks.attach(view)
+
+func open_audio_lab() -> void:
+	if tools_locked() or is_instance_valid(audio_lab): return
+	audio_hooks.attach(null)
+	audio_lab = preload("res://enemy_asset_pipeline/audio_scene_simulator.tscn").instantiate()
+	audio_lab.bank = audio_bank
+	if test_mode: audio_lab.config_path = "res://enemy_asset_pipeline/test/session/audio_preview_bindings.json"
+	audio_lab.closed.connect(_audio_lab_closed)
+	audio_previous_process_mode = process_mode
+	process_mode = Node.PROCESS_MODE_DISABLED
+	add_child(audio_lab)
+
+func _audio_lab_closed() -> void:
+	process_mode = audio_previous_process_mode
+	audio_hooks.attach(view)
+	audio_lab = null
+
+func request_close() -> void:
+	if audio_close_pending: return
+	if is_instance_valid(audio_lab):
+		if audio_lab.route_busy or Game.battle_busy or Game.transition_locked:
+			audio_lab.status.text = "请等待当前动作完成，再关闭测试台。"
+			return
+		audio_close_pending = true
+		await audio_lab.close_preview()
+	else: audio_close_pending = true
+	await preload("res://scripts/combat/audio_cleanup.gd").release(self,get_tree())
+	audio_close_pending = false
+	super.request_close()
 
 func _build_enemy_choices() -> void:
 	super._build_enemy_choices()

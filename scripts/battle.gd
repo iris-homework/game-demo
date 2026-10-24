@@ -1,5 +1,8 @@
 extends DemoUI
 ## Presentation only. CombatModel owns rules; Game owns persistence and story returns.
+signal card_aim_started(uid: String)
+signal card_aim_cancelled
+signal card_played(uid: String)
 var model: CombatModel
 var battle: Dictionary
 var expected_revision: int
@@ -477,6 +480,7 @@ func cancel_selection() -> void:
 	clear_card_drag()
 	if selected_uid.is_empty(): return
 	selected_uid = ""
+	card_aim_cancelled.emit()
 	for uid in cards: cards[uid].set_selected(false)
 	if is_instance_valid(aim): aim.visible = false
 	refresh_enemy_hud()
@@ -490,6 +494,8 @@ func select_card(uid: String, toggle: bool = true) -> void:
 		Game.notice.emit(reason)
 		return
 	selected_uid = "" if toggle and selected_uid == uid else uid
+	if selected_uid.is_empty(): card_aim_cancelled.emit()
+	else: card_aim_started.emit(selected_uid)
 	for card_uid in cards: cards[card_uid].set_selected(card_uid == selected_uid)
 	refresh_enemy_hud()
 	_process(0.0)
@@ -556,6 +562,7 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 	var block_before := model.block
 	var result := model.play_card(uid,target,discard_uid,maxi(0,extra_ammo))
 	if result.is_empty(): return
+	card_played.emit(uid)
 	if cards.has(uid):
 		cards[uid].show_preview(played_preview)
 		cards[uid].show_cost(played_cost)
