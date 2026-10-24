@@ -63,7 +63,7 @@ const ACTOR_OFFSET := Vector2(0,24)
 const ACTOR_SCALE := 0.85
 # Additional placement belongs to the selected stage; fallback scenes retain the base.
 var actor_offset := ACTOR_OFFSET
-const HAND_SCALE := 0.96
+const HAND_SCALE := 1.056
 const HAND_BASE_Y := 748.0
 const HAND_SAFE_WIDTH := 1020.0 # Between the side controls, x=210..1230.
 const HAND_EDGE_PADDING := 8.0
@@ -300,7 +300,7 @@ func hand_position(index: int, count: int) -> Vector2:
 	var edge_angle := absf(hand_rotation(0,count))
 	var half_width := HAND_SCALE*(90.0*cos(edge_angle)+115.0*sin(edge_angle))
 	var span := HAND_SAFE_WIDTH-2.0*(half_width+HAND_EDGE_PADDING)
-	var spacing := minf(118.0,span/maxi(count-1,1))
+	var spacing := minf(129.8,span/maxi(count-1,1))
 	if is_zero_approx(edge_angle): return Vector2(630,HAND_BASE_Y)
 	# Position and tilt share one circle. An independently flattened height curve
 	# makes the inward upper corners of the outer cards poke above their neighbours.

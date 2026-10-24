@@ -4,7 +4,7 @@
     "characterId": "robot",
     "displayName": "故障机器人",
     "battlePortraitAssetId": "",
-    "maxHp": null,
+    "maxHp": 40,
     "intentSequence": [
       {
         "type": "attack",

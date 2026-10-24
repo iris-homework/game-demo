@@ -23,7 +23,7 @@ func check_rest(view: Control, count: int) -> void:
 	var right := -INF
 	for i in count:
 		var card: CombatCard = view.cards[view.model.hand[i]]
-		check(card.scale.is_equal_approx(Vector2.ONE*0.96),"Hand card uses the larger resting size")
+		check(card.scale.is_equal_approx(Vector2.ONE*1.056),"Hand card uses the additional ten-percent resting size")
 		check(card.position.is_equal_approx(card.home) and is_equal_approx(card.rotation,card.home_rotation),"Resting pose matches layout after dealing/reflow")
 		for corner in CORNERS:
 			var point: Vector2 = card.get_global_transform()*corner
