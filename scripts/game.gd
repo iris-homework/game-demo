@@ -10,6 +10,9 @@ signal current_deck_requested
 signal technology_loadout_requested
 signal menu_requested
 signal quit_requested
+signal checkpoint_failed
+signal checkpoint_saved
+var pending_save_kind := ""
 var assets: Dictionary
 var characters: Dictionary
 var player_characters: Dictionary
@@ -152,6 +155,7 @@ func open_technology_loadout() -> void:
 	technology_loadout_requested.emit()
 
 func set_technology_loadout(ids: Array, expected_revision: int) -> bool:
+	if not pending_save_kind.is_empty(): return false
 	if state.is_empty() or page != "map" or state.get("currentScene") != "map" or training_mode or transition_locked or battle_busy or expected_revision != revision: return false
 	if not valid_equipped_technologies(ids, owned_cyberware_ids()): return false
 	var previous: Array = equipped_cyberware_ids()
@@ -214,7 +218,7 @@ func initial_state(player_id: String = "") -> Dictionary:
 	return fresh
 
 func new_game(player_id: String = "") -> void:
-	if transition_locked or battle_busy: return
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy: return
 	var fresh := initial_state(player_id)
 	if fresh.is_empty():
 		notice.emit("主角配置无效，无法开始委托。")
@@ -387,24 +391,44 @@ func texture(id: String) -> Texture2D:
 	if path.is_empty() or not ResourceLoader.exists(path): return null
 	return load(path)
 
-func checkpoint() -> void:
+func checkpoint() -> bool:
+	if not pending_save_kind.is_empty(): return false
 	refresh_event_pool()
 	if not training_mode: black_market_model.refresh(state, card_catalog, black_market_rules)
 	revision += 1
 	if _defer_checkpoint:
 		page = state.currentScene
-		return
-	if save_enabled and not training_mode: save_game()
+		return true
+	if save_enabled and not training_mode and not save_game():
+		pending_save_kind = "scene"
+		checkpoint_failed.emit()
+		return false
 	page = state.currentScene
 	changed.emit()
+	return true
+
+func retry_pending_save() -> bool:
+	if pending_save_kind.is_empty(): return false
+	if not save_game(): return false
+	var kind := pending_save_kind
+	pending_save_kind = ""
+	last_error = ""
+	# Release the modal before resuming a suspended combat presentation.
+	checkpoint_saved.emit()
+	if kind == "scene":
+		page = state.currentScene
+		changed.emit()
+	else:
+		status_changed.emit()
+	return true
 
 func go_map() -> void:
-	if transition_locked or battle_busy or is_run_over(): return
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or is_run_over(): return
 	state.currentScene = "map"
 	checkpoint()
 
 func visit(id: String) -> void:
-	if transition_locked or battle_busy or is_run_over(): return
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or is_run_over(): return
 	var p := place_data(id)
 	if p.is_empty(): return
 	state.currentPlaceId = id
@@ -412,7 +436,7 @@ func visit(id: String) -> void:
 	checkpoint()
 
 func start_event(id: String) -> bool:
-	if transition_locked or battle_busy or is_run_over(): return false
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or is_run_over(): return false
 	if not events.has(id): return false
 	var e: Dictionary = events[id]
 	if not id in state.get("refreshedEventIds", []) or id in state.completedEventIds or not meets(e.unlockCondition) or not event_in_refresh_range(e): return false
@@ -427,7 +451,7 @@ func start_event(id: String) -> bool:
 	state.battleStart = {}
 	state.portraits = {"left":PLAYER_REFERENCE, "right":""}
 	enter_node(e.startNodeId)
-	return true
+	return pending_save_kind.is_empty()
 
 func apply_actions(actions: Array) -> bool:
 	# Validate the entire list on a copy; a rejected action never partially commits.
@@ -491,7 +515,7 @@ func event_completion_days(id: String) -> int:
 	return maxi(0, int(events.get(id, {}).get("completionDays", 0 if id == "E01" else 1)))
 
 func enter_node(id: String) -> void:
-	if transition_locked or battle_busy or (not training_mode and is_run_over()): return
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or (not training_mode and is_run_over()): return
 	if id == "@map":
 		go_map()
 		return
@@ -538,16 +562,16 @@ func record_dialogue(choice_text: String = "") -> void:
 	})
 
 func advance(expected_revision: int) -> void:
-	if transition_locked or battle_busy or expected_revision != revision or state.currentScene != "dialogue": return
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or expected_revision != revision or state.currentScene != "dialogue": return
 	var n := node_data()
 	if n.has("next"): enter_node(n.next)
 
 func skip_dialogue(expected_revision: int) -> void:
-	if transition_locked or battle_busy or expected_revision != revision or page != "dialogue" or state.currentScene != "dialogue": return
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or expected_revision != revision or page != "dialogue" or state.currentScene != "dialogue": return
 	# Follow the same route as Continue, preserving portraits, battle entry and rewards.
 	# Never choose on the player's behalf, even if a choice node also has a next field.
 	var visited: Dictionary = {}
-	while state.currentScene == "dialogue" and not transition_locked and not battle_busy:
+	while state.currentScene == "dialogue" and not transition_locked and not battle_busy and pending_save_kind.is_empty():
 		var n := node_data()
 		if not n.get("choices", []).is_empty() or not n.has("next"): return
 		visited[state.activeNodeId] = true
@@ -559,7 +583,7 @@ func skip_dialogue(expected_revision: int) -> void:
 		if revision == previous_revision: return
 
 func choose(index: int, expected_revision: int) -> bool:
-	if transition_locked or battle_busy or expected_revision != revision or page != "dialogue" or state.currentScene != "dialogue": return false
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or expected_revision != revision or page != "dialogue" or state.currentScene != "dialogue": return false
 	var choices: Array = node_data().get("choices", [])
 	if index < 0 or index >= choices.size(): return false
 	var c: Dictionary = choices[index]
@@ -589,7 +613,7 @@ func choose(index: int, expected_revision: int) -> bool:
 
 func battle_exit(result: String, expected_revision: int) -> bool:
 	if result not in ["win", "lose"]: return false
-	if transition_locked or battle_busy or expected_revision != revision or state.currentScene != "battle": return false
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or expected_revision != revision or state.currentScene != "battle": return false
 	if not training_mode and is_run_over() and result != "lose": return false
 	var b: Dictionary = battles.get(state.battleId, {})
 	if b.is_empty(): return false
@@ -599,8 +623,7 @@ func battle_exit(result: String, expected_revision: int) -> bool:
 	if result == "win" and not b.get("returnNodeByResult", {}).has(result): return false
 	if result == "lose":
 		mark_run_failed(state)
-		checkpoint()
-		return true
+		return checkpoint()
 	if state.get("currentHp", 0) <= 0 or state.get("combat", {}).get("playerHp", 0) <= 0: return false
 	# Keep ownership, payment, healing, claims and the first post-battle node in
 	# one checkpoint. No scene/status signal escapes before the write succeeds.
@@ -674,14 +697,14 @@ func mark_run_failed(subject: Dictionary) -> void:
 	subject.battleReward = {}
 
 func claim_rewards(expected_revision: int) -> bool:
-	if transition_locked or battle_busy or expected_revision != revision or state.currentScene != "result": return false
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or expected_revision != revision or state.currentScene != "result": return false
 	var actions: Array = []
 	for id in event_data().get("rewardIds", []): actions.append({"op":"grantReward", "id":id})
 	if not apply_actions(actions): return false
 	if has_battle_reward() and state.battleReward.status == "pending":
 		state.battleReward.status = "skipped"
 	go_map()
-	return true
+	return pending_save_kind.is_empty()
 
 func prepare_battle_reward() -> void:
 	# Finish-node entry occurs only after all authored post-battle dialogue.
@@ -715,7 +738,7 @@ func has_battle_reward() -> bool:
 	return not training_mode and state.get("currentScene", "") == "result" and not reward.is_empty() and reward.get("eventId", "") == state.activeEventId and reward.get("battleId", "") == state.battleId
 
 func choose_reward_card(id: String, expected_revision: int) -> bool:
-	if transition_locked or battle_busy or expected_revision != revision or not has_battle_reward(): return false
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or expected_revision != revision or not has_battle_reward(): return false
 	var reward: Dictionary = state.battleReward
 	if reward.status != "pending" or not id in reward.options or not reward_rules.cards.has(id): return false
 	# One checkpoint contains both ownership and the consumed choice.
@@ -843,6 +866,22 @@ func valid_save(s) -> bool:
 		if not s.combat.is_empty() and (s.combat.battleId != s.battleId or s.combat.playerHp != s.currentHp): return false
 	return true
 
+func saved_adventure_preview() -> Dictionary:
+	var event_rng_state := event_refresh_rng.state
+	var market_rng_state := black_market_model.rng.state
+	var found: Dictionary = {}
+	for path in [save_path, save_path + ".bak"]:
+		if not FileAccess.file_exists(path): continue
+		var parser := JSON.new()
+		if parser.parse(FileAccess.get_file_as_string(path)) != OK: continue
+		var candidate = migrate_save(parser.data)
+		if valid_save(candidate):
+			found = candidate
+			break
+	event_refresh_rng.state = event_rng_state
+	black_market_model.rng.state = market_rng_state
+	return found
+
 func has_save() -> bool:
 	return FileAccess.file_exists(save_path) or FileAccess.file_exists(save_path + ".bak")
 
@@ -859,6 +898,7 @@ func can_continue() -> bool:
 	return has_save()
 
 func load_game() -> bool:
+	if not pending_save_kind.is_empty(): return false
 	for path in [save_path, save_path + ".bak"]:
 		if not FileAccess.file_exists(path): continue
 		var parser := JSON.new()
@@ -889,18 +929,18 @@ func load_game() -> bool:
 
 ## User navigation asks the main view to confirm before changing adventure state.
 func request_menu() -> void:
-	if transition_locked or battle_busy or page == "menu": return
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or page == "menu": return
 	if page in ["card_library", "cyberware", "defeat"]:
 		menu()
 	else:
 		menu_requested.emit()
 
 func request_quit() -> void:
-	if transition_locked or battle_busy or page != "menu": return
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or page != "menu": return
 	quit_requested.emit()
 
 func menu() -> void:
-	if transition_locked or battle_busy: return
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy: return
 	if training_mode: restore_training()
 	elif is_run_over() and state.get("currentScene", "") != "defeat":
 		mark_run_failed(state)
@@ -910,6 +950,7 @@ func menu() -> void:
 	changed.emit()
 
 func resume() -> void:
+	if not pending_save_kind.is_empty(): return
 	if state.is_empty(): load_game()
 	else:
 		if not training_mode:
@@ -965,12 +1006,17 @@ func initialize_combat() -> void:
 	# Capture after the initial shuffle, before the first draw; never reroll on resume.
 	state.battleStart = {} if training_mode else state.combat.duplicate(true)
 
-func commit_combat(model: CombatModel) -> void:
+func commit_combat(model: CombatModel) -> bool:
+	if not pending_save_kind.is_empty(): return false
 	state.combat = model.snapshot()
 	state.currentHp = model.player_hp
 	revision += 1
-	if save_enabled and not training_mode: save_game()
+	if save_enabled and not training_mode and not save_game():
+		pending_save_kind = "combat"
+		checkpoint_failed.emit()
+		return false
 	status_changed.emit()
+	return true
 
 func healing_service(place_id: String) -> Dictionary:
 	# Views and commits consume the same authored price, percentage and availability.
@@ -999,7 +1045,7 @@ func healing_service(place_id: String) -> Dictionary:
 	return {}
 
 func heal_at(place_id: String) -> bool:
-	if transition_locked or battle_busy or not state.currentScene in ["map", "place"]: return false
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or not state.currentScene in ["map", "place"]: return false
 	var service := healing_service(place_id)
 	if service.is_empty(): return false
 	if not service.can_heal:
@@ -1011,7 +1057,7 @@ func heal_at(place_id: String) -> bool:
 		{"op":"healHpPercent", "percent":service.percent},
 	]
 	if not apply_actions(actions): return false
-	checkpoint()
+	if not checkpoint(): return false
 	var payment := "支付 %d 信用点 · " % service.credits_cost if service.credits_cost > 0 else ""
 	notice.emit(payment + "生命恢复 +%d  /  %d HP" % [int(state.currentHp)-previous, state.maxHp])
 	return true
@@ -1071,17 +1117,21 @@ func _clear_training_encounter() -> void:
 	training_battle_id = ""
 
 func start_training(battle_id: String = "B04") -> void:
-	if transition_locked or battle_busy or training_mode or not battles.has(battle_id): return
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or training_mode or not battles.has(battle_id): return
 	if not battles[battle_id].get("trainingOnly", false):
 		var event: Dictionary = events.get(battles[battle_id].eventId, {})
 		if event.is_empty() or not event.get("nodes", {}).has("battle") or event.nodes.battle.get("battleId") != battle_id: return
-	var fresh := initial_state(player_character_id())
+	var source := state if not state.is_empty() else saved_adventure_preview()
+	if source.is_empty() and has_save():
+		notice.emit("存档无法读取，不能使用当前冒险配置演练。请先恢复有效存档。")
+		return
+	var fresh := initial_state(source.get("playerCharacterId", config.defaultPlayerCharacterId))
 	if fresh.is_empty(): return
-	fresh.deck = state.get("deck", []).duplicate()
-	fresh.removedStartingCards = state.get("removedStartingCards", []).duplicate()
-	if valid_equipped_technologies(state.get("equippedCyberwareIds"), state.get("ownedCyberwareIds")):
-		fresh.ownedCyberwareIds = owned_cyberware_ids()
-		fresh.equippedCyberwareIds = equipped_cyberware_ids()
+	fresh.deck = source.get("deck", []).duplicate()
+	fresh.removedStartingCards = source.get("removedStartingCards", []).duplicate()
+	if valid_equipped_technologies(source.get("equippedCyberwareIds"), source.get("ownedCyberwareIds")):
+		fresh.ownedCyberwareIds = source.ownedCyberwareIds.duplicate()
+		fresh.equippedCyberwareIds = source.equippedCyberwareIds.duplicate()
 	training_backup = state.duplicate(true)
 	training_scenery_place_id = ""
 	if battle_id == "B04":
@@ -1118,12 +1168,12 @@ func finish_training(result: String) -> void:
 	notice.emit("演练结束：%s。冒险进度和血量未改变。" % {"win":"胜利","lose":"失败"}.get(result,result))
 
 func open_cyberware() -> void:
-	if transition_locked or battle_busy: return
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy: return
 	page = "cyberware"
 	changed.emit()
 
 func open_card_library() -> void:
-	if transition_locked or battle_busy or page != "menu": return
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or page != "menu": return
 	# Like the archive, this is a menu page, never an adventure checkpoint.
 	page = "card_library"
 	changed.emit()
@@ -1485,6 +1535,7 @@ func technology_shop_offers() -> Array:
 	return offers.duplicate(true)
 
 func buy_shop_technology(index: int, expected_revision: int) -> bool:
+	if not pending_save_kind.is_empty(): return false
 	if state.is_empty() or page != "place" or state.get("currentScene") != "place" or state.get("currentPlaceId") != "mall":
 		return _market_reject("请先进入沃斯商场。")
 	if training_mode or transition_locked or battle_busy or is_run_over(): return _market_reject("当前无法购买科技。")
@@ -1516,6 +1567,7 @@ func black_market_state() -> Dictionary:
 	return state.get("blackMarket", {}).duplicate(true)
 
 func ensure_black_market() -> bool:
+	if not pending_save_kind.is_empty(): return false
 	if state.is_empty() or training_mode or transition_locked or battle_busy: return false
 	var draft := state.duplicate(true)
 	if not black_market_model.refresh(draft, card_catalog, black_market_rules):
@@ -1528,6 +1580,7 @@ func _market_reject(message: String) -> bool:
 	return false
 
 func _market_can_trade(expected_revision: int) -> bool:
+	if not pending_save_kind.is_empty(): return false
 	if state.is_empty() or page != "place" or state.get("currentScene") != "place" or state.get("currentPlaceId") != "market":
 		return _market_reject("请先进入黑市。")
 	if training_mode or transition_locked or battle_busy or is_run_over(): return _market_reject("当前无法交易。")
@@ -1577,7 +1630,11 @@ func sell_market_card(card_id: String, expected_revision: int) -> bool:
 
 func owned_card_counts() -> Dictionary:
 	var counts := {}
-	var ids := full_deck_ids()
+	var source := state
+	if source.is_empty() and page in ["menu", "card_library"]:
+		source = saved_adventure_preview()
+		if source.is_empty() and has_save(): return counts
+	var ids := full_deck_ids(source)
 	for id in ids: counts[id] = int(counts.get(id, 0)) + 1
 	return counts
 
@@ -1612,7 +1669,7 @@ func console_command(command: String) -> String:
 			if not config.developmentMode: return "开发模式未开启。"
 			if state.is_empty(): return "请先开始或继续委托，再添加卡牌。"
 			if training_mode: return "演练不写入冒险；请退出演练后加牌。"
-			if transition_locked or battle_busy: return "请等当前动作结束后再加牌。"
+			if not pending_save_kind.is_empty() or transition_locked or battle_busy: return "请等当前动作结束后再加牌。"
 			if args.size() < 2 or args.size() > 3: return "用法：addcard <牌名/编号/ID> [数量]"
 			var id := resolve_card_id(args[1])
 			if id.is_empty(): return "未找到卡牌。输入 cards 查询。"

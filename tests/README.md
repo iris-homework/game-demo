@@ -1,5 +1,9 @@
 # 测试目录索引
 
+2026-10-24退出清理：[audio_cleanup_tests](audio_cleanup_tests.tscn)32项检查普通／2D／3D播放对象及声音数据实际释放；[audio_quit_tests](audio_quit_tests.tscn)菜单8项、加`-- window-close`运行关闭处理7项；[resource_pipeline_cleanup_tests](resource_pipeline_cleanup_tests.tscn)58项验证真实牌库依赖图、缓存兼容与Profile／Frame／Attachment所有权。配套原12套、战斗音效113项与管线运行时111项，共18套1604项通过，最终无退出泄漏提示。必须用独立工程／用户目录及`--headless --audio-driver Dummy --verbose`，音频自然播放套件使用真实时间，不加`--fixed-fps`；关闭处理测试不操作系统窗口。见[本轮汇总](../artifacts/qa/resource-cleanup-2026-10-24/verification.json)。保存失败流程现含音频收尾共42项，上一条历史验收的41项记录保留。
+
+2026-10-24审计修复：[cold_start_loadout_tests](cold_start_loadout_tests.tscn)140项覆盖冷启动牌库／经典及单敌演练、备份、坏档与只读隔离；[enemy_intent_phase_tests](combat/presentation/enemy_intent_phase_tests.tscn)15项覆盖易伤、力量与虚弱的展示时序；[save_failure_flow_tests](save_failure_flow_tests.tscn)41项覆盖治疗、对白、奖励、新游戏、战败与真实战斗视图的保存失败／重复重试／恢复。配套9套合计12套1274项通过。测试必须使用复制工程及独立用户目录，全部headless；完整结果及首轮夹具调整见[汇总](../artifacts/qa/audit-fixes-2026-10-24/verification.json)和修改记录。
+
 2026-10-24 删除芬恩：`enemy_visual_library_tests`补充旧引用退役、无立绘攻防与目标区域验证；相关有图夹具改用既有小弟图。6套Godot无窗口检查929项、Node60项通过。旧机器人规则95项4失败在改动前后均复现，详见[验证汇总](../artifacts/qa/remove-finn-2026-10-24/verification.json)，不计为通过。
 
 2026-10-24奖励金额：战后与酒馆回访统一50，金钱芯片额外30。奖励124／战斗类型122／品级概率172／回访130／跳过203／战败379，共1130项无窗口检查通过，含旧1000记录兼容和芯片合计80。扩展被动科技／重开套件的19项失败在恢复旧金额后相同，详见[本轮汇总](../artifacts/qa/battle-credits-2026-10-24/verification.json)及修改记录；未做像素／物理输入验收。

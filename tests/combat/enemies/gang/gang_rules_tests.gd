@@ -54,15 +54,18 @@ func test_encounter() -> void:
 		check(Game.valid_combat(saved(m)), "Strengthening phase snapshot valid")
 	var adventure := Game.state.duplicate(true)
 	Game.state = Game.initial_state()
+	var training_source := Game.state.duplicate(true)
 	Game.start_training("B04")
 	check(Game.state.combat.enemies.map(func(e): return e.hp) == [15, 15, 30], "B04 training also uses authored HP")
 	Game.finish_training("lose")
-	check(Game.state == Game.initial_state(), "B04 training restores prior adventure")
+	check(Game.state == training_source, "B04 training restores prior adventure")
 	Game.state = adventure
 	Game.state = Game.initial_state()
+	Game.state.refreshedEventIds = ["E04"]
+	Game.refresh_event_pool()
 	Game.state.flags.alleyClue = true
 	Game.state.targetId = "richard"
-	check(Game.start_event("E04"), "Formal E04 starts after existing clue requirement")
+	check(Game.start_event("E04"), "Formal E04 starts from its refreshed event slot")
 	for step in 3: Game.advance(Game.revision)
 	check(Game.state.currentScene == "battle" and Game.state.battleId == "B04" and Game.state.combat.enemies.map(func(e): return e.hp) == [15, 15, 30], "Normal dialogue enters the actual three-enemy encounter")
 	check(Game.valid_save(Game.state), "Formal adventure with gang encounter validates")

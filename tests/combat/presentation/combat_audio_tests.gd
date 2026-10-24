@@ -46,6 +46,7 @@ func hit(damage: int = 5, blocked: int = 0, killed: bool = false) -> Dictionary:
 	return {"damage":damage,"blocked":blocked,"hpAfter":0 if killed else 95,"killed":killed}
 
 func destroy_stage() -> void:
+	check(await preload("res://scripts/combat/audio_cleanup.gd").release(stage, get_tree()), "Stage audio playback references drain before disposal")
 	stage.queue_free()
 	await get_tree().process_frame
 	stage = null

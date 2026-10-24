@@ -19,12 +19,14 @@ func _ready() -> void:
 	Game.state = Game.initial_state()
 	Game.state.ownedCyberwareIds.append_array(["money_chip", "healing_chip"])
 	Game.state.equippedCyberwareIds = ["money_chip", "healing_chip"]
-	Game.state.currentHp = 70
+	Game.state.currentHp = int(Game.state.maxHp) - 20
 	Game.state.activeEventId = "E02"
 	Game.state.currentPlaceId = "junkyard"
 	Game.enter_node("battle")
 	var model := CombatModel.new()
 	model.restore(Game.state.combat)
+	# Recovery needs a deterministic lethal attack, independent of enemy balance.
+	model.enemies[0].hp = 1
 	model.draw_cards(10)
 	for uid in model.hand.duplicate():
 		if model.card(uid).type == "attack":
@@ -53,7 +55,7 @@ func _ready() -> void:
 	Game.save_path = "user://battle-recovery-checkpoint.json"
 	view.end_button.pressed.emit()
 	check(Game.page == "dialogue" and Game.state.currentScene == "dialogue", "Same button retries successfully after storage recovers")
-	check(Game.state.credits == before.credits + 30 and Game.state.currentHp == 75, "Recovered exit grants money and healing exactly once")
+	check(Game.state.credits == before.credits + 30 and Game.state.currentHp == before.currentHp + 5, "Recovered exit grants money and healing exactly once")
 	check(Game.state.battleHistory.size() == before.battleHistory.size() + 1, "Recovered exit records one victory")
 	check(Game.valid_save(Game.state), "Recovered state validates")
 	var after: Dictionary = Game.state.duplicate(true)

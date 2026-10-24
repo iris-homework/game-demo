@@ -175,11 +175,14 @@ func begin_round_intents() -> Array:
 			changes.append({"type":"intent_change", "target":index, "intent":enemy.intent.duplicate(true), "intentIndex":0, "intentPhase":"ally_death"})
 	return changes
 
-func enemy_intent_damage(enemy: Dictionary, after_player_turn_end: bool = true) -> int:
+func enemy_intent_damage(enemy: Dictionary, after_player_turn_end: bool = true, vulnerable_layers: int = -1) -> int:
 	var amount := buffs.enemy_attack_damage(enemy, int(enemy.get("intent", {}).get("amount", 0)))
 	# During the player's turn, show the amount that will actually be used after
 	# their own turn-end decay, without changing any live status or intent state.
-	var layers := buffs.count(self, "vulnerable") - (1 if after_player_turn_end else 0)
+	# Playback supplies the displayed status because the live model has already
+	# resolved every enemy action. Negative means the ordinary live-state preview.
+	var layers := buffs.count(self, "vulnerable") if vulnerable_layers < 0 else vulnerable_layers
+	layers -= 1 if after_player_turn_end else 0
 	return roundi(amount * (1.5 if layers > 0 else 1.0))
 
 func card(uid: String) -> Dictionary:
@@ -188,14 +191,14 @@ func card(uid: String) -> Dictionary:
 func card_preview(uid: String, target_index: int = -1, extra_ammo: int = -1) -> Dictionary:
 	return preload("res://scripts/combat/card_preview.gd").build(self, uid, target_index, extra_ammo)
 
-func enemy_intent_text(enemy: Dictionary) -> String:
+func enemy_intent_text(enemy: Dictionary, after_player_turn_end: bool = true, vulnerable_layers: int = -1) -> String:
 	var intent: Dictionary = enemy.get("intent", {})
 	if intent.get("type", "") == "pollution": return "污染 %d" % int(intent.get("amount", 0))
 	if intent.get("type", "") == "vulnerable": return "易伤 %d" % int(intent.get("amount", 0))
 	if intent.get("type", "") == "strength_allies": return "强化 +%d" % int(intent.get("amount", 0))
 	if intent.get("type", "") != "attack": return str(intent.get("description", "非攻击行动"))
 	var amount := int(intent.get("amount", 0))
-	if is_noren(): amount = enemy_intent_damage(enemy)
+	if is_noren(): amount = enemy_intent_damage(enemy, after_player_turn_end, vulnerable_layers)
 	return "攻击 %d" % amount + (" ×%d" % int(intent.hits) if int(intent.get("hits", 1)) > 1 else "")
 
 func attack_hit_count(effect: Dictionary, form: String, enemy_before: Dictionary, ammo_before: int = 0) -> int:

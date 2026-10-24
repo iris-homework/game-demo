@@ -40,7 +40,10 @@ var source_facing := 0.0
 var has_pipeline := false
 
 
-static func parse(raw, expected_id: String, problems: Array[String]) -> PipelineRuntimeProfile:
+# Keep the return annotation on the native base class: a self-script return type
+# retains this script's compiled dependency graph during engine shutdown. The
+# returned object is still a PipelineRuntimeProfile, constructed below.
+static func parse(raw, expected_id: String, problems: Array[String]) -> RefCounted:
 	if not raw is Dictionary:
 		problems.append("%s: pipeline profile must be an object" % expected_id)
 		return null

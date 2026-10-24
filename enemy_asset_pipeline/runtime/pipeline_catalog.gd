@@ -6,20 +6,23 @@ extends RefCounted
 const PUBLISHED_PATH := "res://enemy_asset_pipeline/published/catalog.json"
 const SCHEMA_VERSION := 1
 
-static var preview_path_override: String = ""
-static var published_path_override: String = ""
+# Separate storage from static API methods to avoid retaining their compiled
+# script dependencies at shutdown. Public override properties stay compatible.
+const State := preload("res://enemy_asset_pipeline/runtime/pipeline_catalog_state.gd")
 
-static var _cache: Dictionary = {}
-static var _diagnostics: Array[String] = []
-static var _revision := 0
-static var _source_signature := ""
+static var preview_path_override: String:
+	get: return State.preview_path_override
+	set(value): State.preview_path_override = value
+static var published_path_override: String:
+	get: return State.published_path_override
+	set(value): State.published_path_override = value
 
 
 static func reload() -> void:
-	_cache.clear()
-	_diagnostics.clear()
-	_revision += 1
-	_source_signature = _catalog_signature()
+	State._cache.clear()
+	State._diagnostics.clear()
+	State._revision += 1
+	State._source_signature = _catalog_signature()
 
 
 static func refresh() -> void:
@@ -30,7 +33,7 @@ static func refresh_if_changed() -> bool:
 	## Called at a new-battle resolution boundary. A content signature also
 	## detects same-size publications within one filesystem timestamp tick.
 	var signature := _catalog_signature()
-	if signature == _source_signature and not _cache.is_empty():
+	if signature == State._source_signature and not State._cache.is_empty():
 		return false
 	reload()
 	return true
@@ -43,43 +46,43 @@ static func load_profiles() -> Dictionary:
 
 
 static func set_preview_path(path: String) -> void:
-	preview_path_override = path
+	State.preview_path_override = path
 	reload()
 
 
 static func clear_preview() -> void:
-	preview_path_override = ""
+	State.preview_path_override = ""
 	reload()
 
 
 static func set_published_path(path: String) -> void:
 	## Test isolation hook. Production keeps PUBLISHED_PATH.
-	published_path_override = path
+	State.published_path_override = path
 	reload()
 
 
 static func clear_published_path() -> void:
-	published_path_override = ""
+	State.published_path_override = ""
 	reload()
 
 
 static func published_path() -> String:
-	return published_path_override if not published_path_override.is_empty() else PUBLISHED_PATH
+	return State.published_path_override if not State.published_path_override.is_empty() else PUBLISHED_PATH
 
 
 static func revision() -> int:
-	return _revision
+	return State._revision
 
 
 static func get_diagnostics() -> Array[String]:
 	_load_if_needed()
-	return _diagnostics.duplicate()
+	return State._diagnostics.duplicate()
 
 
 static func get_catalog() -> Dictionary:
 	_load_if_needed()
 	var key := _cache_key()
-	return _cache.get(key, {}).duplicate(true)
+	return State._cache.get(key, {}).duplicate(true)
 
 
 static func get_profiles() -> Dictionary:
@@ -105,7 +108,7 @@ static func get_profile(id: String) -> Dictionary:
 
 static func get_profile_source(id: String) -> String:
 	_load_if_needed()
-	var data: Dictionary = _cache.get(_cache_key(), {})
+	var data: Dictionary = State._cache.get(_cache_key(), {})
 	var sources = data.get("sources", {})
 	return String(sources.get(id, "")) if sources is Dictionary else ""
 
@@ -126,12 +129,12 @@ static func get_bound_profile_id(enemy_id: String, fallback_id: String) -> Strin
 
 
 static func _cache_key() -> String:
-	return published_path()+"|"+preview_path_override
+	return published_path()+"|"+State.preview_path_override
 
 
 static func _catalog_signature() -> String:
 	var published := published_path()
-	var preview := preview_path_override
+	var preview := State.preview_path_override
 	var published_hash := FileAccess.get_sha256(published) if FileAccess.file_exists(published) else "missing"
 	var preview_hash := FileAccess.get_sha256(preview) if FileAccess.file_exists(preview) else "missing"
 	return published+":"+published_hash+"|"+preview+":"+preview_hash
@@ -139,7 +142,7 @@ static func _catalog_signature() -> String:
 
 static func _load_if_needed() -> void:
 	var key := _cache_key()
-	if _cache.has(key):
+	if State._cache.has(key):
 		return
 	var problems: Array[String] = []
 	var profiles: Dictionary = {}
@@ -153,11 +156,11 @@ static func _load_if_needed() -> void:
 	for enemy_id in published.bindings:
 		bindings[enemy_id] = published.bindings[enemy_id]
 		binding_sources[enemy_id] = "published"
-	if not preview_path_override.is_empty():
-		if not _valid_override_path(preview_path_override):
-			problems.append("Preview catalog path must stay inside res:// or user://: "+preview_path_override)
+	if not State.preview_path_override.is_empty():
+		if not _valid_override_path(State.preview_path_override):
+			problems.append("Preview catalog path must stay inside res:// or user://: "+State.preview_path_override)
 		else:
-			var preview := _read_catalog(preview_path_override, "preview", problems)
+			var preview := _read_catalog(State.preview_path_override, "preview", problems)
 			for id in preview.profiles:
 				profiles[id] = preview.profiles[id]
 				sources[id] = "preview"
@@ -171,18 +174,18 @@ static func _load_if_needed() -> void:
 			problems.append("Binding %s -> %s has no profile; falling back." % [enemy_id, target])
 			bindings.erase(enemy_id)
 			binding_sources.erase(enemy_id)
-	_cache[key] = {
+	State._cache[key] = {
 		"schemaVersion": SCHEMA_VERSION,
 		"profiles": profiles,
 		"sources": sources,
 		"bindings": bindings,
 		"bindingSources": binding_sources,
 		"publishedPath": published_path(),
-		"previewPath": preview_path_override,
+		"previewPath": State.preview_path_override,
 		"diagnostics": problems.duplicate(),
-		"revision": _revision,
+		"revision": State._revision,
 	}
-	_diagnostics = problems
+	State._diagnostics = problems
 
 
 static func _read_catalog(path: String, label: String, problems: Array[String]) -> Dictionary:

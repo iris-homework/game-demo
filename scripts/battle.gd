@@ -214,6 +214,13 @@ func battle_portrait(asset_id: String, pos: Vector2, dimensions: Vector2, foot_a
 func enemy_position(index: int) -> Vector2:
 	return Vector2(791 + index*180 - (model.enemies.size()-1)*100,229)+actor_offset
 
+func displayed_enemy_intent(enemy: Dictionary) -> String:
+	if presenting_enemy_turn:
+		# The ordered status events already include this round's player decay.
+		# Enemy strength/weakness also come from the supplied display snapshot.
+		return model.enemy_intent_text(enemy, false, int(shown_player_buffs.get("vulnerable", 0)))
+	return model.enemy_intent_text(enemy)
+
 func refresh_enemy_hud() -> void:
 	if is_instance_valid(enemy_hud):
 		remove_child(enemy_hud)
@@ -248,7 +255,7 @@ func refresh_enemy_hud() -> void:
 		summary_plate.position = Vector2(0,i*80)
 		summary_plate.setup(enemy,i+1,base_font)
 		enemy_summary_plates.append(summary_plate)
-		var intent_text := model.enemy_intent_text(enemy)
+		var intent_text := displayed_enemy_intent(enemy)
 		var plate := ActorHUD.new()
 		# Floor (-2) < foot bars (-1) < actor artwork (0).
 		# Keep the original foot placement; nearer art may cover these strips.
@@ -376,7 +383,7 @@ func start_hand() -> void:
 	if first_draw:
 		await announce_turn("第%d回合" % model.turn)
 		model.draw_cards()
-		commit()
+		await commit()
 	await deal_hand(first_draw)
 	refresh_counts()
 	initialized = true
@@ -557,7 +564,7 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 	set_busy(true)
 	selected_uid = ""
 	aim.visible = false
-	commit()
+	await commit()
 	var retired: Array = [uid]
 	retired.append_array(result.get("discarded", []))
 	retired.append_array(result.get("exhaustedCards", []))
@@ -680,7 +687,7 @@ func end_turn_pressed() -> void:
 		presenting_enemy_turn = false
 		set_busy(false)
 		return
-	commit()
+	await commit()
 	for attack in result.get("turnEvents", result.attacks):
 		if attack.get("type", "attack") != "attack":
 			await present_status_event(attack)
@@ -808,6 +815,7 @@ func apply_shown_status(event: Dictionary) -> void:
 		if int(event.stacksAfter) == 0: shown_player_buffs.erase(event.buffId)
 		else: shown_player_buffs[event.buffId] = int(event.stacksAfter)
 		refresh_player_plate()
+		if event.buffId == "vulnerable": refresh_enemy_hud()
 	else:
 		var enemy: Dictionary = shown_enemies[index]
 		if not enemy.has("buffs"): enemy.buffs = {}
@@ -880,7 +888,8 @@ func refresh_card_previews() -> void:
 		cards[uid].show_preview(model.card_preview(uid, hovered_target if uid == selected_uid else -1))
 
 func commit() -> void:
-	Game.commit_combat(model)
+	if not Game.commit_combat(model):
+		await Game.checkpoint_saved
 	expected_revision = Game.revision
 	refresh_cyberware()
 	refresh_card_previews()
@@ -911,7 +920,7 @@ func activate_cyberware(id: String) -> void:
 		redraw = definition.get("effect", "") == "redraw_hand"
 		legacy_bonus = definition.get("effect", "next_attack_bonus") == "next_attack_bonus"
 	if not model.activate_cyberware(id): return
-	commit()
+	await commit()
 	if legacy_bonus:
 		pile_overlay.refresh()
 		return

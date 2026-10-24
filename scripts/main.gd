@@ -11,6 +11,10 @@ const VIEWS = {
 	"card_library": preload("res://scenes/card_library.tscn")
 }
 var view: Control
+var save_dialog: Control
+var save_retry: Button
+var save_error_label: Label
+var save_background_process_mode := Node.PROCESS_MODE_INHERIT
 var debug_panel: Control
 var debug_background_buttons: Array = []
 var debug_background_process_mode := Node.PROCESS_MODE_INHERIT
@@ -36,15 +40,36 @@ var exit_ok: Button
 var exit_action := ""
 var exit_background_buttons: Array = []
 var exit_background_process_mode := Node.PROCESS_MODE_INHERIT
+var quitting := false
+var previous_auto_accept_quit := true
 
 func _ready() -> void:
+	previous_auto_accept_quit = get_tree().auto_accept_quit
+	get_tree().auto_accept_quit = false
 	Game.changed.connect(show_page)
+	Game.checkpoint_failed.connect(open_save_failure)
+	Game.checkpoint_saved.connect(close_save_failure)
 	Game.notice.connect(show_notice)
 	Game.current_deck_requested.connect(open_current_deck)
 	Game.technology_loadout_requested.connect(open_technology_loadout)
 	Game.menu_requested.connect(open_exit_confirmation.bind("menu"))
 	Game.quit_requested.connect(open_exit_confirmation.bind("quit"))
 	show_page()
+	if not Game.pending_save_kind.is_empty(): open_save_failure()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		quit_after_audio_cleanup()
+
+func _exit_tree() -> void:
+	get_tree().auto_accept_quit = previous_auto_accept_quit
+
+func quit_after_audio_cleanup() -> void:
+	if quitting: return
+	quitting = true
+	process_mode = Node.PROCESS_MODE_DISABLED
+	await preload("res://scripts/combat/audio_cleanup.gd").release(self, get_tree())
+	get_tree().quit()
 
 func show_page() -> void:
 	if Game.transition_locked: return
@@ -108,6 +133,13 @@ func show_notice(message: String) -> void:
 		if is_instance_valid(notice_ui): notice_ui.queue_free())
 
 func _input(event: InputEvent) -> void:
+	if is_instance_valid(save_dialog):
+		if event is InputEventKey:
+			if event.is_action("ui_accept"): return
+			if event.is_action_pressed("ui_focus_next") or event.is_action_pressed("ui_focus_prev"):
+				save_retry.grab_focus()
+			get_viewport().set_input_as_handled()
+		return
 	if is_instance_valid(exit_dialog):
 		if event.is_action_pressed("ui_cancel"):
 			get_viewport().set_input_as_handled()
@@ -155,6 +187,45 @@ func _input(event: InputEvent) -> void:
 			if not Game.state.is_empty() and Game.can_continue(): Game.resume()
 		else: Game.request_menu()
 	elif is_instance_valid(debug_panel): get_viewport().set_input_as_handled()
+
+func open_save_failure() -> void:
+	if is_instance_valid(save_dialog): return
+	get_viewport().gui_release_focus()
+	if is_instance_valid(view):
+		save_background_process_mode = view.process_mode
+		view.process_mode = Node.PROCESS_MODE_DISABLED
+	var ui := DemoUI.new()
+	save_dialog = ui
+	ui.name = "save_failure"
+	ui.z_index = 140
+	ui.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(ui)
+	var shade := ui.rect(ui, Vector2.ZERO, Vector2(1440,900), Color(0,0,0,0.82))
+	shade.mouse_filter = Control.MOUSE_FILTER_STOP
+	ui.panel(ui, Vector2(350,260), Vector2(740,390), DemoUI.PANEL, DemoUI.PINK)
+	ui.label(ui, "进度尚未保存", Vector2(390,290), Vector2(660,50), 32)
+	save_error_label = ui.label(ui, Game.last_error, Vector2(390,358), Vector2(660,70), 20, DemoUI.PINK)
+	ui.label(ui, "本次操作已保留在内存中。请处理存储问题后重试。\n保存成功后继续；现在关闭程序可能丢失这部分进度。", Vector2(390,442), Vector2(660,88), 19, DemoUI.MUTED)
+	save_retry = ui.button(ui, "重试保存", Vector2(390,562), Vector2(660,52), retry_save, true)
+	save_retry.name = "retry_save"
+	for key in ["focus_next", "focus_previous", "focus_neighbor_left", "focus_neighbor_right", "focus_neighbor_top", "focus_neighbor_bottom"]:
+		save_retry.set(key, save_retry.get_path_to(save_retry))
+	save_retry.grab_focus()
+
+func retry_save() -> void:
+	if Game.retry_pending_save(): return
+	if is_instance_valid(save_error_label): save_error_label.text = Game.last_error
+	if is_instance_valid(save_retry): save_retry.grab_focus()
+
+func close_save_failure() -> void:
+	if not is_instance_valid(save_dialog): return
+	get_viewport().gui_release_focus()
+	remove_child(save_dialog)
+	save_dialog.queue_free()
+	save_dialog = null
+	save_retry = null
+	save_error_label = null
+	if is_instance_valid(view): view.process_mode = save_background_process_mode
 
 func open_exit_confirmation(action: String) -> void:
 	if action not in ["menu", "quit"] or Game.battle_busy or Game.transition_locked: return
@@ -228,11 +299,12 @@ func close_exit_confirmation() -> void:
 	exit_background_buttons.clear()
 
 func confirm_exit() -> void:
-	if not is_instance_valid(exit_dialog) or Game.battle_busy or Game.transition_locked: return
+	if quitting or not is_instance_valid(exit_dialog) or Game.battle_busy or Game.transition_locked: return
 	var action := exit_action
 	close_exit_confirmation()
 	if action == "menu": Game.menu()
-	elif action == "quit": get_tree().quit()
+	elif action == "quit":
+		quit_after_audio_cleanup()
 
 func toggle_debug() -> void:
 	if is_instance_valid(debug_panel):
@@ -290,8 +362,7 @@ func debug_change(kind: String, value: int) -> void:
 			Game.state.currentHp = clampi(value,0,int(Game.state.maxHp))
 			if Game.state.currentScene == "battle" and not Game.state.combat.is_empty():
 				Game.state.combat.playerHp = Game.state.currentHp
-	Game.checkpoint()
-	show_notice("测试状态已更新。")
+	if Game.checkpoint(): show_notice("测试状态已更新。")
 
 func open_card_console() -> void:
 	if is_instance_valid(exit_dialog): return
