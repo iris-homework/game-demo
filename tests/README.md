@@ -139,6 +139,8 @@
 
 弹药槽专项见 [ammo_hud_tests](combat/presentation/ammo_hud_tests.tscn)：无窗口检查科技上方布局、十槽两行、0—10发精确亮槽、橙色文字、悬停说明卡结构、真实远程耗弹／无弹拒绝／近战回弹、旧容量及非诺伦隐藏；关闭保存并使用测试专用路径。不调用截图、窗口调整或鼠标移动，不代表渲染与真实悬停验收。
 
+手牌排布专项见 [hand_layout_tests](combat/presentation/hand_layout_tests.tscn)：无窗口检查1／5／7／10／20／40张手牌的放大及上移、旋转卡面横向边界、卡面倾斜与排列圆弧一致、朝内上角无明显突出、每张卡的可见命中区域、命中查询与悬停姿态、选中及取消、补牌落稳与移除后的重排；关闭保存并使用测试专用路径，不截图、不移动系统鼠标。原`hand_fan_visual`保留为图形检查入口。
+
 出牌收益特效专项见 [card_gain_fx_tests](combat/presentation/card_gain_fx_tests.tscn)：无窗口检查成功出牌的实际格挡／抽牌触发、切近战附带抽牌、条件未满足／无牌可抽／失败不触发、复合效果、忙碌锁、模型不重复结算及视图清理。关闭保存并使用专用路径；截图与渲染证据另见 `artifacts/qa/card-gain-fx-2026-10-23/`。
 
 自身目标牌的敌人选择框专项见 [self_skill_targets_tests](combat/interaction/self_skill_targets_tests.tscn)：无窗口检查近远程目标判断、选牌／取消、敌人悬停和提示保留；使用视口合成事件，不移动系统鼠标，禁用保存并使用专用路径。

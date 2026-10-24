@@ -63,7 +63,10 @@ const ACTOR_OFFSET := Vector2(0,24)
 const ACTOR_SCALE := 0.85
 # Additional placement belongs to the selected stage; fallback scenes retain the base.
 var actor_offset := ACTOR_OFFSET
-const HAND_SCALE := 0.90
+const HAND_SCALE := 0.96
+const HAND_BASE_Y := 748.0
+const HAND_SAFE_WIDTH := 1020.0 # Between the side controls, x=210..1230.
+const HAND_EDGE_PADDING := 8.0
 const CENTER_DROP_RECT := Rect2(210,90,1020,620)
 const CARD_DRAG_THRESHOLD := 12.0
 const PILE_SIZE := Vector2(46,58)
@@ -293,16 +296,25 @@ func pile_button(pos: Vector2, title: String, action: Callable) -> void:
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 func hand_position(index: int, count: int) -> Vector2:
-	var offset := index-(count-1)/2.0
-	var spacing := minf(110.4,820.0/maxi(count-1,1))
-	var normalized := offset/maxf((count-1)/2.0,1.0)
-	return Vector2(720+offset*spacing-90,760+normalized*normalized*minf(24.0,(count-1)*3.0))
+	# Reserve the full rotated card footprint, rather than just its centre span.
+	var edge_angle := absf(hand_rotation(0,count))
+	var half_width := HAND_SCALE*(90.0*cos(edge_angle)+115.0*sin(edge_angle))
+	var span := HAND_SAFE_WIDTH-2.0*(half_width+HAND_EDGE_PADDING)
+	var spacing := minf(118.0,span/maxi(count-1,1))
+	if is_zero_approx(edge_angle): return Vector2(630,HAND_BASE_Y)
+	# Position and tilt share one circle. An independently flattened height curve
+	# makes the inward upper corners of the outer cards poke above their neighbours.
+	var radius := spacing*(count-1)/2.0/sin(edge_angle)
+	var angle := hand_rotation(index,count)
+	return Vector2(720+radius*sin(angle)-90,HAND_BASE_Y+radius*(1.0-cos(angle)))
 
 func hand_rotation(index: int, count: int) -> float:
-	return deg_to_rad((index-(count-1)/2.0)/maxf((count-1)/2.0,1.0)*minf(14.0,(count-1)*2.4))
+	return deg_to_rad((index-(count-1)/2.0)/maxf((count-1)/2.0,1.0)*minf(12.0,(count-1)*2.0))
 
 func hand_at_pointer() -> String:
-	var pointer := get_global_mouse_position()
+	return hand_at_point(get_global_mouse_position())
+
+func hand_at_point(pointer: Vector2) -> String:
 	var nearest := ""
 	# The centered attack is visually above the fan, so its visible face wins hits too.
 	if cards.has(selected_uid):
@@ -338,7 +350,7 @@ func create_card(uid: String, index: int, count: int, animate: bool) -> CombatCa
 	view.home_rotation = hand_rotation(index,count)
 	view.home_z = 10+index
 	view.lifted_z = maxi(30,10+count)
-	view.selection_home = hand_position(0,1)+Vector2(0,36) # Enlarged attack ends about 10 pixels above the viewport bottom.
+	view.selection_home = hand_position(0,1)+Vector2(0,36) # Keep the selected attack fully above the viewport bottom.
 	view.center_on_selection = model.card(uid).get("type","attack") == "attack"
 	view.setup(uid,model.card(uid))
 	view.home = hand_position(index,count)
