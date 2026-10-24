@@ -1,7 +1,7 @@
 {
   "noren": {
     "attributes": {
-      "maxHp": 100
+      "maxHp": 70
     },
     "startingDeck": [
       "noren_01",

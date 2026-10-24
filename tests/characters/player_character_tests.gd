@@ -28,7 +28,7 @@ func _ready() -> void:
 	check(Game.player_characters.keys() == ["noren"], "Only Noren is playable in shipped data")
 	Game.new_game()
 	check(Game.player_character_id() == "noren", "Default player ID is Noren")
-	check(Game.state.currentHp == 100 and Game.state.maxHp == 100, "Noren retains 100 HP")
+	check(Game.state.currentHp == 70 and Game.state.maxHp == 70, "Noren starts with 70 HP")
 	check(Game.display_name("@player") == "诺伦", "Player name resolves through ID")
 	check(Game.player_asset_id() == "noren" and Game.player_asset_id("battlePortraitAssetId") == "noren_battle", "Both portraits resolve through ID")
 	check(Game.player_definition().skills.is_empty(), "No invented character skills")
