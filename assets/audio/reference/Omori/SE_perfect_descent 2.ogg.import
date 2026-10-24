@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://b4jpx5a0uh5fe"
+path="res://.godot/imported/SE_perfect_descent 2.ogg-31df9774dc5ada5a45a6162c99362ee4.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/audio/reference/Omori/SE_perfect_descent 2.ogg"
+dest_files=["res://.godot/imported/SE_perfect_descent 2.ogg-31df9774dc5ada5a45a6162c99362ee4.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://hw60q1qiirm1"
+path="res://.godot/imported/glitch2.ogg-1f22e70ec6c2a4c39ba2a22ba28709b2.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/audio/reference/Doki Doki Literature Club/SFX/glitch2.ogg"
+dest_files=["res://.godot/imported/glitch2.ogg-1f22e70ec6c2a4c39ba2a22ba28709b2.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

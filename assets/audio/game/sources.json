@@ -1,0 +1,684 @@
+{
+  "schema": 1,
+  "generated": "2026-10-25",
+  "timezone": "Asia/Shanghai",
+  "scope": "正式游戏音效；仅覆盖 res://assets/audio/game 与 scripts/audio/game_audio.gd 子任务范围",
+  "source_binding": "scripts/audio/sfx_player.gd 的 DEFAULT_BINDINGS（相对文件路径）；读取时已确认没有 enemy_asset_pipeline/audio_preview_bindings.json",
+  "audio_root": "res://assets/audio/game",
+  "cue_count": 27,
+  "bound_cue_count": 21,
+  "silent_cue_count": 6,
+  "unique_audio_count": 18,
+  "silent_cues": [
+    "reward",
+    "victory",
+    "defeat",
+    "turn_start",
+    "transition",
+    "energy"
+  ],
+  "dialogue_pitch": {
+    "noren": 0.88,
+    "npc": 1,
+    "narrator": 1
+  },
+  "copy_policy": "从 assets/audio/incoming 按相同相对目录原字节复制。原件保留；未复制其余候选；未修改价格或正式存档。",
+  "license_status": {
+    "balatro_452647": {
+      "status": "pending_unverified",
+      "note": "下载页未附许可文本；资料来自社区上传与社区调用记录，社区公开或可下载不构成授权。正式发行前必须取得并记录明确许可。",
+      "registration": "licenses/balatro_452647-sources.txt"
+    },
+    "cozy_story_sfx": {
+      "status": "licensed_for_game_use",
+      "note": "许可允许在个人与商业作品中使用及修改，无需付费；不得把素材本身再分发或声称原创。署名非必需，推荐 Cozy Story SFX by Bramble & Byte。",
+      "license_file": "licenses/cozy-story-sfx-LICENSE.txt",
+      "readme_file": "licenses/cozy-story-sfx-README.txt"
+    }
+  },
+  "cues": [
+    {
+      "cue": "ui_click",
+      "usage": "普通按钮点击",
+      "relative_path": "ui/ui_click_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/ui/ui_click_balatro_01.ogg",
+      "silent": false,
+      "sha256": "dfbad0ca8ef2e3643a9a4a44a1adda0ee1831891b54c0cc9721c97e6bf04b838",
+      "bytes": 8133
+    },
+    {
+      "cue": "ui_cancel",
+      "usage": "取消、返回、离开",
+      "relative_path": "ui/ui_cancel_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/ui/ui_cancel_balatro_01.ogg",
+      "silent": false,
+      "sha256": "7af5148a45c875ebbc6457094c3d27885cd40d15f4f5bd8a379446be194c3af3",
+      "bytes": 10080
+    },
+    {
+      "cue": "ui_error",
+      "usage": "操作失败或拒绝提示",
+      "relative_path": "ui/ui_cancel_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/ui/ui_cancel_balatro_01.ogg",
+      "silent": false,
+      "sha256": "7af5148a45c875ebbc6457094c3d27885cd40d15f4f5bd8a379446be194c3af3",
+      "bytes": 10080
+    },
+    {
+      "cue": "card_hover",
+      "usage": "手牌悬停",
+      "relative_path": "cards/card_hover_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/cards/card_hover_balatro_01.ogg",
+      "silent": false,
+      "sha256": "ed9c9b83b139dac7766eabcb762ad2fd031e1d60695c6c221ce89c4dfa64861f",
+      "bytes": 5272
+    },
+    {
+      "cue": "card_select",
+      "usage": "按下或选中卡牌",
+      "relative_path": "cards/card_select_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/cards/card_select_balatro_01.ogg",
+      "silent": false,
+      "sha256": "3a0051435736515804691302fc9fde4ad9f1b9446f5be016eb831e6104bf1c52",
+      "bytes": 10928
+    },
+    {
+      "cue": "card_deselect",
+      "usage": "取消选牌",
+      "relative_path": "cards/card_deselect_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/cards/card_deselect_balatro_01.ogg",
+      "silent": false,
+      "sha256": "1c001b1771b34163d86fc77c134a7a6ab256d62450e410f6fe459f7fd68ca9e2",
+      "bytes": 9883
+    },
+    {
+      "cue": "card_play",
+      "usage": "成功出牌",
+      "relative_path": "cards/card_draw_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/cards/card_draw_balatro_01.ogg",
+      "silent": false,
+      "sha256": "0f7b6614c4d9f494b9470b02bbc0225ea6b35cd552a31c63d88a3d8da8817bd0",
+      "bytes": 13938
+    },
+    {
+      "cue": "card_draw",
+      "usage": "抽牌进入手牌",
+      "relative_path": "cards/card_draw_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/cards/card_draw_balatro_01.ogg",
+      "silent": false,
+      "sha256": "0f7b6614c4d9f494b9470b02bbc0225ea6b35cd552a31c63d88a3d8da8817bd0",
+      "bytes": 13938
+    },
+    {
+      "cue": "card_discard",
+      "usage": "卡牌进入弃牌动画",
+      "relative_path": "cards/card_crumple_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/cards/card_crumple_balatro_01.ogg",
+      "silent": false,
+      "sha256": "4d501d847e83178521c649e6c35d9fa79c3c52f0e0c8511527cb226e1abf440a",
+      "bytes": 14184
+    },
+    {
+      "cue": "card_shuffle",
+      "usage": "洗牌动画",
+      "relative_path": "cards/card_fan_balatro_02.ogg",
+      "res_path": "res://assets/audio/game/cards/card_fan_balatro_02.ogg",
+      "silent": false,
+      "sha256": "b20aca51cadcbf9a666ce0d55bd5a6a076de5cd27c3ffc5a13149a29703a27cb",
+      "bytes": 16469
+    },
+    {
+      "cue": "card_exhaust",
+      "usage": "卡牌消耗",
+      "relative_path": "combat/effect_whoosh_out_balatro_02.ogg",
+      "res_path": "res://assets/audio/game/combat/effect_whoosh_out_balatro_02.ogg",
+      "silent": false,
+      "sha256": "715309d75ea5eb1d96b9665a616b88a8100df8ff1596cc4fe476d50471a7cc84",
+      "bytes": 12848
+    },
+    {
+      "cue": "dialogue_blip",
+      "usage": "对话逐字短音",
+      "relative_path": "dialogue/dialogue_blip_cozy_soft_01.wav",
+      "res_path": "res://assets/audio/game/dialogue/dialogue_blip_cozy_soft_01.wav",
+      "silent": false,
+      "sha256": "95082b77addb696fba5a37a2002117015cbaff092047a8ea937c410ffb56cc05",
+      "bytes": 6218
+    },
+    {
+      "cue": "dialogue_advance",
+      "usage": "对话推进或显示整行",
+      "relative_path": "world/notice_highlight_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/world/notice_highlight_balatro_01.ogg",
+      "silent": false,
+      "sha256": "5a48d31d0cb6ab9228d5ee4ac3e166f24c41a9230f37e5f65da771528320af33",
+      "bytes": 7187
+    },
+    {
+      "cue": "trade_success",
+      "usage": "信用点发生交易变化",
+      "relative_path": "world/credits_coin_balatro_07.ogg",
+      "res_path": "res://assets/audio/game/world/credits_coin_balatro_07.ogg",
+      "silent": false,
+      "sha256": "ff1e5fe8cad32ae3ca14840cf7cad1ecc040e1cfd1ec2bb199033ce51c0b9fa3",
+      "bytes": 11315
+    },
+    {
+      "cue": "coin",
+      "usage": "信用点短音备用动作",
+      "relative_path": "world/credits_coin_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/world/credits_coin_balatro_01.ogg",
+      "silent": false,
+      "sha256": "0d31828d897da9b0e497da34817def0164f515b2047da7f906e449268946273a",
+      "bytes": 11309
+    },
+    {
+      "cue": "reward",
+      "usage": "事件完成／奖励领取",
+      "relative_path": "",
+      "res_path": "",
+      "silent": true,
+      "sha256": "",
+      "bytes": 0
+    },
+    {
+      "cue": "victory",
+      "usage": "战斗胜利结果页",
+      "relative_path": "",
+      "res_path": "",
+      "silent": true,
+      "sha256": "",
+      "bytes": 0
+    },
+    {
+      "cue": "defeat",
+      "usage": "战败终局页",
+      "relative_path": "",
+      "res_path": "",
+      "silent": true,
+      "sha256": "",
+      "bytes": 0
+    },
+    {
+      "cue": "technology",
+      "usage": "科技激活",
+      "relative_path": "cards/card_holo_apply_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/cards/card_holo_apply_balatro_01.ogg",
+      "silent": false,
+      "sha256": "d4ecc0e114b002099b7c219fe48239e64e97ee2cff426308590a6d3b17f71b9e",
+      "bytes": 12555
+    },
+    {
+      "cue": "stance",
+      "usage": "近战／远程形态切换",
+      "relative_path": "cards/card_select_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/cards/card_select_balatro_01.ogg",
+      "silent": false,
+      "sha256": "3a0051435736515804691302fc9fde4ad9f1b9446f5be016eb831e6104bf1c52",
+      "bytes": 10928
+    },
+    {
+      "cue": "ammo",
+      "usage": "获得弹药",
+      "relative_path": "combat/effect_trigger_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/combat/effect_trigger_balatro_01.ogg",
+      "silent": false,
+      "sha256": "df6aff5bf2b6a353430c5452ee854d8182f1c866b8eb2a4109047a4fb034b021",
+      "bytes": 7135
+    },
+    {
+      "cue": "block",
+      "usage": "获得格挡",
+      "relative_path": "cards/card_foil_apply_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/cards/card_foil_apply_balatro_01.ogg",
+      "silent": false,
+      "sha256": "68975987595ef3e91cc0ca5e2cc42925ae4700d0de1f20fde6c6739cf8cdbd6a",
+      "bytes": 8766
+    },
+    {
+      "cue": "parry",
+      "usage": "弹反层被消耗",
+      "relative_path": "combat/effect_slice_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/combat/effect_slice_balatro_01.ogg",
+      "silent": false,
+      "sha256": "6591d662575338d13fb7f35f248a45b5c02b484c21785054068703d04189719f",
+      "bytes": 8497
+    },
+    {
+      "cue": "turn_start",
+      "usage": "新回合开始",
+      "relative_path": "",
+      "res_path": "",
+      "silent": true,
+      "sha256": "",
+      "bytes": 0
+    },
+    {
+      "cue": "heal",
+      "usage": "生命恢复",
+      "relative_path": "cards/card_foil_trigger_balatro_02.ogg",
+      "res_path": "res://assets/audio/game/cards/card_foil_trigger_balatro_02.ogg",
+      "silent": false,
+      "sha256": "1764b004a706ead10c0950b09015e431ec2506a493ad150cdba918bee175d170",
+      "bytes": 9542
+    },
+    {
+      "cue": "transition",
+      "usage": "场景切换",
+      "relative_path": "",
+      "res_path": "",
+      "silent": true,
+      "sha256": "",
+      "bytes": 0
+    },
+    {
+      "cue": "energy",
+      "usage": "恢复能量",
+      "relative_path": "",
+      "res_path": "",
+      "silent": true,
+      "sha256": "",
+      "bytes": 0
+    }
+  ],
+  "files": [
+    {
+      "relative_path": "ui/ui_click_balatro_01.ogg",
+      "source": "assets/audio/incoming/ui/ui_click_balatro_01.ogg",
+      "target": "assets/audio/game/ui/ui_click_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/ui/ui_click_balatro_01.ogg",
+      "source_sha256": "dfbad0ca8ef2e3643a9a4a44a1adda0ee1831891b54c0cc9721c97e6bf04b838",
+      "target_sha256": "dfbad0ca8ef2e3643a9a4a44a1adda0ee1831891b54c0cc9721c97e6bf04b838",
+      "bytes": 8133,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "ui_click"
+      ],
+      "package": "balatro_452647",
+      "original_file": "button.ogg",
+      "original_usage": "界面按钮点击；也用于部分数字更新",
+      "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+      "community_uploader": "digital-goggles",
+      "page_submission_date": "2025-03-21",
+      "license_status": "pending_unverified",
+      "license_note": "下载页未附许可文本，许可未核实；不得把社区公开当作授权。"
+    },
+    {
+      "relative_path": "ui/ui_cancel_balatro_01.ogg",
+      "source": "assets/audio/incoming/ui/ui_cancel_balatro_01.ogg",
+      "target": "assets/audio/game/ui/ui_cancel_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/ui/ui_cancel_balatro_01.ogg",
+      "source_sha256": "7af5148a45c875ebbc6457094c3d27885cd40d15f4f5bd8a379446be194c3af3",
+      "target_sha256": "7af5148a45c875ebbc6457094c3d27885cd40d15f4f5bd8a379446be194c3af3",
+      "bytes": 10080,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "ui_cancel",
+        "ui_error"
+      ],
+      "package": "balatro_452647",
+      "original_file": "cancel.ogg",
+      "original_usage": "取消／负面反馈；结算未达标与盲注变化也复用",
+      "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+      "community_uploader": "digital-goggles",
+      "page_submission_date": "2025-03-21",
+      "license_status": "pending_unverified",
+      "license_note": "下载页未附许可文本，许可未核实；不得把社区公开当作授权。"
+    },
+    {
+      "relative_path": "cards/card_hover_balatro_01.ogg",
+      "source": "assets/audio/incoming/cards/card_hover_balatro_01.ogg",
+      "target": "assets/audio/game/cards/card_hover_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/cards/card_hover_balatro_01.ogg",
+      "source_sha256": "ed9c9b83b139dac7766eabcb762ad2fd031e1d60695c6c221ce89c4dfa64861f",
+      "target_sha256": "ed9c9b83b139dac7766eabcb762ad2fd031e1d60695c6c221ce89c4dfa64861f",
+      "bytes": 5272,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "card_hover"
+      ],
+      "package": "balatro_452647",
+      "original_file": "paper1.ogg",
+      "original_usage": "卡牌悬停；手牌排序和文字逐字也复用",
+      "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+      "community_uploader": "digital-goggles",
+      "page_submission_date": "2025-03-21",
+      "license_status": "pending_unverified",
+      "license_note": "下载页未附许可文本，许可未核实；不得把社区公开当作授权。"
+    },
+    {
+      "relative_path": "cards/card_select_balatro_01.ogg",
+      "source": "assets/audio/incoming/cards/card_select_balatro_01.ogg",
+      "target": "assets/audio/game/cards/card_select_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/cards/card_select_balatro_01.ogg",
+      "source_sha256": "3a0051435736515804691302fc9fde4ad9f1b9446f5be016eb831e6104bf1c52",
+      "target_sha256": "3a0051435736515804691302fc9fde4ad9f1b9446f5be016eb831e6104bf1c52",
+      "bytes": 10928,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "card_select",
+        "stance"
+      ],
+      "package": "balatro_452647",
+      "original_file": "cardSlide1.ogg",
+      "original_usage": "卡牌加入高亮选中区",
+      "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+      "community_uploader": "digital-goggles",
+      "page_submission_date": "2025-03-21",
+      "license_status": "pending_unverified",
+      "license_note": "下载页未附许可文本，许可未核实；不得把社区公开当作授权。"
+    },
+    {
+      "relative_path": "cards/card_deselect_balatro_01.ogg",
+      "source": "assets/audio/incoming/cards/card_deselect_balatro_01.ogg",
+      "target": "assets/audio/game/cards/card_deselect_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/cards/card_deselect_balatro_01.ogg",
+      "source_sha256": "1c001b1771b34163d86fc77c134a7a6ab256d62450e410f6fe459f7fd68ca9e2",
+      "target_sha256": "1c001b1771b34163d86fc77c134a7a6ab256d62450e410f6fe459f7fd68ca9e2",
+      "bytes": 9883,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "card_deselect"
+      ],
+      "package": "balatro_452647",
+      "original_file": "cardSlide2.ogg",
+      "original_usage": "再次点击已选卡牌、取消高亮",
+      "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+      "community_uploader": "digital-goggles",
+      "page_submission_date": "2025-03-21",
+      "license_status": "pending_unverified",
+      "license_note": "下载页未附许可文本，许可未核实；不得把社区公开当作授权。"
+    },
+    {
+      "relative_path": "cards/card_draw_balatro_01.ogg",
+      "source": "assets/audio/incoming/cards/card_draw_balatro_01.ogg",
+      "target": "assets/audio/game/cards/card_draw_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/cards/card_draw_balatro_01.ogg",
+      "source_sha256": "0f7b6614c4d9f494b9470b02bbc0225ea6b35cd552a31c63d88a3d8da8817bd0",
+      "target_sha256": "0f7b6614c4d9f494b9470b02bbc0225ea6b35cd552a31c63d88a3d8da8817bd0",
+      "bytes": 13938,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "card_play",
+        "card_draw"
+      ],
+      "package": "balatro_452647",
+      "original_file": "card1.ogg",
+      "original_usage": "抽／移动卡牌、翻牌等多个卡牌动作共用",
+      "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+      "community_uploader": "digital-goggles",
+      "page_submission_date": "2025-03-21",
+      "license_status": "pending_unverified",
+      "license_note": "下载页未附许可文本，许可未核实；不得把社区公开当作授权。"
+    },
+    {
+      "relative_path": "cards/card_crumple_balatro_01.ogg",
+      "source": "assets/audio/incoming/cards/card_crumple_balatro_01.ogg",
+      "target": "assets/audio/game/cards/card_crumple_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/cards/card_crumple_balatro_01.ogg",
+      "source_sha256": "4d501d847e83178521c649e6c35d9fa79c3c52f0e0c8511527cb226e1abf440a",
+      "target_sha256": "4d501d847e83178521c649e6c35d9fa79c3c52f0e0c8511527cb226e1abf440a",
+      "bytes": 14184,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "card_discard"
+      ],
+      "package": "balatro_452647",
+      "original_file": "crumple1.ogg",
+      "original_usage": "卡牌溶解、生成，以及菜单转换时随机使用",
+      "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+      "community_uploader": "digital-goggles",
+      "page_submission_date": "2025-03-21",
+      "license_status": "pending_unverified",
+      "license_note": "下载页未附许可文本，许可未核实；不得把社区公开当作授权。"
+    },
+    {
+      "relative_path": "cards/card_fan_balatro_02.ogg",
+      "source": "assets/audio/incoming/cards/card_fan_balatro_02.ogg",
+      "target": "assets/audio/game/cards/card_fan_balatro_02.ogg",
+      "res_path": "res://assets/audio/game/cards/card_fan_balatro_02.ogg",
+      "source_sha256": "b20aca51cadcbf9a666ce0d55bd5a6a076de5cd27c3ffc5a13149a29703a27cb",
+      "target_sha256": "b20aca51cadcbf9a666ce0d55bd5a6a076de5cd27c3ffc5a13149a29703a27cb",
+      "bytes": 16469,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "card_shuffle"
+      ],
+      "package": "balatro_452647",
+      "original_file": "cardFan2.ogg",
+      "original_usage": "出牌区状态文字、商店／回合结算展示、页面遮罩",
+      "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+      "community_uploader": "digital-goggles",
+      "page_submission_date": "2025-03-21",
+      "license_status": "pending_unverified",
+      "license_note": "下载页未附许可文本，许可未核实；不得把社区公开当作授权。"
+    },
+    {
+      "relative_path": "combat/effect_whoosh_out_balatro_02.ogg",
+      "source": "assets/audio/incoming/combat/effect_whoosh_out_balatro_02.ogg",
+      "target": "assets/audio/game/combat/effect_whoosh_out_balatro_02.ogg",
+      "res_path": "res://assets/audio/game/combat/effect_whoosh_out_balatro_02.ogg",
+      "source_sha256": "715309d75ea5eb1d96b9665a616b88a8100df8ff1596cc4fe476d50471a7cc84",
+      "target_sha256": "715309d75ea5eb1d96b9665a616b88a8100df8ff1596cc4fe476d50471a7cc84",
+      "bytes": 12848,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "card_exhaust"
+      ],
+      "package": "balatro_452647",
+      "original_file": "whoosh2.ogg",
+      "original_usage": "卡牌溶解、盲注结束和战败等",
+      "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+      "community_uploader": "digital-goggles",
+      "page_submission_date": "2025-03-21",
+      "license_status": "pending_unverified",
+      "license_note": "下载页未附许可文本，许可未核实；不得把社区公开当作授权。"
+    },
+    {
+      "relative_path": "dialogue/dialogue_blip_cozy_soft_01.wav",
+      "source": "assets/audio/incoming/dialogue/dialogue_blip_cozy_soft_01.wav",
+      "target": "assets/audio/game/dialogue/dialogue_blip_cozy_soft_01.wav",
+      "res_path": "res://assets/audio/game/dialogue/dialogue_blip_cozy_soft_01.wav",
+      "source_sha256": "95082b77addb696fba5a37a2002117015cbaff092047a8ea937c410ffb56cc05",
+      "target_sha256": "95082b77addb696fba5a37a2002117015cbaff092047a8ea937c410ffb56cc05",
+      "bytes": 6218,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "dialogue_blip"
+      ],
+      "package": "cozy_story_sfx",
+      "original_file": "sfx/text-soft.wav",
+      "original_usage": "视觉小说逐字对白短音",
+      "source_page": "Cozy Story SFX by Bramble & Byte（aquumgifts.itch.io）",
+      "license_status": "licensed_for_game_use",
+      "license_file": "assets/audio/game/licenses/cozy-story-sfx-LICENSE.txt",
+      "source_note": "原件 assets/audio/reference/cozy-story-sfx/sfx/text-soft.wav，经 incoming 原字节复制。"
+    },
+    {
+      "relative_path": "world/notice_highlight_balatro_01.ogg",
+      "source": "assets/audio/incoming/world/notice_highlight_balatro_01.ogg",
+      "target": "assets/audio/game/world/notice_highlight_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/world/notice_highlight_balatro_01.ogg",
+      "source_sha256": "5a48d31d0cb6ab9228d5ee4ac3e166f24c41a9230f37e5f65da771528320af33",
+      "target_sha256": "5a48d31d0cb6ab9228d5ee4ac3e166f24c41a9230f37e5f65da771528320af33",
+      "bytes": 7187,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "dialogue_advance"
+      ],
+      "package": "balatro_452647",
+      "original_file": "highlight1.ogg",
+      "original_usage": "通知／成就提示；回合结算失败也复用",
+      "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+      "community_uploader": "digital-goggles",
+      "page_submission_date": "2025-03-21",
+      "license_status": "pending_unverified",
+      "license_note": "下载页未附许可文本，许可未核实；不得把社区公开当作授权。"
+    },
+    {
+      "relative_path": "world/credits_coin_balatro_07.ogg",
+      "source": "assets/audio/incoming/world/credits_coin_balatro_07.ogg",
+      "target": "assets/audio/game/world/credits_coin_balatro_07.ogg",
+      "res_path": "res://assets/audio/game/world/credits_coin_balatro_07.ogg",
+      "source_sha256": "ff1e5fe8cad32ae3ca14840cf7cad1ecc040e1cfd1ec2bb199033ce51c0b9fa3",
+      "target_sha256": "ff1e5fe8cad32ae3ca14840cf7cad1ecc040e1cfd1ec2bb199033ce51c0b9fa3",
+      "bytes": 11315,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "trade_success"
+      ],
+      "package": "balatro_452647",
+      "original_file": "coin7.ogg",
+      "original_usage": "确认收款",
+      "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+      "community_uploader": "digital-goggles",
+      "page_submission_date": "2025-03-21",
+      "license_status": "pending_unverified",
+      "license_note": "下载页未附许可文本，许可未核实；不得把社区公开当作授权。"
+    },
+    {
+      "relative_path": "world/credits_coin_balatro_01.ogg",
+      "source": "assets/audio/incoming/world/credits_coin_balatro_01.ogg",
+      "target": "assets/audio/game/world/credits_coin_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/world/credits_coin_balatro_01.ogg",
+      "source_sha256": "0d31828d897da9b0e497da34817def0164f515b2047da7f906e449268946273a",
+      "target_sha256": "0d31828d897da9b0e497da34817def0164f515b2047da7f906e449268946273a",
+      "bytes": 11309,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "coin"
+      ],
+      "package": "balatro_452647",
+      "original_file": "coin1.ogg",
+      "original_usage": "金额变化提示",
+      "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+      "community_uploader": "digital-goggles",
+      "page_submission_date": "2025-03-21",
+      "license_status": "pending_unverified",
+      "license_note": "下载页未附许可文本，许可未核实；不得把社区公开当作授权。"
+    },
+    {
+      "relative_path": "cards/card_holo_apply_balatro_01.ogg",
+      "source": "assets/audio/incoming/cards/card_holo_apply_balatro_01.ogg",
+      "target": "assets/audio/game/cards/card_holo_apply_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/cards/card_holo_apply_balatro_01.ogg",
+      "source_sha256": "d4ecc0e114b002099b7c219fe48239e64e97ee2cff426308590a6d3b17f71b9e",
+      "target_sha256": "d4ecc0e114b002099b7c219fe48239e64e97ee2cff426308590a6d3b17f71b9e",
+      "bytes": 12555,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "technology"
+      ],
+      "package": "balatro_452647",
+      "original_file": "holo1.ogg",
+      "original_usage": "镭射版本应用；部分特殊效果复用",
+      "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+      "community_uploader": "digital-goggles",
+      "page_submission_date": "2025-03-21",
+      "license_status": "pending_unverified",
+      "license_note": "下载页未附许可文本，许可未核实；不得把社区公开当作授权。"
+    },
+    {
+      "relative_path": "combat/effect_trigger_balatro_01.ogg",
+      "source": "assets/audio/incoming/combat/effect_trigger_balatro_01.ogg",
+      "target": "assets/audio/game/combat/effect_trigger_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/combat/effect_trigger_balatro_01.ogg",
+      "source_sha256": "df6aff5bf2b6a353430c5452ee854d8182f1c866b8eb2a4109047a4fb034b021",
+      "target_sha256": "df6aff5bf2b6a353430c5452ee854d8182f1c866b8eb2a4109047a4fb034b021",
+      "bytes": 7135,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "ammo"
+      ],
+      "package": "balatro_452647",
+      "original_file": "generic1.ogg",
+      "original_usage": "通用效果提示；玻璃碎裂、数字与特殊效果多处复用",
+      "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+      "community_uploader": "digital-goggles",
+      "page_submission_date": "2025-03-21",
+      "license_status": "pending_unverified",
+      "license_note": "下载页未附许可文本，许可未核实；不得把社区公开当作授权。"
+    },
+    {
+      "relative_path": "cards/card_foil_apply_balatro_01.ogg",
+      "source": "assets/audio/incoming/cards/card_foil_apply_balatro_01.ogg",
+      "target": "assets/audio/game/cards/card_foil_apply_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/cards/card_foil_apply_balatro_01.ogg",
+      "source_sha256": "68975987595ef3e91cc0ca5e2cc42925ae4700d0de1f20fde6c6739cf8cdbd6a",
+      "target_sha256": "68975987595ef3e91cc0ca5e2cc42925ae4700d0de1f20fde6c6739cf8cdbd6a",
+      "bytes": 8766,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "block"
+      ],
+      "package": "balatro_452647",
+      "original_file": "foil1.ogg",
+      "original_usage": "闪箔版本应用；解锁提示也复用",
+      "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+      "community_uploader": "digital-goggles",
+      "page_submission_date": "2025-03-21",
+      "license_status": "pending_unverified",
+      "license_note": "下载页未附许可文本，许可未核实；不得把社区公开当作授权。"
+    },
+    {
+      "relative_path": "combat/effect_slice_balatro_01.ogg",
+      "source": "assets/audio/incoming/combat/effect_slice_balatro_01.ogg",
+      "target": "assets/audio/game/combat/effect_slice_balatro_01.ogg",
+      "res_path": "res://assets/audio/game/combat/effect_slice_balatro_01.ogg",
+      "source_sha256": "6591d662575338d13fb7f35f248a45b5c02b484c21785054068703d04189719f",
+      "target_sha256": "6591d662575338d13fb7f35f248a45b5c02b484c21785054068703d04189719f",
+      "bytes": 8497,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "parry"
+      ],
+      "package": "balatro_452647",
+      "original_file": "slice1.ogg",
+      "original_usage": "小丑牌吞噬／切除邻牌效果中触发",
+      "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+      "community_uploader": "digital-goggles",
+      "page_submission_date": "2025-03-21",
+      "license_status": "pending_unverified",
+      "license_note": "下载页未附许可文本，许可未核实；不得把社区公开当作授权。"
+    },
+    {
+      "relative_path": "cards/card_foil_trigger_balatro_02.ogg",
+      "source": "assets/audio/incoming/cards/card_foil_trigger_balatro_02.ogg",
+      "target": "assets/audio/game/cards/card_foil_trigger_balatro_02.ogg",
+      "res_path": "res://assets/audio/game/cards/card_foil_trigger_balatro_02.ogg",
+      "source_sha256": "1764b004a706ead10c0950b09015e431ec2506a493ad150cdba918bee175d170",
+      "target_sha256": "1764b004a706ead10c0950b09015e431ec2506a493ad150cdba918bee175d170",
+      "bytes": 9542,
+      "identical": true,
+      "processing": "unchanged_byte_copy",
+      "cues": [
+        "heal"
+      ],
+      "package": "balatro_452647",
+      "original_file": "foil2.ogg",
+      "original_usage": "版本效果结算与通知提示",
+      "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+      "community_uploader": "digital-goggles",
+      "page_submission_date": "2025-03-21",
+      "license_status": "pending_unverified",
+      "license_note": "下载页未附许可文本，许可未核实；不得把社区公开当作授权。"
+    }
+  ]
+}

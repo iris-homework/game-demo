@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://11tr33erx2vx"
+path="res://.godot/imported/sfx-phonebeep.wav-2b502ca9f80cfd7299016dac64ca334a.sample"
+
+[deps]
+
+source_file="res://assets/audio/reference/Phoenix Wright_ce Attorney/sfx-phonebeep.wav"
+dest_files=["res://.godot/imported/sfx-phonebeep.wav-2b502ca9f80cfd7299016dac64ca334a.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

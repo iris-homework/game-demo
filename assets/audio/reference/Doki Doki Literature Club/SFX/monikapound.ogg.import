@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://db3vsv1frodh6"
+path="res://.godot/imported/monikapound.ogg-73fff4508761be12d5b96e1666f62da5.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/audio/reference/Doki Doki Literature Club/SFX/monikapound.ogg"
+dest_files=["res://.godot/imported/monikapound.ogg-73fff4508761be12d5b96e1666f62da5.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

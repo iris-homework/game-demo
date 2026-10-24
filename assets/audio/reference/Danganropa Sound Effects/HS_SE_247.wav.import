@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://dpdoc0lsi4a5q"
+path="res://.godot/imported/HS_SE_247.wav-8841e4a5548c722af8fc5528b4e3209a.sample"
+
+[deps]
+
+source_file="res://assets/audio/reference/Danganropa Sound Effects/HS_SE_247.wav"
+dest_files=["res://.godot/imported/HS_SE_247.wav-8841e4a5548c722af8fc5528b4e3209a.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

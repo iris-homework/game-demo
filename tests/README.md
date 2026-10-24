@@ -1,5 +1,29 @@
 # 测试目录索引
 
+2026-10-25空手牌回合／三角色音调：旧代码58项中1项失败，复现自动回能误发提示；修复后音频库576／场景65／工作台15，共656项无窗口Dummy检查通过。覆盖能量整体静音、真实角色音高和播放器复位；首次随机手牌夹具失败保留，固定种子后复测通过。正式存档未变，工作台保留既有2对象／1资源退出提示。见[本轮汇总](../artifacts/qa/audio-turn-dialogue-2026-10-25/verification.json)。
+
+2026-10-25关闭六类测试台音效：五个候选cue默认静音，归位响指仅在测试台战斗实例静音；候选库562／场景56／工作台15／原战斗音效113，共746项无窗口Dummy检查通过。验证空绑定重扫、奖励／胜败／转场／回合静音、响指隔离恢复及原战斗回归；正式存档未变。工作台保留既有2对象／1资源退出提示，详见[本轮汇总](../artifacts/qa/audio-disabled-2026-10-25/verification.json)。
+
+2026-10-25默认音效刷新：替换胜利、转场、回合开始等13个动作，候选96个。音频库553／正式场景隔离模拟49，共602项无窗口Dummy检查通过，覆盖新增音频解码／时长／非循环及真实胜利、转场、回合音源路径；正式存档未变。见[本轮汇总](../artifacts/qa/audio-reference-refresh-2026-10-25/verification.json)与[音效用途表](../docs/测试台音效用途与替换表.md)。
+
+2026-10-25新增[正式图片mipmap专项](rendering/mipmap_tests.tscn)：检查40张卡面
+实际绑定、按Viewport具名常量核对项目与运行视口过滤、背景／角色／科技／商店／菜单代表纹理、正式
+战斗角色及附件、姿势切换和动态未导入纹理的生成回退。测试关闭保存，使用
+`QA_OUT_DIR`下的独立路径；在复制工程及独立用户目录运行。无窗口只检查
+纹理与节点状态，有显示时输出菜单、牌库、战斗及「贴近」同尺寸过滤A/B截图。
+分别使用`--resolution 1280x800`和`--resolution 1600x1000`验证实际渲染；
+截图不代替真人输入或主观认可。本轮结果见修改记录。
+
+沃斯商场角色回归补正：Viewport的线性mipmap为2、最近邻mipmap为3，
+不要把CanvasItem的数值映射当作Viewport映射。专项实际进入正式商场，
+验证原图绑定与继承过滤；有显示时输出相同原图、尺寸和布局下的正确线性
+版本及旧最近邻对照。修复前新版专项应报告项目、运行视口、商场和战斗背景
+4项过滤失败，修复后全部通过；旧6998项统计存在此枚举检查盲点。
+
+2026-10-25对话短音更新：新增7个参考候选并默认使用Cozy柔和文字音，逐字间隔80毫秒。音频库446／场景模拟45，共491项无窗口Dummy检查通过；全部新候选解码、方案保存及正式存档隔离通过。证据见[对话更新汇总](../artifacts/qa/dialogue-soft-2026-10-25/verification.json)，逐项用途见[替换表](../docs/测试台音效用途与替换表.md)。
+
+2026-10-25音效测试台：候选库专项为[音频库](../enemy_asset_pipeline/test/audio_preview_bank_tests.tscn)，正式页面隔离模拟为[场景模拟](../enemy_asset_pipeline/test/audio_scene_simulator_tests.tscn)，实际制作台打开与返回为[工作台整合](../enemy_asset_pipeline/test/audio_workbench_tests.tscn)。使用独立APPDATA与Dummy音频无窗口运行；场景模拟加`-- --visual`可做程序驱动窗口截图。操作说明见[音效测试台](../docs/音效测试台使用说明.md)，最终结果见[本轮汇总](../artifacts/qa/audio-lab-2026-10-24/verification.json)。
+
 2026-10-24退出清理：[audio_cleanup_tests](audio_cleanup_tests.tscn)32项检查普通／2D／3D播放对象及声音数据实际释放；[audio_quit_tests](audio_quit_tests.tscn)菜单8项、加`-- window-close`运行关闭处理7项；[resource_pipeline_cleanup_tests](resource_pipeline_cleanup_tests.tscn)58项验证真实牌库依赖图、缓存兼容与Profile／Frame／Attachment所有权。配套原12套、战斗音效113项与管线运行时111项，共18套1604项通过，最终无退出泄漏提示。必须用独立工程／用户目录及`--headless --audio-driver Dummy --verbose`，音频自然播放套件使用真实时间，不加`--fixed-fps`；关闭处理测试不操作系统窗口。见[本轮汇总](../artifacts/qa/resource-cleanup-2026-10-24/verification.json)。保存失败流程现含音频收尾共42项，上一条历史验收的41项记录保留。
 
 2026-10-24审计修复：[cold_start_loadout_tests](cold_start_loadout_tests.tscn)140项覆盖冷启动牌库／经典及单敌演练、备份、坏档与只读隔离；[enemy_intent_phase_tests](combat/presentation/enemy_intent_phase_tests.tscn)15项覆盖易伤、力量与虚弱的展示时序；[save_failure_flow_tests](save_failure_flow_tests.tscn)41项覆盖治疗、对白、奖励、新游戏、战败与真实战斗视图的保存失败／重复重试／恢复。配套9套合计12套1274项通过。测试必须使用复制工程及独立用户目录，全部headless；完整结果及首轮夹具调整见[汇总](../artifacts/qa/audit-fixes-2026-10-24/verification.json)和修改记录。

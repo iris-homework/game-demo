@@ -1,0 +1,15 @@
+Balatro 452647 音效候选来源与核查说明
+来源页面：https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/
+社区上传者：digital-goggles；页面提交日期：2025-03-21。
+用户提供目录：C:/Users/22141/Downloads/452647/。
+包内75个OGG，无README或用途说明文件。
+此目录保留原名原件；分类副本位于incoming/ui、cards、dialogue、world、ambience、combat。
+完整原名→新名、用途证据、时长和SHA256：manifest.json。
+中文逐文件对照：docs/Balatro音效对照与分类.md（从工程根目录起）。
+资料来自社区原游戏调用代码及Steamodded维护者配置，并非原作者提供的完整音效手册。
+未定位到调用的文件保留中性命名并标为“原触发待确认”。
+建议在午夜委托中的用途单独登记，全部待试听、未接入；无裁剪、变调或转码。
+下载页未附许可文本，许可状态登记为未核实。
+核查日期：2026-10-24（Asia/Shanghai）。
+
+2026-10-25测试台状态：全部候选已可试听与绑定，原始音频字节未修改，正式游戏尚未接入。

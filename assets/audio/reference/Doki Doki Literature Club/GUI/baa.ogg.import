@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://ds3om5kgmanqh"
+path="res://.godot/imported/baa.ogg-48d12fc6cf3e90798bea3eb155ddfa19.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/audio/reference/Doki Doki Literature Club/GUI/baa.ogg"
+dest_files=["res://.godot/imported/baa.ogg-48d12fc6cf3e90798bea3eb155ddfa19.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

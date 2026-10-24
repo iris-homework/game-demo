@@ -42,8 +42,17 @@ var exit_background_buttons: Array = []
 var exit_background_process_mode := Node.PROCESS_MODE_INHERIT
 var quitting := false
 var previous_auto_accept_quit := true
+var audio_player: Node
+var audio_hooks: Node
 
 func _ready() -> void:
+	audio_player = preload("res://scripts/audio/game_audio.gd").new()
+	add_child(audio_player)
+	audio_hooks = preload("res://scripts/audio/sfx_hooks.gd").new()
+	audio_hooks.bank = audio_player
+	audio_hooks.ui_root = self
+	audio_hooks.observe_choices = false
+	add_child(audio_hooks)
 	previous_auto_accept_quit = get_tree().auto_accept_quit
 	get_tree().auto_accept_quit = false
 	Game.changed.connect(show_page)
@@ -62,6 +71,7 @@ func _notification(what: int) -> void:
 		quit_after_audio_cleanup()
 
 func _exit_tree() -> void:
+	if is_instance_valid(audio_hooks): audio_hooks.attach(null)
 	get_tree().auto_accept_quit = previous_auto_accept_quit
 
 func quit_after_audio_cleanup() -> void:
@@ -78,6 +88,7 @@ func show_page() -> void:
 	else: swap_view()
 
 func swap_view() -> void:
+	if is_instance_valid(audio_hooks): audio_hooks.attach(null)
 	if is_instance_valid(technology_browser): close_technology_loadout()
 	if is_instance_valid(exit_dialog): close_exit_confirmation()
 	if is_instance_valid(deck_browser): close_current_deck()
@@ -94,6 +105,11 @@ func swap_view() -> void:
 		view = VIEWS.get(Game.page,VIEWS.menu).instantiate()
 	shown_page = Game.page
 	add_child(view)
+	# Game.choose can swap the view before select() emits its success signal.
+	# Keep this connection on that view until it is freed, independently of hooks.
+	if view.has_signal("choice_confirmed"):
+		view.choice_confirmed.connect(audio_player.play_cue.bind("ui_click"))
+	if is_instance_valid(audio_hooks): audio_hooks.attach(view)
 
 func play_transition() -> void:
 	Game.transition_locked = true
@@ -118,6 +134,11 @@ func play_transition() -> void:
 	Game.transition_locked = false
 
 func show_notice(message: String) -> void:
+	if is_instance_valid(audio_player):
+		for word in ["不足", "无法", "失败", "无效", "不能", "请先"]:
+			if word in message:
+				audio_player.play_cue("ui_error")
+				break
 	if is_instance_valid(toast): toast.queue_free()
 	var ui := DemoUI.new()
 	toast = ui

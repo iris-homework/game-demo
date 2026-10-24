@@ -51,6 +51,7 @@ func rarity_color() -> Color:
 	return RARITY_COLORS.get(data.get("rarity", ""), CYAN)
 
 func setup(card_uid: String, definition: Dictionary, read_only: bool = false) -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	uid = card_uid
 	data = definition
 	preview_only = read_only

@@ -1,0 +1,2293 @@
+{
+  "package": "balatro_452647",
+  "date": "2026-10-24",
+  "timezone": "Asia/Shanghai",
+  "source_page": "https://sounds.spriters-resource.com/pc_computer/balatro/asset/452647/",
+  "source_directory": "C:\\Users\\22141\\Downloads\\452647",
+  "community_uploader": "digital-goggles",
+  "page_submission_date": "2025-03-21",
+  "expected_file_count": 75,
+  "license_status": "下载页未附许可文本；许可状态未核实",
+  "research_scope": "社区原游戏调用代码与Steamodded维护者配置；未与该提取包原版版本逐字比对",
+  "verification_scope": "Ogg页CRC、Vorbis头、正时长、原件及分类副本SHA256；未解码试听或运行游戏",
+  "originals_subdirectory": "_originals/balatro_452647",
+  "files": [
+    {
+      "original": "button.ogg",
+      "category": "ui",
+      "target": "ui/ui_click_balatro_01.ogg",
+      "original_usage": "界面按钮点击；也用于部分数字更新",
+      "proposed_usage": "通用按钮点击",
+      "checklist_ids": [
+        "UI-04"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：UIElement",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/engine/ui.lua#L989"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 1,
+      "duration_seconds": 0.500023,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 8133,
+      "sha256": "dfbad0ca8ef2e3643a9a4a44a1adda0ee1831891b54c0cc9721c97e6bf04b838",
+      "original_copy": "_originals/balatro_452647/button.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "cancel.ogg",
+      "category": "ui",
+      "target": "ui/ui_cancel_balatro_01.ogg",
+      "original_usage": "取消／负面反馈；结算未达标与盲注变化也复用",
+      "proposed_usage": "取消、返回或拒绝提示候选",
+      "checklist_ids": [
+        "UI-05",
+        "UI-07"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L810"
+        },
+        {
+          "title": "社区原游戏调用代码：启动、菜单、战败",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/game.lua#L3213"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 1,
+      "duration_seconds": 0.485011,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 10080,
+      "sha256": "7af5148a45c875ebbc6457094c3d27885cd40d15f4f5bd8a379446be194c3af3",
+      "original_copy": "_originals/balatro_452647/cancel.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "other1.ogg",
+      "category": "ui",
+      "target": "ui/ui_refresh_balatro_01.ogg",
+      "original_usage": "商店刷新、重掷Boss时触发",
+      "proposed_usage": "界面刷新提示候选",
+      "checklist_ids": [
+        "UI-04"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：按钮回调",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/button_callbacks.lua#L2764"
+        },
+        {
+          "title": "社区原游戏调用代码：按钮回调",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/button_callbacks.lua#L2836"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.518163,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 12148,
+      "sha256": "18ede24dacdd40498a6eadf4ac58fa53bd622fffe4f773c556e834afd4d49e34",
+      "original_copy": "_originals/balatro_452647/other1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "paper1.ogg",
+      "category": "cards",
+      "target": "cards/card_hover_balatro_01.ogg",
+      "original_usage": "卡牌悬停；手牌排序和文字逐字也复用",
+      "proposed_usage": "优先试听：卡牌悬停",
+      "checklist_ids": [
+        "CARD-01"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L4303"
+        },
+        {
+          "title": "社区原游戏调用代码：按钮回调",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/button_callbacks.lua#L38"
+        },
+        {
+          "title": "社区原游戏调用代码：DynaText",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/engine/text.lua#L201"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.065465,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 5272,
+      "sha256": "ed9c9b83b139dac7766eabcb762ad2fd031e1d60695c6c221ce89c4dfa64861f",
+      "original_copy": "_originals/balatro_452647/paper1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "cardSlide1.ogg",
+      "category": "cards",
+      "target": "cards/card_select_balatro_01.ogg",
+      "original_usage": "卡牌加入高亮选中区",
+      "proposed_usage": "优先试听：按下选中卡牌",
+      "checklist_ids": [
+        "CARD-02"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：CardArea",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/cardarea.lua#L140"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.448821,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 10928,
+      "sha256": "3a0051435736515804691302fc9fde4ad9f1b9446f5be016eb831e6104bf1c52",
+      "original_copy": "_originals/balatro_452647/cardSlide1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "cardSlide2.ogg",
+      "category": "cards",
+      "target": "cards/card_deselect_balatro_01.ogg",
+      "original_usage": "再次点击已选卡牌、取消高亮",
+      "proposed_usage": "取消选牌",
+      "checklist_ids": [
+        "CARD-04"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L4607"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.355669,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 9883,
+      "sha256": "1c001b1771b34163d86fc77c134a7a6ab256d62450e410f6fe459f7fd68ca9e2",
+      "original_copy": "_originals/balatro_452647/cardSlide2.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "card1.ogg",
+      "category": "cards",
+      "target": "cards/card_draw_balatro_01.ogg",
+      "original_usage": "抽／移动卡牌、翻牌等多个卡牌动作共用",
+      "proposed_usage": "抽牌、成功出牌的候选",
+      "checklist_ids": [
+        "CARD-03",
+        "CARD-05"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L416"
+        },
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L1107"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.651474,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 13938,
+      "sha256": "0f7b6614c4d9f494b9470b02bbc0225ea6b35cd552a31c63d88a3d8da8817bd0",
+      "original_copy": "_originals/balatro_452647/card1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "card3.ogg",
+      "category": "cards",
+      "target": "cards/card_action_balatro_03.ogg",
+      "original_usage": "本轮调用资料未定位到具体触发",
+      "proposed_usage": "通用卡牌动作候选，先试听再定用途",
+      "checklist_ids": [],
+      "evidence": [],
+      "evidence_status": "原触发待确认",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.498095,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 11872,
+      "sha256": "cc2a08ae46b14a09ed38c22ffffa594edb4a77c5cc29ebf23a176e319fef7fe0",
+      "original_copy": "_originals/balatro_452647/card3.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "cardFan2.ogg",
+      "category": "cards",
+      "target": "cards/card_fan_balatro_02.ogg",
+      "original_usage": "出牌区状态文字、商店／回合结算展示、页面遮罩",
+      "proposed_usage": "展开卡牌、洗牌或面板展开候选；尚未认可",
+      "checklist_ids": [
+        "CARD-07",
+        "UI-06"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L457"
+        },
+        {
+          "title": "社区原游戏调用代码：启动、菜单、战败",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/game.lua#L3024"
+        },
+        {
+          "title": "社区原游戏调用代码：按钮回调",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/button_callbacks.lua#L3077"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.766032,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 16469,
+      "sha256": "b20aca51cadcbf9a666ce0d55bd5a6a076de5cd27c3ffc5a13149a29703a27cb",
+      "original_copy": "_originals/balatro_452647/cardFan2.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "crumple1.ogg",
+      "category": "cards",
+      "target": "cards/card_crumple_balatro_01.ogg",
+      "original_usage": "卡牌溶解、生成，以及菜单转换时随机使用",
+      "proposed_usage": "弃牌或消耗牌的揉皱质感候选",
+      "checklist_ids": [
+        "CARD-06",
+        "CARD-08"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2155"
+        },
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2212"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.74288,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 14184,
+      "sha256": "4d501d847e83178521c649e6c35d9fa79c3c52f0e0c8511527cb226e1abf440a",
+      "original_copy": "_originals/balatro_452647/crumple1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "crumple2.ogg",
+      "category": "cards",
+      "target": "cards/card_crumple_balatro_02.ogg",
+      "original_usage": "卡牌溶解、生成，以及菜单转换时随机使用",
+      "proposed_usage": "弃牌或消耗牌的揉皱质感候选",
+      "checklist_ids": [
+        "CARD-06",
+        "CARD-08"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2155"
+        },
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2212"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.74288,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 14336,
+      "sha256": "f72c12b4bdf893c7e0e53ca3fe3a3a43af300ff90813d40b75dabf16d374e8ff",
+      "original_copy": "_originals/balatro_452647/crumple2.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "crumple3.ogg",
+      "category": "cards",
+      "target": "cards/card_crumple_balatro_03.ogg",
+      "original_usage": "卡牌溶解、生成，以及菜单转换时随机使用",
+      "proposed_usage": "弃牌或消耗牌的揉皱质感候选",
+      "checklist_ids": [
+        "CARD-06",
+        "CARD-08"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2155"
+        },
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2212"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.74288,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 13284,
+      "sha256": "5834244ac3ef18025dbfc6dd374b17b4e3fe25a9f42ee64885653bdea119fa00",
+      "original_copy": "_originals/balatro_452647/crumple3.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "crumple4.ogg",
+      "category": "cards",
+      "target": "cards/card_crumple_balatro_04.ogg",
+      "original_usage": "卡牌溶解、生成，以及菜单转换时随机使用",
+      "proposed_usage": "弃牌或消耗牌的揉皱质感候选",
+      "checklist_ids": [
+        "CARD-06",
+        "CARD-08"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2155"
+        },
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2212"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.74288,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 13132,
+      "sha256": "1f83b9c13cf24a43f4b344874204422ebbac6f0c0667cbb07ae68b63a09e7b45",
+      "original_copy": "_originals/balatro_452647/crumple4.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "crumple5.ogg",
+      "category": "cards",
+      "target": "cards/card_crumple_balatro_05.ogg",
+      "original_usage": "卡牌溶解、生成，以及菜单转换时随机使用",
+      "proposed_usage": "弃牌或消耗牌的揉皱质感候选",
+      "checklist_ids": [
+        "CARD-06",
+        "CARD-08"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2155"
+        },
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2212"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.74288,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 13806,
+      "sha256": "5e257b11005873124a04fb07854a9c87198ba2ece2b4e14ab1856318137ecdf3",
+      "original_copy": "_originals/balatro_452647/crumple5.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "crumpleLong1.ogg",
+      "category": "cards",
+      "target": "cards/card_crumple_long_balatro_01.ogg",
+      "original_usage": "文件名表示长揉皱声；本轮未定位具体触发",
+      "proposed_usage": "较长的卡牌消散／转场候选",
+      "checklist_ids": [
+        "CARD-08"
+      ],
+      "evidence": [],
+      "evidence_status": "原触发待确认",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 3.959002,
+      "ogg_pages": 6,
+      "ogg_crc_verified": true,
+      "bytes": 51138,
+      "sha256": "9a6a07dbfce726b567cf7bf14bcb5f8e62bb7e0b834413014e70be6bb9cd9243",
+      "original_copy": "_originals/balatro_452647/crumpleLong1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "crumpleLong2.ogg",
+      "category": "cards",
+      "target": "cards/card_crumple_long_balatro_02.ogg",
+      "original_usage": "文件名表示长揉皱声；本轮未定位具体触发",
+      "proposed_usage": "较长的卡牌消散／转场候选",
+      "checklist_ids": [
+        "CARD-08"
+      ],
+      "evidence": [],
+      "evidence_status": "原触发待确认",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 3.959002,
+      "ogg_pages": 6,
+      "ogg_crc_verified": true,
+      "bytes": 54742,
+      "sha256": "712edab9415f8ad2d017a8a738fc0e40099dfad97af9ac3199b768c2a757f3f7",
+      "original_copy": "_originals/balatro_452647/crumpleLong2.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "magic_crumple.ogg",
+      "category": "cards",
+      "target": "cards/card_magic_crumple_balatro_01.ogg",
+      "original_usage": "启动画面与菜单进入／转换的魔法揉皱效果",
+      "proposed_usage": "消耗牌溶解、稀有卡出现候选",
+      "checklist_ids": [
+        "CARD-08",
+        "WORLD-07"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：启动、菜单、战败",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/game.lua#L1390"
+        },
+        {
+          "title": "社区原游戏调用代码：启动、菜单、战败",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/game.lua#L1579"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 6.385488,
+      "ogg_pages": 9,
+      "ogg_crc_verified": true,
+      "bytes": 86129,
+      "sha256": "8396f0d850fda4d2630c4260eb29213691ee1bd8a5ffc1e9bbf775ccb814d139",
+      "original_copy": "_originals/balatro_452647/magic_crumple.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "magic_crumple2.ogg",
+      "category": "cards",
+      "target": "cards/card_magic_crumple_balatro_02.ogg",
+      "original_usage": "启动画面与菜单进入／转换的魔法揉皱效果",
+      "proposed_usage": "消耗牌溶解、稀有卡出现候选",
+      "checklist_ids": [
+        "CARD-08",
+        "WORLD-07"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：启动、菜单、战败",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/game.lua#L1390"
+        },
+        {
+          "title": "社区原游戏调用代码：启动、菜单、战败",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/game.lua#L1579"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.492766,
+      "ogg_pages": 5,
+      "ogg_crc_verified": true,
+      "bytes": 35330,
+      "sha256": "e2409935c81918d2bbc183233d45ce7f1d27d465a96a03e228736d34a2fc0052",
+      "original_copy": "_originals/balatro_452647/magic_crumple2.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "magic_crumple3.ogg",
+      "category": "cards",
+      "target": "cards/card_magic_crumple_balatro_03.ogg",
+      "original_usage": "启动画面与菜单进入／转换的魔法揉皱效果",
+      "proposed_usage": "消耗牌溶解、稀有卡出现候选",
+      "checklist_ids": [
+        "CARD-08",
+        "WORLD-07"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：启动、菜单、战败",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/game.lua#L1390"
+        },
+        {
+          "title": "社区原游戏调用代码：启动、菜单、战败",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/game.lua#L1579"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 1.566667,
+      "ogg_pages": 4,
+      "ogg_crc_verified": true,
+      "bytes": 24430,
+      "sha256": "089315c4b47c93810396513ed9366422dbfdaaefd387870f972549e20c47908c",
+      "original_copy": "_originals/balatro_452647/magic_crumple3.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "glass1.ogg",
+      "category": "cards",
+      "target": "cards/card_glass_shatter_balatro_01.ogg",
+      "original_usage": "玻璃牌碎裂时随机选取",
+      "proposed_usage": "卡牌破碎或科技碎裂效果候选",
+      "checklist_ids": [
+        "CARD-08"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2103"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.745533,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 16954,
+      "sha256": "c61519bd9f0876c90662fe0c54020a7f254da56a2528aca7ce63bc7c3d861d79",
+      "original_copy": "_originals/balatro_452647/glass1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "glass2.ogg",
+      "category": "cards",
+      "target": "cards/card_glass_shatter_balatro_02.ogg",
+      "original_usage": "玻璃牌碎裂时随机选取",
+      "proposed_usage": "卡牌破碎或科技碎裂效果候选",
+      "checklist_ids": [
+        "CARD-08"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2103"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.745533,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 16797,
+      "sha256": "903d87742f8c7d19679c4311befc27f3b88a94ad4ff65b2ffcc3c7a70e202f48",
+      "original_copy": "_originals/balatro_452647/glass2.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "glass3.ogg",
+      "category": "cards",
+      "target": "cards/card_glass_shatter_balatro_03.ogg",
+      "original_usage": "玻璃牌碎裂时随机选取",
+      "proposed_usage": "卡牌破碎或科技碎裂效果候选",
+      "checklist_ids": [
+        "CARD-08"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2103"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.745533,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 16572,
+      "sha256": "0b391c0b8a81350f59d723c50d403eef09f0d5b358dc1e9528309f02d06cdba5",
+      "original_copy": "_originals/balatro_452647/glass3.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "glass4.ogg",
+      "category": "cards",
+      "target": "cards/card_glass_shatter_balatro_04.ogg",
+      "original_usage": "玻璃牌碎裂时随机选取",
+      "proposed_usage": "卡牌破碎或科技碎裂效果候选",
+      "checklist_ids": [
+        "CARD-08"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2103"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.745533,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 17504,
+      "sha256": "1eb3dd97299a2b618405fde41d2b3d6a06a109afa066ce7dd746d624b3a8c235",
+      "original_copy": "_originals/balatro_452647/glass4.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "glass5.ogg",
+      "category": "cards",
+      "target": "cards/card_glass_shatter_balatro_05.ogg",
+      "original_usage": "玻璃牌碎裂时随机选取",
+      "proposed_usage": "卡牌破碎或科技碎裂效果候选",
+      "checklist_ids": [
+        "CARD-08"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2103"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.745533,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 17135,
+      "sha256": "f9bd83c6e651546de31f7e8e2f0f18992ea5cc8efae3b6dd8158452ffbb061c2",
+      "original_copy": "_originals/balatro_452647/glass5.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "glass6.ogg",
+      "category": "cards",
+      "target": "cards/card_glass_shatter_balatro_06.ogg",
+      "original_usage": "玻璃牌碎裂时随机选取",
+      "proposed_usage": "卡牌破碎或科技碎裂效果候选",
+      "checklist_ids": [
+        "CARD-08"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2103"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.745533,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 18045,
+      "sha256": "6ab4bebf27bb6a486b7893d4079b6f4248ed01272d13a366705739072e312153",
+      "original_copy": "_originals/balatro_452647/glass6.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "foil1.ogg",
+      "category": "cards",
+      "target": "cards/card_foil_apply_balatro_01.ogg",
+      "original_usage": "闪箔版本应用；解锁提示也复用",
+      "proposed_usage": "奖励卡或能力生效候选",
+      "checklist_ids": [
+        "WORLD-07",
+        "BATTLE-08"
+      ],
+      "evidence": [
+        {
+          "title": "Steamodded维护者的版本音效配置",
+          "url": "https://github.com/Steamodded/smods/blob/main/src/game_object.lua#L3581"
+        },
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L438"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.654785,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 8766,
+      "sha256": "68975987595ef3e91cc0ca5e2cc42925ae4700d0de1f20fde6c6739cf8cdbd6a",
+      "original_copy": "_originals/balatro_452647/foil1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "foil2.ogg",
+      "category": "cards",
+      "target": "cards/card_foil_trigger_balatro_02.ogg",
+      "original_usage": "版本效果结算与通知提示",
+      "proposed_usage": "奖励、能力触发提示候选",
+      "checklist_ids": [
+        "WORLD-07",
+        "BATTLE-08"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L854"
+        },
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L1809"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.654785,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 9542,
+      "sha256": "1764b004a706ead10c0950b09015e431ec2506a493ad150cdba918bee175d170",
+      "original_copy": "_originals/balatro_452647/foil2.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "holo1.ogg",
+      "category": "cards",
+      "target": "cards/card_holo_apply_balatro_01.ogg",
+      "original_usage": "镭射版本应用；部分特殊效果复用",
+      "proposed_usage": "能力生效或科技激活候选",
+      "checklist_ids": [
+        "BATTLE-08",
+        "BATTLE-12"
+      ],
+      "evidence": [
+        {
+          "title": "Steamodded维护者的版本音效配置",
+          "url": "https://github.com/Steamodded/smods/blob/main/src/game_object.lua#L3581"
+        },
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L439"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 1,
+      "duration_seconds": 1.116077,
+      "ogg_pages": 4,
+      "ogg_crc_verified": true,
+      "bytes": 12555,
+      "sha256": "d4ecc0e114b002099b7c219fe48239e64e97ee2cff426308590a6d3b17f71b9e",
+      "original_copy": "_originals/balatro_452647/holo1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "polychrome1.ogg",
+      "category": "cards",
+      "target": "cards/card_polychrome_apply_balatro_01.ogg",
+      "original_usage": "多彩版本应用",
+      "proposed_usage": "较强的奖励卡或科技效果候选",
+      "checklist_ids": [
+        "WORLD-07",
+        "BATTLE-12"
+      ],
+      "evidence": [
+        {
+          "title": "Steamodded维护者的版本音效配置",
+          "url": "https://github.com/Steamodded/smods/blob/main/src/game_object.lua#L3581"
+        },
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L440"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 1.540952,
+      "ogg_pages": 4,
+      "ogg_crc_verified": true,
+      "bytes": 30021,
+      "sha256": "e1716d3e879d75ddd9f8abdc5425e97f4540ac25bfc11a5a91578149a69c92da",
+      "original_copy": "_originals/balatro_452647/polychrome1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "negative.ogg",
+      "category": "cards",
+      "target": "cards/card_negative_apply_balatro_01.ogg",
+      "original_usage": "负片版本应用；战败界面降调复用",
+      "proposed_usage": "负面状态或战败候选；不是专用错误按钮声",
+      "checklist_ids": [
+        "BATTLE-09",
+        "WORLD-05"
+      ],
+      "evidence": [
+        {
+          "title": "Steamodded维护者的版本音效配置",
+          "url": "https://github.com/Steamodded/smods/blob/main/src/game_object.lua#L3581"
+        },
+        {
+          "title": "社区原游戏调用代码：启动、菜单、战败",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/game.lua#L3525"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 1,
+      "duration_seconds": 1.085918,
+      "ogg_pages": 4,
+      "ogg_crc_verified": true,
+      "bytes": 13198,
+      "sha256": "f041ad53dd7213947858672f1f1b0f5f03181ccd25201ce91c906aa734770730",
+      "original_copy": "_originals/balatro_452647/negative.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "gold_seal.ogg",
+      "category": "cards",
+      "target": "cards/card_seal_apply_balatro_01.ogg",
+      "original_usage": "卡牌添加蜡封；盲注设置也复用",
+      "proposed_usage": "奖励卡、科技装配提示候选",
+      "checklist_ids": [
+        "WORLD-07",
+        "WORLD-08"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L470"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.542653,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 13284,
+      "sha256": "fa826f029597d73e63ad277374bf831cda50e547fe36409096552e87286121d8",
+      "original_copy": "_originals/balatro_452647/gold_seal.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "tarot1.ogg",
+      "category": "cards",
+      "target": "cards/card_tarot_effect_balatro_01.ogg",
+      "original_usage": "消耗牌效果与牌型变化；tarot2也用于无法执行提示",
+      "proposed_usage": "技能／能力、错误提示候选；需按听感选择",
+      "checklist_ids": [
+        "BATTLE-08",
+        "UI-07"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L1102"
+        },
+        {
+          "title": "社区原游戏调用代码：按钮回调",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/button_callbacks.lua#L281"
+        },
+        {
+          "title": "社区原游戏调用代码：胜利与出牌",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/state_events.lua#L492"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.33932,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 9121,
+      "sha256": "baf882cf20f098bfaa3d5814b3acef89f04b37c8653348eaad54aadfdd92ee17",
+      "original_copy": "_originals/balatro_452647/tarot1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "tarot2.ogg",
+      "category": "cards",
+      "target": "cards/card_tarot_effect_balatro_02.ogg",
+      "original_usage": "消耗牌效果与牌型变化；tarot2也用于无法执行提示",
+      "proposed_usage": "技能／能力、错误提示候选；需按听感选择",
+      "checklist_ids": [
+        "BATTLE-08",
+        "UI-07"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L1102"
+        },
+        {
+          "title": "社区原游戏调用代码：按钮回调",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/button_callbacks.lua#L281"
+        },
+        {
+          "title": "社区原游戏调用代码：胜利与出牌",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/state_events.lua#L492"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.453968,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 10822,
+      "sha256": "9eb04ad76ac765cabd51e3b3f2917dc8a4e9a67c0d25980bc58fb20f4d5aa5eb",
+      "original_copy": "_originals/balatro_452647/tarot2.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "voice1.ogg",
+      "category": "dialogue",
+      "target": "dialogue/dialogue_blip_balatro_01.ogg",
+      "original_usage": "角色说话时从voice1～11中随机选取的非语言短音",
+      "proposed_usage": "优先试听：模拟说话的逐字短音",
+      "checklist_ids": [
+        "UI-01"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card_Character",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card_character.lua#L119"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.171247,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 7084,
+      "sha256": "40504159c42af2d71b85d0fd818622baac20ce3f9fa311426238b0da8e611d86",
+      "original_copy": "_originals/balatro_452647/voice1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "voice2.ogg",
+      "category": "dialogue",
+      "target": "dialogue/dialogue_blip_balatro_02.ogg",
+      "original_usage": "角色说话时从voice1～11中随机选取的非语言短音",
+      "proposed_usage": "优先试听：模拟说话的逐字短音",
+      "checklist_ids": [
+        "UI-01"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card_Character",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card_character.lua#L119"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.171247,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 7020,
+      "sha256": "517accc19a4fef3b51909a84abc64e12c04bd9854c3c349c801314b1f091de1f",
+      "original_copy": "_originals/balatro_452647/voice2.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "voice3.ogg",
+      "category": "dialogue",
+      "target": "dialogue/dialogue_blip_balatro_03.ogg",
+      "original_usage": "角色说话时从voice1～11中随机选取的非语言短音",
+      "proposed_usage": "优先试听：模拟说话的逐字短音",
+      "checklist_ids": [
+        "UI-01"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card_Character",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card_character.lua#L119"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.171247,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 7099,
+      "sha256": "81bc833683d248d5ae8eeaf0dc6c5c0bff9f76244ac801ed3d29f86caa0510b8",
+      "original_copy": "_originals/balatro_452647/voice3.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "voice4.ogg",
+      "category": "dialogue",
+      "target": "dialogue/dialogue_blip_balatro_04.ogg",
+      "original_usage": "角色说话时从voice1～11中随机选取的非语言短音",
+      "proposed_usage": "优先试听：模拟说话的逐字短音",
+      "checklist_ids": [
+        "UI-01"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card_Character",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card_character.lua#L119"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.171247,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 7363,
+      "sha256": "919ca36ceacf0f54bfdaedfcb16c07233eee946b8f325b439f71bdc0a40448b1",
+      "original_copy": "_originals/balatro_452647/voice4.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "voice5.ogg",
+      "category": "dialogue",
+      "target": "dialogue/dialogue_blip_balatro_05.ogg",
+      "original_usage": "角色说话时从voice1～11中随机选取的非语言短音",
+      "proposed_usage": "优先试听：模拟说话的逐字短音",
+      "checklist_ids": [
+        "UI-01"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card_Character",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card_character.lua#L119"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.17415,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 7195,
+      "sha256": "bb8d5363a6153ceab788a9cca2ea9e0e50952abf94008295a0bec635ad21528d",
+      "original_copy": "_originals/balatro_452647/voice5.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "voice6.ogg",
+      "category": "dialogue",
+      "target": "dialogue/dialogue_blip_balatro_06.ogg",
+      "original_usage": "角色说话时从voice1～11中随机选取的非语言短音",
+      "proposed_usage": "优先试听：模拟说话的逐字短音",
+      "checklist_ids": [
+        "UI-01"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card_Character",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card_character.lua#L119"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.175578,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 7119,
+      "sha256": "34882f12cdae7a7711bcbba694f9e3bdbd08702ac24f91fc6295d6cbee7b45a0",
+      "original_copy": "_originals/balatro_452647/voice6.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "voice7.ogg",
+      "category": "dialogue",
+      "target": "dialogue/dialogue_blip_balatro_07.ogg",
+      "original_usage": "角色说话时从voice1～11中随机选取的非语言短音",
+      "proposed_usage": "优先试听：模拟说话的逐字短音",
+      "checklist_ids": [
+        "UI-01"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card_Character",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card_character.lua#L119"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.177052,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 7061,
+      "sha256": "b26a607b81188cec04fb56344b2a2faf31a8403f8f99c896fd2b34c9028a12d8",
+      "original_copy": "_originals/balatro_452647/voice7.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "voice8.ogg",
+      "category": "dialogue",
+      "target": "dialogue/dialogue_blip_balatro_08.ogg",
+      "original_usage": "角色说话时从voice1～11中随机选取的非语言短音",
+      "proposed_usage": "优先试听：模拟说话的逐字短音",
+      "checklist_ids": [
+        "UI-01"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card_Character",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card_character.lua#L119"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.17415,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 7164,
+      "sha256": "a06b4063030f6aff437c36ec54dd11ff26d298fff4744fe29c955526499ffc6d",
+      "original_copy": "_originals/balatro_452647/voice8.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "voice9.ogg",
+      "category": "dialogue",
+      "target": "dialogue/dialogue_blip_balatro_09.ogg",
+      "original_usage": "角色说话时从voice1～11中随机选取的非语言短音",
+      "proposed_usage": "优先试听：模拟说话的逐字短音",
+      "checklist_ids": [
+        "UI-01"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card_Character",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card_character.lua#L119"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.174127,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 7166,
+      "sha256": "d1f054c3525d64ed98e52a52add04ff41a29981d79c0b82dae8a64022b6ce3da",
+      "original_copy": "_originals/balatro_452647/voice9.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "voice10.ogg",
+      "category": "dialogue",
+      "target": "dialogue/dialogue_blip_balatro_10.ogg",
+      "original_usage": "角色说话时从voice1～11中随机选取的非语言短音",
+      "proposed_usage": "优先试听：模拟说话的逐字短音",
+      "checklist_ids": [
+        "UI-01"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card_Character",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card_character.lua#L119"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.169796,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 7091,
+      "sha256": "3d6a71bbf6a49e405836a01b6b18c3af05a1055284a1c9afb4d756774c5d4976",
+      "original_copy": "_originals/balatro_452647/voice10.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "voice11.ogg",
+      "category": "dialogue",
+      "target": "dialogue/dialogue_blip_balatro_11.ogg",
+      "original_usage": "角色说话时从voice1～11中随机选取的非语言短音",
+      "proposed_usage": "优先试听：模拟说话的逐字短音",
+      "checklist_ids": [
+        "UI-01"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card_Character",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card_character.lua#L119"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.171247,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 6989,
+      "sha256": "63b20ee7b4f0d4f872eaa176fe5bd55a165fa82ef5220ad1bd025ac03d7bb89f",
+      "original_copy": "_originals/balatro_452647/voice11.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "coin1.ogg",
+      "category": "world",
+      "target": "world/credits_coin_balatro_01.ogg",
+      "original_usage": "金额变化提示",
+      "proposed_usage": "信用点到账／交易候选",
+      "checklist_ids": [
+        "WORLD-06"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L96"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.407755,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 11309,
+      "sha256": "0d31828d897da9b0e497da34817def0164f515b2047da7f906e449268946273a",
+      "original_copy": "_originals/balatro_452647/coin1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "coin2.ogg",
+      "category": "world",
+      "target": "world/credits_coin_balatro_02.ogg",
+      "original_usage": "出售卡牌／商店刷新",
+      "proposed_usage": "信用点到账／交易候选",
+      "checklist_ids": [
+        "WORLD-06"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L1601"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.325079,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 9726,
+      "sha256": "b14b3d5caf2e6354b7d82d984b5f0ecab1fe8c3f32dbd941bf88cf7030ca3a80",
+      "original_copy": "_originals/balatro_452647/coin2.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "coin3.ogg",
+      "category": "world",
+      "target": "world/credits_coin_balatro_03.ogg",
+      "original_usage": "金额效果结算",
+      "proposed_usage": "信用点到账／交易候选",
+      "checklist_ids": [
+        "WORLD-06"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L844"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.340567,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 11663,
+      "sha256": "f1aaf97a9bae00feeb84bc32b03e16f8d945149089ce4b8332acda14f2342002",
+      "original_copy": "_originals/balatro_452647/coin3.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "coin4.ogg",
+      "category": "world",
+      "target": "world/credits_coin_balatro_04.ogg",
+      "original_usage": "coin同族文件；本轮未定位该变体的具体触发",
+      "proposed_usage": "信用点到账／交易候选",
+      "checklist_ids": [
+        "WORLD-06"
+      ],
+      "evidence": [],
+      "evidence_status": "原触发待确认",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.293243,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 10525,
+      "sha256": "1a9f0742aa26592aec2b06300c3b4d4152557feba7cb5bf845e3e4f35d82e68c",
+      "original_copy": "_originals/balatro_452647/coin4.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "coin5.ogg",
+      "category": "world",
+      "target": "world/credits_coin_balatro_05.ogg",
+      "original_usage": "coin同族文件；本轮未定位该变体的具体触发",
+      "proposed_usage": "信用点到账／交易候选",
+      "checklist_ids": [
+        "WORLD-06"
+      ],
+      "evidence": [],
+      "evidence_status": "原触发待确认",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.373311,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 13102,
+      "sha256": "45175ad8d483971a58d7ba708fc36bf1351d900bc797b4571eb7eefc0c606e48",
+      "original_copy": "_originals/balatro_452647/coin5.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "coin6.ogg",
+      "category": "world",
+      "target": "world/credits_coin_balatro_06.ogg",
+      "original_usage": "回合收益结算",
+      "proposed_usage": "信用点到账／交易候选",
+      "checklist_ids": [
+        "WORLD-06"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L1034"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.605828,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 18051,
+      "sha256": "1d687ef3cea7fd64df7afcb2216ace75997c2624abbcf6c191278ff853857ab4",
+      "original_copy": "_originals/balatro_452647/coin6.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "coin7.ogg",
+      "category": "world",
+      "target": "world/credits_coin_balatro_07.ogg",
+      "original_usage": "确认收款",
+      "proposed_usage": "信用点到账／交易候选",
+      "checklist_ids": [
+        "WORLD-06"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：按钮回调",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/button_callbacks.lua#L2900"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.356939,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 11315,
+      "sha256": "ff1e5fe8cad32ae3ca14840cf7cad1ecc040e1cfd1ec2bb199033ce51c0b9fa3",
+      "original_copy": "_originals/balatro_452647/coin7.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "chips1.ogg",
+      "category": "world",
+      "target": "world/reward_chips_balatro_01.ogg",
+      "original_usage": "筹码数值效果反馈",
+      "proposed_usage": "奖励数字或能量／资源变化候选",
+      "checklist_ids": [
+        "WORLD-06",
+        "BATTLE-07"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L816"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.252494,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 8984,
+      "sha256": "76a2b75f4a4913850e3bbf8f399c5dbd4460463568c091387be73c45ec13c76b",
+      "original_copy": "_originals/balatro_452647/chips1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "chips2.ogg",
+      "category": "world",
+      "target": "world/reward_chips_balatro_02.ogg",
+      "original_usage": "筹码总量、弃牌／出牌次数变化等反馈",
+      "proposed_usage": "奖励数字或能量／资源变化候选",
+      "checklist_ids": [
+        "WORLD-06",
+        "BATTLE-07"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L62"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.415737,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 12117,
+      "sha256": "7a4d25fbb3a247ad42caa35a8e2be4cbadd3a41dc20850e38c76509464426a0b",
+      "original_copy": "_originals/balatro_452647/chips2.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "multhit1.ogg",
+      "category": "world",
+      "target": "world/reward_mult_add_balatro_01.ogg",
+      "original_usage": "加倍率效果反馈",
+      "proposed_usage": "增伤／能力触发候选；不是怪物多段命中声",
+      "checklist_ids": [
+        "BATTLE-08"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L822"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.586553,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 12082,
+      "sha256": "21a92a680cd9f6e6e64f0c492bfb4887e922087223a7e9f8fe477129b32a0aba",
+      "original_copy": "_originals/balatro_452647/multhit1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "multhit2.ogg",
+      "category": "world",
+      "target": "world/reward_mult_multiply_balatro_01.ogg",
+      "original_usage": "乘倍率效果反馈",
+      "proposed_usage": "增伤／能力触发候选；不是怪物多段命中声",
+      "checklist_ids": [
+        "BATTLE-08"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L829"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.685125,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 14952,
+      "sha256": "c9da345bb8622471a8b9df0604fc57fc2a564e0afd9145b2f21751bfa5363ee8",
+      "original_copy": "_originals/balatro_452647/multhit2.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "highlight1.ogg",
+      "category": "world",
+      "target": "world/notice_highlight_balatro_01.ogg",
+      "original_usage": "通知／成就提示；回合结算失败也复用",
+      "proposed_usage": "任务提示、奖励通知候选",
+      "checklist_ids": [
+        "WORLD-03"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L1808"
+        },
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L1016"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.299932,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 7187,
+      "sha256": "5a48d31d0cb6ab9228d5ee4ac3e166f24c41a9230f37e5f65da771528320af33",
+      "original_copy": "_originals/balatro_452647/highlight1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "highlight2.ogg",
+      "category": "world",
+      "target": "world/stage_highlight_balatro_02.ogg",
+      "original_usage": "底注阶段变化提示",
+      "proposed_usage": "日期／回合／阶段推进候选",
+      "checklist_ids": [
+        "WORLD-03",
+        "BATTLE-02"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L217"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.505578,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 13384,
+      "sha256": "a2bbd976cd7fe3c1ec009c734805f5b700a1339577060ecdfd7c31deafc3b584",
+      "original_copy": "_originals/balatro_452647/highlight2.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "win.ogg",
+      "category": "world",
+      "target": "world/victory_balatro_01.ogg",
+      "original_usage": "获胜流程触发",
+      "proposed_usage": "胜利提示候选",
+      "checklist_ids": [
+        "WORLD-04"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：胜利与出牌",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/state_events.lua#L29"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 3.156259,
+      "ogg_pages": 6,
+      "ogg_crc_verified": true,
+      "bytes": 36566,
+      "sha256": "f4f4345a8380eb84a2cd7dd8a7e9b5bdcdc0943b0d3a25175979caec897f25bb",
+      "original_copy": "_originals/balatro_452647/win.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "gong.ogg",
+      "category": "world",
+      "target": "world/unlock_gong_balatro_01.ogg",
+      "original_usage": "解锁展示叠加的锣声",
+      "proposed_usage": "委托完成、重要解锁提示候选",
+      "checklist_ids": [
+        "WORLD-03"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L1871"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 1.169478,
+      "ogg_pages": 4,
+      "ogg_crc_verified": true,
+      "bytes": 18145,
+      "sha256": "4c203be0a791c8df9318455dbdcf590d7f9541200c988070617b5623bc7f984c",
+      "original_copy": "_originals/balatro_452647/gong.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "timpani.ogg",
+      "category": "world",
+      "target": "world/event_timpani_balatro_01.ogg",
+      "original_usage": "回合变化、创建消耗牌等多个效果中的定音鼓声",
+      "proposed_usage": "回合切换、任务／奖励提示候选",
+      "checklist_ids": [
+        "BATTLE-02",
+        "WORLD-03"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L251"
+        },
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L1375"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.737732,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 14191,
+      "sha256": "6ad6d6050fc36de01c4ba656c5fb903b909a0d694888042354864d49eb5329b8",
+      "original_copy": "_originals/balatro_452647/timpani.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "introPad1.ogg",
+      "category": "world",
+      "target": "world/intro_pad_balatro_01.ogg",
+      "original_usage": "启动画面与演示引导的铺底音",
+      "proposed_usage": "长转场候选；不是完整背景音乐",
+      "checklist_ids": [
+        "WORLD-02"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：启动、菜单、战败",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/game.lua#L1384"
+        },
+        {
+          "title": "社区原游戏调用代码：按钮回调",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/button_callbacks.lua#L2964"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 28.644014,
+      "ogg_pages": 31,
+      "ogg_crc_verified": true,
+      "bytes": 334018,
+      "sha256": "49f07607638cf30875d0a21a23f3eca0cb8d054ffb29243a6b388226207fbc32",
+      "original_copy": "_originals/balatro_452647/introPad1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "splash_buildup.ogg",
+      "category": "world",
+      "target": "world/intro_buildup_balatro_01.ogg",
+      "original_usage": "启动画面蓄势效果",
+      "proposed_usage": "开场／转场蓄势候选",
+      "checklist_ids": [
+        "WORLD-02"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：启动、菜单、战败",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/game.lua#L1391"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 24.13161,
+      "ogg_pages": 26,
+      "ogg_crc_verified": true,
+      "bytes": 339559,
+      "sha256": "f0aa95c0de762a2effe32fe247ae322da30706af817124812ee32cbf411ccac9",
+      "original_copy": "_originals/balatro_452647/splash_buildup.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "ambientFire1.ogg",
+      "category": "ambience",
+      "target": "ambience/ambient_fire_balatro_01.ogg",
+      "original_usage": "随计分火焰强度调节的环境层",
+      "proposed_usage": "低频氛围候选；循环接缝未检查",
+      "checklist_ids": [],
+      "evidence": [
+        {
+          "title": "自定义声音播放器作者的环境混音代码",
+          "url": "https://github.com/Infarctus/Balatro-Custom-Sound-Player/blob/main/sound.lua"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 37.920249,
+      "ogg_pages": 40,
+      "ogg_crc_verified": true,
+      "bytes": 478331,
+      "sha256": "723486fdcf6cefb522d96886afac8a4aa51c6121749ec490a8366f0efef990e1",
+      "original_copy": "_originals/balatro_452647/ambientFire1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "ambientFire2.ogg",
+      "category": "ambience",
+      "target": "ambience/ambient_fire_balatro_02.ogg",
+      "original_usage": "随计分火焰强度调节的环境层",
+      "proposed_usage": "低频氛围候选；循环接缝未检查",
+      "checklist_ids": [],
+      "evidence": [
+        {
+          "title": "自定义声音播放器作者的环境混音代码",
+          "url": "https://github.com/Infarctus/Balatro-Custom-Sound-Player/blob/main/sound.lua"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 37.920249,
+      "ogg_pages": 40,
+      "ogg_crc_verified": true,
+      "bytes": 508497,
+      "sha256": "2f18873287e7fe2cf437883728b6b5232fd6cf75025281224e4f51b9327fc519",
+      "original_copy": "_originals/balatro_452647/ambientFire2.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "ambientFire3.ogg",
+      "category": "ambience",
+      "target": "ambience/ambient_fire_balatro_03.ogg",
+      "original_usage": "随计分火焰强度调节的环境层",
+      "proposed_usage": "低频氛围候选；循环接缝未检查",
+      "checklist_ids": [],
+      "evidence": [
+        {
+          "title": "自定义声音播放器作者的环境混音代码",
+          "url": "https://github.com/Infarctus/Balatro-Custom-Sound-Player/blob/main/sound.lua"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 37.920249,
+      "ogg_pages": 40,
+      "ogg_crc_verified": true,
+      "bytes": 503557,
+      "sha256": "35f05a351ed060bf26fba3dfc1d8b29d51ead20be992cd18c4e78c2a912daf69",
+      "original_copy": "_originals/balatro_452647/ambientFire3.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "ambientOrgan1.ogg",
+      "category": "ambience",
+      "target": "ambience/ambient_organ_balatro_01.ogg",
+      "original_usage": "随计分强度等状态调节的管风琴环境层",
+      "proposed_usage": "紧张氛围候选；不是完整背景音乐",
+      "checklist_ids": [],
+      "evidence": [
+        {
+          "title": "自定义声音播放器作者的环境混音代码",
+          "url": "https://github.com/Infarctus/Balatro-Custom-Sound-Player/blob/main/sound.lua"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 22.814807,
+      "ogg_pages": 25,
+      "ogg_crc_verified": true,
+      "bytes": 380953,
+      "sha256": "45de2c9012e75b0f1ba074cf1394430fcbc4ba3d3340707c2689d0be4f1aa3a8",
+      "original_copy": "_originals/balatro_452647/ambientOrgan1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "generic1.ogg",
+      "category": "combat",
+      "target": "combat/effect_trigger_balatro_01.ogg",
+      "original_usage": "通用效果提示；玻璃碎裂、数字与特殊效果多处复用",
+      "proposed_usage": "通用能力／状态触发候选",
+      "checklist_ids": [
+        "BATTLE-08"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：事件与结算",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/functions/common_events.lua#L849"
+        },
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2104"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.16873,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 7135,
+      "sha256": "df6aff5bf2b6a353430c5452ee854d8182f1c866b8eb2a4109047a4fb034b021",
+      "original_copy": "_originals/balatro_452647/generic1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "slice1.ogg",
+      "category": "combat",
+      "target": "combat/effect_slice_balatro_01.ogg",
+      "original_usage": "小丑牌吞噬／切除邻牌效果中触发",
+      "proposed_usage": "切裂效果候选；需试听判断与现有刀声是否匹配",
+      "checklist_ids": [
+        "BATTLE-10"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2574"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.301859,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 8497,
+      "sha256": "6591d662575338d13fb7f35f248a45b5c02b484c21785054068703d04189719f",
+      "original_copy": "_originals/balatro_452647/slice1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "explosion1.ogg",
+      "category": "combat",
+      "target": "combat/effect_explosion_balatro_01.ogg",
+      "original_usage": "文件名表示爆炸；本轮未定位具体触发",
+      "proposed_usage": "爆炸／死亡爆裂候选，先试听",
+      "checklist_ids": [
+        "BATTLE-13"
+      ],
+      "evidence": [],
+      "evidence_status": "原触发待确认",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 3.038594,
+      "ogg_pages": 5,
+      "ogg_crc_verified": true,
+      "bytes": 48426,
+      "sha256": "086c8d184aaaa3b0571176fe0e6be39687395fd397a1b8092f4403463815f843",
+      "original_copy": "_originals/balatro_452647/explosion1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "explosion_buildup1.ogg",
+      "category": "combat",
+      "target": "combat/effect_explosion_charge_balatro_01.ogg",
+      "original_usage": "卡牌爆炸流程的蓄势阶段",
+      "proposed_usage": "技能充能／爆裂前奏候选",
+      "checklist_ids": [
+        "BATTLE-12"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L1980"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.063197,
+      "ogg_pages": 5,
+      "ogg_crc_verified": true,
+      "bytes": 31851,
+      "sha256": "e01e4f55291ece511ae6d6885060de0781f3541a57571228848a83f3c97d685e",
+      "original_copy": "_originals/balatro_452647/explosion_buildup1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "explosion_release1.ogg",
+      "category": "combat",
+      "target": "combat/effect_explosion_release_balatro_01.ogg",
+      "original_usage": "卡牌爆炸流程的释放阶段",
+      "proposed_usage": "爆裂／退场候选",
+      "checklist_ids": [
+        "BATTLE-13"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2049"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 1.749887,
+      "ogg_pages": 4,
+      "ogg_crc_verified": true,
+      "bytes": 31998,
+      "sha256": "722f8b3a37bd2fcd788aa23d290106af76cbac356d79b782b28360fb0746ea14",
+      "original_copy": "_originals/balatro_452647/explosion_release1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "whoosh.ogg",
+      "category": "combat",
+      "target": "combat/effect_whoosh_balatro_01.ogg",
+      "original_usage": "文件名表示破风；本轮未定位具体触发",
+      "proposed_usage": "出牌／移动／转场候选，先试听",
+      "checklist_ids": [
+        "CARD-03",
+        "BATTLE-14"
+      ],
+      "evidence": [],
+      "evidence_status": "原触发待确认",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.392154,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 9912,
+      "sha256": "9014c03fbfb370b5bef3059e7cec1f9e6d75e3897ab8cb36c5050b58be9ef7e8",
+      "original_copy": "_originals/balatro_452647/whoosh.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "whoosh1.ogg",
+      "category": "combat",
+      "target": "combat/effect_whoosh_in_balatro_01.ogg",
+      "original_usage": "卡牌生成、启动与菜单转换等",
+      "proposed_usage": "面板展开、卡牌生成候选",
+      "checklist_ids": [
+        "UI-06",
+        "WORLD-07"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2212"
+        },
+        {
+          "title": "社区原游戏调用代码：启动、菜单、战败",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/game.lua#L1383"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.603311,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 12902,
+      "sha256": "c7975770c4554f86eb278aa69e6b986ef4f951ed37bdc073525bfba6eeeda5ac",
+      "original_copy": "_originals/balatro_452647/whoosh1.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "whoosh2.ogg",
+      "category": "combat",
+      "target": "combat/effect_whoosh_out_balatro_02.ogg",
+      "original_usage": "卡牌溶解、盲注结束和战败等",
+      "proposed_usage": "卡牌消耗、关闭／退场候选",
+      "checklist_ids": [
+        "CARD-08",
+        "UI-06"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：Card",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/card.lua#L2155"
+        },
+        {
+          "title": "社区原游戏调用代码：启动、菜单、战败",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/game.lua#L3526"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.603311,
+      "ogg_pages": 3,
+      "ogg_crc_verified": true,
+      "bytes": 12848,
+      "sha256": "715309d75ea5eb1d96b9665a616b88a8100df8ff1596cc4fe476d50471a7cc84",
+      "original_copy": "_originals/balatro_452647/whoosh2.ogg",
+      "preview_available": true
+    },
+    {
+      "original": "whoosh_long.ogg",
+      "category": "combat",
+      "target": "combat/effect_whoosh_long_balatro_01.ogg",
+      "original_usage": "启动画面较长的转场破风效果",
+      "proposed_usage": "长转场候选",
+      "checklist_ids": [
+        "WORLD-02"
+      ],
+      "evidence": [
+        {
+          "title": "社区原游戏调用代码：启动、菜单、战败",
+          "url": "https://github.com/futouyiba/cardLua/blob/main/game.lua#L1441"
+        }
+      ],
+      "evidence_status": "调用已核对",
+      "listening_status": "待试听",
+      "integration_status": "测试台可试听与绑定；正式未接入",
+      "codec": "Vorbis",
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 7.801882,
+      "ogg_pages": 10,
+      "ogg_crc_verified": true,
+      "bytes": 114181,
+      "sha256": "c38827de5d8053e5684726195b7c23845cd53ccf91cfc979f7b82fc61daa75bf",
+      "original_copy": "_originals/balatro_452647/whoosh_long.ogg",
+      "preview_available": true
+    }
+  ],
+  "preview_available_since": "2026-10-25"
+}

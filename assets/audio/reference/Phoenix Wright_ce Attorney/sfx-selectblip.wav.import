@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://bjy3ysvjscokw"
+path="res://.godot/imported/sfx-selectblip.wav-cfd2b61e8d66e1aaa1d8e5cdd6cdbc90.sample"
+
+[deps]
+
+source_file="res://assets/audio/reference/Phoenix Wright_ce Attorney/sfx-selectblip.wav"
+dest_files=["res://.godot/imported/sfx-selectblip.wav-cfd2b61e8d66e1aaa1d8e5cdd6cdbc90.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

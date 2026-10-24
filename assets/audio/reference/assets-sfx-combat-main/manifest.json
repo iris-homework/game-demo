@@ -1,0 +1,4095 @@
+{
+  "name": "assets-sfx-combat",
+  "description": "Game combat sound effects (impacts, explosions, weapons, hits)",
+  "version": "0.1.0",
+  "category": "sfx",
+  "theme": "combat",
+  "totalAssets": 255,
+  "sources": [
+    "Kenney Rpg Audio",
+    "Kenney Sci Fi Sounds",
+    "Kenney Impact Sounds"
+  ],
+  "assets": [
+    {
+      "id": "kenney-impact-sounds/footstep_carpet_000",
+      "name": "Footstep Carpet 000",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_carpet_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_carpet_001",
+      "name": "Footstep Carpet 001",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_carpet_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_carpet_002",
+      "name": "Footstep Carpet 002",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_carpet_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_carpet_003",
+      "name": "Footstep Carpet 003",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_carpet_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_carpet_004",
+      "name": "Footstep Carpet 004",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_carpet_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_concrete_000",
+      "name": "Footstep Concrete 000",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_concrete_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_concrete_001",
+      "name": "Footstep Concrete 001",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_concrete_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_concrete_002",
+      "name": "Footstep Concrete 002",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_concrete_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_concrete_003",
+      "name": "Footstep Concrete 003",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_concrete_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_concrete_004",
+      "name": "Footstep Concrete 004",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_concrete_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_grass_000",
+      "name": "Footstep Grass 000",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_grass_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_grass_001",
+      "name": "Footstep Grass 001",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_grass_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_grass_002",
+      "name": "Footstep Grass 002",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_grass_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_grass_003",
+      "name": "Footstep Grass 003",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_grass_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_grass_004",
+      "name": "Footstep Grass 004",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_grass_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_snow_000",
+      "name": "Footstep Snow 000",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_snow_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_snow_001",
+      "name": "Footstep Snow 001",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_snow_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_snow_002",
+      "name": "Footstep Snow 002",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_snow_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_snow_003",
+      "name": "Footstep Snow 003",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_snow_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_snow_004",
+      "name": "Footstep Snow 004",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_snow_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_wood_000",
+      "name": "Footstep Wood 000",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_wood_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_wood_001",
+      "name": "Footstep Wood 001",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_wood_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_wood_002",
+      "name": "Footstep Wood 002",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_wood_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_wood_003",
+      "name": "Footstep Wood 003",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_wood_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/footstep_wood_004",
+      "name": "Footstep Wood 004",
+      "path": "assets/kenney/impact-sounds/Audio/footstep_wood_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactBell_heavy_000",
+      "name": "Impactbell Heavy 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactBell_heavy_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactBell_heavy_001",
+      "name": "Impactbell Heavy 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactBell_heavy_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactBell_heavy_002",
+      "name": "Impactbell Heavy 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactBell_heavy_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactBell_heavy_003",
+      "name": "Impactbell Heavy 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactBell_heavy_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactBell_heavy_004",
+      "name": "Impactbell Heavy 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactBell_heavy_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGeneric_light_000",
+      "name": "Impactgeneric Light 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactGeneric_light_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGeneric_light_001",
+      "name": "Impactgeneric Light 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactGeneric_light_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGeneric_light_002",
+      "name": "Impactgeneric Light 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactGeneric_light_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGeneric_light_003",
+      "name": "Impactgeneric Light 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactGeneric_light_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGeneric_light_004",
+      "name": "Impactgeneric Light 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactGeneric_light_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGlass_heavy_000",
+      "name": "Impactglass Heavy 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactGlass_heavy_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGlass_heavy_001",
+      "name": "Impactglass Heavy 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactGlass_heavy_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGlass_heavy_002",
+      "name": "Impactglass Heavy 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactGlass_heavy_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGlass_heavy_003",
+      "name": "Impactglass Heavy 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactGlass_heavy_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGlass_heavy_004",
+      "name": "Impactglass Heavy 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactGlass_heavy_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGlass_light_000",
+      "name": "Impactglass Light 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactGlass_light_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGlass_light_001",
+      "name": "Impactglass Light 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactGlass_light_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGlass_light_002",
+      "name": "Impactglass Light 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactGlass_light_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGlass_light_003",
+      "name": "Impactglass Light 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactGlass_light_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGlass_light_004",
+      "name": "Impactglass Light 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactGlass_light_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGlass_medium_000",
+      "name": "Impactglass Medium 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactGlass_medium_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGlass_medium_001",
+      "name": "Impactglass Medium 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactGlass_medium_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGlass_medium_002",
+      "name": "Impactglass Medium 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactGlass_medium_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGlass_medium_003",
+      "name": "Impactglass Medium 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactGlass_medium_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactGlass_medium_004",
+      "name": "Impactglass Medium 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactGlass_medium_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMetal_heavy_000",
+      "name": "Impactmetal Heavy 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactMetal_heavy_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMetal_heavy_001",
+      "name": "Impactmetal Heavy 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactMetal_heavy_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMetal_heavy_002",
+      "name": "Impactmetal Heavy 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactMetal_heavy_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMetal_heavy_003",
+      "name": "Impactmetal Heavy 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactMetal_heavy_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMetal_heavy_004",
+      "name": "Impactmetal Heavy 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactMetal_heavy_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMetal_light_000",
+      "name": "Impactmetal Light 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactMetal_light_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMetal_light_001",
+      "name": "Impactmetal Light 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactMetal_light_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMetal_light_002",
+      "name": "Impactmetal Light 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactMetal_light_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMetal_light_003",
+      "name": "Impactmetal Light 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactMetal_light_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMetal_light_004",
+      "name": "Impactmetal Light 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactMetal_light_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMetal_medium_000",
+      "name": "Impactmetal Medium 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactMetal_medium_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMetal_medium_001",
+      "name": "Impactmetal Medium 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactMetal_medium_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMetal_medium_002",
+      "name": "Impactmetal Medium 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactMetal_medium_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMetal_medium_003",
+      "name": "Impactmetal Medium 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactMetal_medium_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMetal_medium_004",
+      "name": "Impactmetal Medium 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactMetal_medium_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMining_000",
+      "name": "Impactmining 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactMining_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMining_001",
+      "name": "Impactmining 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactMining_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMining_002",
+      "name": "Impactmining 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactMining_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMining_003",
+      "name": "Impactmining 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactMining_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactMining_004",
+      "name": "Impactmining 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactMining_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlank_medium_000",
+      "name": "Impactplank Medium 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlank_medium_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlank_medium_001",
+      "name": "Impactplank Medium 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlank_medium_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlank_medium_002",
+      "name": "Impactplank Medium 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlank_medium_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlank_medium_003",
+      "name": "Impactplank Medium 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlank_medium_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlank_medium_004",
+      "name": "Impactplank Medium 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlank_medium_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlate_heavy_000",
+      "name": "Impactplate Heavy 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlate_heavy_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlate_heavy_001",
+      "name": "Impactplate Heavy 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlate_heavy_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlate_heavy_002",
+      "name": "Impactplate Heavy 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlate_heavy_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlate_heavy_003",
+      "name": "Impactplate Heavy 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlate_heavy_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlate_heavy_004",
+      "name": "Impactplate Heavy 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlate_heavy_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlate_light_000",
+      "name": "Impactplate Light 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlate_light_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlate_light_001",
+      "name": "Impactplate Light 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlate_light_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlate_light_002",
+      "name": "Impactplate Light 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlate_light_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlate_light_003",
+      "name": "Impactplate Light 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlate_light_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlate_light_004",
+      "name": "Impactplate Light 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlate_light_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlate_medium_000",
+      "name": "Impactplate Medium 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlate_medium_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlate_medium_001",
+      "name": "Impactplate Medium 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlate_medium_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlate_medium_002",
+      "name": "Impactplate Medium 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlate_medium_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlate_medium_003",
+      "name": "Impactplate Medium 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlate_medium_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPlate_medium_004",
+      "name": "Impactplate Medium 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactPlate_medium_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPunch_heavy_000",
+      "name": "Impactpunch Heavy 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactPunch_heavy_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPunch_heavy_001",
+      "name": "Impactpunch Heavy 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactPunch_heavy_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPunch_heavy_002",
+      "name": "Impactpunch Heavy 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactPunch_heavy_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPunch_heavy_003",
+      "name": "Impactpunch Heavy 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactPunch_heavy_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPunch_heavy_004",
+      "name": "Impactpunch Heavy 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactPunch_heavy_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPunch_medium_000",
+      "name": "Impactpunch Medium 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactPunch_medium_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPunch_medium_001",
+      "name": "Impactpunch Medium 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactPunch_medium_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPunch_medium_002",
+      "name": "Impactpunch Medium 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactPunch_medium_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPunch_medium_003",
+      "name": "Impactpunch Medium 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactPunch_medium_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactPunch_medium_004",
+      "name": "Impactpunch Medium 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactPunch_medium_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactSoft_heavy_000",
+      "name": "Impactsoft Heavy 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactSoft_heavy_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactSoft_heavy_001",
+      "name": "Impactsoft Heavy 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactSoft_heavy_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactSoft_heavy_002",
+      "name": "Impactsoft Heavy 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactSoft_heavy_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactSoft_heavy_003",
+      "name": "Impactsoft Heavy 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactSoft_heavy_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactSoft_heavy_004",
+      "name": "Impactsoft Heavy 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactSoft_heavy_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactSoft_medium_000",
+      "name": "Impactsoft Medium 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactSoft_medium_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactSoft_medium_001",
+      "name": "Impactsoft Medium 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactSoft_medium_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactSoft_medium_002",
+      "name": "Impactsoft Medium 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactSoft_medium_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactSoft_medium_003",
+      "name": "Impactsoft Medium 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactSoft_medium_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactSoft_medium_004",
+      "name": "Impactsoft Medium 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactSoft_medium_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactTin_medium_000",
+      "name": "Impacttin Medium 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactTin_medium_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactTin_medium_001",
+      "name": "Impacttin Medium 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactTin_medium_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactTin_medium_002",
+      "name": "Impacttin Medium 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactTin_medium_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactTin_medium_003",
+      "name": "Impacttin Medium 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactTin_medium_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactTin_medium_004",
+      "name": "Impacttin Medium 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactTin_medium_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactWood_heavy_000",
+      "name": "Impactwood Heavy 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactWood_heavy_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactWood_heavy_001",
+      "name": "Impactwood Heavy 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactWood_heavy_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactWood_heavy_002",
+      "name": "Impactwood Heavy 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactWood_heavy_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactWood_heavy_003",
+      "name": "Impactwood Heavy 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactWood_heavy_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactWood_heavy_004",
+      "name": "Impactwood Heavy 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactWood_heavy_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactWood_light_000",
+      "name": "Impactwood Light 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactWood_light_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactWood_light_001",
+      "name": "Impactwood Light 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactWood_light_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactWood_light_002",
+      "name": "Impactwood Light 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactWood_light_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactWood_light_003",
+      "name": "Impactwood Light 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactWood_light_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactWood_light_004",
+      "name": "Impactwood Light 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactWood_light_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactWood_medium_000",
+      "name": "Impactwood Medium 000",
+      "path": "assets/kenney/impact-sounds/Audio/impactWood_medium_000.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactWood_medium_001",
+      "name": "Impactwood Medium 001",
+      "path": "assets/kenney/impact-sounds/Audio/impactWood_medium_001.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactWood_medium_002",
+      "name": "Impactwood Medium 002",
+      "path": "assets/kenney/impact-sounds/Audio/impactWood_medium_002.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactWood_medium_003",
+      "name": "Impactwood Medium 003",
+      "path": "assets/kenney/impact-sounds/Audio/impactWood_medium_003.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-impact-sounds/impactWood_medium_004",
+      "name": "Impactwood Medium 004",
+      "path": "assets/kenney/impact-sounds/Audio/impactWood_medium_004.ogg",
+      "source": "Kenney Impact Sounds",
+      "sourceUrl": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "impact-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/Preview",
+      "name": "Preview",
+      "path": "assets/kenney/rpg-audio/Preview.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/beltHandle1",
+      "name": "Belthandle1",
+      "path": "assets/kenney/rpg-audio/Audio/beltHandle1.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/beltHandle2",
+      "name": "Belthandle2",
+      "path": "assets/kenney/rpg-audio/Audio/beltHandle2.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/bookClose",
+      "name": "Bookclose",
+      "path": "assets/kenney/rpg-audio/Audio/bookClose.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/bookFlip1",
+      "name": "Bookflip1",
+      "path": "assets/kenney/rpg-audio/Audio/bookFlip1.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/bookFlip2",
+      "name": "Bookflip2",
+      "path": "assets/kenney/rpg-audio/Audio/bookFlip2.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/bookFlip3",
+      "name": "Bookflip3",
+      "path": "assets/kenney/rpg-audio/Audio/bookFlip3.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/bookOpen",
+      "name": "Bookopen",
+      "path": "assets/kenney/rpg-audio/Audio/bookOpen.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/bookPlace1",
+      "name": "Bookplace1",
+      "path": "assets/kenney/rpg-audio/Audio/bookPlace1.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/bookPlace2",
+      "name": "Bookplace2",
+      "path": "assets/kenney/rpg-audio/Audio/bookPlace2.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/bookPlace3",
+      "name": "Bookplace3",
+      "path": "assets/kenney/rpg-audio/Audio/bookPlace3.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/chop",
+      "name": "Chop",
+      "path": "assets/kenney/rpg-audio/Audio/chop.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/cloth1",
+      "name": "Cloth1",
+      "path": "assets/kenney/rpg-audio/Audio/cloth1.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/cloth2",
+      "name": "Cloth2",
+      "path": "assets/kenney/rpg-audio/Audio/cloth2.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/cloth3",
+      "name": "Cloth3",
+      "path": "assets/kenney/rpg-audio/Audio/cloth3.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/cloth4",
+      "name": "Cloth4",
+      "path": "assets/kenney/rpg-audio/Audio/cloth4.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/clothBelt",
+      "name": "Clothbelt",
+      "path": "assets/kenney/rpg-audio/Audio/clothBelt.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/clothBelt2",
+      "name": "Clothbelt2",
+      "path": "assets/kenney/rpg-audio/Audio/clothBelt2.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/creak1",
+      "name": "Creak1",
+      "path": "assets/kenney/rpg-audio/Audio/creak1.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/creak2",
+      "name": "Creak2",
+      "path": "assets/kenney/rpg-audio/Audio/creak2.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/creak3",
+      "name": "Creak3",
+      "path": "assets/kenney/rpg-audio/Audio/creak3.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/doorClose_1",
+      "name": "Doorclose 1",
+      "path": "assets/kenney/rpg-audio/Audio/doorClose_1.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/doorClose_2",
+      "name": "Doorclose 2",
+      "path": "assets/kenney/rpg-audio/Audio/doorClose_2.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/doorClose_3",
+      "name": "Doorclose 3",
+      "path": "assets/kenney/rpg-audio/Audio/doorClose_3.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/doorClose_4",
+      "name": "Doorclose 4",
+      "path": "assets/kenney/rpg-audio/Audio/doorClose_4.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/doorOpen_1",
+      "name": "Dooropen 1",
+      "path": "assets/kenney/rpg-audio/Audio/doorOpen_1.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/doorOpen_2",
+      "name": "Dooropen 2",
+      "path": "assets/kenney/rpg-audio/Audio/doorOpen_2.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/drawKnife1",
+      "name": "Drawknife1",
+      "path": "assets/kenney/rpg-audio/Audio/drawKnife1.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/drawKnife2",
+      "name": "Drawknife2",
+      "path": "assets/kenney/rpg-audio/Audio/drawKnife2.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/drawKnife3",
+      "name": "Drawknife3",
+      "path": "assets/kenney/rpg-audio/Audio/drawKnife3.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/dropLeather",
+      "name": "Dropleather",
+      "path": "assets/kenney/rpg-audio/Audio/dropLeather.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/footstep00",
+      "name": "Footstep00",
+      "path": "assets/kenney/rpg-audio/Audio/footstep00.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/footstep01",
+      "name": "Footstep01",
+      "path": "assets/kenney/rpg-audio/Audio/footstep01.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/footstep02",
+      "name": "Footstep02",
+      "path": "assets/kenney/rpg-audio/Audio/footstep02.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/footstep03",
+      "name": "Footstep03",
+      "path": "assets/kenney/rpg-audio/Audio/footstep03.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/footstep04",
+      "name": "Footstep04",
+      "path": "assets/kenney/rpg-audio/Audio/footstep04.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/footstep05",
+      "name": "Footstep05",
+      "path": "assets/kenney/rpg-audio/Audio/footstep05.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/footstep06",
+      "name": "Footstep06",
+      "path": "assets/kenney/rpg-audio/Audio/footstep06.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/footstep07",
+      "name": "Footstep07",
+      "path": "assets/kenney/rpg-audio/Audio/footstep07.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/footstep08",
+      "name": "Footstep08",
+      "path": "assets/kenney/rpg-audio/Audio/footstep08.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/footstep09",
+      "name": "Footstep09",
+      "path": "assets/kenney/rpg-audio/Audio/footstep09.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/handleCoins",
+      "name": "Handlecoins",
+      "path": "assets/kenney/rpg-audio/Audio/handleCoins.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/handleCoins2",
+      "name": "Handlecoins2",
+      "path": "assets/kenney/rpg-audio/Audio/handleCoins2.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/handleSmallLeather",
+      "name": "Handlesmallleather",
+      "path": "assets/kenney/rpg-audio/Audio/handleSmallLeather.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/handleSmallLeather2",
+      "name": "Handlesmallleather2",
+      "path": "assets/kenney/rpg-audio/Audio/handleSmallLeather2.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/knifeSlice",
+      "name": "Knifeslice",
+      "path": "assets/kenney/rpg-audio/Audio/knifeSlice.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/knifeSlice2",
+      "name": "Knifeslice2",
+      "path": "assets/kenney/rpg-audio/Audio/knifeSlice2.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/metalClick",
+      "name": "Metalclick",
+      "path": "assets/kenney/rpg-audio/Audio/metalClick.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/metalLatch",
+      "name": "Metallatch",
+      "path": "assets/kenney/rpg-audio/Audio/metalLatch.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/metalPot1",
+      "name": "Metalpot1",
+      "path": "assets/kenney/rpg-audio/Audio/metalPot1.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/metalPot2",
+      "name": "Metalpot2",
+      "path": "assets/kenney/rpg-audio/Audio/metalPot2.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-rpg-audio/metalPot3",
+      "name": "Metalpot3",
+      "path": "assets/kenney/rpg-audio/Audio/metalPot3.ogg",
+      "source": "Kenney Rpg Audio",
+      "sourceUrl": "https://kenney.nl/assets/rpg-audio",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "rpg-audio",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/computerNoise_000",
+      "name": "Computernoise 000",
+      "path": "assets/kenney/sci-fi-sounds/Audio/computerNoise_000.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/computerNoise_001",
+      "name": "Computernoise 001",
+      "path": "assets/kenney/sci-fi-sounds/Audio/computerNoise_001.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/computerNoise_002",
+      "name": "Computernoise 002",
+      "path": "assets/kenney/sci-fi-sounds/Audio/computerNoise_002.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/computerNoise_003",
+      "name": "Computernoise 003",
+      "path": "assets/kenney/sci-fi-sounds/Audio/computerNoise_003.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/doorClose_000",
+      "name": "Doorclose 000",
+      "path": "assets/kenney/sci-fi-sounds/Audio/doorClose_000.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/doorClose_001",
+      "name": "Doorclose 001",
+      "path": "assets/kenney/sci-fi-sounds/Audio/doorClose_001.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/doorClose_002",
+      "name": "Doorclose 002",
+      "path": "assets/kenney/sci-fi-sounds/Audio/doorClose_002.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/doorOpen_000",
+      "name": "Dooropen 000",
+      "path": "assets/kenney/sci-fi-sounds/Audio/doorOpen_000.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/doorOpen_001",
+      "name": "Dooropen 001",
+      "path": "assets/kenney/sci-fi-sounds/Audio/doorOpen_001.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/doorOpen_002",
+      "name": "Dooropen 002",
+      "path": "assets/kenney/sci-fi-sounds/Audio/doorOpen_002.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/engineCircular_000",
+      "name": "Enginecircular 000",
+      "path": "assets/kenney/sci-fi-sounds/Audio/engineCircular_000.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/engineCircular_001",
+      "name": "Enginecircular 001",
+      "path": "assets/kenney/sci-fi-sounds/Audio/engineCircular_001.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/engineCircular_002",
+      "name": "Enginecircular 002",
+      "path": "assets/kenney/sci-fi-sounds/Audio/engineCircular_002.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/engineCircular_003",
+      "name": "Enginecircular 003",
+      "path": "assets/kenney/sci-fi-sounds/Audio/engineCircular_003.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/engineCircular_004",
+      "name": "Enginecircular 004",
+      "path": "assets/kenney/sci-fi-sounds/Audio/engineCircular_004.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/explosionCrunch_000",
+      "name": "Explosioncrunch 000",
+      "path": "assets/kenney/sci-fi-sounds/Audio/explosionCrunch_000.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/explosionCrunch_001",
+      "name": "Explosioncrunch 001",
+      "path": "assets/kenney/sci-fi-sounds/Audio/explosionCrunch_001.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/explosionCrunch_002",
+      "name": "Explosioncrunch 002",
+      "path": "assets/kenney/sci-fi-sounds/Audio/explosionCrunch_002.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/explosionCrunch_003",
+      "name": "Explosioncrunch 003",
+      "path": "assets/kenney/sci-fi-sounds/Audio/explosionCrunch_003.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/explosionCrunch_004",
+      "name": "Explosioncrunch 004",
+      "path": "assets/kenney/sci-fi-sounds/Audio/explosionCrunch_004.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/forceField_000",
+      "name": "Forcefield 000",
+      "path": "assets/kenney/sci-fi-sounds/Audio/forceField_000.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/forceField_001",
+      "name": "Forcefield 001",
+      "path": "assets/kenney/sci-fi-sounds/Audio/forceField_001.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/forceField_002",
+      "name": "Forcefield 002",
+      "path": "assets/kenney/sci-fi-sounds/Audio/forceField_002.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/forceField_003",
+      "name": "Forcefield 003",
+      "path": "assets/kenney/sci-fi-sounds/Audio/forceField_003.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/forceField_004",
+      "name": "Forcefield 004",
+      "path": "assets/kenney/sci-fi-sounds/Audio/forceField_004.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/impactMetal_000",
+      "name": "Impactmetal 000",
+      "path": "assets/kenney/sci-fi-sounds/Audio/impactMetal_000.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/impactMetal_001",
+      "name": "Impactmetal 001",
+      "path": "assets/kenney/sci-fi-sounds/Audio/impactMetal_001.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/impactMetal_002",
+      "name": "Impactmetal 002",
+      "path": "assets/kenney/sci-fi-sounds/Audio/impactMetal_002.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/impactMetal_003",
+      "name": "Impactmetal 003",
+      "path": "assets/kenney/sci-fi-sounds/Audio/impactMetal_003.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/impactMetal_004",
+      "name": "Impactmetal 004",
+      "path": "assets/kenney/sci-fi-sounds/Audio/impactMetal_004.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/laserLarge_000",
+      "name": "Laserlarge 000",
+      "path": "assets/kenney/sci-fi-sounds/Audio/laserLarge_000.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/laserLarge_001",
+      "name": "Laserlarge 001",
+      "path": "assets/kenney/sci-fi-sounds/Audio/laserLarge_001.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/laserLarge_002",
+      "name": "Laserlarge 002",
+      "path": "assets/kenney/sci-fi-sounds/Audio/laserLarge_002.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/laserLarge_003",
+      "name": "Laserlarge 003",
+      "path": "assets/kenney/sci-fi-sounds/Audio/laserLarge_003.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/laserLarge_004",
+      "name": "Laserlarge 004",
+      "path": "assets/kenney/sci-fi-sounds/Audio/laserLarge_004.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/laserRetro_000",
+      "name": "Laserretro 000",
+      "path": "assets/kenney/sci-fi-sounds/Audio/laserRetro_000.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/laserRetro_001",
+      "name": "Laserretro 001",
+      "path": "assets/kenney/sci-fi-sounds/Audio/laserRetro_001.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/laserRetro_002",
+      "name": "Laserretro 002",
+      "path": "assets/kenney/sci-fi-sounds/Audio/laserRetro_002.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/laserRetro_003",
+      "name": "Laserretro 003",
+      "path": "assets/kenney/sci-fi-sounds/Audio/laserRetro_003.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/laserRetro_004",
+      "name": "Laserretro 004",
+      "path": "assets/kenney/sci-fi-sounds/Audio/laserRetro_004.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/laserSmall_000",
+      "name": "Lasersmall 000",
+      "path": "assets/kenney/sci-fi-sounds/Audio/laserSmall_000.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/laserSmall_001",
+      "name": "Lasersmall 001",
+      "path": "assets/kenney/sci-fi-sounds/Audio/laserSmall_001.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/laserSmall_002",
+      "name": "Lasersmall 002",
+      "path": "assets/kenney/sci-fi-sounds/Audio/laserSmall_002.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/laserSmall_003",
+      "name": "Lasersmall 003",
+      "path": "assets/kenney/sci-fi-sounds/Audio/laserSmall_003.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/laserSmall_004",
+      "name": "Lasersmall 004",
+      "path": "assets/kenney/sci-fi-sounds/Audio/laserSmall_004.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/lowFrequency_explosion_000",
+      "name": "Lowfrequency Explosion 000",
+      "path": "assets/kenney/sci-fi-sounds/Audio/lowFrequency_explosion_000.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/lowFrequency_explosion_001",
+      "name": "Lowfrequency Explosion 001",
+      "path": "assets/kenney/sci-fi-sounds/Audio/lowFrequency_explosion_001.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/slime_000",
+      "name": "Slime 000",
+      "path": "assets/kenney/sci-fi-sounds/Audio/slime_000.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/slime_001",
+      "name": "Slime 001",
+      "path": "assets/kenney/sci-fi-sounds/Audio/slime_001.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngineLarge_000",
+      "name": "Spaceenginelarge 000",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngineLarge_000.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngineLarge_001",
+      "name": "Spaceenginelarge 001",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngineLarge_001.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngineLarge_002",
+      "name": "Spaceenginelarge 002",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngineLarge_002.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngineLarge_003",
+      "name": "Spaceenginelarge 003",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngineLarge_003.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngineLarge_004",
+      "name": "Spaceenginelarge 004",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngineLarge_004.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngineLow_000",
+      "name": "Spaceenginelow 000",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngineLow_000.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngineLow_001",
+      "name": "Spaceenginelow 001",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngineLow_001.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngineLow_002",
+      "name": "Spaceenginelow 002",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngineLow_002.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngineLow_003",
+      "name": "Spaceenginelow 003",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngineLow_003.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngineLow_004",
+      "name": "Spaceenginelow 004",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngineLow_004.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngineSmall_000",
+      "name": "Spaceenginesmall 000",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngineSmall_000.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngineSmall_001",
+      "name": "Spaceenginesmall 001",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngineSmall_001.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngineSmall_002",
+      "name": "Spaceenginesmall 002",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngineSmall_002.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngineSmall_003",
+      "name": "Spaceenginesmall 003",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngineSmall_003.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngineSmall_004",
+      "name": "Spaceenginesmall 004",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngineSmall_004.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngine_000",
+      "name": "Spaceengine 000",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngine_000.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngine_001",
+      "name": "Spaceengine 001",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngine_001.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngine_002",
+      "name": "Spaceengine 002",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngine_002.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/spaceEngine_003",
+      "name": "Spaceengine 003",
+      "path": "assets/kenney/sci-fi-sounds/Audio/spaceEngine_003.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/thrusterFire_000",
+      "name": "Thrusterfire 000",
+      "path": "assets/kenney/sci-fi-sounds/Audio/thrusterFire_000.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/thrusterFire_001",
+      "name": "Thrusterfire 001",
+      "path": "assets/kenney/sci-fi-sounds/Audio/thrusterFire_001.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/thrusterFire_002",
+      "name": "Thrusterfire 002",
+      "path": "assets/kenney/sci-fi-sounds/Audio/thrusterFire_002.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/thrusterFire_003",
+      "name": "Thrusterfire 003",
+      "path": "assets/kenney/sci-fi-sounds/Audio/thrusterFire_003.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    },
+    {
+      "id": "kenney-sci-fi-sounds/thrusterFire_004",
+      "name": "Thrusterfire 004",
+      "path": "assets/kenney/sci-fi-sounds/Audio/thrusterFire_004.ogg",
+      "source": "Kenney Sci Fi Sounds",
+      "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+      "license": "CC0-1.0",
+      "tags": [
+        "sfx",
+        "combat",
+        "kenney",
+        "sci-fi-sounds",
+        "audio"
+      ],
+      "fileType": "ogg"
+    }
+  ]
+}

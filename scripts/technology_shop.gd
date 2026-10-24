@@ -128,6 +128,12 @@ func open_purchase(index: int) -> void:
 	label(modal,"余额 %d → %d  ·  购买后请到地图配置携带" % [int(Game.state.credits),int(Game.state.credits)-int(offer.price)],Vector2(370,553),Vector2(700,31),17,SOFT)
 	var cancel := shop_button(modal,"取消",Vector2(370,615),Vector2(195,48),close_modal)
 	cancel.name = "cancel_trade"
+	for color_name in ["font_color","font_hover_color","font_pressed_color","font_focus_color"]:
+		cancel.add_theme_color_override(color_name,ROSE)
+	for state_name in ["normal","hover","pressed"]:
+		var cancel_frame := style(Color("f5e7ee"),Color("483446"))
+		cancel_frame.border_width_left = 1
+		cancel.add_theme_stylebox_override(state_name,cancel_frame)
 	var confirm := shop_button(modal,"确认购买",Vector2(589,615),Vector2(481,48),complete_trade.bind(index),true)
 	confirm.name = "confirm_trade"
 	cancel.grab_focus()

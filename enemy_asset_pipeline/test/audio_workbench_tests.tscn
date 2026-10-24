@@ -1,0 +1,4 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://enemy_asset_pipeline/test/audio_workbench_tests.gd" id="1"]
+[node name="AudioWorkbenchTests" type="Node"]
+script = ExtResource("1")

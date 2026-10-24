@@ -1,4 +1,6 @@
 extends DemoUI
+signal advance_requested
+signal choice_confirmed
 const STORY_RED := Color("ff393e")
 const STORY_WHITE := Color("f4f2ef")
 var text_label: Label
@@ -179,6 +181,7 @@ func _process(delta: float) -> void:
 
 func advance() -> void:
 	if is_instance_valid(history_overlay): return
+	advance_requested.emit()
 	if text_label.visible_characters >= 0:
 		text_label.visible_characters = -1
 		return
@@ -188,7 +191,7 @@ func advance() -> void:
 
 func select(index: int) -> void:
 	if is_instance_valid(history_overlay): return
-	Game.choose(index, expected_revision)
+	if Game.choose(index, expected_revision): choice_confirmed.emit()
 
 func skip() -> void:
 	if is_instance_valid(history_overlay): return

@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://dhwdtuxvf2eit"
+path="res://.godot/imported/border-gunshot.wav-e398c08441504d7cd7eb3ba7d18d6316.sample"
+
+[deps]
+
+source_file="res://assets/audio/reference/Paper, Please/border-gunshot.wav"
+dest_files=["res://.godot/imported/border-gunshot.wav-e398c08441504d7cd7eb3ba7d18d6316.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

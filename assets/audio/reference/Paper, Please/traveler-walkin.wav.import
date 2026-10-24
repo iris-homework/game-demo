@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://b38tmjddr87mm"
+path="res://.godot/imported/traveler-walkin.wav-70944eb796362ec8ac6889b4f83073e0.sample"
+
+[deps]
+
+source_file="res://assets/audio/reference/Paper, Please/traveler-walkin.wav"
+dest_files=["res://.godot/imported/traveler-walkin.wav-70944eb796362ec8ac6889b4f83073e0.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2
