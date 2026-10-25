@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-10-25指定敌人技能瞄准：新增[targeted_skill_aim_tests](combat/interaction/targeted_skill_aim_tests.tscn)84项，覆盖30／34／39两种形态及11远程的实际出牌、指定不同敌人、居中不跟随、按下不提前结算、松手／点选确认、防重复、换牌、取消、空目标／死敌、费用不足与同手牌切形态。自身／群体非攻击与攻击输入保留；配套自身目标110、诺伦卡牌899，共3套1093项0失败。隔离工程、独立用户目录、headless+Dummy；运动事件经视口最终变换后`Input.parse_input_event`注入，按钮用`viewport.push_input`，不调用系统鼠标移动。有效旧版对照84项19失败，新版通过；输入坐标／夹具诊断及音频收尾前日志保留，最终日志无脚本错误／警告／退出提示。`skill_drag_visual`仅静态适配，未运行物理窗口或像素验收。见[验证汇总](../artifacts/qa/targeted-skill-aim-2026-10-25/verification.json)。
+
 2026-10-25信用点手动领取：奖励180、酒馆回访356、被动科技149、第一周结算134、奖励选择器73，共5套892项0失败。覆盖生成奖励不自动到账、基础与金钱芯片同次点击领取、卡牌／信用点领取顺序独立、保存失败回滚及UI重试、整行点击、防重复领取、离开跳过未领奖励、旧已到账记录与Boss选卡后读档仍待显式退出。复制工程与独立用户目录、headless+Dummy，日志无脚本错误／警告／退出资源提示；未做像素或物理输入验收。见[验证汇总](../artifacts/qa/manual-reward-credits-2026-10-25/verification.json)。 补充8套1562项通过，共13套2454项；首轮旧科技夹具／旧字幕断言失败及修正后的日志均保留，见[补充回归](../artifacts/qa/manual-reward-credits-2026-10-25/supplemental-verification.json)。`reward_visual`因包含系统鼠标移动仅静态适配，未运行。
 
 2026-10-25第一周结算专项：[week_end_tests](story/week_end_tests.tscn)验证真实两阶段胜利→战后对白→奖励选卡→周结算、单按钮／Esc、存读档与迁移、保存失败重试、新局及演练隔离。使用复制工程、独立用户目录、绝对`QA_OUT_DIR`，headless+Dummy；无窗口节点检查不代表像素或物理输入验收。

@@ -96,8 +96,8 @@ func _ready() -> void:
 	await install_hand([34,1]);view=app.view;before=view.model.snapshot()
 	var skill_home: Vector2=view.cards["card_000"].home+Vector2(68,110)
 	await pointer(skill_home,1);await pointer(skill_home,0)
-	await pointer(Vector2(1310,740),1);await pointer(Vector2(1310,740),0)
-	check(view.selected_uid=="card_000" and view.model.snapshot()==before and not is_instance_valid(view.pile_overlay), "Targeted non-attack consumes invalid button click but still requires an enemy")
+	await pointer(view.DRAW_POS+view.PILE_SIZE/2,1);await pointer(view.DRAW_POS+view.PILE_SIZE/2,0)
+	check(view.cards["card_000"].center_on_selection and is_instance_valid(view.pile_overlay) and view.model.snapshot()==before, "Enemy-targeted skill uses attack aim and permits normal pile-button clicks")
 	await key(KEY_ESCAPE)
 	await pointer(view.DRAW_POS+view.PILE_SIZE/2,1);await pointer(view.DRAW_POS+view.PILE_SIZE/2,0)
 	check(is_instance_valid(view.pile_overlay), "Explicit cancellation restores normal pile-button clicks")
@@ -175,16 +175,16 @@ func _ready() -> void:
 	await start_drag()
 	var target_point: Vector2=view.stage.target_rect(0).get_center()
 	await pointer(target_point);await pointer(target_point,0);await idle()
-	check(view.model.enemies[0].bleed==2, "Targeted skill casts by releasing over its enemy")
+	check(view.model.enemies[0].bleed==3, "Targeted skill casts by releasing over its enemy")
 	await install_hand([34,1]);view=app.view;before=view.model.snapshot()
 	rest=view.cards["card_000"].home+Vector2(68,110)
 	await pointer(rest,1);await pointer(rest,0)
 	target_point=view.stage.target_rect(0).get_center()
 	await pointer(target_point)
-	check(view.cards["card_000"].dragging and (view.cards["card_000"].global_position+view.cards["card_000"].pivot_offset).distance_to(target_point)<3, "Enemy-targeted non-attack skill also follows the pointer")
+	check(view.cards["card_000"].center_on_selection and not view.cards["card_000"].dragging and view.aim.visible, "Enemy-targeted skill keeps the stationary attack-style aiming pose")
 	check(view.model.snapshot()==before, "Hovering a selected skill over an enemy does not cast it")
 	await pointer(target_point,1);await pointer(target_point,0);await idle()
-	check(view.model.enemies[0].bleed==2 and not view.cards.has("card_000"), "Following skill does not swallow enemy confirmation clicks")
+	check(view.model.enemies[0].bleed==3 and not view.cards.has("card_000"), "Aimed skill confirms on an enemy click")
 
 	await install_hand([1,2,3,23,1,1,1,1,1,1]);view=app.view;before=view.model.snapshot()
 	rest=view.cards["card_000"].home+Vector2(68,110)
@@ -192,10 +192,10 @@ func _ready() -> void:
 	await get_tree().create_timer(0.2).timeout
 	var attack: CombatCard=view.cards["card_000"]
 	var centered: Vector2=attack.position
-	check(view.selected_uid=="card_000" and absf((attack.get_global_transform()*attack.pivot_offset).x-720)<1 and is_equal_approx(attack.position.y,646), "Selected attack stays centered close to the bottom edge")
+	check(view.selected_uid=="card_000" and absf((attack.get_global_transform()*attack.pivot_offset).x-720)<1 and is_equal_approx(attack.position.y,attack.selection_home.y-150), "Selected attack stays centered close to the bottom edge")
 	check(is_zero_approx(attack.rotation) and is_equal_approx(attack.scale.x,1.12), "Centered attack is upright and fully enlarged")
 	var bottom: float=(attack.get_global_transform()*Vector2(90,230)).y
-	check(bottom>=888 and bottom<=892, "Selected attack remains fully visible with about ten pixels below it")
+	check(bottom>=876 and bottom<=880, "Selected attack remains fully visible with about twenty-two pixels below it")
 	check(view.model.snapshot()==before, "Centering an attack does not change cards or resources")
 	await pointer(view.cards["card_009"].home+Vector2(68,110))
 	check(attack.position.is_equal_approx(centered) and not attack.dragging, "Attack stays centered while the mouse moves across other cards")

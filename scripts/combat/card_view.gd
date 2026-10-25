@@ -123,7 +123,7 @@ func _ready() -> void:
 		card_button.focus_mode = Control.FOCUS_NONE
 	for state_name in ["normal","hover","pressed","disabled","focus"]:
 		card_button.add_theme_stylebox_override(state_name, StyleBoxEmpty.new())
-	card_button.tooltip_text = data.get("description", "") + "\n攻击牌选中后居中置顶，非攻击牌选中后跟随鼠标。非攻击牌选中期间左键优先出牌，不触发其他按钮；自身技能／能力可在画面内任意位置使用，指定敌人的技能仍需点击敌人。Esc／右键取消。"
+	card_button.tooltip_text = data.get("description", "") + "\n攻击牌与指定敌人的技能选中后居中置顶；指定敌人时可拖到敌人松手或点选敌人释放。自身／群体非攻击牌跟随鼠标，左键优先出牌，可在画面内使用。Esc／右键取消。"
 	if preview_only: card_button.tooltip_text = data.get("description", "")
 	card_button.pressed.connect(func(): if enabled: chosen.emit(uid))
 	if managed_input:

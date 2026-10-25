@@ -339,7 +339,7 @@ func hand_at_pointer() -> String:
 
 func hand_at_point(pointer: Vector2) -> String:
 	var nearest := ""
-	# The centered attack is visually above the fan, so its visible face wins hits too.
+	# A centered aimed card is above the fan, so its visible face wins hits too.
 	if cards.has(selected_uid):
 		var selected: CombatCard = cards[selected_uid]
 		if selected.center_on_selection and Rect2(Vector2.ZERO,selected.size).has_point(selected.get_global_transform().affine_inverse()*pointer): return selected_uid
@@ -363,7 +363,7 @@ func hand_at_point(pointer: Vector2) -> String:
 func update_hand_hover() -> void:
 	var uid := ""
 	if initialized and not Game.battle_busy and not Game.transition_locked and not is_instance_valid(pile_overlay):
-		uid = selected_uid if non_attack_selected() else (held_card_uid if not held_card_uid.is_empty() else hand_at_pointer())
+		uid = selected_uid if following_card_selected() else (held_card_uid if not held_card_uid.is_empty() else hand_at_pointer())
 	for card_uid in cards: cards[card_uid].hover(card_uid == uid)
 
 func create_card(uid: String, index: int, count: int, animate: bool) -> CombatCard:
@@ -373,8 +373,8 @@ func create_card(uid: String, index: int, count: int, animate: bool) -> CombatCa
 	view.home_rotation = hand_rotation(index,count)
 	view.home_z = 10+index
 	view.lifted_z = maxi(30,10+count)
-	view.selection_home = hand_position(0,1)+Vector2(0,36) # Keep the selected attack fully above the viewport bottom.
-	view.center_on_selection = model.card(uid).get("type","attack") == "attack"
+	view.selection_home = hand_position(0,1)+Vector2(0,36) # Keep the aimed card above the viewport bottom.
+	view.center_on_selection = uses_centered_aim(uid)
 	view.setup(uid,model.card(uid))
 	view.home = hand_position(index,count)
 	add_child(view)
@@ -481,7 +481,10 @@ func update_center_drag() -> void:
 	var view: CombatCard = cards[selected_uid]
 	if not view.center_on_selection: view.drag_to(pointer)
 
-func non_attack_selected() -> bool:
+func uses_centered_aim(uid: String) -> bool:
+	return model.card(uid).get("type", "attack") == "attack" or model.card_target(uid) == "enemy"
+
+func following_card_selected() -> bool:
 	return cards.has(selected_uid) and not cards[selected_uid].center_on_selection
 
 func release_area_contains(uid: String, point: Vector2) -> bool:
@@ -509,7 +512,10 @@ func select_card(uid: String, toggle: bool = true) -> void:
 	selected_uid = "" if toggle and selected_uid == uid else uid
 	if selected_uid.is_empty(): card_aim_cancelled.emit()
 	else: card_aim_started.emit(selected_uid)
-	for card_uid in cards: cards[card_uid].set_selected(card_uid == selected_uid)
+	for card_uid in cards:
+		# A stance-dependent skill can change target while remaining in this hand.
+		cards[card_uid].center_on_selection = uses_centered_aim(card_uid)
+		cards[card_uid].set_selected(card_uid == selected_uid)
 	refresh_enemy_hud()
 	_process(0.0)
 
@@ -1102,8 +1108,8 @@ func _input(event: InputEvent) -> void:
 			return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		if initialized and not Game.battle_busy and not Game.transition_locked and not is_instance_valid(pile_overlay):
-			# A selected non-attack owns the next click, including clicks over buttons or cards.
-			if non_attack_selected():
+			# A following self/all card owns clicks over buttons and other cards.
+			if following_card_selected():
 				held_card_uid = selected_uid
 				held_start = get_global_mouse_position()
 				held_card_moved = false
@@ -1133,12 +1139,12 @@ func _input(event: InputEvent) -> void:
 		var should_release := held_card_moved or held_confirmation
 		clear_card_hold()
 		if not released_uid.is_empty() and selected_uid == released_uid and not Game.battle_busy and not Game.transition_locked and not is_instance_valid(pile_overlay):
-			if non_attack_selected(): get_viewport().set_input_as_handled()
+			if following_card_selected(): get_viewport().set_input_as_handled()
 			if model.card_target(released_uid) in ["self","all"]:
 				get_viewport().set_input_as_handled()
 				if should_release:
 					if release_area_contains(released_uid,get_global_mouse_position()): play_selected(-1)
-					elif not non_attack_selected(): cancel_selection()
+					elif not following_card_selected(): cancel_selection()
 			else:
 				var target := target_at_pointer()
 				if target >= 0:
