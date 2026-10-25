@@ -142,7 +142,7 @@ func valid_card_effect(effect: Dictionary) -> bool:
 	if not has(id): return false
 	var entry: Dictionary = _definitions()[id]
 	if not entry.get("cardApply", true): return false
-	var target = effect.get("buffTarget", "player" if entry.target == "both" else entry.target)
+	var target = effect.get("buffTarget", "enemy" if id == "weak" else ("player" if entry.target == "both" else entry.target))
 	return target in ["player", "enemy"] and entry.target in ["both", target]
 
 func apply_card_effect(model, effect: Dictionary, targets: Array, context: Dictionary) -> void:
@@ -157,7 +157,7 @@ func apply_card_effect(model, effect: Dictionary, targets: Array, context: Dicti
 	if effect.has("cap"): options.cap = effect.cap
 	if kind == "parry_fill": options.fill = true
 	# block has always targeted the player, including enemy-targeting skill cards.
-	var target: String = effect.get("buffTarget", "player" if entry.target == "both" else entry.target)
+	var target: String = effect.get("buffTarget", "enemy" if id == "weak" else ("player" if entry.target == "both" else entry.target))
 	if target == "player": apply(model, id, amount, -1, options)
 	else:
 		for index in targets:
@@ -261,7 +261,7 @@ func own_turn_end(model, enemy_index: int = -1) -> Array:
 			events.append(tick)
 			model.log_lines.append("污染造成 %d 点伤害，格挡 %d，剩余 %d 层。" % [tick.damage, tick.blocked, layers - 1])
 		_write_count(model, entry.id, layers - 1, enemy_index)
-		if entry.handler == "vulnerable":
+		if entry.handler in ["vulnerable", "weak"]:
 			events.append({"type":"status_decay", "target":enemy_index, "buffId":entry.id, "stacksAfter":layers - 1})
 	return events
 
@@ -277,12 +277,13 @@ func enemy_badges(enemy: Dictionary) -> Array:
 		if amount != 0: result.append(_badge(entry, amount))
 	return result
 
-func player_badges(model, shown_parry: int = -1, shown_pollution: int = -1, shown_extra = null) -> Array:
+func player_badges(model, shown_parry: int = -1, shown_pollution: int = -1, shown_extra = null, shown_weak: int = -1) -> Array:
 	var result: Array = []
 	for entry in _definitions().values():
 		if not entry.showBadge or entry.target == "enemy": continue
 		var amount := shown_parry if entry.id == "parry" and shown_parry >= 0 else count(model, entry.id)
 		if entry.id == "pollution" and shown_pollution >= 0: amount = shown_pollution
+		if entry.id == "weak" and shown_weak >= 0: amount = shown_weak
 		if shown_extra is Dictionary and entry.get("field", "").is_empty() and entry.id != "pollution": amount = int(shown_extra.get(entry.id, 0))
 		if amount == 0: continue
 		var used: bool = model.get(entry.usedField) if entry.has("usedField") else false
@@ -317,7 +318,7 @@ func valid_snapshot(snapshot: Dictionary) -> bool:
 	for entry in _definitions().values():
 		if entry.get("field", "").is_empty(): continue
 		if entry.target != "enemy" and entry.id != "technology" and entry.stacking != "unique":
-			var value = state.get(entry.saveKey)
+			var value = state.get(entry.saveKey, 0) if entry.id == "weak" else state.get(entry.saveKey)
 			if entry.stacking == "flag":
 				if not value is bool: return false
 			elif not _valid_count(value, int(entry.get("maxStacks", -1))): return false

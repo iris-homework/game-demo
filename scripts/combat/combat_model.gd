@@ -28,6 +28,7 @@ var block := 0
 var stance := "melee"
 var ammo := 0
 var parry := 0
+var weak := 0
 var exhaust_pile: Array = []
 var powers: Array = []
 var turn_damage_bonus := 0
@@ -131,6 +132,7 @@ func initialize(id: String, hp: int, maximum: int, rules: Dictionary, enemy_defs
 	profile = rules.duplicate(true)
 	card_catalog = cards.duplicate(true)
 	card_catalog.merge(profile.get("cards", {}), false)
+	card_catalog.merge(profile.get("phaseTwoCards", {}), false)
 	for i in profile.get("deck", []).size():
 		var uid := "card_%03d" % i
 		instances[uid] = profile.deck[i]
@@ -142,6 +144,7 @@ func initialize(id: String, hp: int, maximum: int, rules: Dictionary, enemy_defs
 		if profile.get("shuffleInitialDeck", true): draw_pile.shuffle()
 	for definition in enemy_defs:
 		var enemy: Dictionary = definition.duplicate(true)
+		if enemy.has("buffs"): enemy.buffs = buffs.restore_extra_state(enemy.buffs)
 		enemy.maxHp = int(profile.enemyMaxHp) if enemy.get("maxHp") == null else int(enemy.maxHp)
 		enemy.hp = enemy.maxHp
 		if is_noren():
@@ -199,6 +202,8 @@ func enemy_intent_text(enemy: Dictionary, after_player_turn_end: bool = true, vu
 	var intent: Dictionary = enemy.get("intent", {})
 	if intent.get("type", "") == "pollution": return "污染 %d" % int(intent.get("amount", 0))
 	if intent.get("type", "") == "vulnerable": return "易伤 %d" % int(intent.get("amount", 0))
+	if intent.get("type", "") == "weak": return "虚弱 %d" % int(intent.get("amount", 0))
+	if intent.get("type", "") == "heal_ally": return "治疗 %d" % int(intent.get("amount", 0))
 	if intent.get("type", "") == "strength_allies": return "强化 +%d" % int(intent.get("amount", 0))
 	if intent.get("type", "") == "charge": return "充能 +%d 电能" % int(intent.get("amount", 0))
 	if intent.get("type", "") == "energy_suit": return "强化：能量防护服"
@@ -220,7 +225,35 @@ func attack_hit_amount(definition: Dictionary, effect: Dictionary, form: String,
 		if ammo_before == 1: base += int(effect.get("lastAmmoBonus", 0))
 		if int(enemy_before.hp) * 2 <= int(enemy_before.maxHp): base += int(effect.get("executeBonus", 0))
 	var multiplier := (2.0 if buffs.count(self,"ranged_mastery") > 0 else 1.5) if form == "ranged" else 1.0
-	return roundi(maxi(0, base) * multiplier)
+	return roundi(maxi(0, base) * multiplier * (0.75 if definition.get("type") == "attack" and weak > 0 else 1.0))
+
+func add_cards_to_draw_pile(id: String, definition: Dictionary, amount: int, uids: Array = []) -> Array:
+	# Keep existing frozen definitions and every existing pile in its original order.
+	if not card_catalog.has(id): card_catalog[id] = definition.duplicate(true)
+	var added: Array = []
+	var sequence := instances.size()
+	for i in amount:
+		var uid: String
+		if uids.is_empty():
+			uid = "console_%03d" % sequence
+			while instances.has(uid):
+				sequence += 1
+				uid = "console_%03d" % sequence
+			sequence += 1
+		else:
+			uid = uids[i]
+		instances[uid] = id
+		draw_pile.append(uid)
+		profile.deck.append(id)
+		added.append(uid)
+	return added
+
+func kill_enemies() -> void:
+	if not outcome.is_empty(): return
+	for i in enemies.size():
+		if enemies[i].hp > 0: enemy_damage(i, int(enemies[i].hp), true)
+	resolve_outcome()
+	advance_encounter_phase()
 
 func draw_cards(amount: int = -1) -> Array:
 	var drawn: Array = []
@@ -317,7 +350,7 @@ func use_item(_item_id: String, _target_index: int, _inventory: Dictionary, _cat
 	return {"ok":false, "reason":"道具效果待设计；当前没有可使用道具。"}
 
 func snapshot() -> Dictionary:
-	var saved := {"battleId":battle_id,"turn":turn,"playerHp":player_hp,"maxHp":max_hp,"drawPile":draw_pile.duplicate(),"hand":hand.duplicate(),"discardPile":discard_pile.duplicate(),"instances":instances.duplicate(true),"enemies":enemies.duplicate(true),"outcome":outcome,"log":log_lines.slice(-30),"profile":profile.duplicate(true),"cardCatalog":card_catalog.duplicate(true),"usedCyberware":used_cyberware.duplicate(),"nextAttackBonus":next_attack_bonus,"norenState":{"energy":energy,"block":block,"stance":stance,"ammo":ammo,"parry":parry,"exhaustPile":exhaust_pile.duplicate(),"powers":powers.duplicate(),"turnDamageBonus":turn_damage_bonus,"turnDiscount":turn_discount,"stanceDiscount":stance_discount,"pressureUsed":pressure_used,"dissectionUsed":dissection_used},"openingDrawDone":opening_draw_done}
+	var saved := {"battleId":battle_id,"turn":turn,"playerHp":player_hp,"maxHp":max_hp,"drawPile":draw_pile.duplicate(),"hand":hand.duplicate(),"discardPile":discard_pile.duplicate(),"instances":instances.duplicate(true),"enemies":enemies.duplicate(true),"outcome":outcome,"log":log_lines.slice(-30),"profile":profile.duplicate(true),"cardCatalog":card_catalog.duplicate(true),"usedCyberware":used_cyberware.duplicate(),"nextAttackBonus":next_attack_bonus,"norenState":{"energy":energy,"block":block,"stance":stance,"ammo":ammo,"parry":parry,"weak":weak,"exhaustPile":exhaust_pile.duplicate(),"powers":powers.duplicate(),"turnDamageBonus":turn_damage_bonus,"turnDiscount":turn_discount,"stanceDiscount":stance_discount,"pressureUsed":pressure_used,"dissectionUsed":dissection_used},"openingDrawDone":opening_draw_done}
 	if profile.get("encounterId", "") == "dancer_duet": saved.encounterPhase = encounter_phase
 	if not buff_state.is_empty(): saved.buffs = buff_state.duplicate(true)
 	if not cyberware_cooldowns.is_empty(): saved.cyberwareCooldowns = cyberware_cooldowns.duplicate()
@@ -353,6 +386,7 @@ func restore(data: Dictionary) -> void:
 	stance = n.get("stance", "melee")
 	ammo = int(n.get("ammo", 0))
 	parry = int(n.get("parry", 0))
+	weak = int(n.get("weak", 0))
 	exhaust_pile = n.get("exhaustPile", []).duplicate()
 	powers = n.get("powers", []).duplicate()
 	turn_damage_bonus = int(n.get("turnDamageBonus", 0))
@@ -460,21 +494,50 @@ func advance_encounter_phase(player_turn_ended: bool = false, transition: Dictio
 	enemies.clear()
 	for definition in profile.phaseTwoEnemies:
 		var enemy: Dictionary = definition.duplicate(true)
+		if enemy.has("buffs"): enemy.buffs = buffs.restore_extra_state(enemy.buffs)
 		enemy.hp = int(enemy.maxHp)
 		enemy.block = 0
 		enemy.bleed = 0
 		enemy.weak = 0
-		enemy.erase("buffs")
 		enemy.intentIndex = 0
 		enemy.intent = intent_for(enemy, 0)
 		enemies.append(enemy)
+	# Encounter cards are created once at the transition, before the fresh draw.
+	for card_id in profile.get("phaseTwoCards", {}):
+		var card_uid: String = "encounter_" + card_id
+		instances[card_uid] = card_id
+		draw_pile.insert(randi_range(0, draw_pile.size()), card_uid)
 	turn += 1
 	buffs.own_turn_start(self)
+	begin_dancer_round()
 	energy = int(profile.get("energyPerTurn", 3))
 	advance_cyberware_cooldowns()
 	transition.drawn = draw_cards()
 	log_lines.append("灯光熄灭。双人舞者 · 第二幕。")
 	return true
+
+func begin_dancer_round() -> Array:
+	var events: Array = []
+	if profile.get("encounterId", "") != "dancer_duet" or encounter_phase != 2: return events
+	for source in enemies.size():
+		if enemies[source].hp <= 0 or buffs.count(self, "soul_link", source) <= 0: continue
+		var black: bool = enemies[source].id == "dancer_black"
+		var target_id := "dancer_white" if black else "dancer_black"
+		for target in enemies.size():
+			if enemies[target].id != target_id or enemies[target].hp <= 0: continue
+			var buff_id := "block" if black else "strength"
+			var amount := 10 if black else 2
+			buffs.apply(self, buff_id, amount, target)
+			events.append({"type":"status_apply", "source":source, "target":target, "buffId":buff_id, "amount":amount, "stacksAfter":buffs.count(self, buff_id, target), "clearSourceBlock":false})
+	return events
+
+func valid_soul_removal(effect: Dictionary) -> bool:
+	return effect.get("enemyId") in ["dancer_black", "dancer_white"] and buffs._valid_count(effect.get("amount"), 2) and effect.amount > 0
+
+func remove_soul_link(effect: Dictionary) -> void:
+	for index in enemies.size():
+		if enemies[index].id == effect.enemyId and enemies[index].hp > 0:
+			buffs._write_count(self, "soul_link", maxi(0, buffs.count(self, "soul_link", index) - int(effect.amount)), index)
 
 func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_ammo: int) -> Dictionary:
 	if not play_error(uid).is_empty(): return {}
@@ -485,10 +548,11 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 	var effects: Array = definition.get("effects", [])
 	if definition.has("consumeAllAmmo") and not definition.consumeAllAmmo is bool: return {}
 	# Validate the complete transaction before spending resources or moving any card.
-	var allowed := ["damage","ammo","draw","stance","discard_attack","exhaust_hand"]
+	var allowed := ["damage","ammo","draw","stance","discard_attack","exhaust_hand","remove_soul_link"]
 	for effect in effects:
 		if not effect is Dictionary: return {}
 		if not effect.get("type", "") in allowed and not buffs.valid_card_effect(effect): return {}
+		if effect.type == "remove_soul_link" and not valid_soul_removal(effect): return {}
 		if effect.has("amount"):
 			if not (effect.amount is int or effect.amount is float): return {}
 			if effect.amount < 0 and not (effect.get("id", effect.type) == "strength" and buffs.valid_card_effect(effect)): return {}
@@ -543,6 +607,7 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 						damage += hit.damage
 						hits.append(hit)
 				bonus = 0
+			"remove_soul_link": remove_soul_link(effect)
 			"ammo": gain_ammo(amount)
 			"draw": drawn.append_array(draw_cards(amount))
 			"stance": drawn.append_array(change_stance(effect.value))
@@ -588,7 +653,7 @@ func end_noren_turn() -> Dictionary:
 		if intent.get("type", "") != "attack":
 			var kind: String = intent.get("type", "")
 			var amount := int(intent.get("amount", 0))
-			if kind in ["pollution", "vulnerable"]:
+			if kind in ["pollution", "vulnerable", "weak"]:
 				buffs.apply(self, kind, amount)
 				turn_events.append({"type":"status_apply","source":index,"target":-1,"buffId":kind,"amount":amount,"stacksAfter":buffs.count(self, kind)})
 				log_lines.append("%s 施加 %d 层%s。" % [enemy.displayName, amount, buffs.definition(kind).name])
@@ -607,6 +672,14 @@ func end_noren_turn() -> Dictionary:
 				buffs.apply(self, "energy_suit", 1, index)
 				turn_events.append({"type":"status_apply","source":index,"target":index,"buffId":"energy_suit","amount":1,"stacksAfter":buffs.count(self,"energy_suit",index)})
 				log_lines.append("%s 强化，获得能量防护服。" % enemy.displayName)
+			elif kind == "heal_ally":
+				for ally_index in enemies.size():
+					var ally: Dictionary = enemies[ally_index]
+					if ally.hp <= 0 or not ally.id in intent.get("targetIds", []): continue
+					var restored := mini(amount, int(ally.maxHp - ally.hp))
+					ally.hp += restored
+					turn_events.append({"type":"heal", "source":index, "target":ally_index, "amount":restored, "hpAfter":ally.hp})
+					log_lines.append("%s 为%s恢复 %d 点生命。" % [enemy.displayName, ally.displayName, restored])
 			elif kind == "strength_allies":
 				for ally_index in enemies.size():
 					if enemies[ally_index].hp <= 0 or not enemies[ally_index].id in intent.get("targetIds", []): continue
@@ -635,6 +708,9 @@ func end_noren_turn() -> Dictionary:
 		var attack := {"type":"attack","index":index,"id":enemy.id,"damage":damage,"hits":hits,"counters":counters,"electricChargeUsed":charge_used,"electricChargeAfter":buffs.count(self,"electric_charge",index)}
 		attacks.append(attack)
 		turn_events.append(attack)
+		if int(intent.get("onHitWeak", 0)) > 0 and player_hp > 0:
+			buffs.apply(self, "weak", int(intent.onHitWeak))
+			turn_events.append({"type":"status_apply", "source":index, "target":-1, "buffId":"weak", "amount":int(intent.onHitWeak), "stacksAfter":weak, "clearSourceBlock":false})
 		turn_events.append_array(buffs.own_turn_end(self, index))
 		resolve_outcome()
 		if not outcome.is_empty(): break
@@ -649,5 +725,6 @@ func end_noren_turn() -> Dictionary:
 			enemy.intentIndex += 1
 			enemy.intent = intent_for(enemy, int(enemy.intentIndex))
 		turn_events.append_array(begin_round_intents())
+		turn_events.append_array(begin_dancer_round())
 	var drawn: Array = transition.drawn if phase_changed else draw_cards()
 	return {"phaseChanged":phase_changed,"discarded":discarded,"attacks":attacks,"turnEvents":turn_events,"drawn":drawn,"outcome":outcome}

@@ -97,6 +97,32 @@ func check_pose_scale(view: Control) -> void:
 			check(absf(displayed/reference - 1.0) < 0.06, actor.kind + "/" + pose + " retains idle body scale despite crouch")
 		actor.set_pose("idle")
 
+func observe_enemy_round(view: Control) -> Dictionary:
+	var observed := {"hpSteps":[],"sawSoulBlock":false,"sawSoulStrength":false,"blockPreserved":true,"sawHeal":false,"sawVulnerable":false}
+	var hp: int = view.shown_player_hp
+	var started := Time.get_ticks_msec()
+	while Game.battle_busy or Game.transition_locked:
+		if view.shown_player_hp != hp:
+			hp = view.shown_player_hp
+			observed.hpSteps.append(hp)
+		if int(view.shown_player_buffs.get("vulnerable",0)) == 3: observed.sawVulnerable = true
+		for popup in get_tree().get_nodes_in_group("combat_damage_numbers"):
+			if popup.get_parent() != view: continue
+			if popup.value == "格挡+10": observed.sawSoulBlock = true
+			if popup.value == "力量+2" and observed.sawSoulBlock:
+				observed.sawSoulStrength = true
+				observed.blockPreserved = observed.blockPreserved and view.shown_enemies[1].block == 10
+			if popup.value == "恢复+10" and not observed.sawHeal:
+				observed.sawHeal = true
+				check(view.shown_enemies[0].hp == 80,"healing popup accompanies the authoritative 70-to-80 HP display change")
+		await get_tree().process_frame
+		if Time.get_ticks_msec()-started > 20000:
+			check(false,"three-step Boss intent playback timed out")
+			get_tree().quit(2)
+			return observed
+	await get_tree().process_frame
+	return observed
+
 func simulate_training_victory(view: Control) -> void:
 	var notices: Array[String] = []
 	var capture := func(message: String): notices.append(message)
@@ -127,7 +153,7 @@ func _ready() -> void:
 	Game.start_training("B16")
 	await idle()
 	var view: Control = app.view
-	check(view.stage.enemies.size() == 1 and view.model.enemies[0].hp == 10,"phase one: only black dancer, 10 HP")
+	check(view.stage.enemies.size() == 1 and view.model.enemies[0].hp == 99,"phase one: only black dancer, 99 HP")
 	check(view.stage.enemies[0].kind == "dancer_black" and not view.stage.enemies[0].poses.is_empty(),"black art loaded")
 	check(not view.stage.dancer_duet and not is_instance_valid(view.dancer_darkness),"phase one retains ordinary lighting")
 	check_boss_bars(view,"Phase one")
@@ -166,7 +192,9 @@ func _ready() -> void:
 	var phase_two_pollution: int = view.model.buffs.count(view.model,"pollution")
 	check(view.stage.enemies.size() == 2 and view.targets.size() == 2,"both phase-two enemies receive target and HUD")
 	check_boss_bars(view,"Phase two")
-	check(view.model.enemies.all(func(e): return e.hp == 10),"finishing phase-one card never damages phase two")
+	check(view.model.enemies.all(func(e): return e.hp == 90),"finishing phase-one card never damages the fresh 90-HP phase-two dancers")
+	check(view.shown_enemies[1].block == 10 and view.model.buffs.count(view.model,"strength",0) == 2,"second phase reveals the first soul-link block and strength")
+	check(view.model.enemies.all(func(e): return view.model.buffs.enemy_count(e,view.model.buffs.definition("soul_link")) == 2),"both dancers reveal two soul-link layers")
 	check(view.stage.player.home.x == 720 and view.stage.enemies[0].home.x > 720 and view.stage.enemies[1].home.x < 720,"player centered between dancers")
 	check(view.stage.enemies[0].facing == -1 and view.stage.enemies[1].facing == 1,"dancers face inward")
 	var phase_two_black_home: Vector2 = view.stage.enemies[0].home
@@ -185,11 +213,38 @@ func _ready() -> void:
 	for i in 2:
 		check(view.target_at_point(view.stage.target_rect(i).get_center()) == i,"each flanking dancer is independently targetable")
 	view.end_turn_pressed()
-	await idle()
+	var first_round: Dictionary = await observe_enemy_round(view)
 	check(view.stage.player.position.is_equal_approx(view.stage.player.home),"round end returns player to center")
 	check(view.stage.enemies[0].facing == -1 and view.stage.enemies[1].facing == 1,"round return preserves inward facing")
 	check(view.stage.enemies[0].position.is_equal_approx(phase_two_black_home) and view.stage.enemies[1].position.is_equal_approx(mirrored_home),"enemy attacks return dancers to wider horizontally aligned homes")
-	check(view.model.player_hp == phase_two_hp-phase_two_pollution-12,"both dancers execute their displayed attack once after the player's normal pollution tick")
+	check(view.model.player_hp == phase_two_hp-phase_two_pollution-22,"black dancer attacks once with soul-link strength after the player's normal pollution tick")
+	check(view.shown_player_weak == 2 and view.model.buffs.count(view.model,"weak") == 2,"white dancer's first weakness intent appears in the displayed player statuses")
+	check(first_round.sawSoulBlock and first_round.sawSoulStrength and first_round.blockPreserved,"first round preserves white's ten block while the white connection gives black strength")
+	# Isolated in-memory durability fixture keeps later animation checks independent
+	# of the player character's authored HP; no encounter stats or save are changed.
+	view.model.max_hp = 1000
+	view.model.player_hp = 1000
+	Game.state.maxHp = 1000
+	view.shown_player_hp = 1000
+	view.refresh_hp()
+	check(view.model.enemies[0].intent.type == "vulnerable" and view.model.enemies[1].intent.hits == 3,"second step displays black vulnerability and white's three-hit attack")
+	view.end_turn_pressed()
+	var second_round: Dictionary = await observe_enemy_round(view)
+	check(second_round.hpSteps == [999,991,983,975],"white's three attack impacts display separately after the one-point pollution tick")
+	check(second_round.sawVulnerable and view.shown_player_buffs.get("vulnerable",0) == 3 and view.model.buffs.count(view.model,"vulnerable") == 3,"black vulnerability applies before white's three attacks and remains synchronized")
+	check(view.shown_player_hp == view.model.player_hp and view.shown_player_weak == 1 and view.model.buffs.count(view.model,"weak") == 1,"second-step player HP and weakness match the committed model")
+	check(second_round.sawSoulBlock and second_round.sawSoulStrength and second_round.blockPreserved,"second round keeps white's block through both connection events")
+	view.model.enemies[0].hp = 70
+	view.shown_enemies[0].hp = 70
+	view.refresh_enemy_hud()
+	check(view.model.enemies[0].intent.type == "attack" and view.model.enemies[1].intent.type == "heal_ally","third step displays black attack and white healing")
+	view.end_turn_pressed()
+	var third_round: Dictionary = await observe_enemy_round(view)
+	check(third_round.sawHeal and view.model.enemies[0].hp == 80 and view.shown_enemies[0].hp == 80,"white healing traverses the real event and popup path exactly once")
+	check(third_round.hpSteps == [936] and view.shown_player_hp == view.model.player_hp,"third-step black attack uses strength and remaining vulnerability in the displayed HP")
+	check(view.shown_player_weak == 0 and view.model.buffs.count(view.model,"weak") == 0 and view.shown_player_buffs.get("vulnerable",0) == 2,"third step synchronizes weak expiration and vulnerable decay")
+	check(third_round.sawSoulBlock and third_round.sawSoulStrength and third_round.blockPreserved and view.shown_enemies[1].block == 10,"third round retains white's ten block throughout connection strength playback")
+	check(view.model.enemies[0].intentIndex == 3 and view.model.enemies[1].intentIndex == 3 and view.model.enemies[1].intent.type == "weak","both three-step intent sequences wrap to the first action")
 	# Rebuild view from the committed phase-two snapshot, without replaying blackout.
 	app.swap_view()
 	await idle()
@@ -213,7 +268,7 @@ func _ready() -> void:
 	view.end_turn_pressed()
 	await wait_with_observation(view)
 	check(saw_blackout and view.stage.dancer_duet and view.targets.size() == 2,"lethal enemy-turn counter also presents second phase")
-	check(view.model.player_hp == view.model.max_hp-6 and view.model.enemies.all(func(e): return e.hp == 10),"counter transition shows only old-stage attack and fresh dancers")
+	check(view.model.player_hp == view.model.max_hp-15 and view.model.enemies.all(func(e): return e.hp == 90),"counter transition shows only the old-stage 15 attack and fresh 90-HP dancers")
 	check(view.model.turn == 2 and view.model.energy == 3 and view.model.hand.size() == 5 and view.cards.size() == 5,"counter transition opens exactly one new player round and hand")
 	check(view.dancer_darkness.z_index < view.player_plate.z_index,"stage darkness leaves player HP readable")
 	check(phase_snapshots_stable,"counter transition preserves committed state")
@@ -224,7 +279,7 @@ func _ready() -> void:
 	Game.start_training("B16")
 	await idle()
 	view = app.view
-	check(view.model.encounter_phase == 1 and view.model.enemies[0].hp == 10,"debug phase-one case starts with an undefeated dancer")
+	check(view.model.encounter_phase == 1 and view.model.enemies[0].hp == 99,"debug phase-one case starts with an undefeated 99-HP dancer")
 	await simulate_training_victory(view)
 	check(Game.state == backup,"phase-one debug victory restores adventure without rewards or progress changes")
 	Game.start_training("B11")

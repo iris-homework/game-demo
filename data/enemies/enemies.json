@@ -298,33 +298,84 @@
     "characterId": "dancer_black",
     "displayName": "黑舞者",
     "battlePortraitAssetId": "",
-    "maxHp": 10,
+    "maxHp": 90,
     "intentSequence": [
       {
         "type": "attack",
-        "amount": 6,
+        "amount": 20,
+        "hits": 1,
+        "animation": "pierce"
+      },
+      {
+        "type": "vulnerable",
+        "amount": 3
+      },
+      {
+        "type": "attack",
+        "amount": 20,
         "hits": 1,
         "animation": "pierce"
       }
     ],
     "prototype": false,
-    "combatVisualId": "dancer_black"
+    "combatVisualId": "dancer_black",
+    "buffs": {
+      "soul_link": 2
+    }
   },
   "dancer_white": {
     "id": "dancer_white",
     "characterId": "dancer_white",
     "displayName": "白舞者",
     "battlePortraitAssetId": "",
-    "maxHp": 10,
+    "maxHp": 90,
     "intentSequence": [
       {
+        "type": "weak",
+        "amount": 2
+      },
+      {
         "type": "attack",
-        "amount": 6,
-        "hits": 1,
+        "amount": 5,
+        "hits": 3,
         "animation": "slash"
+      },
+      {
+        "type": "heal_ally",
+        "amount": 10,
+        "targetIds": [
+          "dancer_black"
+        ]
       }
     ],
     "prototype": false,
-    "combatVisualId": "dancer_white"
+    "combatVisualId": "dancer_white",
+    "buffs": {
+      "soul_link": 2
+    }
+  },
+  "dancer_black_phase_one": {
+    "id": "dancer_black",
+    "characterId": "dancer_black",
+    "displayName": "黑舞者",
+    "battlePortraitAssetId": "",
+    "maxHp": 99,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 15,
+        "hits": 1,
+        "animation": "pierce"
+      },
+      {
+        "type": "attack",
+        "amount": 10,
+        "hits": 1,
+        "animation": "pierce",
+        "onHitWeak": 2
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "dancer_black"
   }
 }

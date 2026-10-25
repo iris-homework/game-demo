@@ -18,9 +18,9 @@ func _ready() -> void:
 	panel(self, Vector2(90,60), Vector2(1260,780), INK, CYAN)
 	label(self,"卡牌控制台",Vector2(122,78),Vector2(600,52),30)
 	button(self,"关闭 / Ctrl+Shift+A",Vector2(1034,81),Vector2(280,42),func(): closed.emit())
-	var hint := "点击卡牌添加 1 张 · 自动保存至自己的牌库 · 下场战斗生效"
+	var hint := "点击卡牌添加 1 张 · 自动保存至自己的牌库 · 战斗中直接加入抽牌堆"
 	if Game.state.is_empty(): hint = "全部卡牌 · 请先开始或继续委托，再点击加牌"
-	elif Game.training_mode: hint = "全部卡牌 · 演练中不能永久加牌，请退出演练后添加"
+	elif Game.training_mode: hint = "点击卡牌加入本场抽牌堆 · 演练加牌仅本场有效"
 	label(self,hint,Vector2(126,143),Vector2(1188,30),17,MUTED)
 	build_card_list()
 	output = RichTextLabel.new()
@@ -34,7 +34,7 @@ func _ready() -> void:
 	entry = LineEdit.new()
 	entry.position = Vector2(126,752)
 	entry.size = Vector2(1188,54)
-	entry.placeholder_text = "可选指令：addcard 深度伤口 2 / owned / help"
+	entry.placeholder_text = "可选指令：addcard 深度伤口 2 / kill / owned / help"
 	entry.add_theme_font_size_override("font_size",20)
 	entry.text_submitted.connect(submit)
 	add_child(entry)
@@ -93,10 +93,13 @@ func submit(command: String) -> void:
 	if command.strip_edges().is_empty(): return
 	history.append(command)
 	history_index = history.size()
-	output.append_text("\n> " + command + "\n" + Game.console_command(command) + "\n")
+	var result := Game.console_command(command)
+	output.append_text("\n> " + command + "\n" + result + "\n")
 	refresh_owned_counts()
 	entry.clear()
 	entry.grab_focus()
+	if command.strip_edges().to_lower() == "kill" and result.begins_with("已清除"):
+		closed.emit()
 
 func _input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo: return

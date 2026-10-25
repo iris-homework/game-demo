@@ -62,7 +62,7 @@ func start_boss() -> CombatModel:
 	model.restore(Game.state.combat)
 	return model
 
-func killing_card(model: CombatModel, all_targets: bool = false, damage: int = 99, hits: int = 3) -> String:
+func killing_card(model: CombatModel, all_targets: bool = false, damage: int = 999, hits: int = 3) -> String:
 	# Test-only transaction: explicit multi-hit/AoE coverage, not an authored card.
 	var uid := "qa_dancer_" + str(model.instances.size())
 	model.instances[uid] = uid
@@ -105,7 +105,7 @@ func test_new_phase_player_turn() -> void:
 		check(model.energy == int(model.profile.energyPerTurn), kind + " new turn restores configured energy")
 		check(model.hand.size() == 5 and result.drawn == model.hand, kind + " returns exactly five new-turn cards")
 		check(result.discarded == old_hand and old_hand.all(func(card_uid): return card_uid in model.discard_pile), kind + " remaining old hand is discarded")
-		check(result.hits.size() == 1 and model.enemies.all(func(e): return e.hp == 10 and e.intentIndex == 0), kind + " complete card cannot hit or advance new dancers")
+		check(result.hits.size() == 1 and model.enemies.all(func(e): return e.hp == 90 and e.intentIndex == 0), kind + " complete card cannot hit or advance new dancers")
 		check_card_zones(model, kind)
 		var snapshot := model.snapshot()
 		var restored := CombatModel.new()
@@ -176,12 +176,12 @@ func test_phase_end_turn_status_once() -> void:
 		var old_hand: Array = model.hand.duplicate()
 		var result: Dictionary = model.end_turn()
 		check(result.phaseChanged and model.turn == 2 and model.energy == 3, source + " opens one new turn")
-		check(model.player_hp == hp_before - 12 and result.attacks.size() == 1, source + " one pollution tick then one vulnerable attack, no new dancer action")
+		check(model.player_hp == hp_before - 26 and result.attacks.size() == 1, source + " one pollution tick then one vulnerable attack, no new dancer action")
 		check(model.buffs.count(model, "pollution") == 2 and model.buffs.count(model, "vulnerable") == 1, source + " player statuses do not decay twice")
 		check(result.turnEvents.filter(func(e): return e.get("target") == -1 and e.get("buffId") == "pollution").size() == 1, source + " only one player pollution event")
 		check(model.cyberware_cooldown("qa_long") == 2, source + " cooldown advances once")
 		check(result.discarded == old_hand and result.drawn == model.hand and model.hand.size() == 5, source + " discard and draw happen once")
-		check(model.enemies.all(func(e): return e.hp == 10 and e.intentIndex == 0), source + " new dancers remain untouched at initial intent")
+		check(model.enemies.all(func(e): return e.hp == 90 and e.intentIndex == 0), source + " new dancers remain untouched at initial intent")
 		check_card_zones(model, source)
 	var model := start_boss()
 	model.draw_cards()
@@ -240,7 +240,7 @@ func test_event_gate() -> void:
 
 func test_phases() -> void:
 	var model := start_boss()
-	check(model.encounter_phase == 1 and model.enemies.size() == 1 and model.enemies[0].hp == 10, "opening black alone at 10 HP")
+	check(model.encounter_phase == 1 and model.enemies.size() == 1 and model.enemies[0].hp == 99, "opening black alone at 99 HP")
 	var opening := model.snapshot()
 	check(Game.valid_combat(opening), "opening snapshot validates")
 	for scene in ["dialogue", "battle", "result"]:
@@ -257,11 +257,11 @@ func test_phases() -> void:
 	var result := model.play_card(killing_card(model, true), -1)
 	check(result.get("phaseChanged", false) and model.encounter_phase == 2 and model.outcome == "", "AoE transitions without victory")
 	check(result.hits.size() == 1 and result.hits[0].hpAfter == 0, "old-stage multi-hit stops at death")
-	check(model.enemies.size() == 2 and model.enemies[0].hp == 10 and model.enemies[1].hp == 10, "no hit spills into second phase")
+	check(model.enemies.size() == 2 and model.enemies[0].hp == 90 and model.enemies[1].hp == 90, "no hit spills into second phase")
 	check(model.enemies[0].id == "dancer_black" and model.enemies[1].id == "dancer_white", "second-phase identities and order")
-	check(model.enemies.all(func(e): return e.intent.amount == 6 and e.intent.hits == 1), "both intents attack 6")
+	check(model.enemies[0].intent.amount == 20 and model.enemies[1].intent.type == "weak" and model.enemies[1].intent.amount == 2, "second phase opens black attack20 and white weak2")
 	result = model.play_card(killing_card(model), 0)
-	check(not result.phaseChanged and model.outcome == "" and model.enemies[1].hp == 10, "one surviving dancer prevents victory")
+	check(not result.phaseChanged and model.outcome == "" and model.enemies[1].hp == 90, "one surviving dancer prevents victory")
 	result = model.play_card(killing_card(model), 1)
 	check(not result.phaseChanged and model.outcome == "win" and model.encounter_phase == 2, "both defeated yields final victory")
 	check(model.play_card(killing_card(model), 0).is_empty(), "final victory locks further plays")
@@ -271,15 +271,15 @@ func test_phases() -> void:
 	model.buffs.apply(model, "bleed", 2, 0)
 	model.stance = "ranged"
 	result = model.play_card(killing_card(model, false, 0, 1), 0)
-	check(result.phaseChanged and model.enemies.all(func(e): return e.hp == 10), "bleed-only lethal card advances phase cleanly")
+	check(result.phaseChanged and model.enemies.all(func(e): return e.hp == 90), "bleed-only lethal card advances phase cleanly")
 	model = start_boss()
 	model.enemies[0].hp = 1
 	model.parry = 1
 	var hp_before := model.player_hp
 	result = model.end_turn()
 	check(result.phaseChanged and result.attacks.size() == 1, "counter lethal produces one old-stage attack")
-	check(model.encounter_phase == 2 and model.enemies.all(func(e): return e.hp == 10), "counter opens fresh second phase")
-	check(model.player_hp == hp_before - 6 and model.turn == 2 and model.energy == 3, "new dancers do not attack in old round")
+	check(model.encounter_phase == 2 and model.enemies.all(func(e): return e.hp == 90), "counter opens fresh second phase")
+	check(model.player_hp == hp_before - 15 and model.turn == 2 and model.energy == 3, "new dancers do not attack in old round")
 	check(model.enemies.all(func(e): return e.intentIndex == 0), "new phase starts at first intent")
 	model = start_boss()
 	model.enemies[0].hp = 1
@@ -296,7 +296,7 @@ func test_phases() -> void:
 func test_snapshots_and_training() -> void:
 	var model := start_boss()
 	var opening: Dictionary = Game.state.battleStart.duplicate(true)
-	model.enemy_damage(0, 10)
+	model.enemy_damage(0, 999)
 	model.resolve_outcome()
 	check(model.advance_encounter_phase(), "explicit boundary advances")
 	check(Game.valid_combat(model.snapshot()), "second-phase frozen snapshot validates")
@@ -313,8 +313,8 @@ func test_snapshots_and_training() -> void:
 	restored.restore(model.snapshot())
 	check(restored.encounter_phase == 2 and restored.snapshot() == model.snapshot(), "second-phase snapshot roundtrip")
 	Game.enemy_catalog.dancer_white.maxHp = 999
-	check(restored.profile.phaseTwoEnemies[1].maxHp == 10, "frozen second-stage definitions ignore live catalog edits")
-	Game.enemy_catalog.dancer_white.maxHp = 10
+	check(restored.profile.phaseTwoEnemies[1].maxHp == 90, "frozen second-stage definitions ignore live catalog edits")
+	Game.enemy_catalog.dancer_white.maxHp = 90
 	for variant in ["missing_phase", "invalid_phase", "missing_defs", "bad_hp", "wrong_id", "wrong_count", "early_win"]:
 		var broken := model.snapshot()
 		match variant:
@@ -340,7 +340,7 @@ func test_snapshots_and_training() -> void:
 	check(Game.training_mode and Game.state.battleId == "B16", "boss training accessible before day seven")
 	model = CombatModel.new()
 	model.restore(Game.state.combat)
-	check(model.enemies[0].hp == 10 and model.profile.phaseTwoEnemies[1].maxHp == 10, "training keeps requested boss HP")
+	check(model.enemies[0].hp == 99 and model.profile.phaseTwoEnemies[1].maxHp == 90, "training keeps requested boss HP")
 	var training_state: Dictionary = Game.state.duplicate(true)
 	check(not Game.battle_exit("win", Game.revision-1), "training simulation still rejects a stale revision")
 	Game.battle_busy = true
@@ -354,8 +354,8 @@ func test_snapshots_and_training() -> void:
 	check(not Game.training_mode and Game.state == adventure, "training restores entire adventure and event pool")
 	# Authored victory follows normal rewards once; no first-phase reward exists.
 	model = start_boss()
-	model.enemy_damage(0, 10); model.resolve_outcome(); model.advance_encounter_phase()
-	model.enemy_damage(0, 10); model.enemy_damage(1, 10); model.resolve_outcome()
+	model.enemy_damage(0, 999); model.resolve_outcome(); model.advance_encounter_phase()
+	model.enemy_damage(0, 999); model.enemy_damage(1, 999); model.resolve_outcome()
 	Game.commit_combat(model)
 	check(Game.battle_exit("win", Game.revision), "boss final victory reaches authored return")
 	Game.skip_dialogue(Game.revision)

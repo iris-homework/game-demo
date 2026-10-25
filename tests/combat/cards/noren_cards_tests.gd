@@ -356,14 +356,15 @@ func _ready() -> void:
 		else: m.card_catalog.noren_20.effects[0][bad_field]="invalid"
 		before=m.snapshot()
 		check(play(m).is_empty() and m.snapshot()==before,"Invalid new parameter fails atomically: "+bad_field)
-	# Persistent ownership, frozen battle, save validation and console errors.
+	# Persistent ownership, live console additions, save validation and console errors.
 	Game.state=Game.initial_state()
 	Game.state.activeEventId="E04";Game.state.currentPlaceId="alley";Game.enter_node("battle")
 	var frozen: Dictionary=Game.state.combat.duplicate(true)
 	check(Game.console_command("addcard 深度伤口 2").begins_with("已添加"),"Console Chinese name")
 	check(Game.console_command("addcard 23").begins_with("已添加"),"Console number")
 	check(Game.console_command("addcard noren_40").begins_with("已添加"),"Console ID")
-	check(Game.owned_card_counts().get("noren_36")==2 and Game.state.combat==frozen,"Adds owned copies without mutating running battle")
+	check(Game.owned_card_counts().get("noren_36")==2 and Game.state.combat.instances.size()==frozen.instances.size()+4 and Game.state.combat.hand==frozen.hand,"Adds owned copies directly to the running draw pile without changing its hand")
+	check(Game.valid_save(Game.state),"Console additions keep opening and live snapshots consistent")
 	var deck: Array=Game.state.deck.duplicate()
 	for command in ["addcard 不存在","addcard 41","addcard 1 0","addcard 1 -2","addcard 1 1.5","addcard 1 100","addcard 1 2 extra"]:
 		Game.console_command(command)
@@ -384,7 +385,7 @@ func _ready() -> void:
 	var original: Dictionary=Game.state.duplicate(true)
 	Game.start_training("B04")
 	check(Game.state.combat.instances.size()==14,"Training copies owned cards")
-	check(Game.console_command("addcard 23").begins_with("演练"),"Training cannot alter adventure ownership")
+	check(Game.console_command("addcard 23").begins_with("已添加") and Game.state.combat.instances.size()==15 and Game.state.deck==original.deck,"Training adds a temporary draw-pile copy without altering ownership")
 	Game.finish_training("lose")
 	check(Game.state==original,"Training restores adventure exactly")
 	var legacy=Game.read_data("prototype/combat.json")

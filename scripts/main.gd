@@ -417,6 +417,7 @@ func close_card_console() -> void:
 			item[0].focus_mode = item[2]
 	console_buttons.clear()
 	if is_instance_valid(view) and view.has_method("refresh_library"): view.refresh_library()
+	if is_instance_valid(view) and view.has_method("resume_console_combat"): view.resume_console_combat()
 
 func open_current_deck() -> void:
 	if is_instance_valid(exit_dialog): return

@@ -116,7 +116,7 @@ func _ready() -> void:
 	var frozen: Array = Game.state.deck.duplicate()
 	Game.training_mode = true
 	await click(console.card_buttons.noren_23)
-	check(Game.state.deck == frozen and console.output.get_parsed_text().contains("演练不写入"),"Training click cannot mutate permanent deck")
+	check(Game.state.deck == frozen and console.output.get_parsed_text().contains("请先进入演练战斗"),"Training click cannot mutate permanent deck")
 	Game.training_mode = false
 	Game.state = {}
 	await click(console.card_buttons.noren_23)

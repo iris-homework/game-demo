@@ -33,7 +33,7 @@
     "id": "weak",
     "name": "虚弱",
     "category": "negative",
-    "target": "enemy",
+    "target": "both",
     "field": "weak",
     "saveKey": "weak",
     "stacking": "add",
@@ -42,7 +42,7 @@
     "icon": "weak",
     "color": "e5a06b",
     "showBadge": true,
-    "description": "虚弱 · {count} 层\n敌人攻击伤害固定降低 25%，不随层数增加；每段四舍五入。该敌人回合结束时减少 1 层，减至 0 层后失效；最多 999 层。",
+    "description": "虚弱 · {count} 层\n攻击伤害固定降低 25%，不随层数增加；每段四舍五入。自身回合结束时减少1层，减至0层失效；最多999层。",
     "maxStacks": 999
   },
   {
@@ -273,5 +273,20 @@
     "color": "ed586b",
     "showBadge": true,
     "description": "深度伤口 · 本场持续\n裂伤触发时不再减少层数；同名能力不叠加。"
+  },
+  {
+    "id": "soul_link",
+    "name": "灵魂连接",
+    "category": "positive",
+    "target": "enemy",
+    "stacking": "add",
+    "maxStacks": 2,
+    "duration": "battle",
+    "handler": "none",
+    "icon": "soul_link",
+    "color": "d8cbff",
+    "showBadge": true,
+    "cardApply": false,
+    "description": "灵魂连接 · {count} 层\n每个玩家回合开始时，存活的黑舞者仍有连接则给存活的白舞者10点格挡；存活的白舞者仍有连接则给存活的黑舞者2点力量。效果不随层数增加。黑卡移除白舞者1层，白卡移除黑舞者1层；降至0层后停止提供增益。"
   }
 ]

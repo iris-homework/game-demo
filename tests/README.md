@@ -1,5 +1,9 @@
 # 测试目录索引
 
+2026-10-25 game-demo 控制台专项：[console_battle_tests](combat/cards/console_battle_tests.tscn)72项覆盖本场重复加牌、唯一实例、即抽即用、牌区及开局同步、存读档、保存失败回滚、保护条件、演练隔离、群体kill／死亡效果与Boss两阶段；真实主场景验证关闭控制台后的模型／计数／revision同步、kill自动关闭及正常离战。须用复制工程与名称含qa的独立用户目录，可传 `-- --output=<专用证据目录>`。配套诺伦卡／Boss／战斗重开共4套1331项0失败，不移动系统鼠标；无GPU像素或物理输入验收。见[验证汇总](../artifacts/qa/console-sync-2026-10-25/verification.json)。
+
+2026-10-25 game-demo 双人舞者同步：新增[机制专项](combat/rules/dancer_mechanics_tests.tscn)和[意图显示专项](combat/presentation/dancer_intent_rules_tests.tscn)，更新本仓库Boss规则／表现的99／90HP断言；保留Boss对白、固定血条及周结算检查。配套验证玩家weak及旧档、连接减层／跨回合增益、黑白卡生成／循环、治疗封顶／不复活，以及电能／防护服／双犬／随机奖励的现有回归。运行须使用复制工程和独立用户目录，结果见修改记录。
+
 2026-10-25敌人HP修订：机器人正式／演练45 HP，抢修工正式／演练60 HP；既有机器人、抢修工、演练、基础战斗与新委托专项适配新初始HP及剩余HP，保留旧快照与机制断言。5套2012项隔离无窗口检查通过，未做GPU像素或物理输入验收。见[验证汇总](../artifacts/qa/enemy-hp-45-60-2026-10-25/verification.json)。
 
 2026-10-25新增[信用点随机范围专项](combat/cards/reward_credit_range_tests.tscn)：547项检查40～60整数奖励、四种来源256次生成及金额变化、重复准备不重抽、整份凭据存读、精确支付和防重、旧50／1000及非法边界；现有奖励、选择器、动效、回访、新委托、被动科技、战败、重开、类型和周结算适配实际冻结金额，共11套2592项隔离无窗口检查通过。未做GPU像素／物理输入验收，见[验证汇总](../artifacts/qa/reward-credit-range-2026-10-25/verification.json)。

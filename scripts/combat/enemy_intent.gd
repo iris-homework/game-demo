@@ -33,7 +33,8 @@ func setup(intent: Dictionary, description: String, font: Font) -> void:
 		"attack": value_label.text = description.trim_prefix("攻击 ").replace(" ","")
 		"strength_allies", "charge": value_label.text = "+%d" % int(intent.get("amount",0))
 		"energy_suit", "fortify": value_label.text = "强化"
-		"pollution", "vulnerable": value_label.text = str(int(intent.get("amount",0)))
+		"pollution", "vulnerable", "weak": value_label.text = str(int(intent.get("amount",0)))
+		"heal_ally": value_label.text = "+%d" % int(intent.get("amount",0))
 		_:
 			value_label.text = description
 			value_label.add_theme_font_size_override("font_size",14)
@@ -83,6 +84,13 @@ func _draw() -> void:
 			draw_arc(Vector2(20,24),9,2.6,4.0,12,Color("e2f5ab"),2,true)
 			for center in [Vector2(16,23),Vector2(25,24),Vector2(20,30)]:
 				draw_circle(center,2.5,Color("456046"))
+		"weak":
+			silhouette([Vector2(7,3),Vector2(10,17),Vector2(18,25),Vector2(27,27),Vector2(32,33),Vector2(37,28),Vector2(29,21),Vector2(25,14),Vector2(18,10),Vector2(18,2),Vector2(13,13)],Color("e5a06b"))
+			draw_line(Vector2(4,31),Vector2(17,31),Color("f4c79f"),3,true)
+			draw_line(Vector2(9,26),Vector2(9,36),Color("f4c79f"),3,true)
+		"heal_ally":
+			silhouette([Vector2(13,2),Vector2(27,2),Vector2(27,13),Vector2(38,13),Vector2(38,27),Vector2(27,27),Vector2(27,38),Vector2(13,38),Vector2(13,27),Vector2(2,27),Vector2(2,13),Vector2(13,13)],Color("81d6a5"))
+			draw_line(Vector2(16,7),Vector2(24,7),Color("d4ffe3"),2,true)
 		_:
 			draw_circle(Vector2(20,19),12,Color("1c1729"))
 			for x in [12,20,28]: draw_circle(Vector2(x,19),2,Color("e8d4ff"))

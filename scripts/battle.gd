@@ -25,6 +25,7 @@ var shown_player_ammo := 0
 var shown_player_block := 0
 var shown_player_parry := 0
 var shown_player_pollution := 0
+var shown_player_weak := 0
 var shown_player_buffs: Dictionary = {}
 var presenting_enemy_turn := false
 var presenting_player_attack := false
@@ -97,6 +98,7 @@ func enter(params: Dictionary) -> void:
 	shown_player_parry = model.parry
 	shown_player_pollution = model.buffs.count(model, "pollution")
 	shown_player_buffs = model.buff_state.duplicate(true)
+	shown_player_weak = model.buffs.count(model,"weak")
 	# Retain existing HUD offsets; only the world imagery is replaced.
 	var scenery_place_id: String = Game.training_scenery_place_id if Game.training_mode and not Game.training_scenery_place_id.is_empty() else battle.placeId
 	var place_asset: String = Game.place_data(scenery_place_id).backgroundAssetId
@@ -829,6 +831,7 @@ func present_encounter_phase() -> void:
 	shown_player_parry = model.parry
 	shown_player_pollution = model.buffs.count(model, "pollution")
 	shown_player_buffs = model.buff_state.duplicate(true)
+	shown_player_weak = model.buffs.count(model,"weak")
 	refresh_player_plate()
 	refresh_hp()
 	refresh_ammo()
@@ -881,6 +884,11 @@ func present_status_event(event: Dictionary) -> void:
 		shown_enemies[target_index].block = 0
 		refresh_enemy_hud()
 		return
+	if event.type == "heal":
+		apply_shown_heal(event)
+		impact(stage.contact(actor)-Vector2(0,70),"恢复+%d" % int(event.get("amount",0)),Color("81d6a5"),0.75)
+		await get_tree().create_timer(0.30).timeout
+		return
 	if event.type == "status_apply":
 		var source := int(event.source)
 		if event.buffId == "pollution":
@@ -917,10 +925,17 @@ func present_status_event(event: Dictionary) -> void:
 	else:
 		actor.set_pose("idle")
 
+func apply_shown_heal(event: Dictionary) -> void:
+	var index := int(event.get("target",-1))
+	if index < 0 or index >= shown_enemies.size(): return
+	shown_enemies[index].hp = int(event.hpAfter)
+	refresh_enemy_hud()
+
 func apply_shown_status(event: Dictionary) -> void:
 	var index := int(event.get("target", -1))
 	if index < 0:
 		if event.buffId == "pollution": shown_player_pollution = int(event.stacksAfter)
+		if event.buffId == "weak": shown_player_weak = int(event.stacksAfter)
 		if int(event.stacksAfter) == 0: shown_player_buffs.erase(event.buffId)
 		else: shown_player_buffs[event.buffId] = int(event.stacksAfter)
 		refresh_player_plate()
@@ -999,6 +1014,33 @@ func refresh_card_previews() -> void:
 		if not uid in model.hand: continue
 		cards[uid].show_cost(model.card_cost(uid))
 		cards[uid].show_preview(model.card_preview(uid, hovered_target if uid == selected_uid else -1))
+
+func resume_console_combat() -> void:
+	if not initialized or model.snapshot() == Game.state.get("combat", {}): return
+	var previous_phase := model.encounter_phase
+	model.restore(Game.state.combat)
+	expected_revision = Game.revision
+	if previous_phase != model.encounter_phase:
+		set_busy(true)
+		# The model has already discarded the old hand and dealt the new round.
+		# Retire old views even when recycling happened to return the same UID.
+		for view in cards.values(): view.queue_free()
+		cards.clear()
+		await present_encounter_phase()
+		if model.outcome.is_empty():
+			await announce_turn("第%d回合" % model.turn)
+			await deal_hand(true)
+			arrange_hand()
+		set_busy(false)
+	shown_enemies = model.enemies.duplicate(true)
+	for i in stage.enemies.size():
+		stage.enemies[i].alive = model.enemies[i].hp > 0
+		stage.enemies[i].visible = stage.enemies[i].alive
+	refresh_enemy_hud()
+	refresh_resources()
+	refresh_card_previews()
+	refresh_counts()
+	if not model.outcome.is_empty(): finish(model.outcome)
 
 func commit() -> void:
 	if not Game.commit_combat(model):
@@ -1237,7 +1279,7 @@ func enemy_statuses(enemy: Dictionary) -> Array:
 
 func refresh_player_plate() -> void:
 	if not is_instance_valid(player_plate): return
-	player_plate.update_values(shown_player_hp,model.max_hp,shown_player_block,model.buffs.player_badges(model,shown_player_parry,shown_player_pollution,shown_player_buffs))
+	player_plate.update_values(shown_player_hp,model.max_hp,shown_player_block,model.buffs.player_badges(model,shown_player_parry,shown_player_pollution,shown_player_buffs,shown_player_weak))
 
 func refresh_hp() -> void:
 	if shown_player_hp < 0:
@@ -1283,6 +1325,7 @@ func refresh_resources() -> void:
 		# Player hits reveal death pollution at their own impact callbacks.
 		if not presenting_player_hits: shown_player_pollution = model.buffs.count(model, "pollution")
 		shown_player_buffs = model.buff_state.duplicate(true)
+		shown_player_weak = model.buffs.count(model,"weak")
 	refresh_player_plate()
 	if not is_instance_valid(resources_label): return
 	if is_instance_valid(energy_panel):

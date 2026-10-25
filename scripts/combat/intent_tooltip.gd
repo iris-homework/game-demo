@@ -63,6 +63,23 @@ static func describe(enemy: Dictionary, preview: String) -> Dictionary:
 			data.unit = "层易伤"
 			data.summary = "对你施加 %d 层易伤。" % amount
 			data.notes.append({"title":"易伤","body":"受到的攻击伤害增加 50%，不影响状态伤害；自身回合结束时减少 1 层，增幅不随层数叠加。"})
+		"weak":
+			data.title = "施加虚弱"
+			data.accent = Color("e5a06b")
+			data.value = str(amount)
+			data.unit = "层虚弱"
+			data.summary = "对你施加 %d 层虚弱。" % amount
+			data.notes.append({"title":"虚弱","body":"攻击伤害降低 25%，每段四舍五入；自身回合结束时减少 1 层，减伤幅度不随层数叠加。"})
+		"heal_ally":
+			data.title = "治疗同伴"
+			data.accent = Color("81d6a5")
+			data.value = "+%d" % amount
+			data.unit = "点生命"
+			var recipient := "黑舞者" if "dancer_black" in intent.get("targetIds", []) else "指定的存活同伴"
+			data.summary = "为%s恢复 %d 点生命。" % [recipient,amount]
+			data.notes.append({"title":"治疗","body":"最多恢复至生命上限；不会复活已倒下的同伴。"})
+	if int(intent.get("onHitWeak",0)) > 0:
+		data.notes.append({"title":"攻击附带","body":"整次攻击结束后，对你施加 %d 层虚弱；即使攻击被格挡仍会施加。" % int(intent.onHitWeak)})
 	if enemy.has("allyDeathIntentSequence"):
 		var sequence: Array = enemy.allyDeathIntentSequence.get("sequence",[])
 		var steps: PackedStringArray = []

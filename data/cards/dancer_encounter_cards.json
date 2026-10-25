@@ -1,0 +1,34 @@
+{
+  "dancer_black_card": {
+    "id": "dancer_black_card",
+    "name": "黑卡",
+    "type": "skill",
+    "cost": 1,
+    "target": "self",
+    "description": "使白舞者失去1层灵魂连接。",
+    "cardText": "使白舞者失去1层灵魂连接。",
+    "effects": [
+      {
+        "type": "remove_soul_link",
+        "amount": 1,
+        "enemyId": "dancer_white"
+      }
+    ]
+  },
+  "dancer_white_card": {
+    "id": "dancer_white_card",
+    "name": "白卡",
+    "type": "skill",
+    "cost": 1,
+    "target": "self",
+    "description": "使黑舞者失去1层灵魂连接。",
+    "cardText": "使黑舞者失去1层灵魂连接。",
+    "effects": [
+      {
+        "type": "remove_soul_link",
+        "amount": 1,
+        "enemyId": "dancer_black"
+      }
+    ]
+  }
+}

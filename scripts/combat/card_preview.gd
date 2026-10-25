@@ -48,6 +48,7 @@ static func build(model, uid: String, target: int, extra: int) -> Dictionary:
 			"discard_attack": lines.append("弃置另一张攻击牌。")
 			"exhaust_hand": lines.append("消耗另一张手牌。")
 			"power": lines.append(row.text)
+			"remove_soul_link": lines.append("使%s失去%s层灵魂连接。" % [row.name,number])
 			"buff":
 				var prefix := "对每名敌人施加" if row.enemy and kind == "all" else ("施加" if row.enemy else "获得")
 				lines.append(prefix + number + row.unit + row.name + "。")
@@ -236,11 +237,19 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 			"discard_attack":
 				if copy.profile.get("recycleDiscardWhenEmpty", true) and not copy.discard_candidates(uid).is_empty(): draw_available += 1
 				rows.append({"type":"discard_attack"})
+			"remove_soul_link":
+				var removed := 0
+				var recipient := "白舞者" if effect.get("enemyId", "") == "dancer_white" else "黑舞者"
+				for index in copy.enemies.size():
+					if copy.enemies[index].get("id", "") == effect.get("enemyId", "") and copy.enemies[index].hp > 0:
+						removed = mini(amount,copy.buffs.count(copy,"soul_link",index))
+						break
+				rows.append({"type":"remove_soul_link","name":recipient,"values":[removed]})
 			_:
 				var id: String = effect.get("id", "") if effect.type == "buff" else ("parry" if effect.type == "parry_fill" else str(effect.get("value", "")) if effect.type == "power" else str(effect.type))
 				if not copy.buffs.has(id): continue
 				var entry: Dictionary = copy.buffs.definition(id)
-				var enemy: bool = effect.get("buffTarget", "player" if entry.target == "both" else entry.target) == "enemy"
+				var enemy: bool = effect.get("buffTarget", "enemy" if id == "weak" else "player" if entry.target == "both" else entry.target) == "enemy"
 				var index := target if enemy else -1
 				var previous: int = copy.buffs.count(copy, id, index)
 				var branches: Dictionary = {}

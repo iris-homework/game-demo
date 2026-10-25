@@ -1101,6 +1101,8 @@ func initialize_combat() -> void:
 	if player.get("combatRules", "") == "noren_v1": rules.merge(noren_rules, true)
 	if battle.get("encounterId", "") == "dancer_duet":
 		rules.encounterId = "dancer_duet"
+		rules.phaseOneEnemies = definitions.duplicate(true)
+		rules.phaseTwoCards = read_data("cards/dancer_encounter_cards.json")
 		rules.phaseTwoEnemies = []
 		for id in battle.phaseTwoEnemyIds:
 			rules.phaseTwoEnemies.append(enemy_catalog[id].duplicate(true))
@@ -1488,10 +1490,14 @@ func valid_battle_start(s: Dictionary) -> bool:
 	if opening.get("openingDrawDone") != false or not opening.hand.is_empty() or not opening.discardPile.is_empty(): return false
 	if not opening.get("norenState", {}).get("exhaustPile", []).is_empty(): return false
 	# Both snapshots must describe the same frozen encounter and card instances.
-	for field in ["profile", "cardCatalog", "instances", "maxHp"]:
+	for field in ["profile", "cardCatalog", "maxHp"]:
 		if opening[field] != s.combat[field]: return false
+	var expected_instances: Dictionary = opening.instances.duplicate(true)
 	if opening.profile.get("encounterId", "") == "dancer_duet":
-		return opening.get("encounterPhase") == 1
+		if s.combat.get("encounterPhase") == 2:
+			for card_id in opening.profile.get("phaseTwoCards", {}): expected_instances["encounter_" + card_id] = card_id
+		return opening.get("encounterPhase") == 1 and expected_instances == s.combat.instances
+	if opening.instances != s.combat.instances: return false
 	if opening.enemies.size() != s.combat.enemies.size(): return false
 	for i in opening.enemies.size():
 		var enemy_id = opening.enemies[i].get("id")
@@ -1559,10 +1565,11 @@ func valid_frozen_card(definition) -> bool:
 	if not definition.get("effects") is Array: return false
 	for effect in definition.effects:
 		if not effect is Dictionary or not effect.get("type") is String or effect.type.is_empty(): return false
-		for key in ["id", "value", "when"]:
+		for key in ["id", "value", "when", "enemyId"]:
 			if effect.has(key) and not effect[key] is String: return false
 		for key in ["amount", "hits", "cap", "executeBonus", "lastAmmoBonus", "rangedBonus", "requiresBleed", "bleedTriggers", "woundedMeleeAmount"]:
 			if effect.has(key) and (not (effect[key] is int or effect[key] is float) or not is_finite(float(effect[key]))): return false
+		if effect.type == "remove_soul_link" and not (effect.get("enemyId") in ["dancer_black", "dancer_white"] and buffs._valid_count(effect.get("amount"), 2) and effect.amount > 0): return false
 		for key in ["allAmmoHits", "rangedIgnoreBlock"]:
 			if effect.has(key) and not effect[key] is bool: return false
 	return true
@@ -1614,30 +1621,57 @@ func valid_combat(c: Dictionary) -> bool:
 			if not buffs._valid_count(enemy.intentLoopStart, sequence.size() - 1): return false
 	return true
 
+func valid_dancer_intent(intent, expected_ids: Array) -> bool:
+	if not intent is Dictionary or intent.get("type") not in ["attack", "weak", "vulnerable", "heal_ally"]: return false
+	if not buffs._valid_count(intent.get("amount"), 999): return false
+	if not buffs._valid_count(intent.get("hits", 1)) or intent.get("hits", 1) < 1: return false
+	if intent.has("onHitWeak") and (intent.type != "attack" or not buffs._valid_count(intent.onHitWeak, 999)): return false
+	if intent.type == "heal_ally":
+		if not intent.get("targetIds") is Array or intent.targetIds.is_empty(): return false
+		for id in intent.targetIds:
+			if not id is String or not id in expected_ids: return false
+	return true
+
 func valid_dancer_encounter(c: Dictionary) -> bool:
 	if c.profile.get("encounterId", "") != "dancer_duet":
-		return c.battleId != "B16" and not c.has("encounterPhase") and not c.profile.has("phaseTwoEnemies")
+		return c.battleId != "B16" and not c.has("encounterPhase") and not c.profile.has("phaseTwoEnemies") and not c.profile.has("phaseTwoCards") and not c.profile.has("phaseOneEnemies")
 	if c.battleId != "B16" or c.profile.get("battleType") != "boss": return false
 	if not buffs._valid_count(c.get("encounterPhase"), 2) or int(c.get("encounterPhase")) not in [1, 2]: return false
 	var definitions = c.profile.get("phaseTwoEnemies")
 	if not definitions is Array or definitions.size() != 2: return false
-	for i in 2:
-		var definition = definitions[i]
-		if not definition is Dictionary: return false
-		if definition.get("id") != ["dancer_black", "dancer_white"][i]: return false
-		for key in ["displayName", "battlePortraitAssetId", "combatVisualId"]:
-			if not definition.get(key) is String: return false
-		if not buffs._valid_count(definition.get("maxHp")) or definition.maxHp < 1: return false
-		if not definition.get("intentSequence") is Array or definition.intentSequence.is_empty(): return false
-		for intent in definition.intentSequence:
-			if not intent is Dictionary or intent.get("type") != "attack": return false
-			if not buffs._valid_count(intent.get("amount")) or not buffs._valid_count(intent.get("hits", 1)) or intent.get("hits", 1) < 1: return false
+	var phase_one = c.profile.get("phaseOneEnemies", [definitions[0]])
+	if not phase_one is Array or phase_one.size() != 1: return false
+	for phase in [phase_one, definitions]:
+		for i in phase.size():
+			var definition = phase[i]
+			if not definition is Dictionary or definition.get("id") != ["dancer_black", "dancer_white"][i]: return false
+			for key in ["displayName", "battlePortraitAssetId", "combatVisualId"]:
+				if not definition.get(key) is String: return false
+			if not buffs._valid_count(definition.get("maxHp")) or definition.maxHp < 1: return false
+			if not buffs.valid_extra_state(definition.get("buffs", {}), "enemy"): return false
+			if not definition.get("intentSequence") is Array or definition.intentSequence.is_empty(): return false
+			for intent in definition.intentSequence:
+				if not valid_dancer_intent(intent, ["dancer_black", "dancer_white"]): return false
 	if c.enemies.size() != int(c.encounterPhase): return false
+	var current_defs: Array = phase_one if int(c.encounterPhase) == 1 else definitions
 	for i in c.enemies.size():
 		var enemy = c.enemies[i]
-		if not enemy is Dictionary or enemy.get("id") != definitions[i].id or enemy.get("maxHp") != definitions[i].maxHp: return false
-		if enemy.get("intentSequence") != definitions[i].intentSequence: return false
+		if not enemy is Dictionary or enemy.get("id") != current_defs[i].id or enemy.get("maxHp") != current_defs[i].maxHp: return false
+		if enemy.get("intentSequence") != current_defs[i].intentSequence: return false
 		if not buffs._valid_count(enemy.get("hp")) or enemy.hp > enemy.maxHp: return false
+		if not buffs._valid_count(enemy.get("intentIndex")): return false
+		if enemy.get("intent") != current_defs[i].intentSequence[int(enemy.intentIndex) % current_defs[i].intentSequence.size()]: return false
+	var phase_cards = c.profile.get("phaseTwoCards", {})
+	if not phase_cards is Dictionary: return false
+	if c.profile.has("phaseTwoCards"):
+		if phase_cards.size() != 2: return false
+		for color in ["black", "white"]:
+			var id: String = "dancer_" + color + "_card"
+			if not phase_cards.has(id) or not valid_frozen_card(phase_cards[id]) or c.cardCatalog.get(id) != phase_cards[id]: return false
+			var uid: String = "encounter_" + id
+			if int(c.encounterPhase) == 1:
+				if c.instances.has(uid) or id in c.instances.values(): return false
+			elif c.instances.get(uid) != id or c.instances.values().count(id) != 1: return false
 	if c.outcome == "win" and (c.encounterPhase != 2 or c.enemies.any(func(e): return e.get("hp", 0) > 0)): return false
 	return true
 
@@ -1856,7 +1890,7 @@ func console_command(command: String) -> String:
 	var args := command.strip_edges().split(" ", false)
 	if args.is_empty(): return "输入 help 查看指令。"
 	match args[0].to_lower():
-		"help": return "cards [关键词]：查询卡牌名称、编号和 ID\nowned：查看已拥有数量\naddcard <牌名/编号/ID> [数量]：添加卡牌（默认 1，最多 99）\n示例：addcard 深度伤口 2　或　addcard 36 2\n新增卡牌保存至当前冒险，下场战斗生效；新委托重置。"
+		"help": return "cards [关键词]：查询卡牌名称、编号和 ID\nowned：查看已拥有数量\naddcard <牌名/编号/ID> [数量]：添加卡牌（默认 1，最多 99）\nkill：当前全部敌人生命归零，正常结算胜利或转阶段\n示例：addcard 深度伤口 2　或　addcard 36 2\n战斗中加牌直接进入抽牌堆；正式冒险保存拥有牌，演练仅本场有效。"
 		"cards":
 			var lines: PackedStringArray = []
 			var query := args[1] if args.size() > 1 else ""
@@ -1875,7 +1909,6 @@ func console_command(command: String) -> String:
 		"addcard":
 			if not config.developmentMode: return "开发模式未开启。"
 			if state.is_empty(): return "请先开始或继续委托，再添加卡牌。"
-			if training_mode: return "演练不写入冒险；请退出演练后加牌。"
 			if not pending_save_kind.is_empty() or transition_locked or battle_busy: return "请等当前动作结束后再加牌。"
 			if args.size() < 2 or args.size() > 3: return "用法：addcard <牌名/编号/ID> [数量]"
 			var id := resolve_card_id(args[1])
@@ -1883,12 +1916,47 @@ func console_command(command: String) -> String:
 			if args.size() == 3 and not args[2].is_valid_int(): return "数量必须为 1～99 的整数。"
 			var amount := int(args[2]) if args.size() == 3 else 1
 			if amount < 1 or amount > 99: return "数量必须为 1～99 的整数。"
-			var old_deck: Array = state.deck.duplicate()
-			for i in amount: state.deck.append(id)
-			if save_enabled and not save_game():
-				state.deck = old_deck
+			var in_battle: bool = state.get("currentScene", "") == "battle" and not state.get("combat", {}).is_empty()
+			if in_battle and not state.combat.outcome.is_empty(): return "战斗已经结束，无法加牌。"
+			if training_mode and not in_battle: return "请先进入演练战斗。"
+			var previous := state.duplicate(true)
+			if not training_mode:
+				for i in amount: state.deck.append(id)
+			if in_battle:
+				var model := CombatModel.new()
+				model.restore(state.combat)
+				var uids := model.add_cards_to_draw_pile(id, card_catalog[id], amount)
+				state.combat = model.snapshot()
+				# New battles restart from this separate opening snapshot. Extend
+				# its inventory too, without saving the live turn as the opening.
+				if not state.get("battleStart", {}).is_empty():
+					var opening := CombatModel.new()
+					opening.restore(state.battleStart)
+					opening.add_cards_to_draw_pile(id, model.card_catalog[id], amount, uids)
+					state.battleStart = opening.snapshot()
+			if save_enabled and not training_mode and not save_game():
+				state = previous
 				return "添加失败：存档无法写入，已撤回本次加牌。"
-			return "已添加 %s ×%d；当前拥有 %d 张。下场战斗生效。" % [card_catalog[id].name, amount, owned_card_counts()[id]]
+			revision += 1
+			if training_mode: return "已添加 %s ×%d 至抽牌堆；仅本场演练有效。" % [card_catalog[id].name, amount]
+			return "已添加 %s ×%d；当前拥有 %d 张。%s" % [card_catalog[id].name, amount, owned_card_counts()[id], "已加入本场抽牌堆。" if in_battle else "下场战斗生效。"]
+		"kill":
+			if not config.developmentMode: return "开发模式未开启。"
+			if args.size() != 1: return "用法：kill（当前全部敌人生命归零）"
+			if not pending_save_kind.is_empty() or transition_locked or battle_busy: return "请等当前动作结束后再使用 kill。"
+			if page != "battle" or state.get("currentScene", "") != "battle" or state.get("combat", {}).is_empty(): return "kill 只能在战斗中使用。"
+			if not state.combat.outcome.is_empty(): return "战斗已经结束。"
+			var previous := state.duplicate(true)
+			var model := CombatModel.new()
+			model.restore(state.combat)
+			model.kill_enemies()
+			state.combat = model.snapshot()
+			state.currentHp = model.player_hp
+			if save_enabled and not training_mode and not save_game():
+				state = previous
+				return "kill 失败：存档无法写入，已撤回本次操作。"
+			revision += 1
+			return "已清除当前敌人；关闭控制台并继续战斗结算。"
 	return "未知指令。输入 help 查看指令。"
 
 func valid_noren_state(c: Dictionary) -> bool:

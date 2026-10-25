@@ -47,6 +47,10 @@ func _draw() -> void:
 			draw_line(Vector2(9,16),Vector2(7,21),Color("ffbdc5"),2,true)
 		"weak":
 			poly([Vector2(3,3),Vector2(12,3),Vector2(10,12),Vector2(19,10),Vector2(16,21),Vector2(24,20),Vector2(13,29),Vector2(4,21),Vector2(10,22),Vector2(11,16),Vector2(3,17)],tint)
+		"soul_link":
+			draw_arc(Vector2(9,10),7,-0.4,TAU-0.9,28,tint,3,true)
+			draw_arc(Vector2(18,20),7,2.7,TAU+2.2,28,tint,3,true)
+			draw_line(Vector2(10,12),Vector2(17,18),tint.lightened(0.2),3,true)
 		"parry":
 			poly([Vector2(2,5),Vector2(12,1),Vector2(23,5),Vector2(21,19),Vector2(12,27),Vector2(4,20)],tint)
 			draw_polyline(PackedVector2Array([Vector2(7,17),Vector2(15,9),Vector2(15,15),Vector2(20,10)]),Color("133c35"),2,true)

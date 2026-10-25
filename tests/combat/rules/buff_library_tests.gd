@@ -16,8 +16,8 @@ func _ready() -> void:
 	Game.save_path = "user://buff_library_qa.json"
 	Game.meta_path = "user://buff_library_meta_qa.json"
 	var fixtures := Fixtures.new()
-	check(Buffs.definitions().size() == 18, "Eighteen statuses registered")
-	check(Buffs.definitions(Buffs.POSITIVE).size() == 14, "Fourteen positive statuses")
+	check(Buffs.definitions().size() == 19, "Nineteen statuses registered")
+	check(Buffs.definitions(Buffs.POSITIVE).size() == 15, "Fifteen positive statuses")
 	check(Buffs.definitions(Buffs.NEGATIVE).map(func(d): return d.id) == ["bleed", "weak", "pollution", "vulnerable"], "Four negative statuses")
 	var catalog: Array = JSON.parse_string(FileAccess.get_file_as_string(Buffs.CATALOG_PATH))
 	check(Buffs.catalog_errors(catalog).is_empty(), "Authored catalog valid")
@@ -37,7 +37,7 @@ func _ready() -> void:
 	m.buffs = Buffs
 	var original := m.snapshot()
 	check(not Buffs.apply(m, "missing", 5) and m.snapshot() == original, "Unknown buff rejected without mutation")
-	check(not Buffs.apply(m, "weak", 1) and not Buffs.apply(m, "parry", 1, 0) and m.snapshot() == original, "Wrong recipient rejected")
+	check(not Buffs.apply(m, "bleed", 1) and not Buffs.apply(m, "parry", 1, 0) and m.snapshot() == original, "Wrong recipient rejected")
 	check(not Buffs.apply(m, "bleed", 1, 99) and m.snapshot() == original, "Missing enemy rejected")
 	Buffs.apply(m, "weak", 3, 0)
 	Buffs.apply(m, "weak", 3, 0)
