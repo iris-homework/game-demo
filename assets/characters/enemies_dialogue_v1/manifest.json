@@ -10,7 +10,7 @@
     "generated": 10,
     "creatorVisualReview": "已逐张检查，修枝猎犬因比例与裁切返修后选用横构图版本",
     "userApproval": "pending",
-    "runtimeBinding": "2026-10-24：pruning_hound、powerline_repairman、beacon_jellyfish已绑定characters/assets及E13/E14/E15对白节点，其余7种未绑定。",
+    "runtimeBinding": "2026-10-25：pruning_hound、powerline_repairman、beacon_jellyfish保留在工程并绑定E13/E14/E15；其余7种未绑定立绘已移出工程归档。",
     "runtimeValidation": "2026-10-24三敌：独立复制工程无窗口对白场景检查及跳过回归共503项通过；原PNG逐张查看，未改图。未进行游戏实际像素／物理输入验收。"
   },
   "notes": [
@@ -101,5 +101,20 @@
       "file": "beacon_jellyfish_dialogue_v1.png",
       "prompt": "Use case: stylized-concept.\nAsset type: a finished standalone visual-novel DIALOGUE CHARACTER STANDING ILLUSTRATION for the game Midnight Commission.\nInput image 1 is the exact enemy identity reference; preserve its identity, equipment, anatomy, materials and original color accents. Input images 2 and 3 (existing Noren and gang dialogue standing portraits) are the STYLE AND PROPORTION reference only; do not include those characters.\nMatch the established dialogue artwork: sharp expressive 2D anime ink outlines, angular large flat cel-shadow planes, restrained subtly textured surfaces, dark violet/charcoal shadow palette, pale warm highlights. This is a newly drawn dialogue portrait, not merely an enlargement of the combat sprite. For human characters use the taller, elegant full-body proportions of the existing dialogue portraits, not the large-headed chibi combat proportions. For non-human characters preserve their original species and mechanical anatomy, express personality through pose, NEVER turn them into humans.\nSingle isolated character, head/entire body/feet/props visible, relaxed conversational pose, three-quarter view with attention slightly toward viewer's left, portrait canvas approximately 1024x1536, centered, about 90% height, generous clean margin around all extremities. Authentic transparent alpha background, no scenery, no ground plane, no drop shadow, no checkerboard drawing, no aura behind character. Readable silhouette and face/eye focal point. No typography, labels, UI, watermark or extra characters. Keep pale solid materials opaque.\nSpecific subject: Same NON-HUMANOID floating mechanical jellyfish: broad weathered pale blue-gray bell with rivets, cream jagged rim and rust patches, orange harbor beacon light inside a metal cage at center, layered dark violet underside, several long blue-gray sheet-metal ribbon tentacles with dark purple inner faces. Calm vertical hover with gently arranged tentacles, every tip inside frame. Preserve lighthouse-lantern identity and metal materials, no human face or limbs, no water or scenery."
     }
-  ]
+  ],
+  "archive": {
+    "date": "2026-10-25",
+    "root": "/Users/anyone/Documents/游戏资源归档/game-demo/20261025-222709",
+    "originalDirectory": "assets/characters/enemies_dialogue_v1",
+    "ids": [
+      "chip_broker",
+      "luggage_lurker",
+      "mirror_inspector",
+      "mutant_mouse",
+      "penitent_ascetic",
+      "rogue_drone",
+      "warden_shield"
+    ],
+    "note": "Original PNGs and import sidecars preserved; all ten generation prompts below remain historical provenance."
+  }
 }

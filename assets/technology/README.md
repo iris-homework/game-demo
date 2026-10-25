@@ -12,7 +12,7 @@
 
 参考原图：`/Users/anyone/Desktop/ChatGPT 图像 2026年10月1日 18_33_52.png`，原图未修改。三图各1254×1254、RGBA透明；直接复制生成文件，未二次抠图或覆盖源图。检查数据见`artifacts/qa/technology-icons-2026-10-23/image-inspection.json`。
 
-统一入口为`scripts/technology_icons.gd`，按稳定科技ID解析，不向战斗快照写入素材路径。商场商品和确认框、地图科技配置的已有项与携带槽、战斗科技激活卡、主菜单只读科技档案共用这三张PNG。空槽及未知／历史测试ID不套用错误图标。旧商场SVG为历史素材，已不被科技界面读取。
+统一入口为`scripts/technology_icons.gd`，按稳定科技ID解析，不向战斗快照写入素材路径。商场商品和确认框、地图科技配置的已有项与携带槽、战斗科技激活卡、主菜单只读科技档案共用这三张PNG。空槽及未知／历史测试ID不套用错误图标。旧商场SVG为历史素材，已不被科技界面读取；2026-10-25已移出工程归档，位置与恢复办法见[维护文档](../../docs/维护文档.md#2026-10-25-退役资源归档)。
 
 生成源位于`/Users/anyone/.codex/generated_images/01a16966-56dd-7202-aee0-8ba4af1de36e/`：
 - 口袋：`exec-c2f34919-6522-4664-bac5-a337bb09cd32.png`
