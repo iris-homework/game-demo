@@ -3,6 +3,7 @@ extends Control
 const DIMENSIONS := Vector2(96,66)
 var kind := ""
 var value_label: Label
+var weak_amount := 0
 var tooltip_data: Dictionary = {}
 
 func _init() -> void:
@@ -18,6 +19,7 @@ func _make_custom_tooltip(_text: String) -> Object:
 
 func setup(intent: Dictionary, description: String, font: Font) -> void:
 	kind = str(intent.get("type",""))
+	weak_amount = maxi(0,int(intent.get("onHitWeak",0))) if kind == "attack" else 0
 	value_label = Label.new()
 	value_label.position = Vector2(0,36)
 	value_label.size = Vector2(DIMENSIONS.x,30)
@@ -39,6 +41,16 @@ func setup(intent: Dictionary, description: String, font: Font) -> void:
 			value_label.text = description
 			value_label.add_theme_font_size_override("font_size",14)
 	add_child(value_label)
+	if weak_amount > 0:
+		# The attack and its debuff are separate visible intentions. Preserve the
+		# existing 96x66 HUD footprint and the numeric damage preview.
+		value_label.size.x = DIMENSIONS.x / 2
+		var weak_label := value_label.duplicate() as Label
+		weak_label.name = "IntentWeakAmount"
+		weak_label.position.x = DIMENSIONS.x / 2
+		weak_label.text = str(weak_amount)
+		weak_label.add_theme_color_override("font_color",Color("f4c79f"))
+		add_child(weak_label)
 	queue_redraw()
 
 func silhouette(points: Array, color: Color) -> void:
@@ -50,7 +62,7 @@ func silhouette(points: Array, color: Color) -> void:
 	draw_polyline(edge,color.darkened(0.25),1.2,true)
 
 func _draw() -> void:
-	draw_set_transform(Vector2((DIMENSIONS.x-40)/2,1))
+	draw_set_transform(Vector2(4 if weak_amount > 0 else (DIMENSIONS.x-40)/2,1))
 	match kind:
 		"attack":
 			# Curved red blade, point upper-left and hilt lower-right.
@@ -84,13 +96,19 @@ func _draw() -> void:
 			draw_arc(Vector2(20,24),9,2.6,4.0,12,Color("e2f5ab"),2,true)
 			for center in [Vector2(16,23),Vector2(25,24),Vector2(20,30)]:
 				draw_circle(center,2.5,Color("456046"))
-		"weak":
-			silhouette([Vector2(7,3),Vector2(10,17),Vector2(18,25),Vector2(27,27),Vector2(32,33),Vector2(37,28),Vector2(29,21),Vector2(25,14),Vector2(18,10),Vector2(18,2),Vector2(13,13)],Color("e5a06b"))
-			draw_line(Vector2(4,31),Vector2(17,31),Color("f4c79f"),3,true)
-			draw_line(Vector2(9,26),Vector2(9,36),Color("f4c79f"),3,true)
+		"weak": draw_weak_symbol()
 		"heal_ally":
 			silhouette([Vector2(13,2),Vector2(27,2),Vector2(27,13),Vector2(38,13),Vector2(38,27),Vector2(27,27),Vector2(27,38),Vector2(13,38),Vector2(13,27),Vector2(2,27),Vector2(2,13),Vector2(13,13)],Color("81d6a5"))
 			draw_line(Vector2(16,7),Vector2(24,7),Color("d4ffe3"),2,true)
 		_:
 			draw_circle(Vector2(20,19),12,Color("1c1729"))
 			for x in [12,20,28]: draw_circle(Vector2(x,19),2,Color("e8d4ff"))
+
+	if weak_amount > 0:
+		draw_set_transform(Vector2(DIMENSIONS.x/2+4,1))
+		draw_weak_symbol()
+
+func draw_weak_symbol() -> void:
+	silhouette([Vector2(7,3),Vector2(10,17),Vector2(18,25),Vector2(27,27),Vector2(32,33),Vector2(37,28),Vector2(29,21),Vector2(25,14),Vector2(18,10),Vector2(18,2),Vector2(13,13)],Color("e5a06b"))
+	draw_line(Vector2(4,31),Vector2(17,31),Color("f4c79f"),3,true)
+	draw_line(Vector2(9,26),Vector2(9,36),Color("f4c79f"),3,true)
