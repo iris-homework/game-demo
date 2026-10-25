@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-10-25战斗回合栏与资源反馈：新增[battle_feedback_tests](combat/presentation/battle_feedback_tests.tscn)，覆盖真实选牌／确认出牌时能量和弹药拒绝、费用明细、错误音只触发一次、无通用toast、快照／版本／输入锁不变、提示复用／续时／替换／释放、提示文字与回合编号布局、实际结束回合的行动方切换。使用独立工程及用户目录、headless+Dummy；无GPU像素或物理输入证据，实测结果见[本轮汇总](../artifacts/qa/battle-feedback-2026-10-25/verification.json)。
+
 2026-10-25 game-demo同步双人舞者后续：[机制专项](combat/rules/dancer_mechanics_tests.tscn)129项覆盖敌方回合开始交叉增益、揭幕不触发、先清旧盾后给予新盾、最终15／易伤3／10与虚弱2／4×3／治疗10循环、预告计入待触发力量且不改模型、最后链接移除／来源死亡、双方分别死亡停止新增益并保留历史力量、回合末致死与旧快照。Boss真实场景表现更新为新数值并复现／防止攻击起点误清新盾。配套10套1154项0失败，独立工程及用户目录、headless+Dummy，未做GPU像素或物理输入验收，见[本轮证据](../artifacts/qa/dancer-link-sync-2026-10-25/verification.json)。
 
 2026-10-25非基础牌增强与剖解经验重做：[卡牌专项](combat/cards/card_balance_tests.tscn)覆盖4张基础牌不变、20张数值、40号新能力逐段／群攻／全挡／致死／技能及弹反隔离、伤口追猎顺序、只读预览、重复能力与新旧快照。使用复制工程与独立用户目录，配套诺伦卡、预览、Buff、卡面与重开回归，结果见[验证记录](../artifacts/qa/card-balance-2026-10-25/verification.json)。不代表实战平衡或物理输入验收。

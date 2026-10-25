@@ -3,6 +3,7 @@ extends DemoUI
 signal card_aim_started(uid: String)
 signal card_aim_cancelled
 signal card_played(uid: String)
+signal resource_denied
 var model: CombatModel
 var battle: Dictionary
 var expected_revision: int
@@ -37,7 +38,9 @@ var preview_selection := ""
 var player_portrait: Node2D
 var enemy_portraits: Array = []
 var turn_label: Label
+var turn_hud: Control
 var turn_banner: Control
+var resource_feedback: Control
 var draw_count: Label
 var discard_count: Label
 var shown_draw_count := 0
@@ -138,9 +141,13 @@ func enter(params: Dictionary) -> void:
 		tag("旧版测试规则",Vector2(760,117),CYAN,310)
 	if Game.texture(place_asset) == null:
 		label(self,"场景美术待补",Vector2(43,203),Vector2(330,26),13,MUTED)
-	cut_panel(self,Vector2(596,14),Vector2(248,48),INK,Color("3d9eff"),12)
-	turn_label = label(self,"回合 %02d  /  你的回合" % model.turn,Vector2(604,20),Vector2(232,36),18,Color("8fcaff"))
-	turn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	turn_hud = preload("res://scripts/combat/turn_hud.gd").new()
+	turn_hud.position = Vector2(570,10)
+	add_child(turn_hud)
+	turn_hud.set_state(model.turn)
+	turn_label = turn_hud.round_label
+	resource_feedback = preload("res://scripts/combat/resource_feedback.gd").new()
+	add_child(resource_feedback)
 	player_portrait = stage.player
 	player_plate = ActorHUD.new()
 	player_plate.z_index = -1
@@ -509,8 +516,9 @@ func select_card(uid: String, toggle: bool = true) -> void:
 	clear_card_drag()
 	var reason := model.play_error(uid)
 	if not reason.is_empty():
-		Game.notice.emit(reason)
+		report_play_error(uid,reason)
 		return
+	clear_resource_feedback()
 	selected_uid = "" if toggle and selected_uid == uid else uid
 	if selected_uid.is_empty(): card_aim_cancelled.emit()
 	else: card_aim_started.emit(selected_uid)
@@ -557,7 +565,7 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 	var uid := selected_uid
 	var error := model.play_error(uid)
 	if not error.is_empty():
-		Game.notice.emit(error)
+		report_play_error(uid,error)
 		return
 	for effect in model.card(uid).get("effects", []):
 		if effect.type == "exhaust_hand" and discard_uid.is_empty():
@@ -703,7 +711,7 @@ func end_turn_pressed() -> void:
 	set_busy(true)
 	selected_uid = ""
 	aim.visible = false
-	turn_label.text = "敌方回合 / 执行意图"
+	turn_hud.set_state(model.turn,"enemy")
 	# Retire hand visuals while the banner plays; the model resolves only once below.
 	var discarded_views := cards.values()
 	cards.clear()
@@ -776,7 +784,7 @@ func end_turn_pressed() -> void:
 	stage.player.set_combat_stance(model.stance if model.is_noren() else "melee")
 	shown_enemies = model.enemies.duplicate(true)
 	refresh_enemy_hud()
-	turn_label.text = "回合 %02d  /  你的回合" % model.turn
+	turn_hud.set_state(model.turn)
 	await announce_turn("第%d回合" % model.turn)
 	await deal_hand(true)
 	refresh_counts()
@@ -836,7 +844,7 @@ func present_encounter_phase() -> void:
 	refresh_player_plate()
 	refresh_hp()
 	refresh_ammo()
-	turn_label.text = "双人舞者 / 第二幕"
+	turn_hud.set_state(model.turn,"reveal")
 	# Hard light cue: reveal the complete formation in one frame, with no fade.
 	stage.dancer_lights.modulate.a = 1.0
 	var light_pulse: Tween = stage.dancer_lights.flash_on()
@@ -855,7 +863,7 @@ func present_encounter_phase() -> void:
 	# Hold the tableau and input lock while the opening brightness settles.
 	await light_pulse.finished
 	dancer_reveal_flash = null
-	turn_label.text = "回合 %02d  / 你的回合" % model.turn
+	turn_hud.set_state(model.turn)
 
 func present_enemy_death_effect(hit: Dictionary) -> void:
 	if not hit.has("playerPollutionAfter"): return
@@ -953,6 +961,7 @@ func apply_shown_status(event: Dictionary) -> void:
 		refresh_enemy_hud()
 
 func announce_turn(text: String, enemy: bool = false) -> void:
+	turn_hud.set_state(model.turn,"enemy" if enemy else "player")
 	var banner := preload("res://scripts/combat/turn_banner.gd").new()
 	turn_banner = banner
 	add_child(banner)
@@ -1000,7 +1009,9 @@ func on_card_discarded() -> void:
 
 func set_busy(value: bool) -> void:
 	Game.battle_busy = value
-	if value: clear_card_drag()
+	if value:
+		clear_card_drag()
+		clear_resource_feedback()
 	if is_instance_valid(end_button): end_button.disabled = value
 	if is_instance_valid(exhaust_button): exhaust_button.disabled = value
 	if is_instance_valid(cyberware_button): cyberware_button.disabled = value
@@ -1058,6 +1069,7 @@ func refresh_cyberware() -> void:
 
 func show_cyberware() -> void:
 	if not initialized or Game.battle_busy or Game.transition_locked or is_instance_valid(pile_overlay): return
+	clear_resource_feedback()
 	cancel_selection()
 	pile_overlay = preload("res://scripts/combat/cyberware_view.gd").new()
 	pile_overlay.setup(model)
@@ -1109,7 +1121,7 @@ func finish(result: String) -> void:
 	end_button.text = "重试战后结算"
 	end_button.tooltip_text = "保存未完成。处理存储问题后点击重试，战斗结果会保留。"
 	end_button.disabled = false
-	turn_label.text = "战后结算 / 等待保存"
+	turn_hud.set_state(model.turn,"save")
 	Game.notice.emit("战后结算未能保存，请点击“重试战后结算”。")
 
 func use_item(item_id: String) -> void:
@@ -1119,6 +1131,7 @@ func use_item(item_id: String) -> void:
 
 func show_pile(title: String, contents: Array) -> void:
 	if Game.battle_busy or Game.transition_locked or is_instance_valid(pile_overlay): return
+	clear_resource_feedback()
 	cancel_selection()
 	pile_overlay = preload("res://scripts/combat/pile_view.gd").new()
 	pile_overlay.setup(model, title, contents)
@@ -1305,6 +1318,32 @@ func preview_defense(partial: bool) -> void:
 	await stage.attack(stage.enemies[index],stage.player,"slash",[{"damage":1 if partial else 0,"blocked":1}],func(_hit, _i): pass)
 	await stage.return_home()
 	set_busy(false)
+
+func report_play_error(uid: String, reason: String) -> void:
+	# Classify the model's rejection; never perform or change resource validation here.
+	var resource := "energy" if reason.begins_with("能量不足") else ("ammo" if reason.begins_with("弹药不足") else "")
+	if resource.is_empty():
+		Game.notice.emit(reason)
+		return
+	clear_resource_feedback()
+	resource_feedback.present(resource,model.card_cost(uid),model.energy)
+	var resource_panel: Control = energy_panel if resource == "energy" else ammo_panel
+	var warning = resource_panel.get_node_or_null("ResourceWarningFX")
+	if warning == null:
+		warning = preload("res://scripts/combat/resource_warning_fx.gd").new()
+		warning.name = "ResourceWarningFX"
+		resource_panel.add_child(warning)
+	warning.flash(Color("70b7ff") if resource == "energy" else AmmoHUD.ORANGE,resource_panel.size)
+	resource_denied.emit()
+
+func clear_resource_feedback() -> void:
+	if is_instance_valid(resource_feedback): resource_feedback.dismiss()
+	for resource_panel in [energy_panel,ammo_panel]:
+		if not is_instance_valid(resource_panel): continue
+		var warning = resource_panel.get_node_or_null("ResourceWarningFX")
+		if warning != null:
+			warning.hide()
+			warning.set_process(false)
 
 func build_energy_hud() -> void:
 	energy_panel = EnergyHUD.new()

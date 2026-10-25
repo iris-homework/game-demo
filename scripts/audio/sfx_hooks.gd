@@ -39,6 +39,8 @@ func attach(value: Control) -> void:
 		_connect(view.card_aim_started,func(_uid: String): _cue("card_select"))
 		_connect(view.card_aim_cancelled,_cue.bind("card_deselect"))
 		_connect(view.card_played,func(_uid: String): _cue("card_play"))
+	if view.has_signal("resource_denied"):
+		_connect(view.resource_denied,_cue.bind("ui_error"))
 	_watch(ui_root if is_instance_valid(ui_root) else view)
 
 func _connect(source: Signal, callback: Callable) -> void:
