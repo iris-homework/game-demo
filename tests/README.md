@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-10-25新增[枪击特效专项](combat/presentation/gun_burst_tests.tscn)：91项检查局部顿帧跨帧delta、两端自然清理／舞台释放、左右镜像／纵深／枪口锚点及三段伤害／全挡／部分挡时的枪声、爆闪和回调同步。使用复制工程、独立用户目录及headless+Dummy；测试不调用模型或保存，不移动鼠标。实际结果与绘制命令预览的边界见[本轮验证](../artifacts/qa/gun-burst-upgrade-2026-10-25/verification.json)。
+
 2026-10-25新增[三选一界面专项](combat/cards/reward_picker_tests.tscn)：61项验证战斗／回访来源、两种窗口尺寸、卡片与返回按钮布局、已有卡数量、固定命中区域、鼠标／键盘切换、Tab／Shift-Tab、Esc返回、保存失败重试与成功后的防重领。必须使用复制工程和独立用户目录，默认拒绝正式用户目录；使用headless+Dummy和视口合成输入，不移动系统鼠标。配套牌库、奖励、回访共4套627项通过；2项鼠标接管失败先复现后修复，证据及既有牌库退出提示见[验证](../artifacts/qa/reward-picker-2026-10-25/verification.json)。静态节点导出预览非Godot截图。
 
 2026-10-25流程走查修复：`commission_return_tests`新增自然三委托后必现、稳定池不重抽、满池旧档优先补回礼且不发奖／不改日期、领取后普通事件补回，共350项；`card_library_filters`验证战斗／回访奖励pending／claimed／skipped三态的退出按钮，共92项。修复前分别15／2项失败，修复后通过。
