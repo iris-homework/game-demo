@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-25",
+  "reviewer": "Codex",
+  "method": "view_image: two full 1086x1448 faces, 362-wide and 173-wide paired PNG previews",
+  "template": "neon-comic-special-v1",
+  "userAcceptance": "pending",
+  "runtimeValidation": "see artifacts/qa/dancer-special-faces-2026-10-25/verification.json",
+  "cards": [
+    {
+      "id": "dancer_black_card",
+      "path": "assets/cards/dancer_special_v1/dancer_black_card.png",
+      "sha256": "8c177a3b8cb860baa5f3e5470f6e3f666473562a86b25dc1799ade4092aa4ce5",
+      "sourceDefinitionSha256": "db33c12ceff114813d98737095a298bdad8a5d96fa7ef62b4600e2af419c4374",
+      "rendererSha256": "6d18732e4d19b0858458fa8b541ccc98686df826868e59c26a06f98c4c4fa8c2",
+      "promptsSha256": "c9dadbddd4d6461ff18eca849545a10c8984e3252eaf2410cf91d98a24d326b7",
+      "visualChecks": {
+        "style": "pass: same angular neon comic ink illustration, no characters",
+        "subject": "pass: paired black/ivory broken chain links with visible central tether",
+        "anatomyAndWeaponGrip": "not applicable: no person or weapon",
+        "cropping": "pass: both primary links and breaking point remain readable inside illustration window",
+        "text": "pass: exact new title, 1 energy, special type and source effect; no extra generated lettering",
+        "readability": "pass: inspected full size and 362/173-wide layouts",
+        "palette": "pass: charcoal versus ivory variants, corner marks black/white rather than rarity",
+        "transparency": "pass: clear outer edge and opaque card body"
+      },
+      "userAcceptance": "pending"
+    },
+    {
+      "id": "dancer_white_card",
+      "path": "assets/cards/dancer_special_v1/dancer_white_card.png",
+      "sha256": "499586d59a7a43b5bb15650e0b583195c05e6b7d2b867c39647bea80aa2d15b1",
+      "sourceDefinitionSha256": "db33c12ceff114813d98737095a298bdad8a5d96fa7ef62b4600e2af419c4374",
+      "rendererSha256": "6d18732e4d19b0858458fa8b541ccc98686df826868e59c26a06f98c4c4fa8c2",
+      "promptsSha256": "c9dadbddd4d6461ff18eca849545a10c8984e3252eaf2410cf91d98a24d326b7",
+      "visualChecks": {
+        "style": "pass: same angular neon comic ink illustration, no characters",
+        "subject": "pass: paired black/ivory broken chain links with visible central tether",
+        "anatomyAndWeaponGrip": "not applicable: no person or weapon",
+        "cropping": "pass: both primary links and breaking point remain readable inside illustration window",
+        "text": "pass: exact new title, 1 energy, special type and source effect; no extra generated lettering",
+        "readability": "pass: inspected full size and 362/173-wide layouts",
+        "palette": "pass: charcoal versus ivory variants, corner marks black/white rather than rarity",
+        "transparency": "pass: clear outer edge and opaque card body"
+      },
+      "userAcceptance": "pending"
+    }
+  ]
+}

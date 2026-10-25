@@ -1,0 +1,146 @@
+{
+  "templateId": "neon-comic-special-v1",
+  "parentTemplate": "neon-comic-title-v3",
+  "date": "2026-10-25",
+  "rendererSha256": "6d18732e4d19b0858458fa8b541ccc98686df826868e59c26a06f98c4c4fa8c2",
+  "sourceDefinitionSha256": "db33c12ceff114813d98737095a298bdad8a5d96fa7ef62b4600e2af419c4374",
+  "fonts": {
+    "assets/fonts/NotoSerifCJKsc-Bold.otf": "8af07d4b6c2e82bcc72a30e066eaf295f11b9424f4aad2eaa9fe0e9c3b38fc73",
+    "art_sources/dancer_special_v1/fonts/NotoSansCJKsc-Bold.otf": "b5f0d1a190a7f9b43c310a8850630af12553df32c4c050543f9059732d9b4c0a"
+  },
+  "software": {
+    "pillow": "11.3.0"
+  },
+  "cards": [
+    {
+      "definition": {
+        "id": "dancer_black_card",
+        "name": "灵魂链接 黑",
+        "type": "special",
+        "cost": 1,
+        "target": "self",
+        "description": "使白舞者失去1层灵魂连接。",
+        "cardText": "使白舞者失去1层灵魂连接。",
+        "effects": [
+          {
+            "type": "remove_soul_link",
+            "amount": 1,
+            "enemyId": "dancer_white"
+          }
+        ]
+      },
+      "path": "assets/cards/dancer_special_v1/dancer_black_card.png",
+      "sha256": "8c177a3b8cb860baa5f3e5470f6e3f666473562a86b25dc1799ade4092aa4ce5",
+      "illustration": "art_sources/dancer_special_v1/black_illustration.png",
+      "illustrationSha256": "7c37d6be33a74c3e06f8595ae248d9486682515df3f9d303c7b9fbee2cf0f98f",
+      "titleBounds": [
+        299,
+        153.5,
+        801,
+        246.5
+      ],
+      "variantBounds": [
+        913,
+        109.5,
+        1022,
+        214.5
+      ],
+      "costBounds": [
+        76,
+        105,
+        161,
+        233
+      ],
+      "rulesLines": [
+        "使白舞者失去1层",
+        "灵魂连接。"
+      ],
+      "rulesBounds": [
+        [
+          280,
+          1058.0,
+          810,
+          1135.0
+        ],
+        [
+          367,
+          1148.0,
+          721,
+          1222.0
+        ]
+      ],
+      "canvas": [
+        1086,
+        1448
+      ],
+      "mode": "RGBA",
+      "userAcceptance": "pending",
+      "visualReview": "pending"
+    },
+    {
+      "definition": {
+        "id": "dancer_white_card",
+        "name": "灵魂链接 白",
+        "type": "special",
+        "cost": 1,
+        "target": "self",
+        "description": "使黑舞者失去1层灵魂连接。",
+        "cardText": "使黑舞者失去1层灵魂连接。",
+        "effects": [
+          {
+            "type": "remove_soul_link",
+            "amount": 1,
+            "enemyId": "dancer_black"
+          }
+        ]
+      },
+      "path": "assets/cards/dancer_special_v1/dancer_white_card.png",
+      "sha256": "499586d59a7a43b5bb15650e0b583195c05e6b7d2b867c39647bea80aa2d15b1",
+      "illustration": "art_sources/dancer_special_v1/white_illustration.png",
+      "illustrationSha256": "fd8c1934a1ca8635764d18c2b9727623f11d1454f40004761ff73476f3af5a7f",
+      "titleBounds": [
+        299,
+        153.0,
+        801,
+        247.0
+      ],
+      "variantBounds": [
+        913,
+        112.5,
+        1017,
+        211.5
+      ],
+      "costBounds": [
+        76,
+        105,
+        161,
+        233
+      ],
+      "rulesLines": [
+        "使黑舞者失去1层",
+        "灵魂连接。"
+      ],
+      "rulesBounds": [
+        [
+          280,
+          1058.0,
+          810,
+          1135.0
+        ],
+        [
+          367,
+          1148.0,
+          721,
+          1222.0
+        ]
+      ],
+      "canvas": [
+        1086,
+        1448
+      ],
+      "mode": "RGBA",
+      "userAcceptance": "pending",
+      "visualReview": "pending"
+    }
+  ]
+}

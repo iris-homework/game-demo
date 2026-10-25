@@ -1,8 +1,8 @@
 {
   "dancer_black_card": {
     "id": "dancer_black_card",
-    "name": "黑卡",
-    "type": "skill",
+    "name": "灵魂链接 黑",
+    "type": "special",
     "cost": 1,
     "target": "self",
     "description": "使白舞者失去1层灵魂连接。",
@@ -17,8 +17,8 @@
   },
   "dancer_white_card": {
     "id": "dancer_white_card",
-    "name": "白卡",
-    "type": "skill",
+    "name": "灵魂链接 白",
+    "type": "special",
     "cost": 1,
     "target": "self",
     "description": "使黑舞者失去1层灵魂连接。",

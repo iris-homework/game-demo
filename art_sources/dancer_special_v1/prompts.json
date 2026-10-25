@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-25",
+  "mode": "built-in",
+  "requests": [
+    {
+      "variant": "black",
+      "prompt": "Use case: illustration-story. Asset type: ONLY the illustration for a Chinese cyberpunk deckbuilding game card, landscape 3:2 composition. Style reference: the attached existing card, but DO NOT copy any card frame or typography. Match its chunky angular ink outlines, sharply cut graphic shapes, distressed screenprinted ink grain, flat cel shading, bold comic illustration, dark charcoal city-wall blocks, restrained cyan and hot magenta motion accents. No people, no letters, no numbers, no symbols that resemble text, no card border, no medallions, no typography, no watermark. One simple legible object group with strong silhouette, centrally composed inside the middle 75%, generous breathing room around it, all chain links visibly connected. Primary request: Black soul-link illustration. Two large interlocking oval chain links made from matte obsidian-black metal, arranged lower-left to upper-right. One black link cracks open at the shared connection, releasing a thin luminous ivory spirit-thread and a few ivory chips. Thick ivory rim highlights make the black metal immediately readable against the charcoal background. Subtle electric-cyan and magenta slash accents behind the link group, minimal background detail. Emphasize black solid mass and an elegant spectral tether breaking. No additional objects. The final result must be a standalone wide illustration, NOT a complete card.",
+      "references": [
+        {
+          "path": "assets/cards/noren_no_character_v3/noren_24.png",
+          "sha256": "13f800d12e434cfed6387121b47cd0426d7a581f0ce63f45bcc1408dd3698968"
+        }
+      ],
+      "output": "art_sources/dancer_special_v1/black_illustration.png",
+      "sha256": "7c37d6be33a74c3e06f8595ae248d9486682515df3f9d303c7b9fbee2cf0f98f",
+      "generation": "built-in image_gen",
+      "transparentBackground": false
+    },
+    {
+      "variant": "white",
+      "prompt": "Use case: illustration-story. Asset type: ONLY a landscape 3:2 standalone illustration for the companion WHITE soul-link game card. Image 1 establishes the original game's print comic art style, image 2 shows the matching black soul-link companion illustration. Match their chunky angular ink outlines, sharply cut graphic shapes, distressed screenprinted ink grain and flat cel shading. Primary request: two large interlocking oval chain links made from luminous ivory-white metal with deep charcoal bevel shadows, arranged upper-left to lower-right. One ivory link cracks open at the shared connection, releasing a thin dark violet spirit-thread and a few small ivory chips; the break and tether must be readable. Bright ivory solid masses dominate, contrasting against a dark charcoal city-wall backdrop with restrained cyan and hot magenta slash accents. One simple central object group in the middle 75%, safe breathing room around edges, no people or extra props. Maintain the companion art's energetic ink-print finish. Do not draw the card frame from image 1. No text, no letters, no numbers, no medallions, no border, no typography, no watermark. This is only the wide illustration, not a complete card.",
+      "references": [
+        {
+          "path": "assets/cards/noren_no_character_v3/noren_24.png",
+          "sha256": "13f800d12e434cfed6387121b47cd0426d7a581f0ce63f45bcc1408dd3698968"
+        },
+        {
+          "path": "art_sources/dancer_special_v1/black_illustration.png",
+          "sha256": "7c37d6be33a74c3e06f8595ae248d9486682515df3f9d303c7b9fbee2cf0f98f"
+        }
+      ],
+      "output": "art_sources/dancer_special_v1/white_illustration.png",
+      "sha256": "fd8c1934a1ca8635764d18c2b9727623f11d1454f40004761ff73476f3af5a7f",
+      "generation": "built-in image_gen",
+      "transparentBackground": false
+    }
+  ]
+}

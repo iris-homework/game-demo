@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "templateId": "neon-comic-special-v1",
+  "canvas": [
+    1086,
+    1448
+  ],
+  "font": "res://assets/fonts/NotoSerifCJKsc-Bold.otf",
+  "cards": {
+    "dancer_black_card": {
+      "path": "res://assets/cards/dancer_special_v1/dancer_black_card.png",
+      "definition": {
+        "id": "dancer_black_card",
+        "name": "灵魂链接 黑",
+        "type": "special",
+        "cost": 1,
+        "target": "self",
+        "description": "使白舞者失去1层灵魂连接。",
+        "cardText": "使白舞者失去1层灵魂连接。",
+        "effects": [
+          {
+            "type": "remove_soul_link",
+            "amount": 1,
+            "enemyId": "dancer_white"
+          }
+        ]
+      }
+    },
+    "dancer_white_card": {
+      "path": "res://assets/cards/dancer_special_v1/dancer_white_card.png",
+      "definition": {
+        "id": "dancer_white_card",
+        "name": "灵魂链接 白",
+        "type": "special",
+        "cost": 1,
+        "target": "self",
+        "description": "使黑舞者失去1层灵魂连接。",
+        "cardText": "使黑舞者失去1层灵魂连接。",
+        "effects": [
+          {
+            "type": "remove_soul_link",
+            "amount": 1,
+            "enemyId": "dancer_black"
+          }
+        ]
+      }
+    }
+  }
+}

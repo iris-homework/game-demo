@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-10-25新增[特殊舞者卡专项](combat/cards/dancer_special_card_tests.tscn)，加`-- --require-art`验证真实face绑定、特殊类型、1费、无稀有度、动态费用、实际出牌、目录隔离及旧技能快照。配套原40牌固定／样式和Boss／机制／预览，共6套5904项隔离无窗口检查通过；样式套件要求独立用户目录名以`MidnightSingleCardFaceQA-`开头，不放宽保护。完整日志和目视／GPU边界见本轮修改记录。
+
 2026-10-25 game-demo 控制台专项：[console_battle_tests](combat/cards/console_battle_tests.tscn)72项覆盖本场重复加牌、唯一实例、即抽即用、牌区及开局同步、存读档、保存失败回滚、保护条件、演练隔离、群体kill／死亡效果与Boss两阶段；真实主场景验证关闭控制台后的模型／计数／revision同步、kill自动关闭及正常离战。须用复制工程与名称含qa的独立用户目录，可传 `-- --output=<专用证据目录>`。配套诺伦卡／Boss／战斗重开共4套1331项0失败，不移动系统鼠标；无GPU像素或物理输入验收。见[验证汇总](../artifacts/qa/console-sync-2026-10-25/verification.json)。
 
 2026-10-25 game-demo 双人舞者同步：新增[机制专项](combat/rules/dancer_mechanics_tests.tscn)和[意图显示专项](combat/presentation/dancer_intent_rules_tests.tscn)，更新本仓库Boss规则／表现的99／90HP断言；保留Boss对白、固定血条及周结算检查。配套验证玩家weak及旧档、连接减层／跨回合增益、黑白卡生成／循环、治疗封顶／不复活，以及电能／防护服／双犬／随机奖励的现有回归。运行须使用复制工程和独立用户目录，结果见修改记录。

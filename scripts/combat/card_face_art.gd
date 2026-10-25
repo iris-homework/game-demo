@@ -2,8 +2,11 @@ extends RefCounted
 ## Presentation-only bindings. Never substitutes today's rules for a frozen card.
 const CONFIG_PATH := "res://data/cards/card_faces_no_character.json"
 const TEMPLATE_ID := "neon-comic-title-v3"
+const SPECIAL_CONFIG_PATH := "res://data/cards/card_faces_special.json"
+const SPECIAL_TEMPLATE_ID := "neon-comic-special-v1"
 const CANVAS := Vector2(1086, 1448)
 static var cached_config: Dictionary = {}
+static var cached_special_config: Dictionary = {}
 
 static func config() -> Dictionary:
 	if cached_config.is_empty() and FileAccess.file_exists(CONFIG_PATH):
@@ -24,8 +27,19 @@ static func matches_canvas(value: Variant) -> bool:
 	return value[0] == CANVAS.x and value[1] == CANVAS.y
 
 static func resolve(definition: Dictionary, settings: Dictionary = {}) -> Dictionary:
-	if settings.is_empty(): settings = config()
-	if settings.get("schemaVersion") != 1 or settings.get("templateId") != TEMPLATE_ID: return {}
+	var template_id := TEMPLATE_ID
+	if settings.is_empty():
+		if definition.get("type") == "special":
+			if cached_special_config.is_empty() and FileAccess.file_exists(SPECIAL_CONFIG_PATH):
+				var parsed = JSON.parse_string(FileAccess.get_file_as_string(SPECIAL_CONFIG_PATH))
+				if parsed is Dictionary: cached_special_config = parsed
+			settings = cached_special_config
+			template_id = SPECIAL_TEMPLATE_ID
+		else: settings = config()
+	elif settings.get("templateId") == SPECIAL_TEMPLATE_ID:
+		if definition.get("type") != "special": return {}
+		template_id = SPECIAL_TEMPLATE_ID
+	if settings.get("schemaVersion") != 1 or settings.get("templateId") != template_id: return {}
 	if not matches_canvas(settings.get("canvas")) or not settings.get("cards") is Dictionary: return {}
 	var entry = settings.cards.get(definition.get("id", ""), {})
 	if not entry is Dictionary or not matches_definition(definition, entry): return {}
