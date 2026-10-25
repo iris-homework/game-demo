@@ -494,12 +494,12 @@
   },
   "E13": {
     "id": "E13",
-    "title": "留在工具房的人",
+    "title": "失控的修剪程序",
     "placeId": "garden",
     "unlockCondition": {},
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
-    "description": "白昼庭院提前进入封控，一名园丁被困在工具房里。巡逻的修枝猎犬认不出他的旧工牌，也不打算让他走。",
+    "description": "白昼庭院的修枝猎犬正在清除步道上的一切活动目标。停机指令没有回应，它的剪刃已经转向你。",
     "demoNote": "",
     "rewardIds": [],
     "nodes": {
@@ -507,7 +507,7 @@
         "id": "intro_01",
         "speakerId": "",
         "speakerSide": "",
-        "text": "修枝猎犬剪去台阶边的一片落叶，又转头盯住工具房。门缝里伸出的旧工牌被剪掉了一角。",
+        "text": "步道两侧的灌木被削得只剩秃枝。修枝猎犬拖着装满碎枝的网兜，剪刃擦过地砖。",
         "next": "intro_02",
         "type": "stage",
         "portraits": {
@@ -516,9 +516,9 @@
       },
       "intro_02": {
         "id": "intro_02",
-        "speakerId": "gardener",
-        "speakerSide": "right",
-        "text": "外面有人吗？别碰那台机器！它现在不让任何人靠近。",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "{主角姓名}核对委托记录：停用这台失控的修枝猎犬，恢复步道通行。",
         "next": "intro_03",
         "portraits": {
           "right": "pruning_hound"
@@ -528,7 +528,7 @@
         "id": "intro_03",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "你在里面多久了？",
+        "text": "编号对得上。先试试停机。",
         "next": "intro_04",
         "portraits": {
           "right": "pruning_hound"
@@ -536,9 +536,9 @@
       },
       "intro_04": {
         "id": "intro_04",
-        "speakerId": "gardener",
-        "speakerSide": "right",
-        "text": "从封控开始。管理员提前清了临时权限，我还在收工具。",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "远程停机请求亮起红色拒绝标记。猎犬停下脚步，眼灯转向{主角姓名}。",
         "next": "intro_05",
         "portraits": {
           "right": "pruning_hound"
@@ -548,7 +548,7 @@
         "id": "intro_05",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "联系过管理员？",
+        "text": "连停机指令都不认了。",
         "next": "intro_06",
         "portraits": {
           "right": "pruning_hound"
@@ -556,9 +556,9 @@
       },
       "intro_06": {
         "id": "intro_06",
-        "speakerId": "gardener",
-        "speakerSide": "right",
-        "text": "他说等访客走了再处理。我跟他说了我还在里面，他就没再回话。",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "一道扫描光掠过鞋尖。猎犬胸前的作业灯亮起，原本朝向灌木的剪刃缓缓抬高。",
         "next": "intro_07",
         "portraits": {
           "right": "pruning_hound"
@@ -568,7 +568,7 @@
         "id": "intro_07",
         "speakerId": "",
         "speakerSide": "",
-        "text": "猎犬低下背甲，两片剪刃缓慢分开。它的眼灯从工具房转向{主角姓名}。",
+        "text": "{主角姓名}向侧面挪开一步，猎犬随即转身，剪刃始终对着同一个方向。",
         "next": "intro_08",
         "type": "stage",
         "portraits": {
@@ -579,7 +579,7 @@
         "id": "intro_08",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "我能把它弄停。你的工具可能要晚点再拿。",
+        "text": "现在把我也算进修剪范围了？",
         "next": "intro_09",
         "portraits": {
           "right": "pruning_hound"
@@ -587,9 +587,9 @@
       },
       "intro_09": {
         "id": "intro_09",
-        "speakerId": "gardener",
-        "speakerSide": "right",
-        "text": "工具是庭院的。你把我带出去就行，委托费我出。",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "猎犬压低前腿，四足刮住地面。两片剪刃猛地合拢，又重新张开。",
         "next": "intro_10",
         "portraits": {
           "right": "pruning_hound"
@@ -599,7 +599,7 @@
         "id": "intro_10",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "躲到柜子后面。等我叫你再出来。",
+        "text": "行，那就拆掉你的剪子。",
         "next": "fight_01",
         "portraits": {
           "right": "pruning_hound"
@@ -610,7 +610,7 @@
         "type": "stage",
         "speakerId": "",
         "speakerSide": "",
-        "text": "{主角姓名}靠近工具房通道，触发猎犬的驱离行动。",
+        "text": "{主角姓名}拔出武器。修枝猎犬蹬开碎枝，迎面扑来。",
         "next": "battle",
         "portraits": {
           "right": "pruning_hound"
@@ -621,7 +621,7 @@
         "type": "stage",
         "speakerId": "",
         "speakerSide": "",
-        "text": "{主角姓名}靠近工具房通道，触发猎犬的驱离行动。",
+        "text": "{主角姓名}拔出武器。修枝猎犬蹬开碎枝，迎面扑来。",
         "next": "battle",
         "portraits": {
           "right": "pruning_hound"
@@ -632,7 +632,7 @@
         "type": "stage",
         "speakerId": "",
         "speakerSide": "",
-        "text": "{主角姓名}退回巡逻范围之外，园丁继续留在工具房内。",
+        "text": "{主角姓名}退到步道外，猎犬仍守在通道中央。",
         "next": "@map",
         "portraits": {
           "right": ""
@@ -658,7 +658,7 @@
         "id": "win_02",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "可以出来了。绕开它的头，刃口还很锋利。",
+        "text": "这次停稳了。",
         "next": "win_03",
         "portraits": {
           "right": ""
@@ -666,9 +666,9 @@
       },
       "win_03": {
         "id": "win_03",
-        "speakerId": "gardener",
-        "speakerSide": "right",
-        "text": "我昨天还给它换过关节油。没想到今天要躲着它。",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "作业灯闪了两下便熄灭，外露的传动轴不再转动。",
         "next": "win_04",
         "portraits": {
           "right": ""
@@ -678,7 +678,7 @@
         "id": "win_04",
         "speakerId": "",
         "speakerSide": "",
-        "text": "{主角姓名}陪园丁走出庭院侧门。他回头看了一眼，把缺角的工牌收进口袋。",
+        "text": "{主角姓名}绕开剪刃，拍下机身编号和停机状态，附到委托记录里。",
         "next": "win_05",
         "type": "stage",
         "portraits": {
@@ -687,9 +687,9 @@
       },
       "win_05": {
         "id": "win_05",
-        "speakerId": "gardener",
-        "speakerSide": "right",
-        "text": "我到外面了。委托确认，谢谢你。",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "步道重新空了出来，只留下几道新鲜的刮痕。",
         "next": "win_06",
         "portraits": {
           "right": ""
@@ -699,7 +699,7 @@
         "id": "win_06",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "今晚先别回去。拿东西的事，让管理员当面来办。",
+        "text": "收工。",
         "next": "finish",
         "portraits": {
           "right": ""
@@ -736,7 +736,7 @@
     "unlockCondition": {},
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
-    "description": "占据厂区的武装小队截走了居民区的供电。值班电工请你守住检修入口，让他拆掉那条私接线路。",
+    "description": "居民支线的电被接进了一组私人储能设备。输电抢修工守在控制台前，拒绝交还线路。",
     "demoNote": "",
     "rewardIds": [],
     "nodes": {
@@ -744,7 +744,7 @@
         "id": "intro_01",
         "speakerId": "",
         "speakerSide": "",
-        "text": "检修门外，一名穿厚绝缘服的男人横起断路杆。他身后的临时电缆通向被武装小队占据的仓库。",
+        "text": "检修门外，输电抢修工横起断路杆。他身后的储能设备正在充电，控制台上的居民支线却显示断供。",
         "next": "intro_02",
         "type": "stage",
         "portraits": {
@@ -753,9 +753,9 @@
       },
       "intro_02": {
         "id": "intro_02",
-        "speakerId": "plant_electrician",
-        "speakerSide": "right",
-        "text": "就是这根线。他们接上以后，居民支线一直断着。",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "{主角姓名}停在控制台前，核对委托中标记的支线编号。临时电缆正接在这一路上。",
         "next": "intro_03",
         "portraits": {
           "right": "powerline_repairman"
@@ -765,7 +765,7 @@
         "id": "intro_03",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "你能恢复吗？",
+        "text": "这条支线断供，是你改的？",
         "next": "intro_04",
         "portraits": {
           "right": "powerline_repairman"
@@ -773,9 +773,9 @@
       },
       "intro_04": {
         "id": "intro_04",
-        "speakerId": "plant_electrician",
+        "speakerId": "powerline_repairman",
         "speakerSide": "right",
-        "text": "能。这一段已经隔离了，但得先让我进去操作。",
+        "text": "是。这组设备还没充满。",
         "next": "intro_05",
         "portraits": {
           "right": "powerline_repairman"
@@ -785,7 +785,7 @@
         "id": "intro_05",
         "speakerId": "powerline_repairman",
         "speakerSide": "right",
-        "text": "仓库还在用电。谁也不许动这条线。",
+        "text": "离控制台远点。充完之前，谁也别动。",
         "next": "intro_06",
         "portraits": {
           "right": "powerline_repairman"
@@ -795,7 +795,7 @@
         "id": "intro_06",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "你知道外面停的是哪一片？",
+        "text": "恢复供电的委托已经挂出来了。把线路交回来。",
         "next": "intro_07",
         "portraits": {
           "right": "powerline_repairman"
@@ -805,7 +805,7 @@
         "id": "intro_07",
         "speakerId": "powerline_repairman",
         "speakerSide": "right",
-        "text": "知道。雇我的人要保仓库，我收了钱，就得守住这里。",
+        "text": "我守了一整晚，你一句话就想拿走？",
         "next": "intro_08",
         "portraits": {
           "right": "powerline_repairman"
@@ -815,7 +815,7 @@
         "id": "intro_08",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "我也是收钱办事。现在有人请我把入口让出来。",
+        "text": "电不是你的。让开。",
         "next": "intro_09",
         "portraits": {
           "right": "powerline_repairman"
@@ -825,7 +825,7 @@
         "id": "intro_09",
         "speakerId": "",
         "speakerSide": "",
-        "text": "抢修工压紧面罩，双手举起长杆。值班电工退到隔离栏后。",
+        "text": "抢修工压紧面罩，把断路杆重重抵在门框上，挡住控制台前的空隙。",
         "next": "intro_10",
         "type": "stage",
         "portraits": {
@@ -836,7 +836,7 @@
         "id": "intro_10",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "你待在那里。杆子放下之前，别过来。",
+        "text": "看来得先让你松手。",
         "next": "fight_01",
         "portraits": {
           "right": "powerline_repairman"
@@ -847,7 +847,7 @@
         "type": "stage",
         "speakerId": "",
         "speakerSide": "",
-        "text": "为了让值班电工能够进入检修位置，{主角姓名}走向守在门前的输电抢修工。",
+        "text": "断路杆扫向{主角姓名}。{主角姓名}侧身避开，逼近守在控制台前的抢修工。",
         "next": "battle",
         "portraits": {
           "right": "powerline_repairman"
@@ -858,7 +858,7 @@
         "type": "stage",
         "speakerId": "",
         "speakerSide": "",
-        "text": "为了让值班电工能够进入检修位置，{主角姓名}走向守在门前的输电抢修工。",
+        "text": "断路杆扫向{主角姓名}。{主角姓名}侧身避开，逼近守在控制台前的抢修工。",
         "next": "battle",
         "portraits": {
           "right": "powerline_repairman"
@@ -869,7 +869,7 @@
         "type": "stage",
         "speakerId": "",
         "speakerSide": "",
-        "text": "{主角姓名}与值班电工退到安全位置。",
+        "text": "{主角姓名}退回检修通道，抢修工仍挡在控制台前。",
         "next": "@map",
         "portraits": {
           "right": ""
@@ -895,7 +895,7 @@
         "id": "win_02",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "往旁边站。别碰开关，也别碰那根线。",
+        "text": "退后。别再碰控制台。",
         "next": "win_03",
         "portraits": {
           "right": "powerline_repairman"
@@ -903,9 +903,9 @@
       },
       "win_03": {
         "id": "win_03",
-        "speakerId": "plant_electrician",
-        "speakerSide": "right",
-        "text": "临时接线拆掉了。我再核对一次，就能把这条支线送回去。",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "抢修工退出检修门。{主角姓名}在控制台上撤销私接设备的供电授权。",
         "next": "win_04",
         "portraits": {
           "right": ""
@@ -915,7 +915,7 @@
         "id": "win_04",
         "speakerId": "",
         "speakerSide": "",
-        "text": "电工依次完成操作，居民支线的状态灯转为正常。他通过值班终端确认了来电回报。",
+        "text": "储能设备的充电灯逐一熄灭，居民支线的状态恢复正常。",
         "next": "win_05",
         "type": "stage",
         "portraits": {
@@ -924,9 +924,9 @@
       },
       "win_05": {
         "id": "win_05",
-        "speakerId": "plant_electrician",
-        "speakerSide": "right",
-        "text": "这一片恢复了。入口我会锁好，今天这份委托可以结了。",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "{主角姓名}将控制台的恢复记录上传到委托终端。",
         "next": "win_06",
         "portraits": {
           "right": ""
@@ -936,7 +936,7 @@
         "id": "win_06",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "好。剩下的厂区你别一个人进去，那里还有他们的人。",
+        "text": "这条线恢复了。走吧。",
         "next": "finish",
         "portraits": {
           "right": ""
@@ -973,7 +973,7 @@
     "unlockCondition": {},
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
-    "description": "夜雾里，一盏航灯漂上了装卸平台。它的触须已经伤了人，码头值守员需要你在下一艘船靠岸前清掉它。",
+    "description": "一只信标水母盘踞在装卸平台，借着旧航灯的亮光藏住触须。清理目标就在眼前，先别靠得太近。",
     "demoNote": "",
     "rewardIds": [],
     "nodes": {
@@ -990,9 +990,9 @@
       },
       "intro_02": {
         "id": "intro_02",
-        "speakerId": "dock_keeper",
-        "speakerSide": "right",
-        "text": "别往前。刚才有人把它当成掉下来的航灯，手差点被刺穿。",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "委托照片里的旧信标壳就在它体内。平台上的金属网格布满细长划痕。",
         "next": "intro_03",
         "portraits": {
           "right": "beacon_jellyfish"
@@ -1002,7 +1002,7 @@
         "id": "intro_03",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "人送走了吗？",
+        "text": "找到你了。离远点看，还真像盏灯。",
         "next": "intro_04",
         "portraits": {
           "right": "beacon_jellyfish"
@@ -1010,9 +1010,9 @@
       },
       "intro_04": {
         "id": "intro_04",
-        "speakerId": "dock_keeper",
-        "speakerSide": "right",
-        "text": "送去处理了。平台也封了，可船不能一直等在外面。",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "{主角姓名}沿着平台侧边移动。水母的伞缘轻轻一收，触须也跟着转向。",
         "next": "intro_05",
         "portraits": {
           "right": "beacon_jellyfish"
@@ -1022,7 +1022,7 @@
         "id": "intro_05",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "它追着灯过来的？能把它引回水里吗？",
+        "text": "会追着动静走。",
         "next": "intro_06",
         "portraits": {
           "right": "beacon_jellyfish"
@@ -1030,9 +1030,9 @@
       },
       "intro_06": {
         "id": "intro_06",
-        "speakerId": "dock_keeper",
-        "speakerSide": "right",
-        "text": "试过。灯关了，它就贴着缆绳走。引到边上又回来了。",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "一截触须突然绷直，刺向刚刚落脚的位置。{主角姓名}退开，金属网格被刮出刺耳的声响。",
         "next": "intro_07",
         "portraits": {
           "right": "beacon_jellyfish"
@@ -1042,7 +1042,7 @@
         "id": "intro_07",
         "speakerId": "",
         "speakerSide": "",
-        "text": "水母收紧伞缘，一束触须突然刺向地上的系船钩，拖出短促的刮擦声。",
+        "text": "水母从缆绳间撑起身体，更多触须越过平台边缘，封住近旁的通道。",
         "next": "intro_08",
         "type": "stage",
         "portraits": {
@@ -1053,7 +1053,7 @@
         "id": "intro_08",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "把工人都留在栏杆外。别再拿东西试它。",
+        "text": "别往出口伸。",
         "next": "intro_09",
         "portraits": {
           "right": "beacon_jellyfish"
@@ -1061,9 +1061,9 @@
       },
       "intro_09": {
         "id": "intro_09",
-        "speakerId": "dock_keeper",
-        "speakerSide": "right",
-        "text": "清理费按委托付。你要准备，我就继续拦着这边。",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "{主角姓名}拔出武器，站到没有缆绳遮挡的位置。水母体内的灯光骤然亮起。",
         "next": "fight_01",
         "portraits": {
           "right": "beacon_jellyfish"
@@ -1074,7 +1074,7 @@
         "type": "stage",
         "speakerId": "",
         "speakerSide": "",
-        "text": "{主角姓名}跨过封锁位置，水母感知到靠近的活动目标。",
+        "text": "信标水母收紧伞缘，触须朝{主角姓名}猛刺过来。",
         "next": "battle",
         "portraits": {
           "right": "beacon_jellyfish"
@@ -1085,7 +1085,7 @@
         "type": "stage",
         "speakerId": "",
         "speakerSide": "",
-        "text": "{主角姓名}跨过封锁位置，水母感知到靠近的活动目标。",
+        "text": "信标水母收紧伞缘，触须朝{主角姓名}猛刺过来。",
         "next": "battle",
         "portraits": {
           "right": "beacon_jellyfish"
@@ -1096,7 +1096,7 @@
         "type": "stage",
         "speakerId": "",
         "speakerSide": "",
-        "text": "{主角姓名}退回安全通道，值守员继续封锁平台。",
+        "text": "{主角姓名}退回平台外侧，水母的亮光重新隐入雾中。",
         "next": "@map",
         "portraits": {
           "right": ""
@@ -1120,9 +1120,9 @@
       },
       "win_02": {
         "id": "win_02",
-        "speakerId": "dock_keeper",
-        "speakerSide": "right",
-        "text": "这下能让大家上来了吧？",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "{主角姓名}停在触须够不到的位置，等到最后一丝抽动也消失。",
         "next": "win_03",
         "portraits": {
           "right": ""
@@ -1132,7 +1132,7 @@
         "id": "win_03",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "先清掉这些东西。触须别用手碰，地上那层液体也处理干净。",
+        "text": "这回真成一盏废灯了。",
         "next": "win_04",
         "portraits": {
           "right": ""
@@ -1142,7 +1142,7 @@
         "id": "win_04",
         "speakerId": "",
         "speakerSide": "",
-        "text": "值守员叫来穿防护装备的清理人员，确认平台可以通行后，才撤开封锁带。",
+        "text": "{主角姓名}拍下熄灭的信标壳，把触须残留的位置标进清理记录。",
         "next": "win_05",
         "type": "stage",
         "portraits": {
@@ -1151,9 +1151,9 @@
       },
       "win_05": {
         "id": "win_05",
-        "speakerId": "dock_keeper",
-        "speakerSide": "right",
-        "text": "这边恢复作业。委托我确认了，靠泊队也会检查那批浮标。",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "委托记录上传完毕。雾里只剩远处固定航灯的光，平台上不再有东西追过来。",
         "next": "win_06",
         "portraits": {
           "right": ""
@@ -1163,7 +1163,7 @@
         "id": "win_06",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "好。我去洗一下鞋底，你们接着忙。",
+        "text": "该走了。",
         "next": "finish",
         "portraits": {
           "right": ""

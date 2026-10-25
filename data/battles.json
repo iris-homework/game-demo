@@ -75,7 +75,7 @@
   "B13": {
     "id": "B13",
     "eventId": "E13",
-    "name": "留在工具房的人",
+    "name": "失控的修剪程序",
     "battleType": "normal",
     "participants": [
       "@player",
