@@ -95,18 +95,18 @@
     "cost": 0,
     "type": "skill",
     "archetype": "通用",
-    "description": "获得 1 颗弹药。消耗。",
+    "description": "获得 2 颗弹药。消耗。",
     "target": "self",
     "sortOrder": 5,
     "artAssetId": "",
     "effects": [
       {
         "type": "ammo",
-        "amount": 1
+        "amount": 2
       }
     ],
     "exhaust": true,
-    "cardText": "获得1颗弹药。消耗。"
+    "cardText": "获得2颗弹药。消耗。"
   },
   {
     "id": "noren_06",
@@ -116,7 +116,7 @@
     "cost": 1,
     "type": "skill",
     "archetype": "通用",
-    "description": "获得 2 颗弹药和 4 点格挡。",
+    "description": "获得 2 颗弹药和 6 点格挡。",
     "target": "self",
     "sortOrder": 6,
     "artAssetId": "",
@@ -127,10 +127,10 @@
       },
       {
         "type": "block",
-        "amount": 4
+        "amount": 6
       }
     ],
-    "cardText": "获得2颗弹药和4点格挡。"
+    "cardText": "获得2颗弹药和6点格挡。"
   },
   {
     "id": "noren_07",
@@ -230,14 +230,14 @@
     "cost": 1,
     "type": "skill",
     "archetype": "通用",
-    "description": "获得 8 点格挡。近身技：获得 1 颗弹药。远程技：对一名敌人施加 1 层虚弱。",
+    "description": "获得 9 点格挡。近身技：获得 1 颗弹药。远程技：对一名敌人施加 1 层虚弱。",
     "target": "stance",
     "sortOrder": 11,
     "artAssetId": "",
     "effects": [
       {
         "type": "block",
-        "amount": 8
+        "amount": 9
       },
       {
         "type": "ammo",
@@ -250,7 +250,7 @@
         "when": "ranged"
       }
     ],
-    "cardText": "获得8点格挡。近身技：获得1颗弹药。远程技：对一名敌人施加1层虚弱。"
+    "cardText": "获得9点格挡。近身技：获得1颗弹药。远程技：对一名敌人施加1层虚弱。"
   },
   {
     "id": "noren_12",
@@ -260,7 +260,7 @@
     "cost": 0,
     "type": "skill",
     "archetype": "通用",
-    "description": "消耗手中的另一张牌，获得 2 颗弹药。本牌进入弃牌堆。没有其他手牌时无法打出。",
+    "description": "消耗手中的另一张牌，获得 3 颗弹药。本牌进入弃牌堆。没有其他手牌时无法打出。",
     "target": "self",
     "sortOrder": 12,
     "artAssetId": "",
@@ -270,10 +270,10 @@
       },
       {
         "type": "ammo",
-        "amount": 2
+        "amount": 3
       }
     ],
-    "cardText": "消耗另一张手牌，获得2颗弹药。"
+    "cardText": "消耗另一张手牌，获得3颗弹药。"
   },
   {
     "id": "noren_13",
@@ -283,17 +283,17 @@
     "cost": 1,
     "type": "attack",
     "archetype": "爆发直伤流",
-    "description": "造成 8 点伤害。",
+    "description": "造成 10 点伤害。",
     "target": "enemy",
     "sortOrder": 13,
     "artAssetId": "",
     "effects": [
       {
         "type": "damage",
-        "amount": 8
+        "amount": 10
       }
     ],
-    "cardText": "造成8点伤害。"
+    "cardText": "造成10点伤害。"
   },
   {
     "id": "noren_14",
@@ -303,14 +303,14 @@
     "cost": 1,
     "type": "attack",
     "archetype": "爆发直伤流",
-    "description": "造成 5 点伤害。近身技：施加 1 层虚弱。",
+    "description": "造成 6 点伤害。近身技：施加 1 层虚弱。",
     "target": "enemy",
     "sortOrder": 14,
     "artAssetId": "",
     "effects": [
       {
         "type": "damage",
-        "amount": 5
+        "amount": 6
       },
       {
         "type": "weak",
@@ -318,7 +318,7 @@
         "when": "melee"
       }
     ],
-    "cardText": "造成5点伤害。近身技：施加1层虚弱。"
+    "cardText": "造成6点伤害。近身技：施加1层虚弱。"
   },
   {
     "id": "noren_15",
@@ -328,18 +328,18 @@
     "cost": 0,
     "type": "skill",
     "archetype": "爆发直伤流",
-    "description": "本回合下一张攻击牌的第一段基础伤害增加 4。消耗。",
+    "description": "本回合下一张攻击牌的第一段基础伤害增加 5。消耗。",
     "target": "self",
     "sortOrder": 15,
     "artAssetId": "",
     "effects": [
       {
         "type": "next_damage",
-        "amount": 4
+        "amount": 5
       }
     ],
     "exhaust": true,
-    "cardText": "本回合下一张攻击牌的第一段基础伤害增加4。消耗。"
+    "cardText": "本回合下一张攻击牌的第一段基础伤害增加5。消耗。"
   },
   {
     "id": "noren_16",
@@ -349,14 +349,14 @@
     "cost": 1,
     "type": "attack",
     "archetype": "爆发直伤流",
-    "description": "造成 8 点伤害。近身技：抽 2 张牌。",
+    "description": "造成 9 点伤害。近身技：抽 2 张牌。",
     "target": "enemy",
     "sortOrder": 16,
     "artAssetId": "",
     "effects": [
       {
         "type": "damage",
-        "amount": 8
+        "amount": 9
       },
       {
         "type": "draw",
@@ -364,7 +364,7 @@
         "when": "melee"
       }
     ],
-    "cardText": "造成 8 点伤害。近身技：抽 2 张牌。"
+    "cardText": "造成9点伤害。近身技：抽2张牌。"
   },
   {
     "id": "noren_17",
@@ -374,14 +374,14 @@
     "cost": 2,
     "type": "attack",
     "archetype": "爆发直伤流",
-    "description": "造成 12 点伤害。近身技：额外获得 2 颗弹药。",
+    "description": "造成 16 点伤害。近身技：额外获得 2 颗弹药。",
     "target": "enemy",
     "sortOrder": 17,
     "artAssetId": "",
     "effects": [
       {
         "type": "damage",
-        "amount": 12
+        "amount": 16
       },
       {
         "type": "ammo",
@@ -389,7 +389,7 @@
         "when": "melee"
       }
     ],
-    "cardText": "造成12点伤害。近身技：额外获得2颗弹药。"
+    "cardText": "造成16点伤害。近身技：额外获得2颗弹药。"
   },
   {
     "id": "noren_18",
@@ -399,7 +399,7 @@
     "cost": 1,
     "type": "skill",
     "archetype": "爆发直伤流",
-    "description": "获得 2 颗弹药。本回合下一张攻击牌的第一段基础伤害增加 3。",
+    "description": "获得 2 颗弹药。本回合下一张攻击牌的第一段基础伤害增加 4。",
     "target": "self",
     "sortOrder": 18,
     "artAssetId": "",
@@ -410,10 +410,10 @@
       },
       {
         "type": "next_damage",
-        "amount": 3
+        "amount": 4
       }
     ],
-    "cardText": "获得2颗弹药。本回合下一张攻击牌的第一段基础伤害增加3。"
+    "cardText": "获得2颗弹药。本回合下一张攻击牌的第一段基础伤害增加4。"
   },
   {
     "id": "noren_19",
@@ -423,21 +423,21 @@
     "cost": 1,
     "type": "attack",
     "archetype": "爆发直伤流",
-    "description": "造成 7 点伤害，施加 2 层虚弱。",
+    "description": "造成 8 点伤害，施加 2 层虚弱。",
     "target": "enemy",
     "sortOrder": 19,
     "artAssetId": "",
     "effects": [
       {
         "type": "damage",
-        "amount": 7
+        "amount": 8
       },
       {
         "type": "weak",
         "amount": 2
       }
     ],
-    "cardText": "造成7点伤害，施加2层虚弱。"
+    "cardText": "造成8点伤害，施加2层虚弱。"
   },
   {
     "id": "noren_20",
@@ -469,18 +469,18 @@
     "cost": 1,
     "type": "attack",
     "archetype": "爆发直伤流",
-    "description": "造成 7 点伤害。远程技：若打出本牌前恰好拥有 1 颗弹药，本牌基础伤害增加 3。",
+    "description": "造成 8 点伤害。远程技：若打出本牌前恰好拥有 1 颗弹药，本牌基础伤害增加 4。",
     "target": "enemy",
     "sortOrder": 21,
     "artAssetId": "",
     "effects": [
       {
         "type": "damage",
-        "amount": 7,
-        "lastAmmoBonus": 3
+        "amount": 8,
+        "lastAmmoBonus": 4
       }
     ],
-    "cardText": "造成7点伤害。远程技：若打出本牌前恰好拥有1颗弹药，本牌基础伤害增加3。"
+    "cardText": "造成8点伤害。远程技：若打出本牌前恰好拥有1颗弹药，本牌基础伤害增加4。"
   },
   {
     "id": "noren_22",
@@ -556,18 +556,18 @@
     "cost": 2,
     "type": "attack",
     "archetype": "爆发直伤流",
-    "description": "造成 12 点伤害。远程技：若目标在本牌使用前的生命值不高于其最大生命值的 50%，本牌基础伤害增加 6。",
+    "description": "造成 14 点伤害。远程技：若目标在本牌使用前的生命值不高于其最大生命值的 50%，本牌基础伤害增加 8。",
     "target": "enemy",
     "sortOrder": 25,
     "artAssetId": "",
     "effects": [
       {
         "type": "damage",
-        "amount": 12,
-        "executeBonus": 6
+        "amount": 14,
+        "executeBonus": 8
       }
     ],
-    "cardText": "造成12点伤害。\n远程技：若目标用牌前生命≤50%，基础伤害+6。"
+    "cardText": "造成14点伤害。\n远程技：若目标用牌前生命≤50%，基础伤害+8。"
   },
   {
     "id": "noren_26",
@@ -598,21 +598,21 @@
     "cost": 1,
     "type": "attack",
     "archetype": "裂伤流",
-    "description": "造成 5 点伤害，攻击结束后施加 2 层裂伤。",
+    "description": "造成 6 点伤害，攻击结束后施加 2 层裂伤。",
     "target": "enemy",
     "sortOrder": 27,
     "artAssetId": "",
     "effects": [
       {
         "type": "damage",
-        "amount": 5
+        "amount": 6
       },
       {
         "type": "bleed",
         "amount": 2
       }
     ],
-    "cardText": "造成5点伤害，攻击结束后施加2层裂伤。"
+    "cardText": "造成6点伤害，攻击结束后施加2层裂伤。"
   },
   {
     "id": "noren_28",
@@ -648,21 +648,21 @@
     "cost": 2,
     "type": "attack",
     "archetype": "裂伤流",
-    "description": "造成 10 点伤害，攻击结束后施加 4 层裂伤。",
+    "description": "造成 14 点伤害，攻击结束后施加 4 层裂伤。",
     "target": "enemy",
     "sortOrder": 29,
     "artAssetId": "",
     "effects": [
       {
         "type": "damage",
-        "amount": 10
+        "amount": 14
       },
       {
         "type": "bleed",
         "amount": 4
       }
     ],
-    "cardText": "造成10点伤害，攻击结束后施加4层裂伤。"
+    "cardText": "造成14点伤害，攻击结束后施加4层裂伤。"
   },
   {
     "id": "noren_30",
@@ -693,14 +693,14 @@
     "cost": 1,
     "type": "skill",
     "archetype": "裂伤流",
-    "description": "获得 4 点格挡。若自身没有弹反，获得 1 层弹反。",
+    "description": "获得 6 点格挡。若自身没有弹反，获得 1 层弹反。",
     "target": "self",
     "sortOrder": 31,
     "artAssetId": "",
     "effects": [
       {
         "type": "block",
-        "amount": 4
+        "amount": 6
       },
       {
         "type": "parry",
@@ -708,7 +708,7 @@
         "cap": 1
       }
     ],
-    "cardText": "获得4点格挡。若自身没有弹反，获得1层弹反。"
+    "cardText": "获得6点格挡。若自身没有弹反，获得1层弹反。"
   },
   {
     "id": "noren_32",
@@ -718,14 +718,14 @@
     "cost": 2,
     "type": "skill",
     "archetype": "裂伤流",
-    "description": "获得 10 点格挡。若自身弹反少于 2 层，获得 1 层弹反。",
+    "description": "获得 14 点格挡。若自身弹反少于 2 层，获得 1 层弹反。",
     "target": "self",
     "sortOrder": 32,
     "artAssetId": "",
     "effects": [
       {
         "type": "block",
-        "amount": 10
+        "amount": 14
       },
       {
         "type": "parry",
@@ -733,7 +733,7 @@
         "cap": 2
       }
     ],
-    "cardText": "获得10点格挡。若自身弹反少于2层，获得1层弹反。"
+    "cardText": "获得14点格挡。若自身弹反少于2层，获得1层弹反。"
   },
   {
     "id": "noren_33",
@@ -743,21 +743,21 @@
     "cost": 2,
     "type": "skill",
     "archetype": "裂伤流",
-    "description": "获得 10 点格挡和 1 层弹反。",
+    "description": "获得 16 点格挡和 1 层弹反。",
     "target": "self",
     "sortOrder": 33,
     "artAssetId": "",
     "effects": [
       {
         "type": "block",
-        "amount": 10
+        "amount": 16
       },
       {
         "type": "parry",
         "amount": 1
       }
     ],
-    "cardText": "获得 10 点格挡和 1 层弹反。"
+    "cardText": "获得16点格挡和1层弹反。"
   },
   {
     "id": "noren_34",
@@ -829,18 +829,18 @@
     "cost": 1,
     "type": "attack",
     "archetype": "裂伤流",
-    "description": "造成 5 点伤害，然后触发 2 次裂伤。近战与远程均生效；远程合计触发 2 次。",
+    "description": "造成 6 点伤害，然后触发 2 次裂伤。近战与远程均生效；远程合计触发 2 次。",
     "target": "enemy",
     "sortOrder": 37,
     "artAssetId": "",
     "effects": [
       {
         "type": "damage",
-        "amount": 5,
+        "amount": 6,
         "bleedTriggers": 2
       }
     ],
-    "cardText": "造成 5 点伤害，然后触发 2 次裂伤。近战与远程均生效；远程合计触发 2 次。"
+    "cardText": "造成6点伤害，然后触发2次裂伤。近战与远程均生效；远程合计触发2次。"
   },
   {
     "id": "noren_38",
@@ -850,21 +850,21 @@
     "cost": 2,
     "type": "attack",
     "archetype": "裂伤流",
-    "description": "对所有敌人造成 4 点伤害，全部攻击结束后，对所有敌人施加 3 层裂伤。",
+    "description": "对所有敌人造成 6 点伤害，全部攻击结束后，对所有敌人施加 3 层裂伤。",
     "target": "all",
     "sortOrder": 38,
     "artAssetId": "",
     "effects": [
       {
         "type": "damage",
-        "amount": 4
+        "amount": 6
       },
       {
         "type": "bleed",
         "amount": 3
       }
     ],
-    "cardText": "对所有敌人造成 4 点伤害，全部攻击结束后，对所有敌人施加 3 层裂伤。"
+    "cardText": "对所有敌人造成6点伤害，全部攻击结束后，对所有敌人施加3层裂伤。"
   },
   {
     "id": "noren_39",
@@ -899,16 +899,16 @@
     "cost": 1,
     "type": "power",
     "archetype": "裂伤流",
-    "description": "每回合首次在近战形态下，用单体卡牌对敌人施加裂伤时，额外施加 1 层裂伤。",
+    "description": "本场战斗中，近战形态每段攻击命中后，对命中的敌人施加 1 层裂伤。多段攻击逐段生效。",
     "target": "self",
     "sortOrder": 40,
     "artAssetId": "",
     "effects": [
       {
         "type": "power",
-        "value": "dissection"
+        "value": "melee_attack_bleed"
       }
     ],
-    "cardText": "每回合首次在近战形态下，用单体卡牌施加裂伤时，额外施加1层裂伤。"
+    "cardText": "本场战斗中，近战每段攻击命中后施加1层裂伤。"
   }
 ]

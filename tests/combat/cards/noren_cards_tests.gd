@@ -42,7 +42,7 @@ func test_hand_exhaust() -> void:
 		var before := m.snapshot()
 		check(m.exhaust_candidates("card_000") == ["card_001"] and m.snapshot() == before,"Dismantle lists another attack, skill or power without changing state")
 		var result := play(m,0,0,"card_001")
-		check(not result.is_empty() and m.ammo == 4 and m.energy == 3,"Dismantle exhausts any card type and grants two ammo at zero cost")
+		check(not result.is_empty() and m.ammo == 5 and m.energy == 3,"Dismantle exhausts any card type and grants three ammo at zero cost")
 		check(m.exhaust_pile == ["card_001"] and m.discard_pile == ["card_000"] and m.hand.is_empty(),"Chosen card is exhausted while Dismantle itself is discarded")
 		check(result.exhaustedCards == ["card_001"] and result.discarded.is_empty() and not result.exhausted,"Exhausted selection and resolving card use distinct result fields")
 		check(m.enemies[0].hp == 1000 and m.block == 0 and m.powers.is_empty() and result.drawn.is_empty(),"Exhausting a card never executes that card's effects")
@@ -106,9 +106,9 @@ func _ready() -> void:
 	Game.state = Game.initial_state()
 	check(Game.state.deck.is_empty(),"No nonstarter owned on new adventure")
 	check(Game.owned_card_counts() == {"noren_01":4,"noren_02":4,"noren_03":1,"noren_04":1},"Exact initial ownership")
-	var base_damage := {1:6,9:8,13:8,14:5,16:8,17:12,19:7,20:9,21:7,25:12,26:30,27:5,28:6,29:10,35:6,37:5,38:4}
-	var ranged_damage := {1:9,9:12,13:12,14:8,16:12,17:18,19:11,20:42,21:11,25:18,26:66,27:8,28:10,29:15,35:9,37:8,38:6}
-	var blocks := {2:5,4:6,6:4,11:8,31:4,32:10,33:10}
+	var base_damage := {1:6,9:8,13:10,14:6,16:9,17:16,19:8,20:9,21:8,25:14,26:30,27:6,28:6,29:14,35:6,37:6,38:6}
+	var ranged_damage := {1:9,9:12,13:15,14:9,16:14,17:24,19:12,20:42,21:12,25:21,26:66,27:9,28:10,29:21,35:9,37:9,38:9}
+	var blocks := {2:5,4:6,6:6,11:9,31:6,32:14,33:16}
 	for form in ["melee","ranged"]:
 		for number in range(1,41):
 			var m := fixture([number,1],form)
@@ -144,39 +144,44 @@ func _ready() -> void:
 	check(m.ammo == 1,"Multi-hit spends one ammo")
 	m = fixture([37],"ranged"); m.enemies[0].bleed = 5
 	result = play(m)
-	check(result.damage == 17 and result.hits.size() == 1 and m.enemies[0].bleed==3,"Hunt triggers bleed exactly twice after one hit")
+	check(result.damage == 18 and result.hits.size() == 1 and m.enemies[0].bleed==3,"Hunt triggers bleed exactly twice after one hit")
 	m = fixture([37],"ranged"); m.enemies[0].bleed = 4
-	check(play(m).damage == 15 and m.enemies[0].bleed==2,"Hunt no longer requires a bleed threshold")
+	check(play(m).damage == 16 and m.enemies[0].bleed==2,"Hunt no longer requires a bleed threshold")
 	m = fixture([38],"ranged",3)
 	for enemy in m.enemies: enemy.bleed = 4
 	result = play(m)
-	check(result.damage == 30 and result.hits.size() == 3 and m.ammo == 1,"AoE spends one ammo and triggers each target bleed")
+	check(result.damage == 39 and result.hits.size() == 3 and m.ammo == 1,"AoE spends one ammo and triggers each target bleed")
 	check(m.enemies.all(func(e): return e.bleed == 5),"AoE new bleed applied after every hit")
 	m = fixture([39]);m.enemies[0].bleed = 4
 	result = play(m)
 	check(m.block == 0 and result.drawn.size() == 3,"Tracking draws a third card on starting bleed threshold")
 	m = fixture([15,35],"ranged")
 	play(m);result = play(m,1)
-	check(result.hits[0].attackDamage == 9 and result.hits[1].attackDamage == 3,"First-segment buff before multiplier; round each segment")
+	check(result.hits[0].attackDamage == 11 and result.hits[1].attackDamage == 3,"First-segment buff before multiplier; round each segment")
 	m = fixture([23,35,13],"ranged")
 	play(m);result = play(m,1)
 	check(result.hits.map(func(h): return h.damage)==[4,4,4],"Ranged mastery doubles all segments")
-	check(play(m,2).damage == 16,"Ranged mastery applies to subsequent attacks")
-	m = fixture([40,34,30]);play(m);play(m,1)
+	check(play(m,2).damage == 20,"Ranged mastery applies to subsequent attacks")
+	m = fixture([40,34,30])
+	# Freeze the pre-rework power to retain this legacy first-application coverage.
+	m.card_catalog.noren_40.effects = [{"type":"power","value":"dissection"}]
+	play(m);play(m,1)
 	check(m.enemies[0].bleed == 4,"Dissection adds one on first single-target melee application")
 	play(m,2)
 	check(m.enemies[0].bleed == 10,"Dissection does not repeat")
-	m = fixture([40,34],"ranged");play(m);play(m,1)
+	m = fixture([40,34],"ranged")
+	m.card_catalog.noren_40.effects = [{"type":"power","value":"dissection"}]
+	play(m);play(m,1)
 	check(m.enemies[0].bleed == 2 and not m.dissection_used,"Dissection not triggered in ranged")
 	m = fixture([40,40]);play(m)
 	var before := m.snapshot()
-	check(not play(m,1).is_empty() and m.powers==["dissection"] and m.exhaust_pile.size()==2 and m.energy==1,"Duplicate ability leaves cycle and pays cost without stacking")
+	check(not play(m,1).is_empty() and m.powers==["melee_attack_bleed"] and m.exhaust_pile.size()==2 and m.energy==1,"Duplicate ability leaves cycle and pays cost without stacking")
 	m = fixture([21],"ranged"); m.ammo=1
-	check(play(m).damage == 15 and m.ammo == 0,"Last bullet checks prepayment ammo")
+	check(play(m).damage == 18 and m.ammo == 0,"Last bullet checks prepayment ammo")
 	m = fixture([25],"ranged");m.enemies[0].hp = 500
-	check(play(m).damage == 27,"Execution includes exactly 50 percent")
+	check(play(m).damage == 33,"Execution includes exactly 50 percent")
 	m = fixture([25],"ranged");m.enemies[0].hp = 501
-	check(play(m).damage == 18,"Execution excludes above threshold")
+	check(play(m).damage == 21,"Execution excludes above threshold")
 	for bullets in [1,2,10]:
 		m=fixture([20],"ranged");m.ammo=bullets
 		result=play(m)
@@ -186,9 +191,9 @@ func _ready() -> void:
 	m = fixture([20],"ranged");m.ammo=2;before=m.snapshot()
 	check(play(m,0,0,"",2).is_empty() and m.snapshot()==before,"Extra ammo fails atomically")
 	m = fixture([16],"ranged");m.enemies[0].block=100
-	check(play(m).damage==0 and m.enemies[0].block==88,"Backstep Slash ranged damage obeys block")
+	check(play(m).damage==0 and m.enemies[0].block==86,"Backstep Slash ranged damage obeys block")
 	m = fixture([16]);m.enemies[0].block=100
-	check(play(m).damage==0 and m.enemies[0].block==92,"Melee Backstep Slash obeys block")
+	check(play(m).damage==0 and m.enemies[0].block==91,"Melee Backstep Slash obeys block")
 	m = fixture([4,1,3,1]);play(m)
 	check(m.stance=="ranged" and m.stance_discount and m.block==6,"Enter ranged grants six block and attack discount")
 	check(m.card_cost("card_001")==0,"Discount reflected in actual cost")
@@ -230,10 +235,10 @@ func _ready() -> void:
 	m=fixture([17]);m.ammo=9;play(m)
 	check(m.ammo==10,"Ammo cap applies to normal and extra gains")
 	m=fixture([14]);play(m);check(m.enemies[0].weak==1,"Melee butt applies weak")
-	m=fixture([11],"ranged");play(m);check(m.enemies[0].weak==1 and m.block==8,"Ranged steady targets enemy and grants eight block")
+	m=fixture([11],"ranged");play(m);check(m.enemies[0].weak==1 and m.block==9,"Ranged steady targets enemy and grants nine block")
 	for form in ["melee","ranged"]:
 		m=fixture([19],form);result=play(m)
-		check(result.damage==(7 if form=="melee" else 11) and m.enemies[0].weak==2,"Suppression deals seven base damage and applies two weak in both stances")
+		check(result.damage==(8 if form=="melee" else 12) and m.enemies[0].weak==2,"Suppression deals eight base damage and applies two weak in both stances")
 	m=fixture([31,32,33]);play(m);m.energy=3;play(m,1);m.energy=3;play(m,2)
 	check(m.parry==3,"New Counter Stance adds one charge up to the three-layer cap")
 	m.enemies[0].intent={"type":"attack","amount":10,"hits":3}
@@ -321,13 +326,13 @@ func _ready() -> void:
 	play(m);result=play(m,1)
 	check(m.powers==["persistent_bleed"] and result.damage==24 and m.enemies[0].bleed==5 and m.ammo==5,"Deep Wound preserves bleed on every ranged segment")
 	m=fixture([37]);m.enemies[0].bleed=5;result=play(m)
-	check(result.damage==14 and result.hits.size()==1 and m.enemies[0].bleed==3 and m.ammo==3,"Hunt explicitly triggers two bleed ticks in melee")
+	check(result.damage==15 and result.hits.size()==1 and m.enemies[0].bleed==3 and m.ammo==3,"Hunt explicitly triggers two bleed ticks in melee")
 	m=fixture([36,37]);m.enemies[0].bleed=5;play(m);result=play(m,1)
-	check(result.damage==15 and m.enemies[0].bleed==5,"Deep Wound also preserves both explicit Hunt ticks")
+	check(result.damage==16 and m.enemies[0].bleed==5,"Deep Wound also preserves both explicit Hunt ticks")
 	m=fixture([23,26],"ranged");play(m);m.energy=3
 	check(play(m,1).damage==88,"Ranged mastery changes Finisher66 into88")
 	m=fixture([23,37],"ranged");m.enemies[0].bleed=5;play(m)
-	check(play(m,1).damage==19 and m.enemies[0].bleed==3,"Ranged mastery doubles body damage but never bleed")
+	check(play(m,1).damage==21 and m.enemies[0].bleed==3,"Ranged mastery doubles body damage but never bleed")
 	m=fixture([24,35,1],"ranged");play(m);result=play(m,1)
 	check(result.hits.map(func(h): return h.attackDamage)==[12,12,12] and m.buffs.count(m,"next_hit_damage")==0,"Weakpoint Lock applies six base damage to each segment of one attack")
 	check(play(m,2).damage==9,"Per-hit bonus is consumed by the first attack only")
@@ -340,11 +345,11 @@ func _ready() -> void:
 	m=fixture([39]);m.enemies[0].bleed=3
 	check(play(m).drawn.size()==3 and m.block==0,"Tracking includes exactly three bleed and draws a third")
 	m=fixture([16]);result=play(m)
-	check(result.damage==8 and result.drawn.size()==2 and m.energy==2,"Backstep Slash costs one and draws two in melee")
+	check(result.damage==9 and result.drawn.size()==2 and m.energy==2,"Backstep Slash costs one and draws two in melee")
 	m=fixture([16],"ranged");result=play(m)
-	check(result.damage==12 and result.drawn.is_empty(),"Backstep Slash does not draw in ranged")
+	check(result.damage==14 and result.drawn.is_empty(),"Backstep Slash does not draw in ranged")
 	m=fixture([33]);result=play(m)
-	check(m.block==10 and m.parry==1 and m.exhaust_pile.is_empty() and m.discard_pile==["card_000"],"Counter Stance grants10 block and1 parry without exhausting")
+	check(m.block==16 and m.parry==1 and m.exhaust_pile.is_empty() and m.discard_pile==["card_000"],"Counter Stance grants16 block and1 parry without exhausting")
 	m=fixture([1]);m.powers=["ranged_mastery","persistent_bleed"];m.buffs.apply(m,"next_hit_damage",6)
 	var new_saved: Dictionary=JSON.parse_string(JSON.stringify(m.snapshot()))
 	check(Game.valid_combat(new_saved),"New powers and per-hit bonus validate in JSON snapshot")

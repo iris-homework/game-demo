@@ -597,6 +597,7 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 						if enemies[index].hp <= 0: break
 						var amount_per_hit := attack_hit_amount(definition, effect, at_start, ammo_before, before[index], segment_bonus + (bonus if segment == 0 else 0), extra_ammo)
 						var hit := enemy_damage(index, amount_per_hit, at_start == "ranged" and effect.get("rangedIgnoreBlock", false), attack)
+						if attack: buffs.apply_melee_attack_bleed(self, index, at_start)
 						buffs.after_attack_hit(self, index, at_start, hit,int(effect.get("bleedTriggers",-1)))
 						if attack and at_start == "melee":
 							# A shared AoE segment grants ammo only once across its targets.

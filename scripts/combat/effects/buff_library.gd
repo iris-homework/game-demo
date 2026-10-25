@@ -188,6 +188,14 @@ func attack_segment_bonus(model) -> int:
 		if entry.handler == "attack_bonus" and entry.get("everyHit", false): bonus += count(model,entry.id)
 	return bonus
 
+func apply_melee_attack_bleed(model, index: int, form: String) -> int:
+	# Separate from legacy dissection: attacks apply one layer per living target
+	# and segment, including fully blocked hits. Skills and counters never call it.
+	if form != "melee" or count(model, "melee_attack_bleed") == 0: return 0
+	var previous := count(model, "bleed", index)
+	apply(model, "bleed", 1, index, {"source":"attack"})
+	return count(model, "bleed", index) - previous
+
 func after_attack_hit(model, index: int, form: String, hit: Dictionary, triggers: int = -1) -> void:
 	hit.attackDamage = hit.damage
 	hit.bleedDamage = 0

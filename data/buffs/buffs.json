@@ -161,6 +161,21 @@
     "usedSaveKey": "dissectionUsed"
   },
   {
+    "id": "melee_attack_bleed",
+    "name": "剖解经验",
+    "category": "positive",
+    "target": "player",
+    "field": "powers",
+    "saveKey": "powers",
+    "stacking": "unique",
+    "duration": "battle",
+    "handler": "none",
+    "icon": "dissection",
+    "color": "d2b3ee",
+    "showBadge": true,
+    "description": "剖解经验 · 本场持续\n近战形态每段攻击命中后，对命中的存活敌人施加1层裂伤；多段逐段、群攻逐目标，全被格挡也生效。\n远程、技能与弹反不触发；同名能力不叠加。"
+  },
+  {
     "id": "pollution",
     "name": "污染",
     "category": "negative",

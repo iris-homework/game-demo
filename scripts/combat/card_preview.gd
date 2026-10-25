@@ -41,6 +41,7 @@ static func build(model, uid: String, target: int, extra: int) -> Dictionary:
 			"bleed_damage":
 				if values.any(func(v): return v.any(func(n): return n > 0)):
 					lines.append("裂伤追加" + number + "点伤害。")
+			"attack_bleed": lines.append("剖解经验追加" + number + "层裂伤。")
 			"ammo": lines.append("获得" + number + "弹药。")
 			"attack_ammo": lines.append(("回弹" if model.stance == "melee" else "耗弹") + number + "。")
 			"draw": lines.append("抽" + number + "张牌。")
@@ -194,11 +195,14 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 					rows[0].values[0] += copy.ammo - previous
 				var hits: Array = []
 				var bleeding: Array = []
+				var attack_bleed := 0
 				var count: int = copy.attack_hit_count(effect, form, before[target],ammo_before) if copy.is_noren() else 1
 				for segment in count:
 					var per_hit: int = copy.attack_hit_amount(definition, effect, form, ammo_before, before[target], segment_bonus+(bonus if segment == 0 else 0), extra) if copy.is_noren() else amount + bonus
 					if copy.is_noren() and attack: per_hit = copy.buffs.incoming_damage(copy, per_hit, target)
 					hits.append(per_hit)
+					if copy.is_noren() and attack and active:
+						attack_bleed += copy.buffs.apply_melee_attack_bleed(copy, target, form)
 					var times: int=int(effect.get("bleedTriggers",1 if form=="ranged" else 0)) if copy.is_noren() else 0
 					for tick in times:
 						var layers := int(copy.enemies[target].get("bleed",0))
@@ -208,6 +212,8 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 				bonus = 0
 				rows.append({"type":"damage", "values":hits if active else [0], "dynamicHits":effect.get("allAmmoHits", false), "bypass":copy.is_noren() and form == "ranged" and effect.get("rangedIgnoreBlock", false)})
 				rows.append({"type":"bleed_damage", "values":bleeding if active else [0]})
+				if copy.is_noren() and attack and form == "melee" and copy.buffs.count(copy, "melee_attack_bleed") > 0:
+					rows.append({"type":"attack_bleed", "values":[attack_bleed]})
 			"ammo":
 				var previous: int = copy.ammo
 				copy.gain_ammo(amount)

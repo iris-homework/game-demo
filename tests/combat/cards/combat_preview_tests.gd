@@ -232,21 +232,21 @@ func test_numeric_effects() -> void:
 	contains(preview_text(m),"造成88点伤害。","Mastery changes Finisher multiplier to two")
 	m = fixture([21], "ranged")
 	m.ammo = 1
-	contains(preview_text(m), "造成15点伤害。", "Last bullet uses prepayment ammo")
+	contains(preview_text(m), "造成18点伤害。", "Last bullet uses prepayment ammo")
 	m.ammo = 2
-	contains(preview_text(m), "造成11点伤害。", "Postpayment last bullet does not qualify")
+	contains(preview_text(m), "造成12点伤害。", "Postpayment last bullet does not qualify")
 	m = fixture([25], "ranged", 3)
 	m.enemies[0].hp = 501
 	m.enemies[1].hp = 500
 	m.enemies[2].hp = 0
-	contains(preview_text(m, 0), "造成18点伤害。", "Execution excludes just above half health")
-	contains(preview_text(m, 1), "造成27点伤害。", "Execution includes exactly half health")
-	contains(preview_text(m, -1), "造成18–27点伤害。", "Execution unknown target range")
+	contains(preview_text(m, 0), "造成21点伤害。", "Execution excludes just above half health")
+	contains(preview_text(m, 1), "造成33点伤害。", "Execution includes exactly half health")
+	contains(preview_text(m, -1), "造成21–33点伤害。", "Execution unknown target range")
 	m = fixture([37], "ranged", 2)
 	m.enemies[0].bleed = 4
 	m.enemies[1].bleed = 5
-	contains(preview_text(m, 0), "造成8点伤害。", "Hunt uses one ranged attack body")
-	contains(preview_text(m, 1), "造成8点伤害。", "Hunt never gains an extra body hit")
+	contains(preview_text(m, 0), "造成9点伤害。", "Hunt uses one ranged attack body")
+	contains(preview_text(m, 1), "造成9点伤害。", "Hunt never gains an extra body hit")
 	contains(preview_text(m, 1), "裂伤追加5＋4点伤害。", "Hunt extra hit consumes next bleed amount")
 	contains(preview_text(m, -1), "裂伤追加4–5＋3–4点伤害。", "Untargeted Hunt shows two bleed tick ranges")
 	m = fixture([38], "ranged", 3)
@@ -256,7 +256,7 @@ func test_numeric_effects() -> void:
 	m.enemies[2].bleed = 100
 	m.enemies[2].hp = 0
 	text = preview_text(m, -1)
-	contains(text, "对每名敌人造成9点伤害。", "AoE first segment bonus applies to each live target")
+	contains(text, "对每名敌人造成12点伤害。", "AoE first segment bonus applies to each live target")
 	contains(text, "裂伤追加2–5点伤害。", "AoE bleed range excludes dead targets")
 	contains(text, "对每名敌人施加2层裂伤。", "AoE ranged new bleed applied after attacks")
 	m = fixture([11])
@@ -311,7 +311,7 @@ func test_potential_status_and_conditional_wording() -> void:
 			check(m.snapshot() == before, "%d potential preview preserves live snapshot" % number)
 			contains(preview.cardText, "施加%d层%s" % [expected, name], "%d card face retains potential layers even on lethal hit" % number)
 			contains(str(preview.description).replace(" ", ""), "施加%d层%s" % [expected, name], "%d tooltip retains potential layers even on lethal hit" % number)
-			contains(preview.cardText, "造成%d点伤害" % (10 if number == 29 else 7 if number == 19 else 5), "%d damage stays untruncated" % number)
+			contains(preview.cardText, "造成%d点伤害" % (14 if number == 29 else 8 if number == 19 else 6), "%d damage stays untruncated" % number)
 			var result := m.play_card("card_000", 0)
 			check(not result.is_empty(), "%d survival comparison executes a valid play" % number)
 			check(int(m.enemies[0].get(status, 0)) == (expected if protected else 0), "%d actual status still skips dead targets" % number)
@@ -329,7 +329,7 @@ func test_potential_status_and_conditional_wording() -> void:
 			var expected := 2 if number == 19 else 1
 			check(m.snapshot() == before, "Ranged lethal bleed preview preserves live state")
 			contains(preview.cardText, "施加%d层%s" % [expected, name], "Follow-up status preview ignores bleed lethality")
-			contains(preview.cardText, "造成%d点伤害" % (11 if number == 19 else 8), "Direct damage remains before block and HP clipping")
+			contains(preview.cardText, "造成%d点伤害" % (12 if number == 19 else 9), "Direct damage remains before block and HP clipping")
 			check(not m.play_card("card_000", 0).is_empty(), "Ranged comparison executes")
 			check((m.enemies[0].hp > 0) == protected, "Ranged survival matches damage and bleed order")
 			check(int(m.enemies[0][status]) == (expected if protected else 0) + (3 if number == 27 else 0), "Actual ranged status still skips targets killed by bleed")
@@ -388,7 +388,7 @@ func _ready() -> void:
 	check(m.card_preview("card_000", 1).cardText.replace(" ","").ends_with("额外抽1张牌。"), "Conditional third draw stays one above threshold: "+m.card_preview("card_000",1).cardText)
 	m = fixture([6])
 	m.ammo = 9
-	check(m.card_preview("card_000").cardText == "获得1颗弹药和4点格挡。", "Only authored ammo and block numbers update")
+	check(m.card_preview("card_000").cardText == "获得1颗弹药和6点格挡。", "Only authored ammo and block numbers update")
 	m = fixture([8])
 	check(m.card_preview("card_000").cardText == m.card("card_000").cardText, "Stance card gets no implicit draw or discount text")
 	m = fixture([33])

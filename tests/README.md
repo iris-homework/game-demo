@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-10-25非基础牌增强与剖解经验重做：[卡牌专项](combat/cards/card_balance_tests.tscn)覆盖4张基础牌不变、20张数值、40号新能力逐段／群攻／全挡／致死／技能及弹反隔离、伤口追猎顺序、只读预览、重复能力与新旧快照。使用复制工程与独立用户目录，配套诺伦卡、预览、Buff、卡面与重开回归，结果见[验证记录](../artifacts/qa/card-balance-2026-10-25/verification.json)。不代表实战平衡或物理输入验收。
+
 2026-10-25信标水母：新增[规则专项](combat/enemies/beacon_jellyfish_rules_tests.tscn)与[表现状态专项](combat/presentation/beacon_jellyfish_presentation_tests.tscn)，覆盖36 HP、攻击10／攻击8附带2虚弱循环、初始柔软、多段逐段获得3格挡、格挡后触发与非攻击隔离、快照及旧战斗兼容；真实演练检查逐命中格挡、初始徽章与复合意图。使用隔离工程和独立用户目录，headless+Dummy；结果与尺寸验证见[本轮证据](../artifacts/qa/beacon-jellyfish-2026-10-25/verification.json)，不代表GPU像素或物理输入验收。
 
 2026-10-25扩展[三选一专项](combat/cards/reward_picker_tests.tscn)：返回与选卡使用左键按下、持键微移、松开的视口输入，复现并防止清焦点吞点击。选择器75项及奖励原地刷新90项，共165项隔离headless检查通过；修复前5项失败日志保留。未做物理输入验收，见[证据](../artifacts/qa/picker-exit-2026-10-25/verification.json)。

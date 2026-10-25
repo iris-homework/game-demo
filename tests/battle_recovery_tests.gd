@@ -55,7 +55,9 @@ func _ready() -> void:
 	Game.save_path = "user://battle-recovery-checkpoint.json"
 	view.end_button.pressed.emit()
 	check(Game.page == "dialogue" and Game.state.currentScene == "dialogue", "Same button retries successfully after storage recovers")
-	check(Game.state.credits == before.credits + 30 and Game.state.currentHp == before.currentHp + 5, "Recovered exit grants money and healing exactly once")
+	# Victory credits are claimed on the reward page; only healing applies now.
+	check(Game.state.credits == before.credits and Game.state.currentHp == before.currentHp + 5, "Recovered exit applies healing once without claiming pending credits")
+	check(Game.state.battlePassiveReward.credits == 30 and Game.state.battlePassiveReward.creditsStatus == "pending", "Recovered exit records exactly thirty pending chip credits")
 	check(Game.state.battleHistory.size() == before.battleHistory.size() + 1, "Recovered exit records one victory")
 	check(Game.valid_save(Game.state), "Recovered state validates")
 	var after: Dictionary = Game.state.duplicate(true)
