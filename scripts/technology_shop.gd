@@ -85,10 +85,10 @@ func refresh_stock() -> void:
 		var definition: Dictionary = Game.cyberware_definition(offer.id)
 		var owned: bool = offer.id in Game.owned_cyberware_ids()
 		label(tile,"已拥有" if owned else "被动科技" if CombatModel.is_passive_cyberware(definition) else "主动科技",Vector2(190,11),Vector2(80,24),12,ROSE).horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		icon(tile,offer.id,Vector2(88,38),Vector2(112,100))
-		label(tile,str(definition.name),Vector2(16,142),Vector2(256,30),22,TEXT).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		label(tile,str(definition.description),Vector2(20,176),Vector2(248,38),14,SOFT).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		label(tile,TechnologyIcons.activation_label(definition),Vector2(20,215),Vector2(248,20),12,ROSE).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		icon(tile,offer.id,Vector2(88,38),Vector2(112,92))
+		label(tile,str(definition.name),Vector2(16,132),Vector2(256,30),22,TEXT).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label(tile,str(definition.description),Vector2(20,166),Vector2(248,48),14,SOFT).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label(tile,TechnologyIcons.activation_label(definition),Vector2(20,216),Vector2(248,20),12,ROSE).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		var buy := shop_button(stock,("已拥有  %d 信用点" if owned else "购买  %d 信用点") % int(offer.price),origin+Vector2(14,238),Vector2(260,34),open_purchase.bind(i),not owned)
 		buy.name = "buy_slot_%d" % i
 		buy.add_theme_font_size_override("font_size",16)

@@ -238,6 +238,57 @@ func test_event_gate() -> void:
 	for place_id in ["market", "mall", "clinic"]:
 		check(not Game.place_data(place_id).is_empty(), "resident place retained " + place_id)
 
+func test_return_boss_exemption() -> void:
+	fresh()
+	Game.state.completedEventIds = ["E01","E02","E04","E11"]
+	Game.state.currentDay = 4
+	Game.state.refreshedEventIds = ["E13","E14","E15"]
+	Game.refresh_event_pool()
+	check("E01R" in Game.state.refreshedEventIds, "earned return remains visible before Boss day")
+	for id in ["E13","E14","E15"]:
+		check(Game.apply_actions([{"op":"completeEvent","id":id}]), "remaining commission advances time: "+id)
+		Game.refresh_event_pool()
+	check(Game.state.currentDay == 7, "six commission completions naturally reach Boss day")
+	check(Game.state.refreshedEventIds == ["E16","E01R"], "Boss clears ordinary commissions while exempting earned return")
+	check(Game.available_events("bar").any(func(event): return event.id == "E01R"), "day-seven bar exposes the exempt return")
+	check(not Game.start_event("E13"), "return exemption does not reopen ordinary commissions")
+	var legacy := Game.state.duplicate(true)
+	legacy.refreshedEventIds = ["E16"]
+	var migrated: Dictionary = Game.migrate_save(legacy)
+	check(migrated.refreshedEventIds == ["E16","E01R"] and Game.valid_save(migrated), "old day-seven save regains earned return without schema change")
+	check(legacy.refreshedEventIds == ["E16"], "exemption migration does not mutate old save input")
+	Game.state = migrated
+	var credits: int = Game.state.credits
+	check(Game.save_game() and Game.load_game(), "Boss and return pool roundtrip through isolated checkpoint")
+	check(Game.state.refreshedEventIds == ["E16","E01R"] and Game.state.credits == credits, "reloading preserves both events without paying early")
+	check(Game.start_event("E01R"), "exempt return passes the real Boss-day entrance guard")
+	Game.skip_dialogue(Game.revision)
+	check(Game.choose(0,Game.revision) and Game.has_battle_reward(), "exempt return reaches normal reward receipt")
+	if not Game.has_battle_reward(): return
+	check(Game.state.currentDay == 7 and Game.state.credits == credits, "day-seven return costs no time and does not auto-pay credits")
+	check(Game.claim_reward_credits(Game.revision), "exempt return credits claim normally")
+	var paid: int = Game.state.credits
+	check(not Game.claim_reward_credits(Game.revision) and Game.state.credits == paid, "exempt return cannot pay twice")
+	check(Game.choose_reward_card(str(Game.state.battleReward.options[0]),Game.revision), "exempt return card claim normally")
+	check(Game.claim_rewards(Game.revision) and Game.state.refreshedEventIds == ["E16"], "collected return releases its slot and leaves Boss available")
+	check(not Game.start_event("E01R") and Game.start_event("E16"), "completed return stays closed and Boss can still start")
+	for completed in [["E01","E02","E04"], ["E02","E04","E11"], ["E01","E02","E04","E11","E01R"]]:
+		fresh()
+		Game.state.completedEventIds = completed
+		Game.state.currentDay = 7
+		Game.refresh_event_pool()
+		check(Game.state.refreshedEventIds == ["E16"] and not Game.start_event("E01R"), "exemption preserves completion/prerequisite checks: "+str(completed))
+	fresh()
+	Game.state.completedEventIds = ["E01","E02","E04","E11"]
+	Game.state.currentDay = 7
+	Game.refresh_event_pool()
+	Game.state.currentDay = 6
+	Game.refresh_event_pool()
+	check(Game.state.refreshedEventIds == ["E01R"], "persisted Boss appearance retains only exempt return after clock rewind")
+	Game.state.completedEventIds.append("E16")
+	Game.state.flags.week1Complete = true
+	check(not Game.start_event("E01R"), "return exemption cannot bypass the completed-week terminal gate")
+
 func test_phases() -> void:
 	var model := start_boss()
 	check(model.encounter_phase == 1 and model.enemies.size() == 1 and model.enemies[0].hp == 80, "opening black alone at 80 HP")
@@ -367,6 +418,7 @@ func _ready() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output))
 	test_dialogue()
 	test_event_gate()
+	test_return_boss_exemption()
 	test_phases()
 	test_new_phase_player_turn()
 	test_phase_turn_state_and_draws()

@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-10-26审计修复：新增[战斗选择与商场排版专项](combat/interaction/choice_picker_input_tests.tscn)，覆盖真实战斗弹窗的确认／导航／取消、防重复、底层快捷键隔离及六项商场商品文字实际布局；使用复制工程和名称含QA的独立用户目录。扩展[预览专项](combat/cards/combat_preview_tests.tscn)覆盖柔软／裂伤致死／群攻共享回弹，扩展[Boss专项](story/dancer_boss_tests.tscn)覆盖六委托到第7天的回礼清场豁免、旧档补入口及正常领取／终局保护。本轮结果及范围见修改记录。
+
 2026-10-25意图矢量图标：新增[intent_icon_asset_tests](combat/presentation/intent_icon_asset_tests.tscn)，检查九类意图／未知回退资源、单图标与复合虚弱双列、调用者伤害预览、只读输入及重用清理；配合原[附带虚弱](combat/presentation/attack_weak_intent_tests.tscn)和[意图时序](combat/presentation/enemy_intent_phase_tests.tscn)专项。使用独立工程／用户目录及headless+Dummy，实测结果见[验证汇总](../artifacts/qa/intent-icons-2026-10-25/verification.json)，CPU图标预览不等同于GPU战斗画面或物理输入验收。
 
 2026-10-25战斗回合栏与资源反馈：新增[battle_feedback_tests](combat/presentation/battle_feedback_tests.tscn)，覆盖真实选牌／确认出牌时能量和弹药拒绝、费用明细、错误音只触发一次、无通用toast、快照／版本／输入锁不变、提示复用／续时／替换／释放、提示文字与回合编号布局、实际结束回合的行动方切换。使用独立工程及用户目录、headless+Dummy；无GPU像素或物理输入证据，实测结果见[本轮汇总](../artifacts/qa/battle-feedback-2026-10-25/verification.json)。

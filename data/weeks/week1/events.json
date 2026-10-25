@@ -424,6 +424,7 @@
     "id": "E01R",
     "title": "三个委托后的回礼",
     "placeId": "bar",
+    "permanent": true,
     "unlockCondition": {
       "all": [
         {

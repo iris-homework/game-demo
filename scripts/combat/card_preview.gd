@@ -164,11 +164,9 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 		for index in copy.enemies.size():
 			if copy.enemies[index].hp > 0: ammo_targets.append(index)
 	else: ammo_targets.append(target)
-	var ammo_hp := {}
-	var ammo_block := {}
-	for index in ammo_targets:
-		ammo_hp[index] = int(copy.enemies[index].hp)
-		ammo_block[index] = int(copy.enemies[index].get("block",0))
+	# Potential damage text keeps HP intact. A separate lazy model tracks actual
+	# hit survival for ammo, sharing the same block/soft/bleed hooks as combat.
+	var ammo_model = null
 	copy.hand.erase(uid)
 	copy.draw_pile.erase(uid)
 	copy.discard_pile.erase(uid)
@@ -180,15 +178,18 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 		match effect.type:
 			"damage":
 				if copy.is_noren() and attack and form == "melee" and active:
+					if ammo_model == null:
+						ammo_model = model.get_script().new()
+						ammo_model.restore(copy.snapshot())
+						ammo_model.buffs = model.buffs
 					var segments := 0
 					for index in ammo_targets:
 						for segment in copy.attack_hit_count(effect, form, before[index],ammo_before):
-							if ammo_hp[index] <= 0: break
+							if ammo_model.enemies[index].hp <= 0: break
 							var requested: int = copy.attack_hit_amount(definition, effect, form, ammo_before, before[index],segment_bonus+(bonus if segment == 0 else 0),extra)
-							requested = copy.buffs.incoming_damage(copy, requested, index)
-							var absorbed: int = mini(ammo_block[index],requested)
-							ammo_block[index] -= absorbed
-							ammo_hp[index] -= maxi(0,requested-absorbed)
+							var hit: Dictionary = ammo_model.enemy_damage(index,requested,false,true)
+							ammo_model.buffs.apply_melee_attack_bleed(ammo_model,index,form)
+							ammo_model.buffs.after_attack_hit(ammo_model,index,form,hit,int(effect.get("bleedTriggers",-1)))
 							segments = maxi(segments,segment+1)
 					var previous: int = copy.ammo
 					copy.gain_ammo(segments)
@@ -264,7 +265,10 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 					if form == "melee":
 						branches.baseBranch = _bleed_branch_gain(copy, effect, before, target, false, model.card_target(uid) == "enemy")
 						branches.woundedBranch = _bleed_branch_gain(copy, effect, before, target, true, model.card_target(uid) == "enemy")
-				if active: copy.buffs.apply_card_effect(copy, effect, [target], {"stance":form, "before":before, "single":model.card_target(uid) == "enemy"})
+				if active:
+					copy.buffs.apply_card_effect(copy, effect, [target], {"stance":form, "before":before, "single":model.card_target(uid) == "enemy"})
+					if ammo_model != null:
+						ammo_model.buffs.apply_card_effect(ammo_model, effect, ammo_targets, {"stance":form, "before":before, "single":model.card_target(uid) == "enemy"})
 				var gained: int = copy.buffs.count(copy, id, index) - previous
 				if effect.type == "power":
 					rows.append({"type":"power", "text":definition.get("cardText", definition.get("description", "")) + ("\n已生效，不叠加。" if gained == 0 else "")})

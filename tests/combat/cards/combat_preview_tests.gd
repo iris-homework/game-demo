@@ -367,6 +367,43 @@ func test_potential_status_and_conditional_wording() -> void:
 		check(str(preview.description).replace(" ", "") == expected, "Ranged deepening tooltip preserves inactive melee branch")
 		check(ranged.snapshot() == before, "Ranged deepening preview preserves live snapshot")
 
+func test_melee_ammo_hit_hooks() -> void:
+	# Compare the public summary against real resolution, including hooks that
+	# change whether a later segment can execute. Preview must stay read-only.
+	for scenario in [[35,4,0,2,true], [35,2,3,8,true], [35,1,0,2,true], [35,4,0,2,false], [9,6,0,2,true], [35,4,0,10,true]]:
+		var m := fixture([scenario[0]])
+		m.enemies[0].hp = scenario[1]
+		m.enemies[0].block = scenario[2]
+		m.ammo = scenario[3]
+		if scenario[4]: m.buffs.apply(m,"soft",1,0)
+		var before := m.snapshot()
+		var preview := m.card_preview("card_000",0)
+		check(m.snapshot() == before, "Soft ammo preview preserves snapshot: "+str(scenario))
+		var row: Dictionary = preview.effects.filter(func(effect): return effect.type == "attack_ammo")[0]
+		var old_ammo := m.ammo
+		var result := m.play_card("card_000",0)
+		check(not result.is_empty(), "Soft ammo fixture actually plays: "+str(scenario))
+		check(row.values[0] == m.ammo-old_ammo, "Ammo summary matches real hit hooks: "+str(scenario))
+		if scenario == [35,4,0,2,true]:
+			check("回弹3。" in preview.text and result.hits.size() == 3 and m.enemies[0].hp == 2, "Low-HP soft jellyfish survives all three hits and previews three ammo")
+	var aoe := fixture([38],"melee",2)
+	aoe.card_catalog.noren_38.effects = [{"type":"damage","amount":2,"hits":3}]
+	for index in aoe.enemies.size():
+		aoe.enemies[index].hp = 4
+		aoe.buffs.apply(aoe,"soft",1,index)
+	var before := aoe.snapshot()
+	var preview := aoe.card_preview("card_000",-1)
+	check(aoe.snapshot() == before and "回弹3。" in preview.text, "Soft AoE counts each shared segment once without mutating targets")
+	var result := aoe.play_card("card_000",-1)
+	check(result.hits.size() == 6 and aoe.ammo == 5, "Real soft AoE executes six target hits but gains three ammo")
+	var bleeding := fixture([37])
+	bleeding.enemies[0].hp = 8
+	bleeding.enemies[0].bleed = 3
+	bleeding.card_catalog.noren_37.effects = [{"type":"damage","amount":1,"hits":3,"bleedTriggers":2}]
+	preview = bleeding.card_preview("card_000",0)
+	result = bleeding.play_card("card_000",0)
+	check("回弹2。" in preview.text and result.hits.size() == 2 and bleeding.ammo == 4, "Ammo simulation also stops after actual bleed death between segments")
+
 func _ready() -> void:
 	Game.save_enabled = false
 	Game.save_path = "user://combat_preview_qa.json"
@@ -379,6 +416,7 @@ func _ready() -> void:
 	test_barrage_first_hit_wording()
 	test_read_only_catalog()
 	test_potential_status_and_conditional_wording()
+	test_melee_ammo_hit_hooks()
 	var m := fixture([1])
 	m.next_attack_bonus = 2
 	check(m.card_preview("card_000").cardText == "造成8点伤害。", "Basic attack gains damage but no implicit ammo line")
