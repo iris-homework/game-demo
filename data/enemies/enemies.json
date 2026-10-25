@@ -282,11 +282,21 @@
     "displayName": "信标水母",
     "battlePortraitAssetId": "",
     "maxHp": 36,
+    "buffs": {
+      "soft": 1
+    },
     "intentSequence": [
       {
         "type": "attack",
-        "amount": 6,
+        "amount": 10,
         "hits": 1,
+        "animation": "pierce"
+      },
+      {
+        "type": "attack",
+        "amount": 8,
+        "hits": 1,
+        "onHitWeak": 2,
         "animation": "pierce"
       }
     ],

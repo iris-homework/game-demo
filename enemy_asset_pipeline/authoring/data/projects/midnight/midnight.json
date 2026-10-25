@@ -1122,10 +1122,10 @@
         "label": "信标水母",
         "sourceFacing": "left",
         "targetRect": [
-          -65,
-          -145,
-          130,
-          155
+          -78,
+          -174,
+          156,
+          186
         ],
         "poses": {
           "idle": {

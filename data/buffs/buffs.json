@@ -275,6 +275,20 @@
     "description": "深度伤口 · 本场持续\n裂伤触发时不再减少层数；同名能力不叠加。"
   },
   {
+    "id": "soft",
+    "name": "柔软",
+    "category": "positive",
+    "target": "enemy",
+    "stacking": "flag",
+    "duration": "battle",
+    "handler": "soft",
+    "icon": "soft",
+    "color": "a6e8ed",
+    "showBadge": true,
+    "cardApply": false,
+    "description": "柔软 · 本场持续\n每受到一段攻击，在该段伤害结算后获得3点格挡；多段攻击逐段触发，完全格挡也触发。同名不叠加。裂伤、污染、弹反等非攻击伤害不触发。格挡在自身下次行动开始时清除。"
+  },
+  {
     "id": "soul_link",
     "name": "灵魂连接",
     "category": "positive",

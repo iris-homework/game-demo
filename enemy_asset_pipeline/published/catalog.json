@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "revision": "ead900819373d101",
+  "revision": "c9cadb1c692ed2af",
   "profiles": {
     "warden_shield": {
       "id": "warden_shield",
@@ -6049,10 +6049,10 @@
       "label": "信标水母",
       "sourceFacing": "left",
       "targetRect": [
-        -65,
-        -145,
-        130,
-        155
+        -78,
+        -174,
+        156,
+        186
       ],
       "poses": {
         "idle": {
@@ -6061,7 +6061,7 @@
             634.5,
             1500
           ],
-          "scale": 0.07713498622589532
+          "scale": 0.09256198347107439
         },
         "move": {
           "texture": "res://enemy_asset_pipeline/published/assets/d1113dd187261840fe0bd8ff77b2cbe90787a097235e0513735f4f725425d1bc.png",
@@ -6069,7 +6069,7 @@
             637.5,
             1500
           ],
-          "scale": 0.082596
+          "scale": 0.0991152
         },
         "pierce": {
           "texture": "res://enemy_asset_pipeline/published/assets/c5ceabe26974fde37405a5bf3c9c9a0a971d41396bd6e23d5936f51c973683f4.png",
@@ -6077,7 +6077,7 @@
             797.5,
             1500
           ],
-          "scale": 0.11334
+          "scale": 0.136008
         },
         "damaged": {
           "texture": "res://enemy_asset_pipeline/published/assets/f19294cda4e123af6df10a233166e8c7a4bd5b69a364f8d09c79110d3f6faa84.png",
@@ -6085,7 +6085,7 @@
             633,
             1500
           ],
-          "scale": 0.09858
+          "scale": 0.118296
         }
       },
       "hitEffectTexture": "res://enemy_asset_pipeline/published/assets/7b359d4b08b45036cf13d8da51301fd0720bf268d8f19305b921756416284685.png",
@@ -6100,12 +6100,12 @@
           {
             "texture": "res://enemy_asset_pipeline/published/assets/9c8f72c46125f5e0a4c894c11be1ca02f4a8cc5ed1b701bdf845e4d5649007ae.png",
             "transform": [
-              0.07713498622589532,
+              0.09256198347107439,
               0,
               0,
-              0.07713498622589532,
-              -48.94214876033058,
-              -115.70247933884298
+              0.09256198347107439,
+              -58.7305785123967,
+              -138.84297520661158
             ],
             "duration": 0.125,
             "loop": true,
@@ -6113,7 +6113,7 @@
               634.5,
               1500
             ],
-            "scale": 0.07713498622589532,
+            "scale": 0.09256198347107439,
             "audio": [],
             "attachments": [],
             "xsxb": {
@@ -6192,12 +6192,12 @@
           {
             "texture": "res://enemy_asset_pipeline/published/assets/d1113dd187261840fe0bd8ff77b2cbe90787a097235e0513735f4f725425d1bc.png",
             "transform": [
-              0.082596,
+              0.0991152,
               0,
               0,
-              0.082596,
-              -52.65495,
-              -123.894
+              0.0991152,
+              -63.18594,
+              -148.6728
             ],
             "duration": 0.125,
             "loop": true,
@@ -6205,7 +6205,7 @@
               637.5,
               1500
             ],
-            "scale": 0.082596,
+            "scale": 0.0991152,
             "audio": [],
             "attachments": [],
             "xsxb": {
@@ -6284,12 +6284,12 @@
           {
             "texture": "res://enemy_asset_pipeline/published/assets/c5ceabe26974fde37405a5bf3c9c9a0a971d41396bd6e23d5936f51c973683f4.png",
             "transform": [
-              0.11334,
+              0.136008,
               0,
               0,
-              0.11334,
-              -90.38865,
-              -146.01
+              0.136008,
+              -108.46637999999999,
+              -175.212
             ],
             "duration": 0.125,
             "loop": false,
@@ -6297,7 +6297,7 @@
               797.5,
               1500
             ],
-            "scale": 0.11334,
+            "scale": 0.136008,
             "audio": [],
             "attachments": [],
             "xsxb": {
@@ -6376,12 +6376,12 @@
           {
             "texture": "res://enemy_asset_pipeline/published/assets/f19294cda4e123af6df10a233166e8c7a4bd5b69a364f8d09c79110d3f6faa84.png",
             "transform": [
-              0.09858,
+              0.118296,
               0,
               0,
-              0.09858,
-              -45.60114,
-              -147.87
+              0.118296,
+              -54.721368000000005,
+              -177.44400000000002
             ],
             "duration": 0.125,
             "loop": false,
@@ -6389,7 +6389,7 @@
               633,
               1500
             ],
-            "scale": 0.09858,
+            "scale": 0.118296,
             "audio": [],
             "attachments": [],
             "xsxb": {
@@ -6501,10 +6501,10 @@
             "y": 0
           },
           "scale": {
-            "x": 0.6,
-            "y": 0.6
+            "x": 0.72,
+            "y": 0.72
           },
-          "uniformScale": 0.6,
+          "uniformScale": 0.72,
           "rotation": 0
         },
         "animations": [

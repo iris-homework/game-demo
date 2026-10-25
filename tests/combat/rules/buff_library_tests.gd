@@ -16,8 +16,8 @@ func _ready() -> void:
 	Game.save_path = "user://buff_library_qa.json"
 	Game.meta_path = "user://buff_library_meta_qa.json"
 	var fixtures := Fixtures.new()
-	check(Buffs.definitions().size() == 19, "Nineteen statuses registered")
-	check(Buffs.definitions(Buffs.POSITIVE).size() == 15, "Fifteen positive statuses")
+	check(Buffs.definitions().size() == 20, "Twenty statuses registered")
+	check(Buffs.definitions(Buffs.POSITIVE).size() == 16, "Sixteen positive statuses")
 	check(Buffs.definitions(Buffs.NEGATIVE).map(func(d): return d.id) == ["bleed", "weak", "pollution", "vulnerable"], "Four negative statuses")
 	var catalog: Array = JSON.parse_string(FileAccess.get_file_as_string(Buffs.CATALOG_PATH))
 	check(Buffs.catalog_errors(catalog).is_empty(), "Authored catalog valid")

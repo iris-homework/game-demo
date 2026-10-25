@@ -24,6 +24,11 @@ func poly(points: Array, color: Color) -> void:
 func _draw() -> void:
 	if hovered: draw_circle(Vector2(14,14),16,Color(tint,0.16))
 	match symbol:
+		"soft":
+			draw_circle(Vector2(14,12),11,tint)
+			draw_arc(Vector2(14,13),7,PI,TAU,20,tint.lightened(0.3),2,true)
+			for x in [6,14,22]:
+				draw_polyline(PackedVector2Array([Vector2(x,19),Vector2(x-2,24),Vector2(x+1,29)]),tint,3,true)
 		"energy_suit":
 			poly([Vector2(8,1),Vector2(1,6),Vector2(6,14),Vector2(6,27),Vector2(23,27),Vector2(23,14),Vector2(28,6),Vector2(21,1),Vector2(18,8),Vector2(11,8)],tint)
 			draw_polyline(PackedVector2Array([Vector2(16,11),Vector2(11,18),Vector2(18,18),Vector2(13,25)]),Color("245e6d"),2,true)

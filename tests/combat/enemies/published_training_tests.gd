@@ -80,7 +80,8 @@ func test_config() -> void:
 			elif choice.id == "pruning_hound":
 				check(int(choice.maxHp) == 35 and choice.displayName == "双修枝猎犬" and enemy_ids == ["pruning_hound", "pruning_hound_second"] and sequence.size() == 2 and sequence[0].amount == 4 and sequence[0].hits == 2 and sequence[1].type == "fortify" and sequence[1].amount == 5 and sequence[1].strength == 1, "Hound choice is the formal thirty-five HP pair with staggered actions")
 			else:
-				check(int(choice.maxHp) == 36 and enemy_ids == ["beacon_jellyfish"] and sequence.size() == 1 and sequence[0].amount == 6 and sequence[0].hits == 1, "Jellyfish choice follows formal thirty-six HP / attack6")
+				check(int(choice.maxHp) == 36 and enemy_ids == ["beacon_jellyfish"] and sequence.size() == 2 and sequence[0].amount == 10 and sequence[0].hits == 1 and sequence[1].amount == 8 and sequence[1].get("onHitWeak") == 2, "Jellyfish choice follows formal thirty-six HP / attack10 then attack8 with weak2")
+				check(Game.enemy_catalog.beacon_jellyfish.get("buffs", {}).get("soft") == 1, "Jellyfish practice source has innate soft passive")
 		else:
 			check(int(choice.maxHp) == 100 and sequence.size() == 1 and sequence[0].type == "attack" and sequence[0].amount == 6 and sequence[0].hits == 1, "Unconnected enemy retains provisional 100 HP / single6: " + str(choice.id))
 	ids.sort()
@@ -168,6 +169,10 @@ func test_start_and_restore() -> void:
 				check(model.player_hp == before_hp - 18 and model.enemies[0].block == 5 and model.buffs.count(model, "strength", 0) == 1 and model.enemies[1].block == 0, label + ": second hound clears block and attacks5 twice while first fortifies")
 				model.end_turn()
 				check(model.player_hp == before_hp - 28 and model.enemies[0].block == 0 and model.enemies[1].block == 5 and model.buffs.count(model, "strength", 1) == 2, label + ": pair continues staggered actions with additive individual strength")
+			elif id == "beacon_jellyfish":
+				check(model.player_hp == before_hp - 10 and model.enemies[0].intent.amount == 8 and model.enemies[0].intent.onHitWeak == 2 and model.buffs.count(model,"soft",0) == 1, label + ": first jellyfish turn attacks ten and prepares eight plus weak two with soft retained")
+				model.end_turn()
+				check(model.player_hp == before_hp - 18 and model.weak == 2 and model.enemies[0].intent.amount == 10, label + ": second jellyfish turn attacks eight, applies weak two and loops to ten")
 			else:
 				check(model.player_hp == before_hp - 6 and model.enemies[0].intent.type == "attack" and model.enemies[0].intent.amount == 6, label + ": real end_turn applies single 6-damage attack and repeats")
 			Game.commit_combat(model)
@@ -275,7 +280,7 @@ func test_attack_presentation() -> void:
 			var before_hp: int = view.model.player_hp
 			var repairman: bool = choice.id == "powerline_repairman"
 			var hound: bool = choice.id == "pruning_hound"
-			var expected_damage := 8 if hound else 5 if repairman else 6
+			var expected_damage := 8 if hound else 5 if repairman else 10 if choice.id == "beacon_jellyfish" else 6
 			var expected_hits := 2 if hound else 1
 			var per_hit_damage := 4 if hound else expected_damage
 			var expected_turn := 3 if repairman else 2
@@ -427,7 +432,7 @@ func _ready() -> void:
 		sentinel_paths.append(path)
 	original_battles = Game.battles.duplicate(true)
 	original_enemies = Game.enemy_catalog.duplicate(true)
-	check(original_battles.size() == 7 and original_enemies.size() == 17, "Formal baseline has seven battles / seventeen enemies")
+	check(original_battles.size() == 7 and original_enemies.size() == 18 and original_enemies.has("dancer_black_phase_one"), "Formal baseline has seven battles / eighteen enemies including the separate phase-one dancer")
 	test_config()
 	test_dynamic_formal_choices()
 	test_start_and_restore()
