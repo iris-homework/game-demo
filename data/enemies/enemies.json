@@ -308,7 +308,7 @@
     "characterId": "dancer_black",
     "displayName": "黑舞者",
     "battlePortraitAssetId": "",
-    "maxHp": 90,
+    "maxHp": 80,
     "intentSequence": [
       {
         "type": "attack",
@@ -338,7 +338,7 @@
     "characterId": "dancer_white",
     "displayName": "白舞者",
     "battlePortraitAssetId": "",
-    "maxHp": 90,
+    "maxHp": 80,
     "intentSequence": [
       {
         "type": "weak",
@@ -369,7 +369,7 @@
     "characterId": "dancer_black",
     "displayName": "黑舞者",
     "battlePortraitAssetId": "",
-    "maxHp": 99,
+    "maxHp": 80,
     "intentSequence": [
       {
         "type": "attack",

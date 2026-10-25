@@ -39,7 +39,7 @@ func to_hand(m: CombatModel, card_id: String) -> String:
 
 func run_rules() -> void:
 	var m := boss()
-	check(m.enemies[0].hp == 99, "phase one 99 HP")
+	check(m.enemies[0].hp == 80, "phase one 80 HP")
 	check(m.instances.values().count("dancer_black_card") == 0, "no encounter cards in phase one")
 	for i in 4:
 		var expected := 15 if i % 2 == 0 else 10
@@ -50,7 +50,7 @@ func run_rules() -> void:
 		check(result.attacks.size() == 1 and m.player_hp == before, "phase-one block absorbs attack")
 		check(m.weak == (2 if i % 2 == 1 else (1 if i > 0 else 0)), "weak once per whole attack, including blocked hit")
 	m = phase_two()
-	check(m.enemies.map(func(e): return e.hp) == [90, 90], "phase two both 90 HP")
+	check(m.enemies.map(func(e): return e.hp) == [80, 80], "phase two both 80 HP")
 	check(m.enemies.all(func(e): return m.buffs.count(m,"soul_link", m.enemies.find(e)) == 2), "initial soul links two each")
 	check(m.enemies[1].block == 0 and m.buffs.count(m,"strength",0) == 0, "entry player round grants no soul-link buffs")
 	check(m.instances.values().count("dancer_black_card") == 1 and m.instances.values().count("dancer_white_card") == 1, "exactly one card each generated")
@@ -69,7 +69,7 @@ func run_rules() -> void:
 			check(m.enemies[0].intent.type == ["attack","vulnerable","attack"][step], "black three-step cycle")
 			check(m.enemies[1].intent.type == ["weak","attack","heal_ally"][step], "white three-step cycle")
 			m.block = 1000
-			if step == 2: m.enemies[0].hp = 85
+			if step == 2: m.enemies[0].hp = 75
 			var result := m.end_turn()
 			var link_events: Array = result.turnEvents.filter(func(e): return e.type == "status_apply" and e.get("target",-1) >= 0 and e.buffId in ["block","strength"])
 			check(link_events.size() == 2, "one pair of soul-link events per enemy phase")
@@ -80,8 +80,8 @@ func run_rules() -> void:
 				check(result.attacks.size() == 1 and result.attacks[0].hits.size() == 3, "white hits exactly three times")
 				check(m.buffs.count(m,"vulnerable") == 3, "black applies three vulnerable")
 			if step == 2:
-				check(m.enemies[0].hp == 90, "heal caps at max HP")
-				check(result.turnEvents.any(func(e): return e.type == "heal" and e.amount == 5 and e.hpAfter == 90), "heal event records actual restoration")
+				check(m.enemies[0].hp == 80, "heal caps at max HP")
+				check(result.turnEvents.any(func(e): return e.type == "heal" and e.amount == 5 and e.hpAfter == 80), "heal event records actual restoration")
 			check(m.enemies[1].block == 10, "white receives fixed ten block survives enemy actions into player round")
 			check(m.buffs.count(m,"strength",0) == (cycle*3+step+1)*2, "black gains two permanent strength each round")
 	# Removing the final link during player input prevents this enemy phase's
