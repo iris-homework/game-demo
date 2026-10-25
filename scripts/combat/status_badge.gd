@@ -24,6 +24,9 @@ func poly(points: Array, color: Color) -> void:
 func _draw() -> void:
 	if hovered: draw_circle(Vector2(14,14),16,Color(tint,0.16))
 	match symbol:
+		"electric_charge":
+			poly([Vector2(17,1),Vector2(3,17),Vector2(13,17),Vector2(9,29),Vector2(25,10),Vector2(16,10),Vector2(21,1)],tint)
+			draw_line(Vector2(15,6),Vector2(9,14),Color("e5fbff"),2,true)
 		"strength":
 			poly([Vector2(2,15),Vector2(7,15),Vector2(10,9),Vector2(14,10),Vector2(14,3),Vector2(19,3),Vector2(23,12),Vector2(23,23),Vector2(17,27),Vector2(5,26)],tint)
 			draw_line(Vector2(6,21),Vector2(17,21),Color("503622"),2,true)

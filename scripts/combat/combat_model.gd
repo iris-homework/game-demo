@@ -197,6 +197,7 @@ func enemy_intent_text(enemy: Dictionary, after_player_turn_end: bool = true, vu
 	if intent.get("type", "") == "pollution": return "污染 %d" % int(intent.get("amount", 0))
 	if intent.get("type", "") == "vulnerable": return "易伤 %d" % int(intent.get("amount", 0))
 	if intent.get("type", "") == "strength_allies": return "强化 +%d" % int(intent.get("amount", 0))
+	if intent.get("type", "") == "charge": return "充能 +%d 电能" % int(intent.get("amount", 0))
 	if intent.get("type", "") != "attack": return str(intent.get("description", "非攻击行动"))
 	var amount := int(intent.get("amount", 0))
 	if is_noren(): amount = enemy_intent_damage(enemy, after_player_turn_end, vulnerable_layers)
@@ -402,6 +403,7 @@ func gain_ammo(amount: int) -> void:
 
 func enemy_damage(index: int, amount: int, bypass: bool = false, attack_damage: bool = false) -> Dictionary:
 	var enemy: Dictionary = enemies[index]
+	if attack_damage and enemy.hp > 0: buffs.after_incoming_attack(self, index)
 	amount = buffs.incoming_damage(self, amount, index) if attack_damage else maxi(0, amount)
 	var absorbed := 0 if bypass else mini(amount, int(enemy.get("block", 0)))
 	enemy.block = int(enemy.get("block", 0)) - absorbed
@@ -412,7 +414,7 @@ func enemy_damage(index: int, amount: int, bypass: bool = false, attack_damage: 
 	if death_pollution > 0:
 		buffs.apply(self,"pollution",death_pollution)
 		log_lines.append("%s 死亡，向角色施加 %d 层污染。" % [enemy.displayName,death_pollution])
-	return {"target":index,"damage":loss,"blocked":absorbed,"hpAfter":enemy.hp,"blockAfter":enemy.block,"killed":enemy.hp == 0,"deathPollution":death_pollution,"playerPollutionAfter":buffs.count(self,"pollution")}
+	return {"target":index,"damage":loss,"blocked":absorbed,"hpAfter":enemy.hp,"blockAfter":enemy.block,"killed":enemy.hp == 0,"deathPollution":death_pollution,"playerPollutionAfter":buffs.count(self,"pollution"),"electricChargeAfter":buffs.count(self,"electric_charge",index)}
 
 func player_damage(amount: int, attack_damage: bool = false) -> Dictionary:
 	if attack_damage: amount = buffs.incoming_damage(self, amount)
@@ -583,6 +585,10 @@ func end_noren_turn() -> Dictionary:
 				buffs.apply(self, kind, amount)
 				turn_events.append({"type":"status_apply","source":index,"target":-1,"buffId":kind,"amount":amount,"stacksAfter":buffs.count(self, kind)})
 				log_lines.append("%s 施加 %d 层%s。" % [enemy.displayName, amount, buffs.definition(kind).name])
+			elif kind == "charge":
+				buffs.apply(self, "electric_charge", amount, index)
+				turn_events.append({"type":"status_apply","source":index,"target":index,"buffId":"electric_charge","amount":amount,"stacksAfter":buffs.count(self, "electric_charge", index)})
+				log_lines.append("%s 充能，获得 %d 层电能。" % [enemy.displayName, amount])
 			elif kind == "strength_allies":
 				for ally_index in enemies.size():
 					if enemies[ally_index].hp <= 0 or not enemies[ally_index].id in intent.get("targetIds", []): continue
@@ -593,6 +599,9 @@ func end_noren_turn() -> Dictionary:
 			resolve_outcome()
 			continue
 		var per_hit := buffs.enemy_attack_damage(enemy, int(intent.get("amount", 0)))
+		# Freeze the bonus for the whole attack, then consume it once for all hits.
+		var charge_used := buffs.count(self, "electric_charge", index)
+		buffs.clear(self, "electric_charge", index)
 		var total := buffs.incoming_damage(self, per_hit) * int(intent.get("hits", 1))
 		var hits: Array = []
 		var damage := 0
@@ -605,7 +614,7 @@ func end_noren_turn() -> Dictionary:
 			hits.append(hit)
 			if player_hp == 0: break
 		var counters: Array = buffs.after_enemy_attack(self, index, total)
-		var attack := {"type":"attack","index":index,"id":enemy.id,"damage":damage,"hits":hits,"counters":counters}
+		var attack := {"type":"attack","index":index,"id":enemy.id,"damage":damage,"hits":hits,"counters":counters,"electricChargeUsed":charge_used,"electricChargeAfter":buffs.count(self,"electric_charge",index)}
 		attacks.append(attack)
 		turn_events.append(attack)
 		turn_events.append_array(buffs.own_turn_end(self, index))

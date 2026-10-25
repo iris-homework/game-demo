@@ -1,5 +1,7 @@
 # 午夜委托文档索引
 
+2026-10-25 game-demo：机器人改为攻击10→充能5层电能→攻击5×2循环；电能逐段增伤、攻击时耗尽、受攻击逐段减层。见[规则](游戏规则.md#2026-10-20-故障机器人)及[验证记录](修改记录.md)。
+
 2026-10-25 game-demo：指定敌人的技能牌改为和攻击牌相同的居中瞄准、拖放及点选释放；“稳住阵脚”按当前形态选择自身／敌人操作。见[操作规则](游戏规则.md)和[输入维护](卡牌与效果实现维护指南.md#技能牌拖放释放)。
 
 2026-10-25 game-demo：奖励信用点改为点击条目领取，和卡牌分别保存；金钱芯片额外信用点同次领取，离开会放弃未领项目，旧已到账奖励不追发。新Boss奖励须显式离开才结束第一周，见[奖励规则](游戏规则.md#奖励领取)及[接入说明](开发接入说明.md)。
@@ -168,7 +170,7 @@ mipmap）改为2（线性mipmap），原角色图片与导入像素未变。按�
 | --- | --- | --- |
 | 战斗类型（2026-10-23） | 支持普通／精英／Boss，现有六场全部普通；新战斗与奖励冻结类型，旧记录缺字段按普通。每个奖励候选按 B／A／S 固定权重抽取：普通60／37／3、精英50／40／10、Boss0／0／100，无隐藏保底；已生成候选不重抽，敌人数值不变 | [战斗配置](../data/battles.json)、[奖励概率](../data/card_reward_rates.json)、[奖励规则](游戏规则.md#奖励领取)、[类型接入](开发接入说明.md#战斗类型2026-10-23)、[类型专项](../tests/combat/rules/battle_type_tests.tscn) |
 | 工程与工作区 | 可运行工程为 `MidnightDemo/`；上级仅为制作工作区，两层入口均路由到本索引和工程 AGENTS | [工作区入口](../../README.md)、[工程约定](../AGENTS.md)、[project.godot](../project.godot) |
-| B02 机器人 | 正式B02为40 HP、每回合一次基础10伤害攻击；机器人演练为100 HP。已有战斗快照保留冻结值，原型回退3 HP不适用于当前正式机器人 | [敌人](../data/enemies/enemies.json)、[原型](../data/prototype/combat.json)、[战斗](../data/battles.json)、[Game.initialize_combat](../scripts/game.gd)、[CombatModel](../scripts/combat/combat_model.gd) |
+| B02 机器人 | 正式B02为40 HP，按攻击10→充能5层电能→攻击5×2循环；机器人演练为100 HP。已有战斗快照保留冻结值，原型回退3 HP不适用于当前正式机器人 | [敌人](../data/enemies/enemies.json)、[原型](../data/prototype/combat.json)、[战斗](../data/battles.json)、[Game.initialize_combat](../scripts/game.gd)、[CombatModel](../scripts/combat/combat_model.gd) |
 | 地图 | `city_map_expanded` 指向 `map-expanded-v1.png`；`mapContentRect` 表示原城市区域，17 地点的 `mapAnchor` 仍相对该区域 | [地图配置](../data/map.json)、[资源](../data/assets.json)、[地图视图](../scripts/map.gd) |
 | 主菜单背景 | 加载 `noren-bar-seated-v2-detail.png`，由 `menu_native_art.gdshader` 提供局部动画；旧 GIF 和 60 帧 PNG 为历史来源 | [背景实现](../scripts/menu/menu_environment.gd)、[背景 shader](../shaders/menu_native_art.gdshader) |
 | B04 阶段切换 | 小弟先行动、老大最后行动；全部敌方行动结束、下一玩家回合开始前检查小弟死亡并切换意图。玩家阶段击杀小弟不会把当轮已显示的老大意图立即改成攻击 | [CombatModel.end_turn / begin_round_intents](../scripts/combat/combat_model.gd)、[游戏规则](游戏规则.md) |

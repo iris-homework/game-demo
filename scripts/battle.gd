@@ -624,6 +624,8 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 			shown_enemies[index].hp = hit.hpAfter
 			shown_enemies[index].block = hit.get("blockAfter",0)
 			shown_enemies[index].bleed = hit.get("bleedAfter",0)
+			if hit.has("electricChargeAfter"):
+				apply_shown_status({"target":index,"buffId":"electric_charge","stacksAfter":hit.electricChargeAfter})
 			if hit.has("ammoAfter"):
 				shown_player_ammo = int(hit.ammoAfter)
 				refresh_ammo()
@@ -728,8 +730,7 @@ func end_turn_pressed() -> void:
 			for i in shown_enemies.size():
 				if shown_enemies[i].id == attack.id: attacker_index = i
 		if attacker_index < 0: continue
-		shown_enemies[attacker_index].block = 0
-		refresh_enemy_hud()
+		present_attack_start(attack, attacker_index)
 		var default_style: String = stage.enemies[attacker_index].attack_style_override
 		if default_style.is_empty(): default_style = "pierce"
 		var style: String = shown_enemies[attacker_index].intent.get("animation",default_style)
@@ -778,6 +779,16 @@ func end_turn_pressed() -> void:
 	refresh_counts()
 	set_busy(false)
 
+
+func present_attack_start(attack: Dictionary, index: int) -> void:
+	var enemy: Dictionary = shown_enemies[index]
+	enemy.block = 0
+	if int(attack.get("electricChargeUsed",0)) > 0:
+		# Keep the in-flight damage preview while showing that charge is spent.
+		enemy.intent = enemy.intent.duplicate(true)
+		enemy.intent.amount = int(enemy.intent.get("amount",0)) + int(attack.electricChargeUsed)
+		apply_shown_status({"target":index,"buffId":"electric_charge","stacksAfter":int(attack.electricChargeAfter)})
+	refresh_enemy_hud()
 
 func setup_dancer_duet() -> void:
 	var visuals: Array[EnemyVisualResolver.Visual] = []

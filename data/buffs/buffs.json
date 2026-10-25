@@ -219,6 +219,19 @@
     "everyHit": true
   },
   {
+    "id": "electric_charge",
+    "name": "电能",
+    "category": "positive",
+    "target": "enemy",
+    "stacking": "add",
+    "duration": "battle",
+    "handler": "electric_charge",
+    "icon": "electric_charge",
+    "color": "75dfff",
+    "showBadge": true,
+    "description": "电能 · {count} 层\n下次攻击的每段基础伤害 +{count}，攻击生效时消耗全部层数。每受到一段攻击减少 1 层，完全格挡也减少；裂伤、污染等非攻击伤害不减层。未使用时跨回合保留。"
+  },
+  {
     "id": "ranged_mastery",
     "name": "弱点瞄准",
     "category": "positive",

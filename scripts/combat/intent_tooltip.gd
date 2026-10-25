@@ -19,6 +19,13 @@ static func describe(enemy: Dictionary, preview: String) -> Dictionary:
 			data.unit = "每段伤害 × 次数" if hits>1 else "点伤害"
 			data.summary = "将对你造成 %d 次伤害，每次 %d 点。" % [hits,damage] if hits>1 else "将对你造成 %d 点攻击伤害。" % damage
 			data.notes.append({"title":"伤害预览","body":"预计合计 %d 点，先由格挡抵消。数值已计入当前伤害修正。" % (damage*hits)})
+		"charge":
+			data.title = "充能"
+			data.accent = Color("75dfff")
+			data.value = "+%d" % amount
+			data.unit = "层电能 / 自身"
+			data.summary = "获得 %d 层电能。" % amount
+			data.notes.append({"title":"电能","body":"下次攻击的每段基础伤害增加当前电能层数，攻击生效时消耗全部层数。每受到一段攻击减少1层，完全格挡也减少；裂伤、污染等非攻击伤害不减层。"})
 		"strength_allies":
 			data.title = "强化同伴"
 			data.accent = Color("f3c875")

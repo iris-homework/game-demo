@@ -31,7 +31,7 @@ func setup(intent: Dictionary, description: String, font: Font) -> void:
 	value_label.add_theme_constant_override("outline_size",4)
 	match kind:
 		"attack": value_label.text = description.trim_prefix("攻击 ").replace(" ","")
-		"strength_allies": value_label.text = "+%d" % int(intent.get("amount",0))
+		"strength_allies", "charge": value_label.text = "+%d" % int(intent.get("amount",0))
 		"pollution", "vulnerable": value_label.text = str(int(intent.get("amount",0)))
 		_:
 			value_label.text = description
@@ -59,6 +59,9 @@ func _draw() -> void:
 			draw_line(Vector2(22,33),Vector2(32,23),Color("25172c"),8,true)
 			draw_line(Vector2(22,33),Vector2(32,23),Color("ff6b8b"),4,true)
 			draw_circle(Vector2(35,36),3,Color("f96586"))
+		"charge":
+			silhouette([Vector2(22,1),Vector2(6,21),Vector2(18,21),Vector2(14,37),Vector2(35,13),Vector2(23,13),Vector2(28,1)],Color("75dfff"))
+			draw_line(Vector2(21,9),Vector2(14,18),Color("ddfaff"),2,true)
 		"strength_allies":
 			silhouette([Vector2(9,34),Vector2(9,18),Vector2(2,18),Vector2(20,2),Vector2(38,18),Vector2(31,18),Vector2(31,34)],Color("f3bb56"))
 			draw_polyline(PackedVector2Array([Vector2(9,16),Vector2(20,6),Vector2(31,16)]),Color("ffe7a5"),2,true)

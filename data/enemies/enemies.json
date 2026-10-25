@@ -10,6 +10,15 @@
         "type": "attack",
         "amount": 10,
         "hits": 1
+      },
+      {
+        "type": "charge",
+        "amount": 5
+      },
+      {
+        "type": "attack",
+        "amount": 5,
+        "hits": 2
       }
     ],
     "prototype": false,
