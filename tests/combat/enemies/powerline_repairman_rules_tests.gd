@@ -36,7 +36,7 @@ func test_encounter_and_loop() -> void:
 	check(Game.events.E14.nodes.battle.battleId == "B14" and Game.battles.B14.enemyIds == ["powerline_repairman"], "Existing E14 route retains one repairman in B14")
 	var model := repairman()
 	var enemy: Dictionary = model.enemies[0]
-	check(Game.enemy_catalog.powerline_repairman.maxHp == 45 and enemy.hp == 45 and enemy.maxHp == 45, "Formal repairman starts with forty-five HP")
+	check(Game.enemy_catalog.powerline_repairman.maxHp == 60 and enemy.hp == 60 and enemy.maxHp == 60, "Formal repairman starts with sixty HP")
 	var sequence: Array = enemy.intentSequence
 	check(sequence.size() == 3 and sequence[0].type == "energy_suit" and sequence[0].amount == 1 and sequence[1].type == "attack" and sequence[1].amount == 5 and sequence[1].hits == 1 and sequence[2].type == "attack" and sequence[2].amount == 3 and sequence[2].hits == 2 and enemy.get("intentLoopStart") == 1, "One opening suit is followed by attack5 and attack3 twice")
 	check(model.buffs.count(model, "energy_suit", 0) == 0 and model.buffs.count(model, "electric_charge", 0) == 0, "Suit and charge are absent before opening enhancement")
@@ -69,7 +69,7 @@ func test_encounter_and_loop() -> void:
 func test_suit_and_incoming_attacks() -> void:
 	var model := repairman()
 	model.enemy_damage(0, 1, false, true)
-	check(model.enemies[0].hp == 44 and model.buffs.count(model, "electric_charge", 0) == 0, "An attack before enhancement creates no electric charge")
+	check(model.enemies[0].hp == 59 and model.buffs.count(model, "electric_charge", 0) == 0, "An attack before enhancement creates no electric charge")
 	model.buffs.apply(model, "electric_charge", 2, 0)
 	model.enemies[0].block = 10
 	model.enemy_damage(0, 1, false, true)
@@ -99,7 +99,7 @@ func test_suit_and_incoming_attacks() -> void:
 	model.stance = "ranged"
 	model.buffs.apply(model, "bleed", 5, 0)
 	var result := model.play_card(uid, 0)
-	check(result.hits.size() == 3 and result.damage == 21 and model.enemies[0].hp == 24, "Real ranged three-hit card resolves attack bodies and three bleed ticks")
+	check(result.hits.size() == 3 and result.damage == 21 and model.enemies[0].hp == 39, "Real ranged three-hit card resolves attack bodies and three bleed ticks")
 	check(model.buffs.count(model, "electric_charge", 0) == 5 and model.buffs.count(model, "bleed", 0) == 2, "Three attack bodies produce exactly three charge; attached bleed produces none")
 
 	model = suited_repairman()
@@ -118,7 +118,7 @@ func test_suit_and_incoming_attacks() -> void:
 	model.buffs.own_turn_end(model, 0)
 	model.buffs.apply(model, "parry", 1)
 	model.buffs.after_enemy_attack(model, 0, 10)
-	check(model.enemies[0].hp == 36 and model.buffs.count(model, "electric_charge", 0) == 2, "Ordinary damage, pollution and parry counter neither generate nor decay charge")
+	check(model.enemies[0].hp == 51 and model.buffs.count(model, "electric_charge", 0) == 2, "Ordinary damage, pollution and parry counter neither generate nor decay charge")
 
 func test_outgoing_charge_consumption() -> void:
 	var model := suited_repairman()
@@ -184,7 +184,7 @@ func test_snapshot_and_legacy() -> void:
 	for round_index in 4:
 		var result := restored.end_turn()
 		check(result.attacks.size() == 1 and result.attacks[0].damage == 8 and restored.enemies[0].maxHp == 48 and restored.enemies[0].intent.amount == 8 and restored.buffs.count(restored, "energy_suit", 0) == 0, "Old B14 round%d keeps frozen attack8 and gains no suit" % round_index)
-	check(Game.enemy_catalog.powerline_repairman.maxHp == 45 and Game.enemy_catalog.powerline_repairman.intentSequence[0].type == "energy_suit", "Legacy restore never rewrites the current catalog")
+	check(Game.enemy_catalog.powerline_repairman.maxHp == 60 and Game.enemy_catalog.powerline_repairman.intentSequence[0].type == "energy_suit", "Legacy restore never rewrites the current catalog")
 
 func _ready() -> void:
 	Game.save_enabled = false

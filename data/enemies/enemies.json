@@ -4,7 +4,7 @@
     "characterId": "robot",
     "displayName": "故障机器人",
     "battlePortraitAssetId": "",
-    "maxHp": 40,
+    "maxHp": 45,
     "intentSequence": [
       {
         "type": "attack",
@@ -253,7 +253,7 @@
     "characterId": "powerline_repairman",
     "displayName": "输电抢修工",
     "battlePortraitAssetId": "",
-    "maxHp": 45,
+    "maxHp": 60,
     "intentLoopStart": 1,
     "intentSequence": [
       {

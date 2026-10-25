@@ -25,10 +25,10 @@ func saved(model: CombatModel) -> Dictionary:
 func test_encounter_and_loop() -> void:
 	check(Game.events.E02.nodes.battle.battleId == "B02" and Game.battles.B02.placeId == "junkyard", "Existing garbage-yard event routes to B02")
 	check(Game.battles.B02.enemyIds == ["robot"], "B02 contains the single robot")
-	check(Game.enemy_catalog.robot.maxHp == 40, "Formal robot catalog retains authored forty HP")
+	check(Game.enemy_catalog.robot.maxHp == 45, "Formal robot catalog retains authored forty-five HP")
 	check(Game.enemy_catalog.robot.combatVisualId == "robot" and not Game.enemy_catalog.robot.prototype, "Robot uses its own combat visual and authored intent")
 	var model := robot()
-	check(model.enemies[0].hp == 40 and model.enemies[0].maxHp == 40, "Formal robot starts with authored forty HP")
+	check(model.enemies[0].hp == 45 and model.enemies[0].maxHp == 45, "Formal robot starts with authored forty-five HP")
 	var sequence: Array = model.enemies[0].intentSequence
 	var expected_sequence: Array = JSON.parse_string('[{"type":"attack","amount":10,"hits":1},{"type":"charge","amount":5},{"type":"attack","amount":5,"hits":2}]')
 	check(sequence == expected_sequence, "Robot sequence is attack10, charge5, attack5 twice")
@@ -140,7 +140,7 @@ func test_electric_charge() -> void:
 	model.buffs.own_turn_end(model, 0)
 	model.buffs.apply(model, "parry", 1)
 	model.buffs.after_enemy_attack(model, 0, 10)
-	check(model.buffs.count(model, "electric_charge", 0) == 5 and model.enemies[0].hp == 31, "Ordinary damage, pollution tick and parry counter do not count as attacks received")
+	check(model.buffs.count(model, "electric_charge", 0) == 5 and model.enemies[0].hp == 36, "Ordinary damage, pollution tick and parry counter do not count as attacks received")
 
 	model = charged_robot()
 	model.block = 100
@@ -256,7 +256,7 @@ func test_training_isolation() -> void:
 	for outcome in ["win", "lose"]:
 		Game.start_training("B02")
 		check(Game.training_mode and Game.state.battleId == "B02" and Game.state.combat.enemies[0].intent.amount == 10, outcome + " training uses authored robot intent")
-		check(Game.state.combat.enemies[0].hp == 40 and Game.state.combat.enemies[0].maxHp == 40 and Game.enemy_catalog.robot.maxHp == 40, outcome + " training follows formal forty HP without changing the catalog")
+		check(Game.state.combat.enemies[0].hp == 45 and Game.state.combat.enemies[0].maxHp == 45 and Game.enemy_catalog.robot.maxHp == 45, outcome + " training follows formal forty-five HP without changing the catalog")
 		var model := CombatModel.new()
 		model.restore(Game.state.combat)
 		var training_hp_before := model.player_hp
@@ -284,7 +284,7 @@ func _ready() -> void:
 	test_charged_snapshot()
 	test_snapshot_compatibility()
 	test_training_isolation()
-	var report := {"checks":checks, "failures":failures, "robotIntent":"attack10_charge5_attack5x2_loop", "formalHp":40, "trainingHp":40, "legacyIntent":"saved_attack1_and_attack10_loop_retained"}
+	var report := {"checks":checks, "failures":failures, "robotIntent":"attack10_charge5_attack5x2_loop", "formalHp":45, "trainingHp":45, "legacyIntent":"saved_attack1_and_attack10_loop_retained"}
 	FileAccess.open(output_dir + "/rules-result.json", FileAccess.WRITE).store_string(JSON.stringify(report, "\t"))
 	print("ROBOT RULES: %d checks, %d failures" % [checks, failures.size()])
 	get_tree().quit(0 if failures.is_empty() else 1)

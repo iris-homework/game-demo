@@ -2,7 +2,7 @@ extends Node
 ## Run in an isolated copied project, headless; no formal player saves or mouse input.
 const CASES := [
 	["E13", "B13", "pruning_hound", "garden", 35, 8],
-	["E14", "B14", "powerline_repairman", "power", 45, 0],
+	["E14", "B14", "powerline_repairman", "power", 60, 0],
 	["E15", "B15", "beacon_jellyfish", "port", 36, 6],
 ]
 var checks := 0

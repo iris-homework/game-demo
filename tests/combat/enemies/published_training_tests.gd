@@ -76,7 +76,7 @@ func test_config() -> void:
 			check(source.get("battleId") == formal_id and not source.has("maxHp") and not source.has("intentSequence") and not source.has("intentLoopStart"), "Formal-backed source contains a battle reference without duplicated HP or intent: " + str(choice.id))
 			check(choice.get("battleId") == formal_id and same(choice.get("enemyIds"), enemy_ids) and choice.maxHp == definition.maxHp and same(sequence, definition.intentSequence) and choice.get("intentLoopStart", 0) == definition.get("intentLoopStart", 0), "Choice resolves current formal formation, HP and intent data: " + str(choice.id))
 			if choice.id == "powerline_repairman":
-				check(int(choice.maxHp) == 45 and sequence.size() == 3 and sequence[0].type == "energy_suit" and sequence[1].amount == 5 and sequence[2].amount == 3 and sequence[2].hits == 2 and choice.get("intentLoopStart") == 1, "Repairman choice has formal forty-five HP and one-time suit / attack cycle")
+				check(int(choice.maxHp) == 60 and sequence.size() == 3 and sequence[0].type == "energy_suit" and sequence[1].amount == 5 and sequence[2].amount == 3 and sequence[2].hits == 2 and choice.get("intentLoopStart") == 1, "Repairman choice has formal sixty HP and one-time suit / attack cycle")
 			elif choice.id == "pruning_hound":
 				check(int(choice.maxHp) == 35 and choice.displayName == "双修枝猎犬" and enemy_ids == ["pruning_hound", "pruning_hound_second"] and sequence.size() == 2 and sequence[0].amount == 4 and sequence[0].hits == 2 and sequence[1].type == "fortify" and sequence[1].amount == 5 and sequence[1].strength == 1, "Hound choice is the formal thirty-five HP pair with staggered actions")
 			else:

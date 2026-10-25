@@ -30,8 +30,8 @@ func _ready() -> void:
 	Game.meta_path = output + "combat-meta.json"
 	var current_robot := CombatModel.new()
 	current_robot.initialize("B02",100,100,Game.prototype_rules,[Game.enemy_catalog.robot])
-	check(current_robot.enemies[0].maxHp == 40 and current_robot.enemies[0].intent.amount == 10,"Current B02 keeps authored HP 40 / attack 10 separately from legacy fixtures")
-	for authored in [["B13",35,4,"attack"],["B14",45,1,"energy_suit"],["B15",36,6,"attack"]]:
+	check(current_robot.enemies[0].maxHp == 45 and current_robot.enemies[0].intent.amount == 10,"Current B02 keeps authored HP 45 / attack 10 separately from legacy fixtures")
+	for authored in [["B13",35,4,"attack"],["B14",60,1,"energy_suit"],["B15",36,6,"attack"]]:
 		var current := CombatModel.new()
 		var authored_definitions: Array = []
 		for enemy_id in Game.battles[authored[0]].enemyIds: authored_definitions.append(Game.enemy_catalog[enemy_id])
