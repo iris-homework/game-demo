@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-10-25 game-demo同步双人舞者后续：[机制专项](combat/rules/dancer_mechanics_tests.tscn)129项覆盖敌方回合开始交叉增益、揭幕不触发、先清旧盾后给予新盾、最终15／易伤3／10与虚弱2／4×3／治疗10循环、预告计入待触发力量且不改模型、最后链接移除／来源死亡、双方分别死亡停止新增益并保留历史力量、回合末致死与旧快照。Boss真实场景表现更新为新数值并复现／防止攻击起点误清新盾。配套10套1154项0失败，独立工程及用户目录、headless+Dummy，未做GPU像素或物理输入验收，见[本轮证据](../artifacts/qa/dancer-link-sync-2026-10-25/verification.json)。
+
 2026-10-25非基础牌增强与剖解经验重做：[卡牌专项](combat/cards/card_balance_tests.tscn)覆盖4张基础牌不变、20张数值、40号新能力逐段／群攻／全挡／致死／技能及弹反隔离、伤口追猎顺序、只读预览、重复能力与新旧快照。使用复制工程与独立用户目录，配套诺伦卡、预览、Buff、卡面与重开回归，结果见[验证记录](../artifacts/qa/card-balance-2026-10-25/verification.json)。不代表实战平衡或物理输入验收。
 
 2026-10-25信标水母：新增[规则专项](combat/enemies/beacon_jellyfish_rules_tests.tscn)与[表现状态专项](combat/presentation/beacon_jellyfish_presentation_tests.tscn)，覆盖36 HP、攻击10／攻击8附带2虚弱循环、初始柔软、多段逐段获得3格挡、格挡后触发与非攻击隔离、快照及旧战斗兼容；真实演练检查逐命中格挡、初始徽章与复合意图。使用隔离工程和独立用户目录，headless+Dummy；结果与尺寸验证见[本轮证据](../artifacts/qa/beacon-jellyfish-2026-10-25/verification.json)，不代表GPU像素或物理输入验收。

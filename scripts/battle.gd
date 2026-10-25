@@ -783,8 +783,9 @@ func end_turn_pressed() -> void:
 	set_busy(false)
 
 
-func present_attack_start(_attack: Dictionary, index: int) -> void:
-	shown_enemies[index].block = 0
+func present_attack_start(_attack: Dictionary, _index: int) -> void:
+	# Expiry comes from the model's ordered block_clear event. A shield granted
+	# earlier in this enemy phase (the dancers' link) must survive the attack.
 	refresh_enemy_hud()
 
 func present_attack_impact(attack: Dictionary, index: int) -> void:

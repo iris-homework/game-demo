@@ -183,7 +183,15 @@ func begin_round_intents() -> Array:
 	return changes
 
 func enemy_intent_damage(enemy: Dictionary, after_player_turn_end: bool = true, vulnerable_layers: int = -1) -> int:
-	var amount := buffs.enemy_attack_damage(enemy, int(enemy.get("intent", {}).get("amount", 0)))
+	var base := int(enemy.get("intent", {}).get("amount", 0))
+	# The next enemy phase grants strength before the attack. Predict it only
+	# during player input; playback already carries the applied status snapshot.
+	if after_player_turn_end and profile.get("encounterId", "") == "dancer_duet" and encounter_phase == 2 and enemy.get("id", "") == "dancer_black" and enemy.hp > 0:
+		for source in enemies:
+			if source.id == "dancer_white" and source.hp > 0 and buffs.enemy_count(source, buffs.definition("soul_link")) > 0:
+				base += 2
+				break
+	var amount := buffs.enemy_attack_damage(enemy, base)
 	# During the player's turn, show the amount that will actually be used after
 	# their own turn-end decay, without changing any live status or intent state.
 	# Playback supplies the displayed status because the live model has already
@@ -509,16 +517,22 @@ func advance_encounter_phase(player_turn_ended: bool = false, transition: Dictio
 		draw_pile.insert(randi_range(0, draw_pile.size()), card_uid)
 	turn += 1
 	buffs.own_turn_start(self)
-	begin_dancer_round()
 	energy = int(profile.get("energyPerTurn", 3))
 	advance_cyberware_cooldowns()
 	transition.drawn = draw_cards()
 	log_lines.append("灯光熄灭。双人舞者 · 第二幕。")
 	return true
 
-func begin_dancer_round() -> Array:
+func begin_dancer_enemy_turn() -> Array:
 	var events: Array = []
-	if profile.get("encounterId", "") != "dancer_duet" or encounter_phase != 2: return events
+	if not outcome.is_empty() or profile.get("encounterId", "") != "dancer_duet" or encounter_phase != 2: return events
+	# Both dancers begin this shared enemy phase before either acts. Expire the
+	# previous shield first so the new link shield survives White's action.
+	for index in enemies.size():
+		if enemies[index].hp <= 0: continue
+		var old_block := buffs.count(self, "block", index)
+		buffs.own_turn_start(self, index)
+		if old_block > 0: events.append({"type":"block_clear", "target":index})
 	for source in enemies.size():
 		if enemies[source].hp <= 0 or buffs.count(self, "soul_link", source) <= 0: continue
 		var black: bool = enemies[source].id == "dancer_black"
@@ -643,13 +657,16 @@ func end_noren_turn() -> Dictionary:
 	var turn_events: Array = buffs.player_turn_end(self)
 	resolve_outcome()
 	var attacks: Array = []
+	var dancer_enemy_turn: bool = profile.get("encounterId", "") == "dancer_duet" and encounter_phase == 2
+	turn_events.append_array(begin_dancer_enemy_turn())
 	for index in enemies.size():
 		if not outcome.is_empty(): break
 		var enemy: Dictionary = enemies[index]
 		if enemy.hp <= 0: continue
-		var old_block := buffs.count(self, "block", index)
-		buffs.own_turn_start(self, index)
-		if old_block > 0: turn_events.append({"type":"block_clear","target":index})
+		if not dancer_enemy_turn:
+			var old_block := buffs.count(self, "block", index)
+			buffs.own_turn_start(self, index)
+			if old_block > 0: turn_events.append({"type":"block_clear","target":index})
 		var intent: Dictionary = enemy.intent
 		if intent.get("type", "") != "attack":
 			var kind: String = intent.get("type", "")
@@ -726,6 +743,5 @@ func end_noren_turn() -> Dictionary:
 			enemy.intentIndex += 1
 			enemy.intent = intent_for(enemy, int(enemy.intentIndex))
 		turn_events.append_array(begin_round_intents())
-		turn_events.append_array(begin_dancer_round())
 	var drawn: Array = transition.drawn if phase_changed else draw_cards()
 	return {"phaseChanged":phase_changed,"discarded":discarded,"attacks":attacks,"turnEvents":turn_events,"drawn":drawn,"outcome":outcome}

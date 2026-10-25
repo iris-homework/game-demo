@@ -259,7 +259,7 @@ func test_phases() -> void:
 	check(result.hits.size() == 1 and result.hits[0].hpAfter == 0, "old-stage multi-hit stops at death")
 	check(model.enemies.size() == 2 and model.enemies[0].hp == 90 and model.enemies[1].hp == 90, "no hit spills into second phase")
 	check(model.enemies[0].id == "dancer_black" and model.enemies[1].id == "dancer_white", "second-phase identities and order")
-	check(model.enemies[0].intent.amount == 20 and model.enemies[1].intent.type == "weak" and model.enemies[1].intent.amount == 2, "second phase opens black attack20 and white weak2")
+	check(model.enemies[0].intent.amount == 15 and model.enemies[1].intent.type == "weak" and model.enemies[1].intent.amount == 2, "second phase opens black attack15 and white weak2")
 	result = model.play_card(killing_card(model), 0)
 	check(not result.phaseChanged and model.outcome == "" and model.enemies[1].hp == 90, "one surviving dancer prevents victory")
 	result = model.play_card(killing_card(model), 1)

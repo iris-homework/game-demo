@@ -312,7 +312,7 @@
     "intentSequence": [
       {
         "type": "attack",
-        "amount": 20,
+        "amount": 15,
         "hits": 1,
         "animation": "pierce"
       },
@@ -322,7 +322,7 @@
       },
       {
         "type": "attack",
-        "amount": 20,
+        "amount": 10,
         "hits": 1,
         "animation": "pierce"
       }
@@ -346,7 +346,7 @@
       },
       {
         "type": "attack",
-        "amount": 5,
+        "amount": 4,
         "hits": 3,
         "animation": "slash"
       },
