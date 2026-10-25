@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs><linearGradient id="shell" x1="18" y1="8" x2="43" y2="50" gradientUnits="userSpaceOnUse"><stop stop-color="#ebceff"/><stop offset=".5" stop-color="#b786e2"/><stop offset="1" stop-color="#654a9b"/></linearGradient></defs>
+  <path d="m30 6-19 7 4 22q5 11 16 19l-3-16 7-12-11-7Z" fill="url(#shell)" stroke="#201b36" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="m38 6 15 7-4 22q-4 9-13 16l1-13 7-14-12-6Z" fill="url(#shell)" stroke="#201b36" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="m16 16 10-4m-10 7 3 13q3 7 8 12m21-28-8-4" fill="none" stroke="#f2dfff" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="m33 12-5 8 12 5-8 13 1 11" fill="none" stroke="#f7dbff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m7 33-4 2m53-2 5 2" stroke="#d6a2f2" stroke-opacity=".8" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

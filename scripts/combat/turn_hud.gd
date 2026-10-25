@@ -21,8 +21,10 @@ func _ready() -> void:
 	eyebrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	round_label = make_label("",Vector2(12,18),Vector2(68,37),26,Color("f4f7ff"))
 	round_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	phase_label = make_label("",Vector2(119,5),Vector2(166,28),19,PLAYER)
-	caption_label = make_label("",Vector2(119,33),Vector2(166,16),10,Color("9aaabd"))
+	phase_label = make_label("",Vector2(96,5),Vector2(196,28),19,PLAYER)
+	phase_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	caption_label = make_label("",Vector2(96,33),Vector2(196,16),10,Color("9aaabd"))
+	caption_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	set_state(round_number,phase)
 
 func make_label(text: String, origin: Vector2, dimensions: Vector2, font_size: int, color: Color) -> Label:
@@ -50,7 +52,7 @@ func set_state(number: int, next_phase: String = "player") -> void:
 		font_size -= 1
 	round_label.add_theme_font_size_override("font_size",font_size)
 	phase_label.text = {"player":"你的回合","enemy":"敌方回合","reveal":"第二幕","save":"等待保存"}.get(phase,"你的回合")
-	caption_label.text = {"enemy":"执行敌方意图","reveal":"双人舞者 / 揭幕","save":"战后结算 / 请重试"}.get(phase,"")
+	caption_label.text = {"reveal":"双人舞者 / 揭幕","save":"战后结算 / 请重试"}.get(phase,"")
 	caption_label.visible = not caption_label.text.is_empty()
 	phase_label.position.y = 5.0 if caption_label.visible else 14.0
 	phase_label.add_theme_color_override("font_color",accent)

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs><linearGradient id="mystery" x1="18" y1="10" x2="45" y2="50" gradientUnits="userSpaceOnUse"><stop stop-color="#e5d4ff"/><stop offset="1" stop-color="#68598e"/></linearGradient></defs>
+  <path d="M32 6 56 30 32 54 8 30Z" fill="#231e39" stroke="#121724" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M32 10 52 30 32 50 12 30Z" fill="none" stroke="url(#mystery)" stroke-width="1.6" stroke-linejoin="round"/>
+  <circle cx="22" cy="30" r="2.8" fill="#ddcaff"/><circle cx="32" cy="30" r="2.8" fill="#ddcaff"/><circle cx="42" cy="30" r="2.8" fill="#ddcaff"/>
+</svg>

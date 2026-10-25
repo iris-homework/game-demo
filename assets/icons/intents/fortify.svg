@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs><linearGradient id="shield" x1="17" y1="8" x2="45" y2="52" gradientUnits="userSpaceOnUse"><stop stop-color="#8cddff"/><stop offset=".48" stop-color="#428fc5"/><stop offset="1" stop-color="#203d6b"/></linearGradient></defs>
+  <path d="M32 5 53 13 49 35Q44 46 32 55 20 46 15 35L11 13Z" fill="url(#shield)" stroke="#101c2c" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="m32 10 16 6-3 17q-4 10-13 17-9-7-13-17l-3-17Z" fill="#183d64" stroke="#a1e2ff" stroke-opacity=".8" stroke-width="1.4"/>
+  <path d="m32 12 14 5-3 15q-3 8-11 15Z" fill="#428cbd" fill-opacity=".35"/>
+  <path d="M29 41V29h-8l11-13 11 13h-8v12Z" fill="#ffd38b" stroke="#182a41" stroke-width="2" stroke-linejoin="round"/>
+  <path d="m26 26 6-7 6 7M31 30v8" fill="none" stroke="#fff2c9" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="m14 15 3 17M48 16l-2 11" stroke="#daf4ff" stroke-width="1.4" stroke-linecap="round"/>
+</svg>

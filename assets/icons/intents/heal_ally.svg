@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs><linearGradient id="heart" x1="20" y1="11" x2="43" y2="50" gradientUnits="userSpaceOnUse"><stop stop-color="#c2ffe1"/><stop offset=".45" stop-color="#76d4a5"/><stop offset="1" stop-color="#34776b"/></linearGradient></defs>
+  <path d="M32 53C22 44 8 34 8 23 8 8 25 6 32 17 39 6 56 8 56 23 56 34 42 44 32 53Z" fill="url(#heart)" stroke="#122b30" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M32 48C42 39 51 31 51 23c0-6-3-10-7-11 8 7 0 23-12 28Z" fill="#367e6d" fill-opacity=".5"/>
+  <path d="M14 24c-1-7 7-11 12-5" fill="none" stroke="#e0ffed" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M28 23h8v7h7v8h-7v7h-8v-7h-7v-8h7Z" fill="#e2ffed" stroke="#28605a" stroke-width="1.5" stroke-linejoin="round"/>
+</svg>
