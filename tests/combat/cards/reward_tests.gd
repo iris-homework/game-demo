@@ -35,6 +35,17 @@ func _ready() -> void:
 	Game.meta_path = "res://artifacts/qa/reward-2026-10-09/test_meta.json"
 	for id in Game.battles:
 		start_battle(id)
+		if id == "B16":
+			# Formal Boss victories require a valid defeated second-phase snapshot.
+			var boss := CombatModel.new()
+			boss.restore(Game.state.combat)
+			boss.enemy_damage(0, 999)
+			boss.resolve_outcome()
+			check(boss.advance_encounter_phase(), "Boss reward fixture reaches real second phase")
+			for index in boss.enemies.size(): boss.enemy_damage(index, 999)
+			boss.resolve_outcome()
+			check(boss.encounter_phase == 2 and boss.outcome == "win" and Game.valid_combat(boss.snapshot()), "Boss reward fixture defeats both second-phase dancers")
+			check(Game.commit_combat(boss), "Boss reward fixture commits actual victory")
 		var rev := Game.revision
 		check(Game.battle_exit("win",rev),id + " accepts victory")
 		check(not Game.battle_exit("win",rev),"Duplicate result rejected")
@@ -53,8 +64,13 @@ func _ready() -> void:
 		check(not Game.choose_reward_card(options[0],rev) and not Game.choose_reward_card(options[2],Game.revision),"Duplicate and second choice rejected")
 		check(Game.state.deck == [options[1]] and Game.state.credits == int(Game.config.initialCredits) + 50,"One card added with no repeated credits")
 		check(roundtrip() and Game.state.battleReward.status == "claimed" and Game.state.deck == [options[1]],"Claimed reward persists")
-		check(Game.claim_rewards(Game.revision) and Game.page == "map","Exit reward to map")
-		check(not Game.choose_reward_card(options[0],Game.revision),"No claiming from map")
+		if id == "B16":
+			check(Game.page == "result" and Game.is_week_complete() and not Game.can_continue(), "Claimed Boss receipt reloads into first-week completion")
+			check(not Game.claim_rewards(Game.revision), "Completed Boss reward cannot exit a second time")
+			check(not Game.choose_reward_card(options[0],Game.revision), "No claiming from week completion")
+		else:
+			check(Game.claim_rewards(Game.revision) and Game.page == "map","Exit reward to map")
+			check(not Game.choose_reward_card(options[0],Game.revision),"No claiming from map")
 	# The money chip remains an additional reward, separate from the base 50.
 	start_battle("B02")
 	Game.state.ownedCyberwareIds.append("money_chip")

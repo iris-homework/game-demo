@@ -93,5 +93,10 @@
     "displayName": "商场店员",
     "portraitAssetId": "reception",
     "battlePortraitAssetId": ""
+  },
+  "dancer_black": {
+    "displayName": "黑舞者",
+    "portraitAssetId": "dancer_black_dialogue",
+    "battlePortraitAssetId": ""
   }
 }

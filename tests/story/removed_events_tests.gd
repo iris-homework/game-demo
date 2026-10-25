@@ -18,8 +18,8 @@ func test_catalog() -> void:
 	Game.state = Game.initial_state()
 	var event_ids: Array = Game.events.keys()
 	event_ids.sort()
-	check(event_ids == ["E01", "E01R", "E02", "E04", "E11", "E13", "E14", "E15"], "retained events, three new commissions and the gated return reward are authored")
-	check(Game.battles.keys() == ["B02", "B04", "B11", "B13", "B14", "B15"], "three retained and three new battles are authored")
+	check(event_ids == ["E01", "E01R", "E02", "E04", "E11", "E13", "E14", "E15", "E16"], "retained events, six commissions, return reward and day-seven Boss are authored")
+	check(Game.battles.keys() == ["B02", "B04", "B11", "B13", "B14", "B15", "B16"], "six normal battles and the day-seven Boss are authored")
 	check(Game.read_data("weeks/week1/week.json").eventIds == Game.events.keys(), "week index matches event catalog")
 	check(ids(Game.eligible_events()) == ["E01", "E02", "E04", "E11", "E13", "E14", "E15"], "seven events eligible before E01, return reward stays gated")
 	for event in Game.events.values():
@@ -27,7 +27,8 @@ func test_catalog() -> void:
 			check(not event.unlockCondition.is_empty(), "return reward requires completed commissions")
 		else:
 			check(event.unlockCondition.is_empty(), "no event prerequisite " + event.id)
-		check(event.refreshTimeRange == {"startDay":null, "endDay":null}, "anytime range " + event.id)
+		var valid_range: bool = event.refreshTimeRange.startDay == 7 and event.refreshTimeRange.endDay == 7 if event.id == "E16" else event.refreshTimeRange == {"startDay":null, "endDay":null}
+		check(valid_range, "authored refresh range " + event.id)
 		check(event.nodes.has(event.startNodeId), "valid start node " + event.id)
 		for node in event.nodes.values():
 			if node.has("next"): check(node.next == "@map" or event.nodes.has(node.next), "valid next node " + event.id)

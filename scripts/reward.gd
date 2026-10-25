@@ -55,11 +55,16 @@ func _ready() -> void:
 	else:
 		label(card_row,"✓  已领取" if reward.status == "claimed" else "已跳过",Vector2(818,61),Vector2(180,37),21,CYAN if reward.status == "claimed" else MUTED)
 	label(self,"从三张不同的非初始牌中选择一张 · B 蓝 / A 红 / S 金",Vector2(216,695),Vector2(980,32),15,MUTED)
+	var boss_finale: bool = Game.state.activeEventId == "E16" and "E16" in Game.state.completedEventIds
 	var complete: bool = Game.state.flags.get("week1Complete",false) and Game.event_data().get("nodes", {}).get("finish", {}).get("effects", []).any(func(action): return action.get("op") == "finishWeek")
 	var time_text := "领奖不消耗时间。可以继续探索城市。" if event_reward else "时间推进1天。事件已更新到城市地图。"
+	if boss_finale: time_text = "领取奖励后，结束第一周。"
 	label(self,"第一周 · 落幕。可返回地图探索剩余事件。" if complete else time_text,Vector2(216,754),Vector2(820,35),20,CYAN)
-	label(self,"离开将放弃本次未选择的卡牌。" if pending else "奖励已保存，可继续探索城市。",Vector2(216,803),Vector2(775,31),16,MUTED)
+	label(self,"离开将放弃本次未选择的卡牌。" if pending else ("奖励已保存，可以结束第一周。" if boss_finale else "奖励已保存，可继续探索城市。"),Vector2(216,803),Vector2(775,31),16,MUTED)
 	exit_button = button(self,"放弃卡牌并返回  →" if pending else "返回地图  →",Vector2(1110,782),Vector2(276,61),leave_rewards,true)
+	if boss_finale:
+		exit_button.text = "放弃卡牌并结束第一周 →" if pending else "结束第一周  →"
+		exit_button.add_theme_font_size_override("font_size",17)
 	fade_in()
 
 func leave_rewards() -> void:

@@ -75,7 +75,7 @@ func assert_ended(label: String) -> void:
 	check(Game.is_run_over() and not Game.can_continue(), label + ": run over and continue unavailable")
 
 func test_all_battles() -> void:
-	check(Game.battles.size() == 6, "Fixture covers the six currently authored battles")
+	check(Game.battles.size() == 7 and Game.battles.has("B16"), "Fixture covers six normal battles and the day-seven Boss")
 	for battle_id in Game.battles:
 		var label := "loss-" + str(battle_id)
 		var model := begin_battle(label, battle_id)

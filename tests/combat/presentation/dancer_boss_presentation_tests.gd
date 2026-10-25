@@ -6,6 +6,22 @@ var phase_snapshots_stable := true
 var phase_snapshot: Dictionary = {}
 var hard_light_cues := true
 
+func check_boss_bars(view: Control, title: String) -> void:
+	check(view.enemy_summary_plates.size() == view.shown_enemies.size(),title+" has one fixed bar per Boss")
+	for i in view.enemy_summary_plates.size():
+		var plate: Control = view.enemy_summary_plates[i]
+		var track_center_x: float = plate.global_position.x+plate.track.get_center().x
+		check(is_equal_approx(track_center_x,720) and plate.size == Vector2(600,68),title+" visible Boss health track centered at screen top")
+		var name_label: Label = plate.get_child(0)
+		check(is_equal_approx(name_label.get_global_rect().get_center().x,track_center_x) and name_label.horizontal_alignment == HORIZONTAL_ALIGNMENT_CENTER,title+" Boss name aligns with health track center")
+		check(is_equal_approx(plate.global_position.y,96+i*80),title+" Boss bars stack vertically with 12px gaps")
+		check(plate.hp == view.shown_enemies[i].hp and plate.block == int(view.shown_enemies[i].get("block",0)),title+" fixed bar uses displayed hit snapshot")
+		check(plate.hp_label.position.x > plate.track.end.x and plate.mouse_filter == Control.MOUSE_FILTER_IGNORE,title+" wide bar keeps HP readable and targeting unobstructed")
+		check(not plate.get_global_rect().intersects(view.turn_label.get_global_rect()),title+" Boss bar leaves turn indicator clear")
+		for child in view.get_children():
+			if child is Button and child.text == "调试结果":
+				check(not plate.get_global_rect().intersects(child.get_global_rect()),title+" debug button leaves Boss bars clear")
+
 func wait_with_observation(view: Control) -> void:
 	var start := Time.get_ticks_msec()
 	var blackout_started := -1
@@ -114,6 +130,13 @@ func _ready() -> void:
 	check(view.stage.enemies.size() == 1 and view.model.enemies[0].hp == 10,"phase one: only black dancer, 10 HP")
 	check(view.stage.enemies[0].kind == "dancer_black" and not view.stage.enemies[0].poses.is_empty(),"black art loaded")
 	check(not view.stage.dancer_duet and not is_instance_valid(view.dancer_darkness),"phase one retains ordinary lighting")
+	check_boss_bars(view,"Phase one")
+	var bar_position: Vector2 = view.enemy_summary_plates[0].global_position
+	view.stage.frame_attack(view.stage.player,view.stage.enemies[0],view.stage.enemies[0].position-Vector2(100,0))
+	await view.stage.camera_tween.finished
+	view.update_target_rects()
+	check(view.enemy_summary_plates[0].global_position.is_equal_approx(bar_position),"Boss bar stays fixed while camera approaches target")
+	await view.stage.camera_to(720,1.0,0.01).finished
 	var phase_one_black_home: Vector2 = view.stage.enemies[0].home
 	# Force a known lethal card without depending on the shuffled opening hand.
 	var uid := str(view.model.hand[0])
@@ -142,6 +165,7 @@ func _ready() -> void:
 	var phase_two_hp: int = view.model.player_hp
 	var phase_two_pollution: int = view.model.buffs.count(view.model,"pollution")
 	check(view.stage.enemies.size() == 2 and view.targets.size() == 2,"both phase-two enemies receive target and HUD")
+	check_boss_bars(view,"Phase two")
 	check(view.model.enemies.all(func(e): return e.hp == 10),"finishing phase-one card never damages phase two")
 	check(view.stage.player.home.x == 720 and view.stage.enemies[0].home.x > 720 and view.stage.enemies[1].home.x < 720,"player centered between dancers")
 	check(view.stage.enemies[0].facing == -1 and view.stage.enemies[1].facing == 1,"dancers face inward")
@@ -173,6 +197,7 @@ func _ready() -> void:
 	check(view.stage.dancer_duet and view.stage.enemies.size() == 2 and view.stage.player.home.x == 720,"phase-two snapshot restores centered stage")
 	check(view.stage.enemies[0].home.is_equal_approx(phase_two_black_home) and view.stage.enemies[1].home.is_equal_approx(mirrored_home),"phase-two snapshot restores wider horizontally aligned dancer positions")
 	check(not is_instance_valid(view.dancer_blackout),"restored second phase does not replay transition")
+	check_boss_bars(view,"Restored phase two")
 	check(is_equal_approx(view.stage.dancer_lights.reveal_progress,1.0) and not is_instance_valid(view.dancer_reveal_flash),"restored second phase does not replay opening flash or light pulse")
 	await simulate_training_victory(view)
 	check(Game.state == backup,"Boss training restores original adventure")
@@ -202,6 +227,15 @@ func _ready() -> void:
 	check(view.model.encounter_phase == 1 and view.model.enemies[0].hp == 10,"debug phase-one case starts with an undefeated dancer")
 	await simulate_training_victory(view)
 	check(Game.state == backup,"phase-one debug victory restores adventure without rewards or progress changes")
+	Game.start_training("B11")
+	await idle()
+	view = app.view
+	for i in view.enemy_summary_plates.size():
+		var plate: Control = view.enemy_summary_plates[i]
+		check(plate.size == Vector2(328,68) and plate.global_position.is_equal_approx(Vector2(1072,96+i*80)),"ordinary battle keeps original right-hand HP layout")
+		check(plate.track == Rect2(18,44,170,12),"ordinary battle retains original HP track size")
+	Game.finish_training("lose")
+	await idle()
 	app.queue_free()
 	await get_tree().process_frame
 	await get_tree().create_timer(0.3).timeout

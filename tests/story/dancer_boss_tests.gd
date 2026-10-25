@@ -20,6 +20,37 @@ func fresh() -> void:
 	Game.state.currentScene = "map"
 	Game.page = "map"
 
+func test_dialogue() -> void:
+	fresh()
+	Game.state.currentDay = 7
+	Game.refresh_event_pool()
+	check(Game.start_event("E16"), "expanded Boss dialogue starts through formal event entrance")
+	var visited: Array[String] = []
+	while Game.page == "dialogue" and visited.size() < 20:
+		visited.append(Game.state.activeNodeId)
+		Game.advance(Game.revision)
+	check(visited.size() == 9 and Game.state.battleId == "B16" and Game.page == "battle", "expanded intro continues into existing Boss battle")
+	var event: Dictionary = Game.events.E16
+	check(event.nodes.values().all(func(n): return n.get("speakerId", "") in ["", "@player", "dancer_black"] and "白舞者" not in n.get("text", "")), "white dancer never appears or speaks in dialogue")
+	var asset_id: String = Game.characters.dancer_black.portraitAssetId
+	var path := "res://assets/characters/dancer_black_dialogue_v1.png"
+	check(Game.assets[asset_id].path == path and not Game.assets[asset_id].whiteKey, "black dancer binds existing transparent dialogue portrait")
+	var texture := Game.texture(asset_id)
+	check(texture != null and texture.get_size() == Vector2(1024,1536), "original black dancer portrait loads at authored resolution")
+	# Stage, player and dancer lines all override stale portraits on resumed saves.
+	for node_id in ["intro_01", "intro_02", "intro_03", "win_01", "win_02", "win_03", "lose"]:
+		Game.enter_node(node_id)
+		Game.state.portraits = {"left":"@player", "right":"bartender"}
+		var before: Dictionary = Game.state.duplicate(true)
+		var view = load("res://scenes/dialogue.tscn").instantiate()
+		add_child(view)
+		var portraits: Array = view.find_children("*", "TextureRect", true, false).filter(func(p): return p.texture != null and p.texture.resource_path.begins_with("res://assets/characters/"))
+		check(portraits.size() == 1 and portraits[0].texture == texture, node_id + " shows only black dancer portrait, including old checkpoint state")
+		if portraits.size() == 1:
+			check(portraits[0].material == null and portraits[0].is_visible_in_tree(), node_id + " preserves portrait transparency in actual dialogue view")
+		check(Game.state == before, node_id + " presentation does not rewrite saved state")
+		view.free()
+
 func start_boss() -> CombatModel:
 	fresh()
 	Game.state.currentDay = 7
@@ -334,6 +365,7 @@ func test_snapshots_and_training() -> void:
 func _ready() -> void:
 	if not OS.get_environment("QA_OUT_DIR").is_empty(): output = OS.get_environment("QA_OUT_DIR")
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output))
+	test_dialogue()
 	test_event_gate()
 	test_phases()
 	test_new_phase_player_turn()

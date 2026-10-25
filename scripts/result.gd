@@ -1,7 +1,12 @@
 extends DemoUI
 var reward_view: Control
+var week_end_view: Control
 
 func _ready() -> void:
+	if Game.is_week_complete():
+		week_end_view = preload("res://scripts/week_end.gd").new()
+		add_child(week_end_view)
+		return
 	if Game.has_battle_reward():
 		reward_view = preload("res://scripts/reward.gd").new()
 		add_child(reward_view)
@@ -38,4 +43,5 @@ func _ready() -> void:
 	fade_in()
 
 func handle_escape() -> bool:
+	if is_instance_valid(week_end_view): return week_end_view.handle_escape()
 	return is_instance_valid(reward_view) and reward_view.handle_escape()

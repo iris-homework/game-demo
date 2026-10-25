@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-25",
+  "source": "卡牌游戏美术资源/角色/黑舞者_对话立绘_v1.png",
+  "installed": "res://assets/characters/dancer_black_dialogue_v1.png",
+  "sha256": "62a8cb146504912f1bf79cecae42bbd803b8744243cb7eddb6d98de97355f08a",
+  "dimensions": [
+    1024,
+    1536
+  ],
+  "mode": "RGBA",
+  "processing": "Original PNG copied byte-for-byte; transparency preserved; whiteKey disabled; mipmap import enabled.",
+  "use": "E16 dialogue portrait; user authorized integration of existing art."
+}

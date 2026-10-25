@@ -377,7 +377,8 @@ func map_place_state(id: String) -> Dictionary:
 		"completed":completed and available.is_empty(), "services":p.get("services", [])}
 
 func objective() -> String:
-	if "E16" in state.get("completedEventIds", []): return "双人舞者已击败 · 可继续使用常驻设施"
+	if is_week_complete(): return "第一周结束 · 后续内容开发中"
+	if "E16" in state.get("completedEventIds", []): return "双人舞者已击败 · 领取奖励后结束第一周"
 	if state.get("flags", {}).get("week1Complete", false): return "第一周已完成 · 可继续探索剩余事件"
 	var targets := map_target_events()
 	if targets.size() == 1: return targets[0].title + "  /  " + place_data(targets[0].placeId).name
@@ -741,9 +742,16 @@ func valid_battle_passive_reward(subject: Dictionary) -> bool:
 	if reward.claimId != reward.eventId + ":" + reward.battleId + ":passive_victory" or not reward.claimId in subject.claimedRewardIds: return false
 	return {"battleId":reward.battleId, "result":"win"} in subject.battleHistory
 
-func is_run_over(subject: Dictionary = {}) -> bool:
+func is_run_failed(subject: Dictionary = {}) -> bool:
 	var s: Dictionary = state if subject.is_empty() else subject
 	return s.get("currentScene", "") == "defeat" or s.get("result", "") == "lose" or (s.get("currentScene", "") == "dialogue" and s.get("activeNodeId", "") == "lose") or (s.get("currentScene", "") == "battle" and s.get("combat", {}).get("outcome", "") == "lose")
+
+func is_week_complete(subject: Dictionary = {}) -> bool:
+	var s: Dictionary = state if subject.is_empty() else subject
+	return s.get("flags", {}).get("week1Complete", false) == true and "E16" in s.get("completedEventIds", []) and not is_run_failed(s)
+
+func is_run_over(subject: Dictionary = {}) -> bool:
+	return is_run_failed(subject) or is_week_complete(subject)
 
 func mark_run_failed(subject: Dictionary) -> void:
 	# Also used for a lethal snapshot saved before its presentation has finished.
@@ -755,12 +763,15 @@ func mark_run_failed(subject: Dictionary) -> void:
 	subject.battleReward = {}
 
 func claim_rewards(expected_revision: int) -> bool:
-	if not pending_save_kind.is_empty() or transition_locked or battle_busy or expected_revision != revision or state.currentScene != "result": return false
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or is_run_over() or expected_revision != revision or state.currentScene != "result": return false
 	var actions: Array = []
 	for id in event_data().get("rewardIds", []): actions.append({"op":"grantReward", "id":id})
 	if not apply_actions(actions): return false
 	if has_battle_reward() and state.battleReward.status == "pending":
 		state.battleReward.status = "skipped"
+	if state.activeEventId == "E16" and "E16" in state.completedEventIds and state.result == "win":
+		state.flags.week1Complete = true
+		return checkpoint()
 	go_map()
 	return pending_save_kind.is_empty()
 
@@ -796,7 +807,7 @@ func has_battle_reward() -> bool:
 	return not training_mode and state.get("currentScene", "") == "result" and not reward.is_empty() and reward.get("eventId", "") == state.activeEventId and reward.get("battleId", "") == state.battleId
 
 func choose_reward_card(id: String, expected_revision: int) -> bool:
-	if not pending_save_kind.is_empty() or transition_locked or battle_busy or expected_revision != revision or not has_battle_reward(): return false
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or is_run_over() or expected_revision != revision or not has_battle_reward(): return false
 	var reward: Dictionary = state.battleReward
 	if reward.status != "pending" or not id in reward.options or not reward_rules.cards.has(id): return false
 	# One checkpoint contains both ownership and the consumed choice.
@@ -826,7 +837,7 @@ func save_game() -> bool:
 	# Keep live combat in memory; only the restart point goes to disk until win/lose.
 	var saved := state.duplicate(true)
 	if not training_mode:
-		if is_run_over(saved): mark_run_failed(saved)
+		if is_run_failed(saved): mark_run_failed(saved)
 		else: restart_unfinished_battle(saved)
 	var temp := save_path + ".tmp"
 	var file := FileAccess.open(temp, FileAccess.WRITE)
@@ -896,6 +907,7 @@ func valid_save(s) -> bool:
 	if not s.combat.is_empty() and s.combat.profile.get("playerCharacterId", s.playerCharacterId) != s.playerCharacterId: return false
 	if not s.completedEventIds is Array or not s.flags is Dictionary or not s.choiceHistory is Dictionary or not s.portraits is Dictionary: return false
 	if s.flags.has("dancerBossAppeared") and not s.flags.dancerBossAppeared is bool: return false
+	if s.flags.has("week1Complete") and not s.flags.week1Complete is bool: return false
 	if not s.claimedRewardIds is Array or not s.battleHistory is Array: return false
 	if not s.deck is Array or not s.battleReward is Dictionary: return false
 	if not valid_removed_starting_cards(s): return false
@@ -997,7 +1009,7 @@ func load_game() -> bool:
 ## User navigation asks the main view to confirm before changing adventure state.
 func request_menu() -> void:
 	if not pending_save_kind.is_empty() or transition_locked or battle_busy or page == "menu": return
-	if page in ["card_library", "cyberware", "defeat"]:
+	if page in ["card_library", "cyberware", "defeat"] or is_week_complete():
 		menu()
 	else:
 		menu_requested.emit()
@@ -1009,7 +1021,7 @@ func request_quit() -> void:
 func menu() -> void:
 	if not pending_save_kind.is_empty() or transition_locked or battle_busy: return
 	if training_mode: restore_training()
-	elif is_run_over() and state.get("currentScene", "") != "defeat":
+	elif is_run_failed() and state.get("currentScene", "") != "defeat":
 		mark_run_failed(state)
 		revision += 1
 	elif restart_unfinished_battle(state): revision += 1
@@ -1021,7 +1033,7 @@ func resume() -> void:
 	if state.is_empty(): load_game()
 	else:
 		if not training_mode:
-			if is_run_over():
+			if is_run_failed():
 				mark_run_failed(state)
 				revision += 1
 			elif restart_unfinished_battle(state): revision += 1
@@ -1349,8 +1361,23 @@ func migrate_save(data):
 				combat.profile.cyberware = player_cyberware(data.playerCharacterId)
 	# New terminal page and old authored lose nodes share the same failed run.
 	# Keep malformed combat data for valid_save() to reject rather than hide it.
-	if data.get("combat", {}) is Dictionary and is_run_over(data): mark_run_failed(data)
+	if data.get("combat", {}) is Dictionary and is_run_failed(data): mark_run_failed(data)
+	normalize_week_completion(data)
 	return data
+
+func normalize_week_completion(data: Dictionary) -> void:
+	# Older completed Boss saves may already be back on the map. Do not replay
+	# completion, reissue rewards or skip a still-pending card selection.
+	if not data.get("flags") is Dictionary or not data.get("completedEventIds") is Array or not "E16" in data.completedEventIds or is_run_failed(data): return
+	var reward = data.get("battleReward", {})
+	var settled: bool = reward is Dictionary and reward.get("eventId") == "E16" and reward.get("status") in ["claimed", "skipped"]
+	if data.flags.get("week1Complete", false) != true and not data.get("currentScene") in ["map", "place"] and not (data.get("currentScene") == "result" and settled): return
+	data.flags.week1Complete = true
+	data.currentScene = "result"
+	data.activeEventId = "E16"
+	data.activeNodeId = "finish"
+	data.currentPlaceId = "hive"
+	data.erase("placeDialogue")
 
 func migrate_mercenary_story(data: Dictionary) -> void:
 	# Retire removed content without replaying completion, rewards or day costs.
@@ -1387,8 +1414,9 @@ func migrate_mercenary_story(data: Dictionary) -> void:
 			if key is String and key.get_slice(":", 0) in retired_events:
 				data.choiceHistory.erase(key)
 	if data.get("flags") is Dictionary:
-		# The authored first-week finale has been removed with E12.
-		data.flags.erase("week1Complete")
+		# Clear the removed E12 finale, preserving the new E16 completion marker.
+		if not data.get("completedEventIds") is Array or not "E16" in data.completedEventIds:
+			data.flags.erase("week1Complete")
 	if data.get("portraits") is Dictionary:
 		for side in ["left", "right"]:
 			if data.portraits.get(side, "") in retired_characters: data.portraits[side] = ""

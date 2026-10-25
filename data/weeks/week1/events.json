@@ -1200,57 +1200,182 @@
     "unlockCondition": {},
     "repeatPolicy": "once",
     "startNodeId": "intro_01",
-    "description": "第七天，蜂巢城寨亮起舞台灯。黑舞者独自候场，暗处还藏着另一位舞者。",
+    "description": "第七天，蜂巢城寨的通道被临时封锁。屋顶的聚光灯照着街口，持枪的黑舞者将整条路当成了舞台。想要通行的人，都得先陪他完成一场演出。居民的门窗紧闭，诺伦决定亲自走进灯光里。",
     "demoNote": "",
     "rewardIds": [],
     "nodes": {
       "intro_01": {
         "id": "intro_01",
-        "type": "stage",
         "speakerId": "",
         "speakerSide": "",
-        "text": "蜂巢城寨的灯光逐一熄灭。街中央只剩一道光，黑舞者站在光里，缓缓举起长枪。",
+        "text": "蜂巢城寨的街灯接连熄灭，屋顶的聚光灯却亮了起来。黑舞者横枪站在通道中央，身后是一排锁住的路障。",
         "portraits": {
-          "left": "@player",
-          "right": ""
+          "left": "",
+          "right": "dancer_black"
         },
-        "next": "intro_02"
+        "next": "intro_02",
+        "type": "stage"
       },
       "intro_02": {
         "id": "intro_02",
         "speakerId": "@player",
         "speakerSide": "left",
-        "text": "封路等我？那就开始吧。",
+        "text": "把路让开。我还有事要办。",
+        "portraits": {
+          "left": "",
+          "right": "dancer_black"
+        },
+        "next": "intro_03"
+      },
+      "intro_03": {
+        "id": "intro_03",
+        "speakerId": "dancer_black",
+        "speakerSide": "right",
+        "text": "灯已经亮了。走进这里，就得陪我跳完这一支。",
+        "portraits": {
+          "left": "",
+          "right": "dancer_black"
+        },
+        "next": "intro_04"
+      },
+      "intro_04": {
+        "id": "intro_04",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "你把路封了，还要别人配合？",
+        "portraits": {
+          "left": "",
+          "right": "dancer_black"
+        },
+        "next": "intro_05"
+      },
+      "intro_05": {
+        "id": "intro_05",
+        "speakerId": "dancer_black",
+        "speakerSide": "right",
+        "text": "放心，我不挑舞伴。跟得上枪尖，就能走。",
+        "portraits": {
+          "left": "",
+          "right": "dancer_black"
+        },
+        "next": "intro_06"
+      },
+      "intro_06": {
+        "id": "intro_06",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "后面的住户也得过这条路。把枪收起来。",
+        "portraits": {
+          "left": "",
+          "right": "dancer_black"
+        },
+        "next": "intro_07"
+      },
+      "intro_07": {
+        "id": "intro_07",
+        "speakerId": "dancer_black",
+        "speakerSide": "right",
+        "text": "等演出结束，路自然会开。",
+        "portraits": {
+          "left": "",
+          "right": "dancer_black"
+        },
+        "next": "intro_08"
+      },
+      "intro_08": {
+        "id": "intro_08",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "黑舞者后撤半步，枪尖斜指地面。屋顶传来一声节拍，街口的灯同时转向诺伦。",
+        "portraits": {
+          "left": "",
+          "right": "dancer_black"
+        },
+        "next": "intro_09",
+        "type": "stage"
+      },
+      "intro_09": {
+        "id": "intro_09",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "那我就替你早点收场。",
+        "portraits": {
+          "left": "",
+          "right": "dancer_black"
+        },
         "next": "battle"
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "枪尖垂下。黑舞者踉跄着退到路边，抬手关掉了头顶的聚光灯。",
+        "portraits": {
+          "left": "",
+          "right": "dancer_black"
+        },
+        "next": "win_02",
+        "type": "stage"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "dancer_black",
+        "speakerSide": "right",
+        "text": "……最后这一拍，你抢得不错。",
+        "portraits": {
+          "left": "",
+          "right": "dancer_black"
+        },
+        "next": "win_03"
+      },
+      "win_03": {
+        "id": "win_03",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "把路障撤了。下次想演出，先问问别人愿不愿意看。",
+        "portraits": {
+          "left": "",
+          "right": "dancer_black"
+        },
+        "next": "win_04"
+      },
+      "win_04": {
+        "id": "win_04",
+        "speakerId": "dancer_black",
+        "speakerSide": "right",
+        "text": "知道了。今晚不再拦人。",
+        "portraits": {
+          "left": "",
+          "right": "dancer_black"
+        },
+        "next": "win_05"
+      },
+      "win_05": {
+        "id": "win_05",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "路障的锁扣逐一松开，街灯重新亮起。诺伦收起武器，沿着恢复通行的街道离开。",
+        "portraits": {
+          "left": "",
+          "right": "dancer_black"
+        },
+        "next": "finish",
+        "type": "stage"
       },
       "battle": {
         "id": "battle",
         "type": "battle",
         "battleId": "B16"
       },
-      "win_01": {
-        "id": "win_01",
-        "type": "stage",
-        "speakerId": "",
-        "speakerSide": "",
-        "text": "黑白舞者同时停住。聚光灯逐渐暗下去，街道终于恢复寂静。",
-        "portraits": {
-          "right": ""
-        },
-        "next": "win_02"
-      },
-      "win_02": {
-        "id": "win_02",
-        "speakerId": "@player",
-        "speakerSide": "left",
-        "text": "谢幕了。",
-        "next": "finish"
-      },
       "lose": {
         "id": "lose",
         "speakerId": "",
         "speakerSide": "",
-        "text": "舞台灯光熄灭。"
+        "text": "舞台灯光熄灭。",
+        "portraits": {
+          "left": "",
+          "right": "dancer_black"
+        }
       },
       "finish": {
         "id": "finish",

@@ -183,7 +183,8 @@ func enter(params: Dictionary) -> void:
 		cyberware_button.add_theme_stylebox_override(state_name,purple_style)
 	refresh_cyberware()
 	if Game.config.developmentMode:
-		button(self,"调试结果",Vector2(900,163),Vector2(160,36),show_debug_results).add_theme_font_size_override("font_size",15)
+		var debug_position := Vector2(1240,96) if model.profile.get("battleType","normal") == "boss" else Vector2(900,163)
+		button(self,"调试结果",debug_position,Vector2(160,36),show_debug_results).add_theme_font_size_override("font_size",15)
 	aim = Node2D.new()
 	aim.set_script(preload("res://scripts/combat/targeting_line.gd"))
 	aim.z_index = 35
@@ -246,8 +247,12 @@ func refresh_enemy_hud() -> void:
 	add_child(enemy_hud)
 	var summary := Control.new()
 	enemy_hud.add_child(summary)
-	summary.size = Vector2(344,80*mini(3,shown_enemies.size())-12)
-	summary.global_position = Vector2(1072,96)
+	# Use the frozen battle type, including training and restored encounters.
+	var boss: bool = model.profile.get("battleType","normal") == "boss"
+	var summary_width: float = EnemyHPSummary.BOSS_DIMENSIONS.x if boss else EnemyHPSummary.DIMENSIONS.x
+	summary.size = Vector2(summary_width+16,80*mini(3,shown_enemies.size())-12)
+	# Center the visible health track; the HP readout sits to its right.
+	summary.global_position = Vector2(720-EnemyHPSummary.BOSS_TRACK.get_center().x,96) if boss else Vector2(1072,96)
 	summary.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	# A fixed-height viewport keeps larger encounters above the actor stage.
 	var summary_scroll := ScrollContainer.new()
@@ -256,7 +261,7 @@ func refresh_enemy_hud() -> void:
 	summary_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE if shown_enemies.size() <= 3 else Control.MOUSE_FILTER_PASS
 	summary.add_child(summary_scroll)
 	var rows := Control.new()
-	rows.custom_minimum_size = Vector2(328,80*shown_enemies.size()-12)
+	rows.custom_minimum_size = Vector2(summary_width,80*shown_enemies.size()-12)
 	rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	summary_scroll.add_child(rows)
 	for i in shown_enemies.size():
@@ -264,7 +269,7 @@ func refresh_enemy_hud() -> void:
 		var summary_plate := EnemyHPSummary.new()
 		rows.add_child(summary_plate)
 		summary_plate.position = Vector2(0,i*80)
-		summary_plate.setup(enemy,i+1,base_font)
+		summary_plate.setup(enemy,i+1,base_font,boss)
 		enemy_summary_plates.append(summary_plate)
 		var intent_text := displayed_enemy_intent(enemy)
 		var plate := ActorHUD.new()

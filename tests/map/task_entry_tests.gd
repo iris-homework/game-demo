@@ -69,6 +69,9 @@ func test_map_entries() -> void:
 
 func test_briefing(event_id: String) -> void:
 	fresh([event_id])
+	if event_id == "E16":
+		Game.state.currentDay = 7
+		Game.refresh_event_pool()
 	var event: Dictionary = Game.events[event_id]
 	Game.visit(event.placeId)
 	var before := Game.state.duplicate(true)
@@ -205,7 +208,7 @@ func _ready() -> void:
 		return
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT))
 	await test_map_entries()
-	for id in ["E02", "E04", "E11", "E13", "E14", "E15"]:
+	for id in ["E02", "E04", "E11", "E13", "E14", "E15", "E16"]:
 		await test_briefing(id)
 	await test_multiple_tasks()
 	await test_stale_and_locked_start()
