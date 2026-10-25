@@ -1,5 +1,13 @@
 # 测试目录索引
 
+2026-10-25演练同步：已发布演练专项验证B13／B14／B15仅引用正式数据、双35／45／36 HP完整阵容、正式数据内存变化即时跟随、选择器深拷贝及无临时enemy，经典机器人同步40 HP；菜单文案与双猎犬演员／意图同步。配套机器人、意图、新委托、冷启动牌组、重开、战斗、Boss共8套2489项隔离无窗口断言通过，未做GPU像素／物理输入验收。见[验证汇总](../artifacts/qa/training-formal-sync-2026-10-25/verification.json)。
+
+2026-10-25电能显示时机：意图展示专项增加血条下同排Buff节点、机器人蓄力／扩张前保留电能、抢修工接近／前摇保留电能、首次命中清除及重复回调预览稳定检查；搭配机器人／抢修工规则共3套298项隔离无窗口断言通过。未做GPU像素／物理输入验收，见[验证汇总](../artifacts/qa/electric-charge-impact-2026-10-25/verification.json)。
+
+2026-10-25双猎犬：新增[规则专项](combat/enemies/pruning_hound_rules_tests.tscn)，覆盖双35HP、反相循环、独立力量与格挡、下一次各自行动清格挡、未行动敌人保留格挡、玩家格挡时机、死敌跳过、新旧快照及强化参数校验。意图专项增加真实双犬演练，检查第二条力量事件不擦掉新格挡、另一犬行动不提前清格挡。12套3617项隔离无窗口断言通过；未做像素／物理输入验收，并发正式进程的存档哈希变化单独记录。见[验证汇总](../artifacts/qa/pruning-hound-pair-2026-10-25/verification.json)。
+
+2026-10-25抢修工防护服：新增[规则专项](combat/enemies/powerline_repairman_rules_tests.tscn)，覆盖45HP、单次强化后双攻击循环、实伤逐段积电／全挡不减／非攻击不触发、消耗、新旧快照与非法循环起点。意图专项增加真实演练及逐段HUD观察，演练专项适配抢修工新意图并保留其余九种。8套2962项隔离无窗口检查通过；专用用户目录保护首轮退出和最终结果见[验证汇总](../artifacts/qa/repairman-energy-suit-2026-10-25/verification.json)。未做GPU像素或物理输入验收。
+
 2026-10-25机器人电能：[机器人规则专项](combat/enemies/robot/robot_rules_tests.tscn)覆盖三步循环、电能增伤／削层／消耗、多段格挡、状态伤害隔离与新旧快照；[意图展示专项](combat/presentation/enemy_intent_phase_tests.tscn)包含真实演练充能与三段削层／双段射线。六套1459项隔离无窗口断言通过，正式用户文件不变；未做GPU像素或物理输入验收。首轮夹具失败及最终证据见[验证汇总](../artifacts/qa/robot-charge-2026-10-25/verification.json)。
 
 2026-10-25指定敌人技能瞄准：新增[targeted_skill_aim_tests](combat/interaction/targeted_skill_aim_tests.tscn)84项，覆盖30／34／39两种形态及11远程的实际出牌、指定不同敌人、居中不跟随、按下不提前结算、松手／点选确认、防重复、换牌、取消、空目标／死敌、费用不足与同手牌切形态。自身／群体非攻击与攻击输入保留；配套自身目标110、诺伦卡牌899，共3套1093项0失败。隔离工程、独立用户目录、headless+Dummy；运动事件经视口最终变换后`Input.parse_input_event`注入，按钮用`viewport.push_input`，不调用系统鼠标移动。有效旧版对照84项19失败，新版通过；输入坐标／夹具诊断及音频收尾前日志保留，最终日志无脚本错误／警告／退出提示。`skill_drag_visual`仅静态适配，未运行物理窗口或像素验收。见[验证汇总](../artifacts/qa/targeted-skill-aim-2026-10-25/verification.json)。

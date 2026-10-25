@@ -32,6 +32,7 @@ func setup(intent: Dictionary, description: String, font: Font) -> void:
 	match kind:
 		"attack": value_label.text = description.trim_prefix("攻击 ").replace(" ","")
 		"strength_allies", "charge": value_label.text = "+%d" % int(intent.get("amount",0))
+		"energy_suit", "fortify": value_label.text = "强化"
 		"pollution", "vulnerable": value_label.text = str(int(intent.get("amount",0)))
 		_:
 			value_label.text = description
@@ -59,6 +60,13 @@ func _draw() -> void:
 			draw_line(Vector2(22,33),Vector2(32,23),Color("25172c"),8,true)
 			draw_line(Vector2(22,33),Vector2(32,23),Color("ff6b8b"),4,true)
 			draw_circle(Vector2(35,36),3,Color("f96586"))
+		"fortify":
+			silhouette([Vector2(5,5),Vector2(20,1),Vector2(35,5),Vector2(32,24),Vector2(20,36),Vector2(8,24)],Color("73cafa"))
+			draw_line(Vector2(20,27),Vector2(20,10),Color("ffe2a1"),4,true)
+			draw_polyline(PackedVector2Array([Vector2(13,17),Vector2(20,10),Vector2(27,17)]),Color("ffe2a1"),4,true)
+		"energy_suit":
+			silhouette([Vector2(12,2),Vector2(4,8),Vector2(9,18),Vector2(9,35),Vector2(31,35),Vector2(31,18),Vector2(36,8),Vector2(28,2),Vector2(25,10),Vector2(15,10)],Color("81e4d4"))
+			draw_polyline(PackedVector2Array([Vector2(22,14),Vector2(16,23),Vector2(24,23),Vector2(18,31)]),Color("245e6d"),3,true)
 		"charge":
 			silhouette([Vector2(22,1),Vector2(6,21),Vector2(18,21),Vector2(14,37),Vector2(35,13),Vector2(23,13),Vector2(28,1)],Color("75dfff"))
 			draw_line(Vector2(21,9),Vector2(14,18),Color("ddfaff"),2,true)

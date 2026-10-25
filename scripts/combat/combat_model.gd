@@ -158,7 +158,10 @@ func initialize(id: String, hp: int, maximum: int, rules: Dictionary, enemy_defs
 func intent_for(enemy: Dictionary, index: int) -> Dictionary:
 	var sequence: Array = enemy.get("intentSequence", [])
 	if enemy.get("intentPhase", "") == "ally_death": sequence = enemy.get("allyDeathIntentSequence", {}).get("sequence", sequence)
-	return (profile.intent if sequence.is_empty() else sequence[index % sequence.size()]).duplicate(true)
+	if sequence.is_empty(): return profile.intent.duplicate(true)
+	var loop_start := int(enemy.get("intentLoopStart", 0))
+	var cursor := index if index < sequence.size() else loop_start + (index - loop_start) % (sequence.size() - loop_start)
+	return sequence[cursor].duplicate(true)
 
 func begin_round_intents() -> Array:
 	# A full round is player actions followed by enemy actions.
@@ -198,6 +201,8 @@ func enemy_intent_text(enemy: Dictionary, after_player_turn_end: bool = true, vu
 	if intent.get("type", "") == "vulnerable": return "易伤 %d" % int(intent.get("amount", 0))
 	if intent.get("type", "") == "strength_allies": return "强化 +%d" % int(intent.get("amount", 0))
 	if intent.get("type", "") == "charge": return "充能 +%d 电能" % int(intent.get("amount", 0))
+	if intent.get("type", "") == "energy_suit": return "强化：能量防护服"
+	if intent.get("type", "") == "fortify": return "强化：格挡 +%d／力量 +%d" % [int(intent.get("amount",0)),int(intent.get("strength",0))]
 	if intent.get("type", "") != "attack": return str(intent.get("description", "非攻击行动"))
 	var amount := int(intent.get("amount", 0))
 	if is_noren(): amount = enemy_intent_damage(enemy, after_player_turn_end, vulnerable_layers)
@@ -403,11 +408,11 @@ func gain_ammo(amount: int) -> void:
 
 func enemy_damage(index: int, amount: int, bypass: bool = false, attack_damage: bool = false) -> Dictionary:
 	var enemy: Dictionary = enemies[index]
-	if attack_damage and enemy.hp > 0: buffs.after_incoming_attack(self, index)
 	amount = buffs.incoming_damage(self, amount, index) if attack_damage else maxi(0, amount)
 	var absorbed := 0 if bypass else mini(amount, int(enemy.get("block", 0)))
 	enemy.block = int(enemy.get("block", 0)) - absorbed
 	var loss := mini(maxi(0, amount - absorbed), int(enemy.hp))
+	if attack_damage and enemy.hp > 0: buffs.after_incoming_attack(self, index, loss)
 	enemy.hp -= loss
 	# Only an alive-to-dead transition triggers death effects, for every damage source.
 	var death_pollution := int(enemy.get("deathPollution",0)) if loss > 0 and enemy.hp == 0 else 0
@@ -576,7 +581,9 @@ func end_noren_turn() -> Dictionary:
 		if not outcome.is_empty(): break
 		var enemy: Dictionary = enemies[index]
 		if enemy.hp <= 0: continue
+		var old_block := buffs.count(self, "block", index)
 		buffs.own_turn_start(self, index)
+		if old_block > 0: turn_events.append({"type":"block_clear","target":index})
 		var intent: Dictionary = enemy.intent
 		if intent.get("type", "") != "attack":
 			var kind: String = intent.get("type", "")
@@ -585,10 +592,21 @@ func end_noren_turn() -> Dictionary:
 				buffs.apply(self, kind, amount)
 				turn_events.append({"type":"status_apply","source":index,"target":-1,"buffId":kind,"amount":amount,"stacksAfter":buffs.count(self, kind)})
 				log_lines.append("%s 施加 %d 层%s。" % [enemy.displayName, amount, buffs.definition(kind).name])
+			elif kind == "fortify":
+				buffs.apply(self, "block", amount, index)
+				var strength := int(intent.get("strength",0))
+				buffs.apply(self, "strength", strength, index)
+				turn_events.append({"type":"status_apply","source":index,"target":index,"buffId":"block","amount":amount,"stacksAfter":buffs.count(self,"block",index)})
+				turn_events.append({"type":"status_apply","source":index,"target":index,"buffId":"strength","amount":strength,"stacksAfter":buffs.count(self,"strength",index)})
+				log_lines.append("%s 强化，获得 %d 格挡、%d 力量。" % [enemy.displayName,amount,strength])
 			elif kind == "charge":
 				buffs.apply(self, "electric_charge", amount, index)
 				turn_events.append({"type":"status_apply","source":index,"target":index,"buffId":"electric_charge","amount":amount,"stacksAfter":buffs.count(self, "electric_charge", index)})
 				log_lines.append("%s 充能，获得 %d 层电能。" % [enemy.displayName, amount])
+			elif kind == "energy_suit":
+				buffs.apply(self, "energy_suit", 1, index)
+				turn_events.append({"type":"status_apply","source":index,"target":index,"buffId":"energy_suit","amount":1,"stacksAfter":buffs.count(self,"energy_suit",index)})
+				log_lines.append("%s 强化，获得能量防护服。" % enemy.displayName)
 			elif kind == "strength_allies":
 				for ally_index in enemies.size():
 					if enemies[ally_index].hp <= 0 or not enemies[ally_index].id in intent.get("targetIds", []): continue

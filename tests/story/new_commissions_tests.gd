@@ -1,8 +1,8 @@
 extends Node
 ## Run in an isolated copied project, headless; no formal player saves or mouse input.
 const CASES := [
-	["E13", "B13", "pruning_hound", "garden", 36, 6],
-	["E14", "B14", "powerline_repairman", "power", 48, 8],
+	["E13", "B13", "pruning_hound", "garden", 35, 8],
+	["E14", "B14", "powerline_repairman", "power", 45, 0],
 	["E15", "B15", "beacon_jellyfish", "port", 36, 6],
 ]
 var checks := 0
@@ -132,19 +132,25 @@ func test_event(c: Array) -> void:
 	check(Game.state.currentDay == day and Game.state.credits == credits, id + " entering battle spends no day or reward")
 	var model := CombatModel.new()
 	model.restore(Game.state.combat)
-	check(model.enemies.size() == 1 and model.enemies[0].id == c[2] and model.enemies[0].maxHp == c[4], id + " formal enemy and HP")
+	check(model.enemies.size() == (2 if id == "E13" else 1) and model.enemies[0].id == c[2] and model.enemies[0].maxHp == c[4], id + " formal enemy count and HP")
+	if id == "E13":
+		check(model.enemies[1].id == "pruning_hound_second" and model.enemies[1].hp == 35 and model.enemies[1].maxHp == 35 and model.enemies[1].combatVisualId == "pruning_hound" and model.enemies[1].intent.type == "fortify", "E13 second hound shares published art and starts with fortify")
 	var visual = Game.enemy_combat_visual(model.enemies[0])
 	check(visual.id == c[2] and visual.pipeline_active and visual.diagnostics.is_empty(), id + " published art resolves without fallback")
 	check(visual.poses.get("idle") is Texture2D, id + " actual idle texture loaded")
 	var hp: int = model.player_hp
 	model.end_turn()
 	check(model.player_hp == hp - int(c[5]), id + " actual enemy turn applies configured damage")
+	if id == "E14":
+		check(model.buffs.count(model, "energy_suit", 0) == 1 and model.enemies[0].intent.type == "attack" and model.enemies[0].intent.amount == 5, "E14 first turn equips energy suit and prepares attack5")
 	Game.commit_combat(model)
 	check(Game.state.currentHp == model.player_hp, id + " progressed combat commits")
 	check(Game.save_game() and Game.load_game(), id + " midbattle saves and loads")
 	check(Game.state.combat.turn == 1 and Game.state.currentHp == hp and Game.state.combat.enemies[0].hp == c[4], id + " reload restarts fixed opening")
 	model.restore(Game.state.combat)
-	model.enemy_damage(0, 999)
+	if id == "E13":
+		check(model.enemies.size() == 2 and model.enemies[0].hp == 35 and model.enemies[1].hp == 35 and model.enemies[0].intent.type == "attack" and model.enemies[1].intent.type == "fortify", "E13 reload restores both hounds and their staggered opening")
+	for index in model.enemies.size(): model.enemy_damage(index, 999)
 	model.resolve_outcome()
 	Game.commit_combat(model)
 	check(model.outcome == "win" and Game.state.combat.outcome == "win", id + " model victory commits")
@@ -165,7 +171,10 @@ func test_event(c: Array) -> void:
 	var authored: Dictionary = Game.enemy_catalog[c[2]].duplicate(true)
 	Game.menu()
 	Game.start_enemy_training(c[2])
-	check(Game.training_mode and Game.state.combat.enemies[0].maxHp == 100, id + " training retains its separate HP")
+	check(Game.training_mode and Game.state.combat.enemies[0].hp == c[4] and Game.state.combat.enemies[0].maxHp == c[4] and Game.state.combat.enemies.size() == (2 if id == "E13" else 1), id + " training follows current formal HP and enemy count")
+	check(Game.training_enemy_id.is_empty() and Game.state.combat.enemies[0].id == c[2] and same(Game.state.combat.enemies[0].intentSequence, authored.intentSequence), id + " training uses formal enemy identity and current intent sequence")
+	if id == "E13":
+		check(Game.state.combat.enemies[1].id == "pruning_hound_second" and Game.state.combat.enemies[1].hp == 35 and Game.state.combat.enemies[1].intent.type == "fortify", "E13 enemy training includes its second thirty-five HP hound with opposite opening")
 	Game.finish_training("lose")
 	check(same(saved, Game.state) and same(authored, Game.enemy_catalog[c[2]]), id + " training restores adventure and formal enemy")
 	# A separate actual defeat must remain terminal and unrewarded.

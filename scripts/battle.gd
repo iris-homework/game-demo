@@ -735,6 +735,7 @@ func end_turn_pressed() -> void:
 		if default_style.is_empty(): default_style = "pierce"
 		var style: String = shown_enemies[attacker_index].intent.get("animation",default_style)
 		await stage.attack(stage.enemies[attacker_index],stage.player,style,attack.hits,func(hit: Dictionary, _index: int):
+			if _index == 0: present_attack_impact(attack, attacker_index)
 			shown_player_hp = int(hit.hpAfter)
 			shown_player_block = maxi(0,shown_player_block-int(hit.get("blocked",0)))
 			shown_player_pollution = int(hit.get("pollutionAfter", shown_player_pollution))
@@ -780,15 +781,19 @@ func end_turn_pressed() -> void:
 	set_busy(false)
 
 
-func present_attack_start(attack: Dictionary, index: int) -> void:
-	var enemy: Dictionary = shown_enemies[index]
-	enemy.block = 0
-	if int(attack.get("electricChargeUsed",0)) > 0:
-		# Keep the in-flight damage preview while showing that charge is spent.
-		enemy.intent = enemy.intent.duplicate(true)
-		enemy.intent.amount = int(enemy.intent.get("amount",0)) + int(attack.electricChargeUsed)
-		apply_shown_status({"target":index,"buffId":"electric_charge","stacksAfter":int(attack.electricChargeAfter)})
+func present_attack_start(_attack: Dictionary, index: int) -> void:
+	shown_enemies[index].block = 0
 	refresh_enemy_hud()
+
+func present_attack_impact(attack: Dictionary, index: int) -> void:
+	var enemy: Dictionary = shown_enemies[index]
+	if int(attack.get("electricChargeUsed",0)) <= 0: return
+	if model.buffs.enemy_count(enemy,model.buffs.definition("electric_charge")) <= 0: return
+	# Keep the badge through preparation; spend it on the first actual hit only.
+	# Fold its captured bonus into the shown intent to keep later-hit previews stable.
+	enemy.intent = enemy.intent.duplicate(true)
+	enemy.intent.amount = int(enemy.intent.get("amount",0)) + int(attack.electricChargeUsed)
+	apply_shown_status({"target":index,"buffId":"electric_charge","stacksAfter":int(attack.electricChargeAfter)})
 
 func setup_dancer_duet() -> void:
 	var visuals: Array[EnemyVisualResolver.Visual] = []
@@ -872,10 +877,12 @@ func present_status_event(event: Dictionary) -> void:
 	if event.type == "status_decay":
 		apply_shown_status(event)
 		return
+	if event.type == "block_clear":
+		shown_enemies[target_index].block = 0
+		refresh_enemy_hud()
+		return
 	if event.type == "status_apply":
 		var source := int(event.source)
-		shown_enemies[source].block = 0
-		refresh_enemy_hud()
 		if event.buffId == "pollution":
 			await stage.present_pollution_spit(stage.enemies[source],actor,func():
 				apply_shown_status(event)
@@ -920,9 +927,13 @@ func apply_shown_status(event: Dictionary) -> void:
 		if event.buffId == "vulnerable": refresh_enemy_hud()
 	else:
 		var enemy: Dictionary = shown_enemies[index]
-		if not enemy.has("buffs"): enemy.buffs = {}
-		if int(event.stacksAfter) == 0: enemy.buffs.erase(event.buffId)
-		else: enemy.buffs[event.buffId] = int(event.stacksAfter)
+		var definition := model.buffs.definition(event.buffId)
+		var field: String = definition.get("field", "")
+		if not field.is_empty(): enemy[field] = int(event.stacksAfter)
+		else:
+			if not enemy.has("buffs"): enemy.buffs = {}
+			if int(event.stacksAfter) == 0: enemy.buffs.erase(event.buffId)
+			else: enemy.buffs[event.buffId] = int(event.stacksAfter)
 		refresh_enemy_hud()
 
 func announce_turn(text: String, enemy: bool = false) -> void:

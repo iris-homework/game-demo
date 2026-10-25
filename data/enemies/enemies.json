@@ -209,12 +209,39 @@
     "characterId": "pruning_hound",
     "displayName": "修枝猎犬",
     "battlePortraitAssetId": "",
-    "maxHp": 36,
+    "maxHp": 35,
     "intentSequence": [
       {
         "type": "attack",
-        "amount": 6,
-        "hits": 1,
+        "amount": 4,
+        "hits": 2,
+        "animation": "pierce"
+      },
+      {
+        "type": "fortify",
+        "amount": 5,
+        "strength": 1
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "pruning_hound"
+  },
+  "pruning_hound_second": {
+    "id": "pruning_hound_second",
+    "characterId": "pruning_hound",
+    "displayName": "修枝猎犬",
+    "battlePortraitAssetId": "",
+    "maxHp": 35,
+    "intentSequence": [
+      {
+        "type": "fortify",
+        "amount": 5,
+        "strength": 1
+      },
+      {
+        "type": "attack",
+        "amount": 4,
+        "hits": 2,
         "animation": "pierce"
       }
     ],
@@ -226,12 +253,23 @@
     "characterId": "powerline_repairman",
     "displayName": "输电抢修工",
     "battlePortraitAssetId": "",
-    "maxHp": 48,
+    "maxHp": 45,
+    "intentLoopStart": 1,
     "intentSequence": [
       {
+        "type": "energy_suit",
+        "amount": 1
+      },
+      {
         "type": "attack",
-        "amount": 8,
+        "amount": 5,
         "hits": 1,
+        "animation": "pierce"
+      },
+      {
+        "type": "attack",
+        "amount": 3,
+        "hits": 2,
         "animation": "pierce"
       }
     ],

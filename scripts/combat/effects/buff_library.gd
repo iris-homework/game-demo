@@ -40,9 +40,9 @@ func catalog_errors(rows) -> PackedStringArray:
 		if entry.target not in ["player", "enemy", "both"]: errors.append(entry.id + ": invalid target")
 		if entry.stacking not in ["add", "guarded_add", "flag", "unique"]: errors.append(entry.id + ": invalid stacking")
 		if entry.duration not in ["battle", "player_turn_end", "own_turn_start", "own_turn_end_decay"]: errors.append(entry.id + ": invalid duration")
-		if entry.handler not in ["block", "bleed", "weak", "pollution", "vulnerable", "strength", "parry", "electric_charge", "attack_bonus", "attack_discount", "high_pressure", "dissection", "none"]: errors.append(entry.id + ": implement handler first")
-		if entry.handler in ["block", "bleed", "weak", "pollution", "vulnerable", "strength", "parry", "electric_charge", "high_pressure", "dissection"] and entry.id != entry.handler: errors.append(entry.id + ": specialized handler requires its canonical ID")
-		if entry.handler == "electric_charge" and entry.target != "enemy": errors.append(entry.id + ": electric charge currently requires enemy target")
+		if entry.handler not in ["block", "bleed", "weak", "pollution", "vulnerable", "strength", "parry", "energy_suit", "electric_charge", "attack_bonus", "attack_discount", "high_pressure", "dissection", "none"]: errors.append(entry.id + ": implement handler first")
+		if entry.handler in ["block", "bleed", "weak", "pollution", "vulnerable", "strength", "parry", "energy_suit", "electric_charge", "high_pressure", "dissection"] and entry.id != entry.handler: errors.append(entry.id + ": specialized handler requires its canonical ID")
+		if entry.handler in ["energy_suit", "electric_charge"] and entry.target != "enemy": errors.append(entry.id + ": currently requires enemy target")
 		if entry.handler in ["attack_bonus", "attack_discount"] and entry.target != "player": errors.append(entry.id + ": attack modifier currently requires player target")
 		if not entry.get("showBadge") is bool or not Color.html_is_valid(entry.color): errors.append(entry.id + ": invalid display")
 		if entry.has("maxStacks") and not _valid_count(entry.maxStacks): errors.append(entry.id + ": invalid maximum")
@@ -212,7 +212,10 @@ func enemy_attack_damage(enemy: Dictionary, amount: int) -> int:
 	var base := maxi(0, amount + (enemy_count(enemy, strength) if not strength.is_empty() else 0) + charge)
 	return roundi(base * (0.75 if int(enemy.get("weak", 0)) > 0 else 1.0))
 
-func after_incoming_attack(model, enemy_index: int) -> void:
+func after_incoming_attack(model, enemy_index: int, hp_loss: int) -> void:
+	if count(model, "energy_suit", enemy_index) > 0:
+		if hp_loss > 0: apply(model, "electric_charge", 1, enemy_index)
+		return
 	var layers := count(model, "electric_charge", enemy_index)
 	if layers > 0: _write_count(model, "electric_charge", layers - 1, enemy_index)
 

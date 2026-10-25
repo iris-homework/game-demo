@@ -19,6 +19,22 @@ static func describe(enemy: Dictionary, preview: String) -> Dictionary:
 			data.unit = "每段伤害 × 次数" if hits>1 else "点伤害"
 			data.summary = "将对你造成 %d 次伤害，每次 %d 点。" % [hits,damage] if hits>1 else "将对你造成 %d 点攻击伤害。" % damage
 			data.notes.append({"title":"伤害预览","body":"预计合计 %d 点，先由格挡抵消。数值已计入当前伤害修正。" % (damage*hits)})
+		"fortify":
+			data.title = "强化"
+			data.accent = Color("73cafa")
+			data.value = "格挡 +%d / 力量 +%d" % [amount,int(intent.get("strength",0))]
+			data.unit = "自身"
+			data.summary = "获得 %d 点格挡，增加 %d 层力量。" % [amount,int(intent.get("strength",0))]
+			data.notes.append({"title":"格挡","body":"受到伤害时优先消耗，在自己的下一个行动回合开始时清除；角色与敌人均适用。"})
+			data.notes.append({"title":"力量","body":"每层使每段基础攻击伤害 +1，持续至本场战斗结束。"})
+		"energy_suit":
+			data.title = "强化"
+			data.accent = Color("81e4d4")
+			data.value = "能量防护服"
+			data.unit = "自身 / 本场持续"
+			data.summary = "获得能量防护服，受攻击时电能不再衰减。"
+			data.notes.append({"title":"受击充能","body":"每段攻击本体实际扣血时获得1层电能，多段逐段触发。完全格挡不增加，部分格挡后扣血仍增加；裂伤、污染等非攻击伤害不触发。"})
+			data.notes.append({"title":"电能","body":"下次攻击的每段基础伤害增加当前电能层数，攻击生效时消耗全部层数。"})
 		"charge":
 			data.title = "充能"
 			data.accent = Color("75dfff")

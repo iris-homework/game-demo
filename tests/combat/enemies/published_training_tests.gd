@@ -3,6 +3,7 @@ extends Node
 const Stage := preload("res://scripts/combat/test_stage.gd")
 const AuthoredEffect := preload("res://scripts/combat/authored_attack_fx.gd")
 const IDS := ["warden_shield", "chip_broker", "mutant_mouse", "luggage_lurker", "penitent_ascetic", "rogue_drone", "mirror_inspector", "pruning_hound", "powerline_repairman", "beacon_jellyfish"]
+const FORMAL_BATTLES := {"pruning_hound":"B13", "powerline_repairman":"B14", "beacon_jellyfish":"B15"}
 const OUTPUT := "res://artifacts/qa/unified-training-2026-10-24/"
 var checks := 0
 var failures: Array[String] = []
@@ -65,7 +66,23 @@ func test_config() -> void:
 		check(choice.id in IDS and choice.combatVisualId == choice.id and not str(choice.displayName).is_empty(), "Choice identity/name/explicit visual: " + str(choice.id))
 		check(not Game.place_data(choice.placeId).is_empty(), "Choice has existing place: " + str(choice.id))
 		var sequence: Array = choice.intentSequence
-		check(int(choice.maxHp) == 100 and sequence.size() == 1 and sequence[0].type == "attack" and sequence[0].amount == 6 and sequence[0].hits == 1, "Explicit provisional 100 HP / single 6-damage attack: " + str(choice.id))
+		if FORMAL_BATTLES.has(choice.id):
+			var formal_id: String = FORMAL_BATTLES[choice.id]
+			var enemy_ids: Array = Game.battles[formal_id].enemyIds
+			var definition: Dictionary = Game.enemy_catalog[enemy_ids[0]]
+			var source: Dictionary = {}
+			for entry in authored:
+				if entry.id == choice.id: source = entry
+			check(source.get("battleId") == formal_id and not source.has("maxHp") and not source.has("intentSequence") and not source.has("intentLoopStart"), "Formal-backed source contains a battle reference without duplicated HP or intent: " + str(choice.id))
+			check(choice.get("battleId") == formal_id and same(choice.get("enemyIds"), enemy_ids) and choice.maxHp == definition.maxHp and same(sequence, definition.intentSequence) and choice.get("intentLoopStart", 0) == definition.get("intentLoopStart", 0), "Choice resolves current formal formation, HP and intent data: " + str(choice.id))
+			if choice.id == "powerline_repairman":
+				check(int(choice.maxHp) == 45 and sequence.size() == 3 and sequence[0].type == "energy_suit" and sequence[1].amount == 5 and sequence[2].amount == 3 and sequence[2].hits == 2 and choice.get("intentLoopStart") == 1, "Repairman choice has formal forty-five HP and one-time suit / attack cycle")
+			elif choice.id == "pruning_hound":
+				check(int(choice.maxHp) == 35 and choice.displayName == "双修枝猎犬" and enemy_ids == ["pruning_hound", "pruning_hound_second"] and sequence.size() == 2 and sequence[0].amount == 4 and sequence[0].hits == 2 and sequence[1].type == "fortify" and sequence[1].amount == 5 and sequence[1].strength == 1, "Hound choice is the formal thirty-five HP pair with staggered actions")
+			else:
+				check(int(choice.maxHp) == 36 and enemy_ids == ["beacon_jellyfish"] and sequence.size() == 1 and sequence[0].amount == 6 and sequence[0].hits == 1, "Jellyfish choice follows formal thirty-six HP / attack6")
+		else:
+			check(int(choice.maxHp) == 100 and sequence.size() == 1 and sequence[0].type == "attack" and sequence[0].amount == 6 and sequence[0].hits == 1, "Unconnected enemy retains provisional 100 HP / single6: " + str(choice.id))
 	ids.sort()
 	var expected := IDS.duplicate()
 	expected.sort()
@@ -75,6 +92,37 @@ func test_config() -> void:
 		choices[0].intentSequence[0].amount = 999
 		var fresh: Array[Dictionary] = Game.training_enemy_choices()
 		check(fresh[0].displayName != "tampered" and fresh[0].intentSequence[0].amount == 6, "Choice API returns deeply independent data")
+
+func choice_for(id: String) -> Dictionary:
+	for choice in Game.training_enemy_choices():
+		if choice.id == id: return choice
+	return {}
+
+func test_dynamic_formal_choices() -> void:
+	for id in FORMAL_BATTLES:
+		reset(adventure())
+		var original := Game.state.duplicate(true)
+		var battle_id: String = FORMAL_BATTLES[id]
+		var primary_id: String = Game.battles[battle_id].enemyIds[0]
+		var baseline: Dictionary = Game.enemy_catalog[primary_id].duplicate(true)
+		Game.enemy_catalog[primary_id].maxHp = int(baseline.maxHp) + 7
+		Game.enemy_catalog[primary_id].intentSequence[0].amount = int(baseline.intentSequence[0].amount) + 2
+		var updated: Dictionary = Game.enemy_catalog[primary_id].duplicate(true)
+		var choice := choice_for(id)
+		check(choice.maxHp == updated.maxHp and same(choice.intentSequence, updated.intentSequence) and same(choice.enemyIds, Game.battles[battle_id].enemyIds), "Choice dynamically follows formal changes at read time: " + id)
+		choice.intentSequence[0].amount = 999
+		choice.enemyIds.clear()
+		var independent := choice_for(id)
+		check(same(independent.intentSequence, updated.intentSequence) and same(independent.enemyIds, Game.battles[battle_id].enemyIds) and same(Game.enemy_catalog[primary_id], updated), "Resolved choice data cannot mutate formal source or future reads: " + id)
+		Game.save_enabled = true
+		Game.start_enemy_training(id)
+		check(Game.training_mode and Game.state.combat.enemies[0].hp == updated.maxHp and same(Game.state.combat.enemies[0].intentSequence, updated.intentSequence) and Game.state.combat.enemies[0].intent.amount == updated.intentSequence[0].amount, "Starting training uses changed formal HP and intent immediately: " + id)
+		check(Game.training_enemy_id.is_empty() and Game.enemy_catalog.size() == original_enemies.size() and not Game.enemy_catalog.has("training_" + id), "Formal-backed practice never adds a temporary enemy: " + id)
+		Game.menu()
+		check(same(Game.state, original) and same(Game.enemy_catalog[primary_id], updated), "Leaving practice restores adventure and preserves formal source: " + id)
+		Game.enemy_catalog[primary_id] = baseline
+		check_catalogs("Dynamic formal " + id)
+		check_disk("Dynamic formal " + id)
 
 func test_start_and_restore() -> void:
 	for id in IDS:
@@ -86,12 +134,19 @@ func test_start_and_restore() -> void:
 			check(Game.training_mode and Game.page == "battle" and Game.state.currentScene == "battle", label + ": enters playable battle")
 			if not Game.training_mode or Game.state.get("combat", {}).is_empty(): continue
 			check(Game.state.battleId == "training_" + id and Game.battles[Game.state.battleId].get("trainingOnly", false), label + ": session-only battle identifier")
-			check(Game.state.battleStart.is_empty() and Game.state.battleReward.is_empty() and Game.state.dialogueHistory.is_empty(), label + ": no story, reward or persisted opening snapshot")
+			check(Game.state.battleStart.is_empty() and Game.state.battleReward.is_empty() and Game.state.dialogueHistory.is_empty() and Game.state.activeEventId.is_empty(), label + ": no story context, reward or persisted opening snapshot")
 			check(Game.state.deck == original.get("deck", []), label + ": adventure reward cards carried into practice")
 			if not original.is_empty(): check(Game.state.equippedCyberwareIds == original.equippedCyberwareIds, label + ": equipped technology retained")
 			var model := CombatModel.new()
 			model.restore(Game.state.combat)
-			check(model.enemies.size() == 1 and model.enemies[0].hp == 100 and model.enemies[0].maxHp == 100 and model.enemies[0].combatVisualId == id, label + ": actual combat snapshot uses selected enemy")
+			if FORMAL_BATTLES.has(id):
+				var formal_ids: Array = Game.battles[FORMAL_BATTLES[id]].enemyIds
+				check(model.enemies.size() == formal_ids.size() and same(Game.battles[Game.state.battleId].enemyIds, formal_ids) and Game.training_enemy_id.is_empty() and Game.enemy_catalog.size() == original_enemies.size(), label + ": actual practice uses formal formation without temporary enemy copies")
+				for index in formal_ids.size():
+					var definition: Dictionary = Game.enemy_catalog[formal_ids[index]]
+					check(model.enemies[index].id == formal_ids[index] and model.enemies[index].hp == definition.maxHp and model.enemies[index].maxHp == definition.maxHp and same(model.enemies[index].intentSequence, definition.intentSequence) and model.enemies[index].combatVisualId == id, label + ": formal identity, HP and intent retained for slot" + str(index))
+			else:
+				check(model.enemies.size() == 1 and model.enemies[0].id == "training_" + id and model.enemies[0].hp == 100 and model.enemies[0].maxHp == 100 and model.enemies[0].combatVisualId == id and Game.training_enemy_id == "training_" + id, label + ": unconnected choice retains one temporary 100 HP enemy")
 			check(Game.valid_combat(Game.state.combat), label + ": combat snapshot validates")
 			var visual = Game.enemy_combat_visual(model.enemies[0])
 			check(visual.id == id and visual.pipeline_active and visual.diagnostics.is_empty(), label + ": published visual resolves without fallback")
@@ -101,7 +156,20 @@ func test_start_and_restore() -> void:
 			else: check(visual.poses.has("attack") or visual.poses.has("pierce") or visual.poses.has("slash") or visual.poses.has("hit"), label + ": attack pose available")
 			var before_hp: int = model.player_hp
 			model.end_turn()
-			check(model.player_hp == before_hp - 6 and model.enemies[0].intent.type == "attack" and model.enemies[0].intent.amount == 6, label + ": real end_turn applies single 6-damage attack and repeats")
+			if id == "powerline_repairman":
+				check(model.player_hp == before_hp and model.buffs.count(model, "energy_suit", 0) == 1 and model.enemies[0].intent.type == "attack" and model.enemies[0].intent.amount == 5, label + ": first turn equips suit without damage")
+				model.end_turn()
+				check(model.player_hp == before_hp - 5 and model.enemies[0].intent.amount == 3 and model.enemies[0].intent.hits == 2, label + ": second turn attacks5 and prepares two hits")
+				model.end_turn()
+				check(model.player_hp == before_hp - 11 and model.enemies[0].intent.amount == 5 and model.buffs.count(model, "energy_suit", 0) == 1, label + ": third turn attacks3 twice then loops attack5 with suit retained")
+			elif id == "pruning_hound":
+				check(model.player_hp == before_hp - 8 and model.enemies[0].intent.type == "fortify" and model.enemies[1].intent.type == "attack" and model.enemies[1].block == 5 and model.buffs.count(model, "strength", 1) == 1, label + ": first hound attacks4 twice while second fortifies")
+				model.end_turn()
+				check(model.player_hp == before_hp - 18 and model.enemies[0].block == 5 and model.buffs.count(model, "strength", 0) == 1 and model.enemies[1].block == 0, label + ": second hound clears block and attacks5 twice while first fortifies")
+				model.end_turn()
+				check(model.player_hp == before_hp - 28 and model.enemies[0].block == 0 and model.enemies[1].block == 5 and model.buffs.count(model, "strength", 1) == 2, label + ": pair continues staggered actions with additive individual strength")
+			else:
+				check(model.player_hp == before_hp - 6 and model.enemies[0].intent.type == "attack" and model.enemies[0].intent.amount == 6, label + ": real end_turn applies single 6-damage attack and repeats")
 			Game.commit_combat(model)
 			Game.menu()
 			check(not Game.training_mode and Game.page == "menu" and same(Game.state, original), label + ": leaving midfight restores exact adventure or empty state")
@@ -179,6 +247,10 @@ func test_existing_training() -> void:
 		var before := Game.state.duplicate(true)
 		Game.start_training(id)
 		check(Game.training_mode and Game.page == "battle" and Game.state.battleId == id and not Game.state.combat.is_empty(), "Existing " + id + " practice still enters")
+		for index in Game.battles[id].enemyIds.size():
+			var definition: Dictionary = Game.enemy_catalog[Game.battles[id].enemyIds[index]]
+			var enemy: Dictionary = Game.state.combat.enemies[index]
+			check(enemy.id == definition.id and enemy.hp == definition.maxHp and enemy.maxHp == definition.maxHp and same(enemy.intentSequence, definition.intentSequence), "Classic practice follows formal HP and intent: " + id + " slot" + str(index))
 		Game.menu()
 		check(same(Game.state, before), "Existing " + id + " practice restores adventure")
 		check_catalogs(id)
@@ -195,21 +267,35 @@ func test_attack_presentation() -> void:
 		while not view.initialized and Time.get_ticks_msec() < deadline:
 			await get_tree().process_frame
 		check(view.initialized and not Game.battle_busy, "Real battle scene initializes playable hand: " + str(choice.id))
-		check(view.stage.enemies.size() == 1 and view.stage.enemies[0].kind == choice.id and view.stage.enemies[0].sprite.texture != null, "Real battle scene uses selected published actor: " + str(choice.id))
+		check(view.stage.enemies.size() == (2 if choice.id == "pruning_hound" else 1) and view.stage.enemies[0].kind == choice.id and view.stage.enemies[0].sprite.texture != null, "Real battle scene uses selected published actor count: " + str(choice.id))
+		if choice.id == "pruning_hound":
+			check(view.stage.enemies[1].kind == "pruning_hound" and view.stage.enemies[1].sprite.texture != null and view.model.enemies[1].hp == 35, "Real hound practice displays the second formal thirty-five HP actor")
 		if view.initialized:
 			var contact := {"count":0}
 			var before_hp: int = view.model.player_hp
-			var expected_pose: String = "bite_close" if choice.id == "luggage_lurker" else "shoot" if choice.id == "mirror_inspector" else str(choice.intentSequence[0].animation)
+			var repairman: bool = choice.id == "powerline_repairman"
+			var hound: bool = choice.id == "pruning_hound"
+			var expected_damage := 8 if hound else 5 if repairman else 6
+			var expected_hits := 2 if hound else 1
+			var per_hit_damage := 4 if hound else expected_damage
+			var expected_turn := 3 if repairman else 2
+			if repairman:
+				await view.end_turn_pressed()
+				check(view.model.turn == 2 and view.model.player_hp == before_hp and view.model.buffs.count(view.model, "energy_suit", 0) == 1 and not Game.battle_busy, "Actual repairman first turn equips suit without attacking and releases input")
+			var attack_intent: Dictionary = choice.intentSequence[1 if repairman else 0]
+			var expected_pose: String = "bite_close" if choice.id == "luggage_lurker" else "shoot" if choice.id == "mirror_inspector" else str(attack_intent.animation)
 			view.stage.phase_changed.connect(func(phase: String):
 				if phase != "impact": return
 				contact.count += 1
 				check(view.stage.enemies[0].pose == expected_pose, "Actual battle contact uses selected attack pose: " + str(choice.id))
 				# Authored attacks announce impact just before revealing the supplied hit.
-				check_presented_contact.call_deferred(view, str(choice.id), before_hp))
+				check_presented_contact.call_deferred(view, str(choice.id), before_hp, expected_damage, per_hit_damage * contact.count))
 			await view.end_turn_pressed()
-			check(contact.count == 1, "Actual battle plays one enemy hit per round: " + str(choice.id))
-			check(view.model.turn == 2 and view.model.player_hp == before_hp - 6 and Game.state.currentHp == before_hp - 6 and not Game.battle_busy, "Real end-turn finishes with one committed six-damage hit and releases input: " + str(choice.id))
+			check(contact.count == expected_hits, "Actual battle plays each configured enemy hit: " + str(choice.id))
+			check(view.model.turn == expected_turn and view.model.player_hp == before_hp - expected_damage and Game.state.currentHp == before_hp - expected_damage and not Game.battle_busy, "Real end-turn commits configured damage once and releases input: " + str(choice.id))
 			check(view.stage.enemies[0].pose == "idle" and view.model.hand.size() == 5, "Actual battle returns enemy idle and deals next hand: " + str(choice.id))
+			if hound:
+				check(view.model.enemies[1].block == 5 and view.model.buffs.count(view.model, "strength", 1) == 1 and view.stage.enemies[1].pose == "idle", "Real paired-hound turn also applies second hound's fortify once")
 		view.queue_free()
 		await get_tree().process_frame
 		Game.menu()
@@ -218,8 +304,9 @@ func test_attack_presentation() -> void:
 		check_disk("Real battle " + str(choice.id))
 	Engine.time_scale = 1.0
 
-func check_presented_contact(view: Control, id: String, before_hp: int) -> void:
-	check(view.shown_player_hp == before_hp - 6 and view.model.player_hp == before_hp - 6, "Actual battle contact presents model damage exactly once: " + id)
+func check_presented_contact(view: Control, id: String, before_hp: int, expected_damage: int = 6, presented_damage: int = -1) -> void:
+	var shown_damage := expected_damage if presented_damage < 0 else presented_damage
+	check(view.shown_player_hp == before_hp - shown_damage and view.model.player_hp == before_hp - expected_damage, "Actual battle contact presents model damage exactly once: " + id)
 	if id in ["luggage_lurker", "mirror_inspector"]:
 		var effects: Array[String] = []
 		for child in view.stage.world.get_children():
@@ -249,6 +336,9 @@ func test_menu() -> void:
 	await get_tree().process_frame
 	var modal: Control = menu.training_container
 	check(menu.training_open and modal.is_visible_in_tree(), "Single entry opens unified practice modal")
+	var labels: Array = modal.find_children("*", "Label", true, false)
+	check(labels.any(func(node): return node.text == "敌人演练") and labels.any(func(node): return node.text == "按当前敌人配置") and labels.all(func(node): return not "100 HP" in node.text and node.text != "单敌演练"), "Practice labels describe current enemy configuration without fixed HP or single-enemy claims")
+	check(modal.find_child("enemy_choice_pruning_hound", true, false).text == "双修枝猎犬", "Practice button explicitly names the paired hounds")
 	var buttons := modal.find_children("*", "Button", true, false)
 	check(buttons.size() == 16, "Unified panel contains four battles, ten enemies, scenery and return")
 	var choice_rects: Array[Rect2] = []
@@ -337,8 +427,9 @@ func _ready() -> void:
 		sentinel_paths.append(path)
 	original_battles = Game.battles.duplicate(true)
 	original_enemies = Game.enemy_catalog.duplicate(true)
-	check(original_battles.size() == 7 and original_enemies.size() == 16, "Formal baseline has seven battles / sixteen enemies")
+	check(original_battles.size() == 7 and original_enemies.size() == 17, "Formal baseline has seven battles / seventeen enemies")
 	test_config()
+	test_dynamic_formal_choices()
 	test_start_and_restore()
 	test_rejections()
 	test_terminal_restore()

@@ -126,8 +126,8 @@ func _build_training_panel() -> void:
 	training_scenery_button = _menu_button("training_scenery", "黑帮" + _training_scenery_label(), Vector2(310, 326), Vector2(820, 42), open_scenery_picker, false, 16, training_container)
 	training_scenery_button.tooltip_text = "仅调整黑帮三人组的演练场景"
 	focus_buttons.append(training_scenery_button)
-	label(training_container, "单敌演练", Vector2(310, 394), Vector2(240, 30), 21, CYAN)
-	label(training_container, "100 HP · 每回合攻击 6", Vector2(720, 394), Vector2(410, 30), 17, MUTED)
+	label(training_container, "敌人演练", Vector2(310, 394), Vector2(240, 30), 21, CYAN)
+	label(training_container, "按当前敌人配置", Vector2(720, 394), Vector2(410, 30), 17, MUTED)
 	var choices := Game.training_enemy_choices()
 	for index in choices.size():
 		var choice: Dictionary = choices[index]

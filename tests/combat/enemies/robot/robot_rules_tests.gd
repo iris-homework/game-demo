@@ -256,7 +256,7 @@ func test_training_isolation() -> void:
 	for outcome in ["win", "lose"]:
 		Game.start_training("B02")
 		check(Game.training_mode and Game.state.battleId == "B02" and Game.state.combat.enemies[0].intent.amount == 10, outcome + " training uses authored robot intent")
-		check(Game.state.combat.enemies[0].maxHp == Game.TRAINING_ENEMY_HP and Game.enemy_catalog.robot.maxHp == 40, outcome + " training overrides only its copy of HP")
+		check(Game.state.combat.enemies[0].hp == 40 and Game.state.combat.enemies[0].maxHp == 40 and Game.enemy_catalog.robot.maxHp == 40, outcome + " training follows formal forty HP without changing the catalog")
 		var model := CombatModel.new()
 		model.restore(Game.state.combat)
 		var training_hp_before := model.player_hp
@@ -284,7 +284,7 @@ func _ready() -> void:
 	test_charged_snapshot()
 	test_snapshot_compatibility()
 	test_training_isolation()
-	var report := {"checks":checks, "failures":failures, "robotIntent":"attack10_charge5_attack5x2_loop", "formalHp":40, "trainingHp":Game.TRAINING_ENEMY_HP, "legacyIntent":"saved_attack1_and_attack10_loop_retained"}
+	var report := {"checks":checks, "failures":failures, "robotIntent":"attack10_charge5_attack5x2_loop", "formalHp":40, "trainingHp":40, "legacyIntent":"saved_attack1_and_attack10_loop_retained"}
 	FileAccess.open(output_dir + "/rules-result.json", FileAccess.WRITE).store_string(JSON.stringify(report, "\t"))
 	print("ROBOT RULES: %d checks, %d failures" % [checks, failures.size()])
 	get_tree().quit(0 if failures.is_empty() else 1)

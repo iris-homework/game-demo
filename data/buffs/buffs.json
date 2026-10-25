@@ -12,7 +12,7 @@
     "icon": "block",
     "color": "6dcaff",
     "showBadge": false,
-    "description": "格挡 · {count}\n受到伤害时优先消耗；在自身回合开始时清除。"
+    "description": "格挡 · {count}\n受到伤害时优先消耗；在自己的下一个行动回合开始时清除，角色与敌人均适用。"
   },
   {
     "id": "bleed",
@@ -219,6 +219,19 @@
     "everyHit": true
   },
   {
+    "id": "energy_suit",
+    "name": "能量防护服",
+    "category": "positive",
+    "target": "enemy",
+    "stacking": "flag",
+    "duration": "battle",
+    "handler": "energy_suit",
+    "icon": "energy_suit",
+    "color": "81e4d4",
+    "showBadge": true,
+    "description": "能量防护服 · 本场持续\n受到攻击时电能不再衰减。每段攻击本体实际扣血时，获得1层电能；完全格挡不增加，部分格挡后扣血仍增加。裂伤、污染等非攻击伤害不触发。"
+  },
+  {
     "id": "electric_charge",
     "name": "电能",
     "category": "positive",
@@ -229,7 +242,7 @@
     "icon": "electric_charge",
     "color": "75dfff",
     "showBadge": true,
-    "description": "电能 · {count} 层\n下次攻击的每段基础伤害 +{count}，攻击生效时消耗全部层数。每受到一段攻击减少 1 层，完全格挡也减少；裂伤、污染等非攻击伤害不减层。未使用时跨回合保留。"
+    "description": "电能 · {count} 层\n下次攻击的每段基础伤害 +{count}，攻击生效时消耗全部层数。每受到一段攻击减少 1 层，完全格挡也减少；能量防护服生效时不衰减。裂伤、污染等非攻击伤害不减层。未使用时跨回合保留。"
   },
   {
     "id": "ranged_mastery",

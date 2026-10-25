@@ -45,8 +45,7 @@
       "gang_henchman",
       "gang_henchman_second",
       "gang"
-    ],
-    "trainingEnemyHp": null
+    ]
   },
   "B11": {
     "id": "B11",
@@ -69,8 +68,7 @@
     "enemyIds": [
       "fish",
       "fish_second"
-    ],
-    "trainingEnemyHp": null
+    ]
   },
   "B13": {
     "id": "B13",
@@ -91,9 +89,9 @@
     "placeId": "garden",
     "prototypeProfileId": "attack_flow_v1",
     "enemyIds": [
-      "pruning_hound"
-    ],
-    "trainingEnemyHp": null
+      "pruning_hound",
+      "pruning_hound_second"
+    ]
   },
   "B14": {
     "id": "B14",
@@ -115,8 +113,7 @@
     "prototypeProfileId": "attack_flow_v1",
     "enemyIds": [
       "powerline_repairman"
-    ],
-    "trainingEnemyHp": null
+    ]
   },
   "B15": {
     "id": "B15",
@@ -138,8 +135,7 @@
     "prototypeProfileId": "attack_flow_v1",
     "enemyIds": [
       "beacon_jellyfish"
-    ],
-    "trainingEnemyHp": null
+    ]
   },
   "B16": {
     "id": "B16",
@@ -162,7 +158,6 @@
     "enemyIds": [
       "dancer_black"
     ],
-    "trainingEnemyHp": null,
     "encounterId": "dancer_duet",
     "phaseTwoEnemyIds": [
       "dancer_black",

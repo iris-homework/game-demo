@@ -106,47 +106,17 @@
   },
   {
     "id": "pruning_hound",
-    "displayName": "修枝猎犬",
-    "placeId": "garden",
-    "combatVisualId": "pruning_hound",
-    "maxHp": 100,
-    "intentSequence": [
-      {
-        "type": "attack",
-        "amount": 6,
-        "hits": 1,
-        "animation": "pierce"
-      }
-    ]
+    "displayName": "双修枝猎犬",
+    "battleId": "B13"
   },
   {
     "id": "powerline_repairman",
     "displayName": "输电抢修工",
-    "placeId": "power",
-    "combatVisualId": "powerline_repairman",
-    "maxHp": 100,
-    "intentSequence": [
-      {
-        "type": "attack",
-        "amount": 6,
-        "hits": 1,
-        "animation": "pierce"
-      }
-    ]
+    "battleId": "B14"
   },
   {
     "id": "beacon_jellyfish",
     "displayName": "信标水母",
-    "placeId": "port",
-    "combatVisualId": "beacon_jellyfish",
-    "maxHp": 100,
-    "intentSequence": [
-      {
-        "type": "attack",
-        "amount": 6,
-        "hits": 1,
-        "animation": "pierce"
-      }
-    ]
+    "battleId": "B15"
   }
 ]

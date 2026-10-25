@@ -1093,8 +1093,6 @@ func initialize_combat() -> void:
 	var definitions: Array = []
 	for id in battle.enemyIds:
 		var definition: Dictionary = enemy_catalog[id].duplicate(true)
-		if training_mode and battle.get("trainingEnemyHp", TRAINING_ENEMY_HP) != null:
-			definition.maxHp = int(battle.get("trainingEnemyHp", TRAINING_ENEMY_HP))
 		definitions.append(definition)
 	var model := CombatModel.new()
 	var rules := prototype_rules.duplicate(true)
@@ -1195,28 +1193,44 @@ func set_b04_scenery_choice(place_id: String) -> bool:
 func training_enemy_choices() -> Array[Dictionary]:
 	var choices: Array[Dictionary] = []
 	for definition in training_enemies:
-		choices.append(definition.duplicate(true))
+		var choice: Dictionary = definition.duplicate(true)
+		if choice.has("battleId"):
+			var battle: Dictionary = battles.get(choice.battleId, {})
+			var ids: Array = battle.get("enemyIds", [])
+			if ids.is_empty() or ids.any(func(id): return not enemy_catalog.has(id)): continue
+			# Display metadata and practice snapshots share the current formal source.
+			choice.merge(enemy_catalog[ids[0]].duplicate(true), false)
+			choice.enemyIds = ids.duplicate()
+			choice.placeId = battle.placeId
+		choices.append(choice)
 	return choices
 
 func start_enemy_training(id: String) -> void:
 	if page != "menu" or transition_locked or battle_busy or training_mode: return
-	for definition in training_enemies:
+	for definition in training_enemy_choices():
 		if definition.id != id: continue
 		var temporary_id := "training_" + id
 		if battles.has(temporary_id) or enemy_catalog.has(temporary_id): return
-		# Practice definitions exist only for this session, never in story content.
-		var enemy: Dictionary = definition.duplicate(true)
-		enemy.id = temporary_id
-		enemy.characterId = id
-		enemy.battlePortraitAssetId = ""
-		enemy.prototype = false
-		enemy_catalog[temporary_id] = enemy
-		battles[temporary_id] = {
-			"id":temporary_id, "eventId":"", "name":definition.displayName + "演练",
-			"battleType":"normal", "placeId":definition.placeId,
-			"enemyIds":[temporary_id], "trainingOnly":true, "trainingEnemyHp":100
-		}
-		training_enemy_id = temporary_id
+		var practice: Dictionary
+		if definition.has("battleId"):
+			practice = battles[definition.battleId].duplicate(true)
+			# Reuse every authored enemy, including encounter size and phase data.
+			# No temporary enemy or second set of HP/intents is created.
+			training_enemy_id = ""
+		else:
+			var enemy: Dictionary = definition.duplicate(true)
+			enemy.id = temporary_id
+			enemy.characterId = id
+			enemy.battlePortraitAssetId = ""
+			enemy.prototype = false
+			enemy_catalog[temporary_id] = enemy
+			practice = {"battleType":"normal", "placeId":definition.placeId, "enemyIds":[temporary_id]}
+			training_enemy_id = temporary_id
+		practice.id = temporary_id
+		practice.eventId = ""
+		practice.name = definition.displayName + "演练"
+		practice.trainingOnly = true
+		battles[temporary_id] = practice
 		training_battle_id = temporary_id
 		start_training(temporary_id)
 		if not training_mode: _clear_training_encounter()
@@ -1587,6 +1601,15 @@ func valid_combat(c: Dictionary) -> bool:
 		if not enemy.intent.get("hits",1) is float and not enemy.intent.get("hits",1) is int: return false
 		if enemy.intent.get("amount",0) < 0 or enemy.intent.get("hits",1) < 1: return false
 		if not valid_conditional_intent(enemy, c.enemies): return false
+		var actions: Array = [enemy.intent]
+		if enemy.get("intentSequence") is Array: actions.append_array(enemy.intentSequence)
+		for action in actions:
+			if action is Dictionary and action.get("type") == "fortify":
+				if not buffs._valid_count(action.get("amount")) or not buffs._valid_count(action.get("strength"), 999): return false
+		if enemy.has("intentLoopStart"):
+			var sequence = enemy.get("intentSequence")
+			if not sequence is Array or sequence.is_empty(): return false
+			if not buffs._valid_count(enemy.intentLoopStart, sequence.size() - 1): return false
 	return true
 
 func valid_dancer_encounter(c: Dictionary) -> bool:

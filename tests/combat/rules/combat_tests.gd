@@ -16,7 +16,7 @@ func model_for(id: String, hp: int = 100) -> CombatModel:
 	var legacy_enemy: Dictionary = definitions[0].duplicate(true)
 	legacy_enemy.maxHp = null
 	legacy_enemy.intentSequence = []
-	for field in ["attackPollution", "deathPollution", "allyDeathIntentSequence", "formationSlot"]:
+	for field in ["attackPollution", "deathPollution", "allyDeathIntentSequence", "formationSlot", "intentLoopStart"]:
 		legacy_enemy.erase(field)
 	definitions = [legacy_enemy]
 	m.initialize(id,hp,100,Game.prototype_rules,definitions)
@@ -31,11 +31,14 @@ func _ready() -> void:
 	var current_robot := CombatModel.new()
 	current_robot.initialize("B02",100,100,Game.prototype_rules,[Game.enemy_catalog.robot])
 	check(current_robot.enemies[0].maxHp == 40 and current_robot.enemies[0].intent.amount == 10,"Current B02 keeps authored HP 40 / attack 10 separately from legacy fixtures")
-	for authored in [["B13",36,6],["B14",48,8],["B15",36,6]]:
+	for authored in [["B13",35,4,"attack"],["B14",45,1,"energy_suit"],["B15",36,6,"attack"]]:
 		var current := CombatModel.new()
-		var enemy_id: String = Game.battles[authored[0]].enemyIds[0]
-		current.initialize(authored[0],70,70,Game.prototype_rules,[Game.enemy_catalog[enemy_id]])
-		check(current.enemies[0].maxHp == authored[1] and current.enemies[0].intent.amount == authored[2], str(authored[0])+" retains its authored HP and attack separately from legacy fixtures")
+		var authored_definitions: Array = []
+		for enemy_id in Game.battles[authored[0]].enemyIds: authored_definitions.append(Game.enemy_catalog[enemy_id])
+		current.initialize(authored[0],70,70,Game.prototype_rules,authored_definitions)
+		check(current.enemies[0].maxHp == authored[1] and current.enemies[0].intent.amount == authored[2] and current.enemies[0].intent.type == authored[3], str(authored[0])+" retains its authored HP and opening action separately from legacy fixtures")
+		if authored[0] == "B13":
+			check(current.enemies.size() == 2 and current.enemies[0].intent.hits == 2 and current.enemies[1].id == "pruning_hound_second" and current.enemies[1].maxHp == 35 and current.enemies[1].intent.type == "fortify" and current.enemies[1].intent.amount == 5 and current.enemies[1].intent.strength == 1, "Current B13 uses two thirty-five HP hounds with staggered attack/fortify")
 	for id in Game.battles:
 		var m := model_for(id)
 		check(m.enemies[0].hp == 3,id+" HP 3")
