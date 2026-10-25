@@ -11,28 +11,44 @@
         "speakerId": "black_market_keeper",
         "speakerSide": "right",
         "text": "头一回来吧？随便看看，价钱都写着呢。看上哪张，付钱拿走就行。",
-        "next": "intro_02"
+        "next": "intro_02",
+        "portraits": {
+          "left": "@player",
+          "right": "black_market_keeper"
+        }
       },
       "intro_02": {
         "type": "dialogue",
         "speakerId": "@player",
         "speakerSide": "left",
         "text": "我来找点趁手的。你这儿也收旧卡？",
-        "next": "intro_03"
+        "next": "intro_03",
+        "portraits": {
+          "left": "@player",
+          "right": "black_market_keeper"
+        }
       },
       "intro_03": {
         "type": "dialogue",
         "speakerId": "black_market_keeper",
         "speakerSide": "right",
         "text": "收啊。用不上的卡拿来，我按回收价给你钱。不过一批货我只收一张，你可想好了再卖。",
-        "next": "intro_06"
+        "next": "intro_06",
+        "portraits": {
+          "left": "@player",
+          "right": "black_market_keeper"
+        }
       },
       "intro_06": {
         "type": "dialogue",
         "speakerId": "@player",
         "speakerSide": "left",
         "text": "行，那我先看看。",
-        "next": "enter_shop"
+        "next": "enter_shop",
+        "portraits": {
+          "left": "@player",
+          "right": "black_market_keeper"
+        }
       },
       "enter_shop": {
         "type": "place"
@@ -51,21 +67,33 @@
         "speakerId": "woss_clerk",
         "speakerSide": "right",
         "text": "欢迎光临沃斯商场。这里是战斗科技专区，请问您需要什么。",
-        "next": "intro_05"
+        "next": "intro_05",
+        "portraits": {
+          "left": "@player",
+          "right": "woss_clerk"
+        }
       },
       "intro_05": {
         "type": "dialogue",
         "speakerId": "woss_clerk",
         "speakerSide": "right",
         "text": "本专区提供六款科技，每款售价一百五十信用点。您可返回地图调整携带配置，已拥有的商品无需重复购买。",
-        "next": "intro_06"
+        "next": "intro_06",
+        "portraits": {
+          "left": "@player",
+          "right": "woss_clerk"
+        }
       },
       "intro_06": {
         "type": "dialogue",
         "speakerId": "@player",
         "speakerSide": "left",
         "text": "好，我挑几件适合自己的。",
-        "next": "enter_shop"
+        "next": "enter_shop",
+        "portraits": {
+          "left": "@player",
+          "right": "woss_clerk"
+        }
       },
       "enter_shop": {
         "type": "place"

@@ -19,14 +19,7 @@ func _ready() -> void:
 	expected_revision = Game.revision
 	node = Game.node_data()
 	var e := Game.event_data()
-	if Game.in_place_dialogue():
-		if e.placeId == "market":
-			add_child(preload("res://scripts/black_market_art.gd").new())
-		else:
-			image_asset(self, "woss_mall_shop", Vector2.ZERO, Vector2(1440,900))
-		rect(self, Vector2.ZERO, Vector2(1440,900), Color(0,0,0,0.10))
-	else:
-		background(Game.place_data(e.placeId).backgroundAssetId, 0.19)
+	background(Game.place_data(e.placeId).backgroundAssetId, 0.19)
 	var side: String = node.get("speakerSide", "")
 	# Visible characters can differ from the speaker (creatures and off-screen NPCs).
 	# Resolve from the current node so continuing an old dialogue save also shows them.
@@ -38,9 +31,8 @@ func _ready() -> void:
 			if id is String and (id.is_empty() or Game.characters.has(Game.resolve_character_id(id))):
 				shown[portrait_side] = id
 	var speaker := Game.resolve_character_id(node.get("speakerId", ""))
-	if not Game.in_place_dialogue():
-		portrait(shown.left, "left", side == "left" and Game.resolve_character_id(shown.left) == speaker, 173, 642)
-		portrait(shown.right, "right", side == "right" and Game.resolve_character_id(shown.right) == speaker, 173, 642)
+	portrait(shown.left, "left", side == "left" and Game.resolve_character_id(shown.left) == speaker, 173, 642)
+	portrait(shown.right, "right", side == "right" and Game.resolve_character_id(shown.right) == speaker, 173, 642)
 	map_chrome(e.title, Callable(), true) # Keep the skip-story slot between deck and menu.
 	history_button = button(self, "对话记录", Vector2(856,16), Vector2(108,44), open_history)
 	history_button.add_theme_font_size_override("font_size", 17)

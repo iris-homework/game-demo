@@ -48,6 +48,8 @@ func test_authored_data() -> void:
 			check(Game.characters.has(Game.resolve_character_id(node.get("speakerId", ""))), place_id + " speaker is registered")
 			check(node.get("text", "") is String and not node.get("text", "").is_empty(), place_id + " dialogue has text")
 			check(definition.nodes.has(node.get("next", "")), place_id + " next node exists")
+			var npc := "black_market_keeper" if place_id == "market" else "woss_clerk"
+			check(node.get("portraits", {}) == {"left":Game.PLAYER_REFERENCE, "right":npc}, place_id + " every line supplies both portraits for old checkpoints")
 		var expected_lines := 4 if place_id == "market" else 3
 		check(spoken == expected_lines, place_id + " has expected introductory sentence count")
 		var seen := []
@@ -228,22 +230,63 @@ func has_texture(node: Node, texture: Texture2D) -> bool:
 		if has_texture(child, texture): return true
 	return false
 
+func portrait_node(view: Node, texture: Texture2D) -> TextureRect:
+	if texture == null: return null
+	for child in view.get_children():
+		if child is TextureRect and child.texture == texture: return child
+	return null
+
+func check_portrait_frame(place_id: String, player_speaking: bool) -> void:
+	var npc_id := "black_market_keeper" if place_id == "market" else "woss_clerk"
+	var player := portrait_node(app.view, Game.texture(Game.player_asset_id()))
+	var npc := portrait_node(app.view, Game.texture(Game.characters[npc_id].portraitAssetId))
+	check(player != null and npc != null, place_id + " shows player and shopkeeper as separate portraits")
+	if player == null or npc == null: return
+	check(player.position.is_equal_approx(Vector2(120,173)) and npc.position.is_equal_approx(Vector2(900,173)), place_id + " uses standard left and right portrait positions")
+	check(player.size.is_equal_approx(Vector2(390,642)) and npc.size.is_equal_approx(Vector2(390,642)), place_id + " uses standard dialogue portrait frames")
+	check(player.stretch_mode == TextureRect.STRETCH_KEEP_ASPECT_CENTERED and npc.stretch_mode == TextureRect.STRETCH_KEEP_ASPECT_CENTERED, place_id + " preserves portrait aspect ratio")
+	var inactive := Color(0.72,0.66,0.79,0.95)
+	check(player.modulate.is_equal_approx(Color.WHITE if player_speaking else inactive), place_id + " player brightness follows speaker")
+	check(npc.modulate.is_equal_approx(inactive if player_speaking else Color.WHITE), place_id + " shopkeeper brightness follows speaker")
+	check(player.mouse_filter == Control.MOUSE_FILTER_IGNORE and npc.mouse_filter == Control.MOUSE_FILTER_IGNORE, place_id + " portraits do not block dialogue advance input")
+	if place_id == "market":
+		check(npc.material == null and not Game.assets[Game.characters[npc_id].portraitAssetId].get("whiteKey", true), "market portrait preserves original transparent pale hair and clothes")
+	else:
+		check(npc.material is ShaderMaterial and npc.material.shader.resource_path == "res://shaders/white_key.gdshader", "mall portrait uses existing white-paper dialogue treatment")
+
 func test_real_views() -> void:
 	fresh()
 	app = preload("res://scenes/main.tscn").instantiate()
 	add_child(app)
 	for place_id in ["market", "mall"]:
+		# Old shop checkpoints retain their previous event's portrait state.
+		Game.state.portraits = {"left":Game.PLAYER_REFERENCE, "right":"bartender"}
 		Game.visit(place_id)
 		await settle()
+		await get_tree().create_timer(0.25).timeout
 		check(app.view.get_script().resource_path.ends_with("dialogue.gd"), place_id + " real main displays standard conversation")
 		check(app.view.text_label.text == Game.render_text(Game.node_data().text), place_id + " real view shows authored first line")
 		check(not app.view.skip_button.disabled, place_id + " real Skip button is available")
 		check(not "角色立绘待补" in visible_text(app.view) and not "老板娘" in visible_text(app.view), place_id + " first-visit view has no old NPC placeholder")
+		check_portrait_frame(place_id, false)
+		check(not has_texture(app.view, Game.texture("bartender")), place_id + " authored portraits replace previous event's NPC")
+		check(app.view.get_node_or_null("black_market_art") == null, place_id + " conversation does not embed shop scene characters")
 		if place_id == "market":
-			check(app.view.get_node_or_null("black_market_art") != null, "market conversation uses layered storefront artwork")
+			check(has_texture(app.view, Game.texture("black_market_background")), "market conversation uses existing empty environment plate")
 		else:
-			var original := Game.texture("woss_mall_shop")
-			check(original != null and has_texture(app.view, original), "mall conversation uses original woss storefront texture")
+			var backdrop := Game.texture("mall")
+			check(backdrop is AtlasTexture and has_texture(app.view, backdrop), "mall conversation uses environment region as standard background")
+			if backdrop is AtlasTexture:
+				check(backdrop.atlas == Game.texture("woss_mall_shop") and backdrop.region == Rect2(680,0,906,992), "mall background region excludes character embedded at storefront left")
+			check(not has_texture(app.view, Game.texture("woss_mall_shop")), "mall conversation omits full storefront plate with duplicate clerk")
+		var steps := 0
+		while Game.state.currentScene == "dialogue" and Game.node_data().get("speakerId", "") != Game.PLAYER_REFERENCE and steps < 10:
+			Game.advance(Game.revision)
+			steps += 1
+		await settle()
+		await get_tree().create_timer(0.25).timeout
+		check(steps < 10 and Game.state.currentScene == "dialogue" and Game.node_data().get("speakerId", "") == Game.PLAYER_REFERENCE, place_id + " reaches protagonist reply")
+		check_portrait_frame(place_id, true)
 		app.view.skip_button.pressed.emit()
 		await settle()
 		var script_name := "black_market.gd" if place_id == "market" else "technology_shop.gd"

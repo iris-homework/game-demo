@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-25",
+  "source": "卡牌游戏美术资源/角色/黑市老板.png",
+  "destination": "res://assets/characters/black_market_keeper.png",
+  "sha256": "e5cdc6c5a5c457c22095cd81c91f400f4c072286690b8d7c93a35e55cd031eae",
+  "mode": "byte-for-byte copy of existing original; no image generation or pixel editing",
+  "alpha": "preserve PNG alpha; whiteKey=false"
+}

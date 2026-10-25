@@ -78,12 +78,12 @@
     "battleAssetId": "hotel_battle_simplified"
   },
   "mall": {
-    "path": "",
-    "kind": "pending"
+    "path": "res://assets/backgrounds/woss_mall_dialogue.tres",
+    "kind": "background"
   },
   "market": {
-    "path": "",
-    "kind": "pending"
+    "path": "res://assets/market/black-market-background-v2.png",
+    "kind": "background"
   },
   "hospital": {
     "path": "res://assets/backgrounds/laboratory_dialogue_v1.png",
@@ -346,5 +346,10 @@
       0
     ],
     "trainingSelectable": true
+  },
+  "black_market_keeper": {
+    "path": "res://assets/characters/black_market_keeper.png",
+    "kind": "portrait",
+    "whiteKey": false
   }
 }
