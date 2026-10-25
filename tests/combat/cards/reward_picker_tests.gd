@@ -49,6 +49,30 @@ func click(point: Vector2) -> void:
 		await get_tree().process_frame
 	await settle()
 
+# A real click can contain pointer motion while the left button is held.
+func click_with_motion(point: Vector2) -> void:
+	await motion(point)
+	var down := InputEventMouseButton.new()
+	down.position = point
+	down.global_position = point
+	down.button_index = MOUSE_BUTTON_LEFT
+	down.pressed = true
+	get_viewport().push_input(down, true)
+	await get_tree().process_frame
+	var drift := InputEventMouseMotion.new()
+	drift.position = point + Vector2(2,1)
+	drift.global_position = drift.position
+	drift.relative = Vector2(2,1)
+	drift.button_mask = MOUSE_BUTTON_MASK_LEFT
+	get_viewport().push_input(drift, true)
+	await get_tree().process_frame
+	var up := InputEventMouseButton.new()
+	up.position = drift.position
+	up.global_position = drift.position
+	up.button_index = MOUSE_BUTTON_LEFT
+	get_viewport().push_input(up, true)
+	await settle()
+
 func remove_app() -> void:
 	if not is_instance_valid(app): return
 	if is_instance_valid(app.audio_hooks): app.audio_hooks.attach(null)
@@ -164,9 +188,10 @@ func test_modal(source: String) -> void:
 	check(not reward.exit_button.disabled and reward.card_reward_button.has_focus(), source + " close restores the reward button and focus")
 	picker = opened_picker()
 	await settle()
-	picker.back_button.pressed.emit()
+	await click_with_motion(picker.back_button.get_global_rect().get_center())
 	await settle()
-	check(not is_instance_valid(reward.picker) and Game.state == before, source + " Back closes only the picker")
+	check(not is_instance_valid(reward.picker) and Game.state == before, source + " one Back click with held-button pointer drift closes only the picker")
+	if is_instance_valid(reward.picker): reward.close_picker()
 	picker = opened_picker()
 	await get_tree().create_timer(0.6).timeout
 	var failed_path := Game.save_path.path_join("blocked.json")
@@ -181,7 +206,7 @@ func test_modal(source: String) -> void:
 	check(FileAccess.get_file_as_bytes(real_path) == disk_before and not picker.option_buttons[0].disabled, source + " failed selection leaves the original disk and retry action intact")
 	Game.save_path = real_path
 	if source == "battle": await key(KEY_2)
-	else: await click(picker.option_buttons[1].get_global_rect().get_center())
+	else: await click_with_motion(picker.option_buttons[1].get_global_rect().get_center())
 	check(Game.state.battleReward.status == "claimed" and Game.state.battleReward.selectedCardId == offers[1] and Game.state.deck.count(offers[1]) == 1, source + " real key or pointer input grants exactly the selected card")
 	check(Game.state.credits == before.credits and Game.state.deck.size() == before.deck.size() + 1, source + " selection does not repeat the credit reward")
 	check(not is_instance_valid(app.view.reward_view.picker) and app.view.reward_view.exit_button.text == "放弃信用点并返回  →", source + " successful card selection leaves credit claim available")

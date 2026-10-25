@@ -160,7 +160,9 @@ func _input(event: InputEvent) -> void:
 	var focused := get_viewport().gui_get_focus_owner()
 	if event is InputEventMouseMotion:
 		# Mouse hover takes over without leaving a keyboard highlight behind.
-		if is_instance_valid(focused) and picker.is_ancestor_of(focused):
+		# Keep focus during a click: releasing it cancels BaseButton's pending
+		# press, so normal pointer drift would swallow the following release.
+		if event.button_mask == 0 and is_instance_valid(focused) and picker.is_ancestor_of(focused):
 			focused.release_focus()
 	elif not is_instance_valid(focused):
 		# Enter the modal's focus loop explicitly when it starts without focus.
