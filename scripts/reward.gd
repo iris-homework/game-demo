@@ -4,6 +4,7 @@ const GOLD := Color("ffda83")
 var expected_revision: int
 var picker: Control
 var card_reward_button: Button
+var credits_reward_button: Button
 var exit_button: Button
 var option_buttons: Array[Button] = []
 var suspended_buttons: Array[Button] = []
@@ -12,13 +13,14 @@ func _ready() -> void:
 	expected_revision = Game.revision
 	var reward: Dictionary = Game.state.battleReward
 	var pending: bool = reward.status == "pending"
+	var credits_pending: bool = Game.reward_credits_status() == "pending"
 	var event_reward: bool = reward.get("source", "battle") == "event"
 	background("city", 0.76)
 	chrome("委托奖励" if event_reward else "战斗奖励")
 	var heading := label(self,"约定的回礼" if event_reward else "战斗胜利",Vector2(210,145),Vector2(920,80),58)
 	heading.add_theme_color_override("font_color",CREAM)
 	tag("COMMISSION / " + reward.eventId if event_reward else "VICTORY / " + reward.battleId,Vector2(214,115),CYAN,290)
-	label(self,Game.event_data().title + "  /  " + Game.battle_type_label(reward.get("battleType", "normal")) + "  /  战利品已结算",Vector2(216,239),Vector2(980,40),20,MUTED)
+	label(self,Game.event_data().title + "  /  " + Game.battle_type_label(reward.get("battleType", "normal")) + "  /  战利品",Vector2(216,239),Vector2(980,40),20,MUTED)
 	rect(self,Vector2(214,296),Vector2(1012,1),Color("3a5155"))
 	label(self,"本次战利品",Vector2(214,314),Vector2(500,35),22)
 	label(self,"REWARDS / 02",Vector2(1040,320),Vector2(195,28),14,CYAN)
@@ -26,8 +28,18 @@ func _ready() -> void:
 	var credits := cut_panel(self,Vector2(214,371),Vector2(1012,128),Color("172025"),Color("655a3f"),18)
 	credit_icon(credits,Vector2(24,23),Vector2(78,78))
 	label(credits,"信用点",Vector2(130,19),Vector2(350,32),19,MUTED)
-	label(credits,"+%d" % int(reward.credits),Vector2(126,53),Vector2(380,60),42,GOLD)
-	label(credits,"✓  已到账",Vector2(819,49),Vector2(175,37),21,GOLD)
+	label(credits,"+%d" % Game.reward_credit_amount(),Vector2(126,53),Vector2(380,60),42,GOLD)
+	if credits_pending:
+		credits_reward_button = button(credits,"点击领取  →",Vector2(758,35),Vector2(221,55),claim_credits,true)
+		credits_reward_button.name = "claim_reward_credits"
+		credits.mouse_filter = Control.MOUSE_FILTER_STOP
+		credits.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		credits.gui_input.connect(func(event: InputEvent):
+			if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				credits.accept_event()
+				claim_credits())
+	else:
+		label(credits,"✓  已到账" if Game.reward_credits_status() == "claimed" else "已放弃",Vector2(819,49),Vector2(175,37),21,GOLD)
 
 	var passive: Dictionary = Game.battle_passive_summary()
 	if int(passive.get("credits",0)) > 0 or int(passive.get("healing",0)) > 0:
@@ -60,16 +72,26 @@ func _ready() -> void:
 	var time_text := "领奖不消耗时间。可以继续探索城市。" if event_reward else "时间推进1天。事件已更新到城市地图。"
 	if boss_finale: time_text = "领取奖励后，结束第一周。"
 	label(self,"第一周 · 落幕。可返回地图探索剩余事件。" if complete else time_text,Vector2(216,754),Vector2(820,35),20,CYAN)
-	label(self,"离开将放弃本次未选择的卡牌。" if pending else ("奖励已保存，可以结束第一周。" if boss_finale else "奖励已保存，可继续探索城市。"),Vector2(216,803),Vector2(775,31),16,MUTED)
-	exit_button = button(self,"放弃卡牌并返回  →" if pending else "返回地图  →",Vector2(1110,782),Vector2(276,61),leave_rewards,true)
+	var unclaimed: Array[String] = []
+	if credits_pending: unclaimed.append("信用点")
+	if pending: unclaimed.append("卡牌")
+	label(self,"离开将放弃本次未领取的%s。" % "和".join(unclaimed) if not unclaimed.is_empty() else ("奖励已保存，可以结束第一周。" if boss_finale else "奖励已保存，可继续探索城市。"),Vector2(216,803),Vector2(775,31),16,MUTED)
+	var abandoned := "奖励" if credits_pending and pending else "信用点" if credits_pending else "卡牌" if pending else ""
+	var exit_text := "放弃%s并返回  →" % abandoned if not abandoned.is_empty() else "返回地图  →"
+	exit_button = button(self,exit_text,Vector2(1110,782),Vector2(276,61),leave_rewards,true)
 	if boss_finale:
-		exit_button.text = "放弃卡牌并结束第一周 →" if pending else "结束第一周  →"
+		exit_button.text = "放弃%s并结束第一周 →" % abandoned if not abandoned.is_empty() else "结束第一周  →"
 		exit_button.add_theme_font_size_override("font_size",17)
 	fade_in()
 
 func leave_rewards() -> void:
 	if is_instance_valid(picker): return
 	Game.claim_rewards(expected_revision)
+
+func claim_credits() -> void:
+	if is_instance_valid(picker): return
+	if not Game.claim_reward_credits(expected_revision) and Game.reward_credits_status() == "pending":
+		Game.notice.emit("信用点尚未领取，请重试；若保存失败，请检查存储空间。")
 
 func open_picker() -> void:
 	if is_instance_valid(picker) or Game.transition_locked or Game.battle_busy or expected_revision != Game.revision: return

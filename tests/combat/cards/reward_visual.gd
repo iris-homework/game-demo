@@ -88,19 +88,22 @@ func _ready() -> void:
 		check(not view.selected_uid.is_empty(),"Mouse selects attack card")
 		await click(Vector2(1030,400))
 		await idle()
-	check(Game.page == "dialogue" and Game.state.credits == 0,"Natural victory reaches dialogue before rewards")
+	check(Game.page == "dialogue" and Game.state.credits == int(Game.config.initialCredits),"Natural victory reaches dialogue before rewards")
 	await shot("post-battle-dialogue")
 	var advances := 0
 	while Game.page == "dialogue" and advances < 8:
 		await click(Vector2(1257,792))
 		advances += 1
 	await settle()
-	check(Game.page == "result" and Game.has_battle_reward() and Game.state.credits == int(Game.config.initialCredits) + 50,"Finish dialogue via button opens reward")
+	check(Game.page == "result" and Game.has_battle_reward() and Game.state.credits == int(Game.config.initialCredits) and Game.reward_credits_status() == "pending","Finish dialogue via button opens unpaid reward")
 	if not Game.has_battle_reward():
 		get_tree().quit(1)
 		return
 	await shot("reward")
 	var reward = app.view.reward_view
+	await click(reward.credits_reward_button.get_global_rect().get_center())
+	check(Game.state.credits == int(Game.config.initialCredits) + 50 and Game.reward_credits_status() == "claimed", "Credit reward button pays offered credits once")
+	reward = app.view.reward_view
 	check(reward.exit_button.get_global_rect().end.x <= 1440 and reward.exit_button.position.y > 750,"Map exit is inside lower-right corner")
 	await click(Vector2(540,591))
 	check(is_instance_valid(reward.picker) and reward.option_buttons.size() == 3,"Click reward entry opens three cards")
@@ -156,9 +159,12 @@ func _ready() -> void:
 	Game.enter_node("finish")
 	check(Game.save_game() and Game.load_game(),"Pending reward reloads")
 	await settle()
+	reward = app.view.reward_view
+	await click(reward.credits_reward_button.get_global_rect().get_center())
+	check(Game.state.credits == int(Game.config.initialCredits) + 100 and Game.reward_credits_status() == "claimed", "Reloaded reward credits still require one explicit click")
 	await click(Vector2(1080,599))
 	await key(KEY_3)
-	check(Game.state.deck == ["test_reward_02","test_reward_03"] and Game.state.credits == 2000,"Keyboard selects after reload without repeating credits")
+	check(Game.state.deck == ["test_reward_02","test_reward_03"] and Game.state.credits == int(Game.config.initialCredits) + 100,"Keyboard selects after reload without repeating credits")
 	# Expanded deck: empty first-turn hand must stay empty after a view restore.
 	Game.state.activeEventId = "E02"
 	Game.state.currentPlaceId = "junkyard"

@@ -716,11 +716,10 @@ func _apply_victory_technologies() -> void:
 		elif definition.effect == "victory_heal": healing += int(definition.amount)
 	if credits == 0 and healing == 0: return
 	healing = mini(healing, maxi(0, int(state.maxHp) - int(state.currentHp)))
-	state.credits += credits
 	state.currentHp += healing
 	if not state.combat.is_empty(): state.combat.playerHp = state.currentHp
 	state.claimedRewardIds.append(claim_id)
-	state.battlePassiveReward = {"claimId":claim_id, "eventId":state.activeEventId, "battleId":state.battleId, "credits":credits, "healing":healing}
+	state.battlePassiveReward = {"claimId":claim_id, "eventId":state.activeEventId, "battleId":state.battleId, "credits":credits, "healing":healing, "creditsStatus":"pending" if credits > 0 else "claimed"}
 
 func battle_passive_summary() -> Dictionary:
 	var reward: Dictionary = state.get("battlePassiveReward", {})
@@ -732,6 +731,7 @@ func valid_battle_passive_reward(subject: Dictionary) -> bool:
 	var reward = subject.get("battlePassiveReward", {})
 	if not reward is Dictionary: return false
 	if reward.is_empty(): return true
+	if reward.has("creditsStatus") and reward.creditsStatus not in ["pending", "claimed", "skipped"]: return false
 	for key in ["claimId", "eventId", "battleId"]:
 		if not reward.get(key) is String: return false
 	for key in ["credits", "healing"]:
@@ -769,6 +769,10 @@ func claim_rewards(expected_revision: int) -> bool:
 	if not apply_actions(actions): return false
 	if has_battle_reward() and state.battleReward.status == "pending":
 		state.battleReward.status = "skipped"
+	if has_battle_reward() and reward_credits_status() == "pending":
+		state.battleReward.creditsStatus = "skipped"
+		if int(state.battleReward.get("bonusCredits", 0)) > 0:
+			state.battlePassiveReward.creditsStatus = "skipped"
 	if state.activeEventId == "E16" and "E16" in state.completedEventIds and state.result == "win":
 		state.flags.week1Complete = true
 		return checkpoint()
@@ -795,16 +799,40 @@ func prepare_battle_reward() -> void:
 		notice.emit("奖励卡牌配置错误：无法生成三个不同选项，请检查概率与卡牌池。")
 		return
 	var credits := int(reward_rules.credits)
-	state.credits += credits
 	state.claimedRewardIds.append(claim_id)
+	var passive: Dictionary = state.get("battlePassiveReward", {})
+	var bonus: int = int(passive.get("credits", 0)) if not event_reward and passive.get("eventId") == state.activeEventId and passive.get("battleId") == state.battleId and passive.get("creditsStatus", "claimed") == "pending" else 0
 	state.battleReward = {"claimId":claim_id, "eventId":state.activeEventId,
 		"battleId":state.battleId, "battleType":kind, "credits":credits,
-		"options":options, "selectedCardId":"", "status":"pending"}
+		"options":options, "selectedCardId":"", "status":"pending", "creditsStatus":"pending", "bonusCredits":bonus}
 	if event_reward: state.battleReward.source = "event"
 
 func has_battle_reward() -> bool:
 	var reward: Dictionary = state.get("battleReward", {})
 	return not training_mode and state.get("currentScene", "") == "result" and not reward.is_empty() and reward.get("eventId", "") == state.activeEventId and reward.get("battleId", "") == state.battleId
+
+func reward_credits_status() -> String:
+	# Old receipts were paid when generated; never pay them again.
+	return str(state.get("battleReward", {}).get("creditsStatus", "claimed"))
+
+func reward_credit_amount() -> int:
+	var reward: Dictionary = state.get("battleReward", {})
+	return int(reward.get("credits", 0)) + int(reward.get("bonusCredits", 0))
+
+func claim_reward_credits(expected_revision: int) -> bool:
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or is_run_over() or page != "result" or expected_revision != revision or not has_battle_reward(): return false
+	if reward_credits_status() != "pending" or not valid_battle_reward(state): return false
+	var previous := state.duplicate(true)
+	state.credits += reward_credit_amount()
+	state.battleReward.creditsStatus = "claimed"
+	if int(state.battleReward.get("bonusCredits", 0)) > 0:
+		state.battlePassiveReward.creditsStatus = "claimed"
+	if save_enabled and not save_game():
+		state = previous
+		return false
+	revision += 1
+	changed.emit()
+	return true
 
 func choose_reward_card(id: String, expected_revision: int) -> bool:
 	if not pending_save_kind.is_empty() or transition_locked or battle_busy or is_run_over() or expected_revision != revision or not has_battle_reward(): return false
@@ -1370,7 +1398,9 @@ func normalize_week_completion(data: Dictionary) -> void:
 	# completion, reissue rewards or skip a still-pending card selection.
 	if not data.get("flags") is Dictionary or not data.get("completedEventIds") is Array or not "E16" in data.completedEventIds or is_run_failed(data): return
 	var reward = data.get("battleReward", {})
-	var settled: bool = reward is Dictionary and reward.get("eventId") == "E16" and reward.get("status") in ["claimed", "skipped"]
+	# New reward records stay open until explicit exit, including after choosing
+	# a card or collecting credits. Only legacy receipts imply completion.
+	var settled: bool = reward is Dictionary and not reward.has("creditsStatus") and reward.get("eventId") == "E16" and reward.get("status") in ["claimed", "skipped"]
 	if data.flags.get("week1Complete", false) != true and not data.get("currentScene") in ["map", "place"] and not (data.get("currentScene") == "result" and settled): return
 	data.flags.week1Complete = true
 	data.currentScene = "result"
@@ -1476,6 +1506,17 @@ func valid_battle_reward(s: Dictionary) -> bool:
 	# Preserve receipts already paid before the battle reward changed from 1000 to 50.
 	if not (r.get("credits") is int or r.get("credits") is float): return false
 	if r.credits != int(reward_rules.credits) and r.credits != 1000: return false
+	if r.has("creditsStatus") and r.creditsStatus not in ["pending", "claimed", "skipped"]: return false
+	var bonus = r.get("bonusCredits", 0)
+	if not (bonus is int or bonus is float) or not is_finite(float(bonus)) or bonus < 0 or bonus != floor(float(bonus)): return false
+	var passive_record = s.get("battlePassiveReward", {})
+	if r.get("creditsStatus") == "pending" and passive_record is Dictionary and passive_record.get("eventId") == r.eventId and passive_record.get("battleId") == r.battleId and passive_record.get("creditsStatus") == "pending":
+		if bonus != passive_record.get("credits", 0): return false
+	if bonus > 0:
+		var passive = s.get("battlePassiveReward", {})
+		if r.get("source", "battle") != "battle" or not passive is Dictionary or not valid_battle_passive_reward(s): return false
+		if passive.get("eventId") != r.eventId or passive.get("battleId") != r.battleId or passive.get("credits") != bonus: return false
+		if passive.get("creditsStatus", "claimed") != r.get("creditsStatus", "claimed"): return false
 	if not r.get("options") is Array or r.options.size() != 3: return false
 	var seen := []
 	for id in r.options:

@@ -63,7 +63,7 @@ func check_battle_view(kind: String) -> void:
 func check_reward_view(kind: String) -> void:
 	var view: Control = load("res://scripts/reward.gd").new()
 	add_child(view)
-	var expected: String = Game.event_data().title + "  /  " + Game.battle_type_label(kind) + "  /  战利品已结算"
+	var expected: String = Game.event_data().title + "  /  " + Game.battle_type_label(kind) + "  /  战利品"
 	check(expected in labels_under(view), "Reward subtitle displays frozen " + kind)
 	view.free()
 
@@ -91,13 +91,14 @@ func test_types() -> void:
 		check(Game.battle_type() == kind, "Disk reload and opening restart preserve type")
 		finish_battle()
 		check(Game.state.battleReward.battleType == kind, "Reward captures finished battle type")
-		check(Game.state.credits == int(Game.config.initialCredits) + 50 and Game.state.battleReward.options.size() == 3, "Type does not change current reward amounts")
+		check(Game.state.credits == int(Game.config.initialCredits) and Game.reward_credit_amount() == 50 and Game.reward_credits_status() == "pending" and Game.state.battleReward.options.size() == 3, "Type does not change unpaid reward amounts")
 		var offers: Array = Game.state.battleReward.options
 		check(offers[0] != offers[1] and offers[0] != offers[2] and offers[1] != offers[2], "Reward options remain distinct")
 		check(offers.all(func(id): return Game.card_catalog[id].rarity != "C"), "Reward still uses non-C pool")
 		check_reward_view(kind)
 		roundtrip()
 		check(Game.state.battleReward.battleType == kind, "Pending reward retains type after reload")
+		check(Game.claim_reward_credits(Game.revision) and Game.state.credits == int(Game.config.initialCredits) + 50, "Typed credit reward requires explicit claim")
 		check(Game.choose_reward_card(offers[0], Game.revision), "Typed reward can be claimed")
 		var credits: int = Game.state.credits
 		Game.enter_node("finish")

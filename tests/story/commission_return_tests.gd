@@ -131,25 +131,35 @@ func test_real_flow() -> void:
 	check(Game.choose(0, Game.revision), "reward succeeds after restoring save path")
 	Game.save_enabled = false
 	check(Game.state.currentDay == 4 and Game.state.currentHp == 42 and Game.state.battleHistory == history, "reward spends no day and triggers no victory chip or fake battle")
-	check(Game.state.credits == credits + 50 and Game.state.battleReward.source == "event" and Game.state.battleReward.battleType == "normal", "return uses ordinary battle credit and rarity rules")
+	check(Game.state.credits == credits and Game.reward_credits_status() == "pending" and Game.reward_credit_amount() == 50 and Game.state.battleReward.source == "event" and Game.state.battleReward.battleType == "normal", "return generates unpaid credits with ordinary rarity rules")
 	check(Game.state.battleReward.options.size() == 3 and Game.state.battleReward.options.all(func(id): return Game.card_catalog[id].rarity in ["B", "A", "S"]), "three non-starting card options")
 	check(Game.state.claimedRewardIds.count("E01R:commission") == 1 and Game.valid_save(Game.state), "reward receipt is valid and unique")
 	var legacy := Game.state.duplicate(true)
 	legacy.credits = credits + 1000
 	legacy.battleReward.credits = 1000
+	legacy.battleReward.erase("creditsStatus")
+	legacy.battleReward.erase("bonusCredits")
 	check(Game.valid_save(Game.migrate_save(JSON.parse_string(JSON.stringify(legacy)))), "legacy 1000-credit return receipt remains loadable")
 	var pending = JSON.parse_string(JSON.stringify(Game.state.battleReward))
 	Game.state = {}
 	check(Game.load_game() and JSON.parse_string(JSON.stringify(Game.state.battleReward)) == pending, "reward reload preserves choices and receipt")
 	check(not Game.choose(0, rev), "stale collection cannot repeat")
 	Game.prepare_battle_reward()
-	check(Game.state.credits == credits + 50 and JSON.parse_string(JSON.stringify(Game.state.battleReward)) == pending, "re-entry never regrants or rerolls")
+	check(Game.state.credits == credits and JSON.parse_string(JSON.stringify(Game.state.battleReward)) == pending, "re-entry neither pays pending credits nor rerolls")
 	var view = load("res://scripts/reward.gd").new()
 	add_child(view)
 	check("约定的回礼" in texts(view) and "领奖不消耗时间" in texts(view) and not "战斗胜利" in texts(view), "reward UI describes a return visit")
 	view.open_picker()
 	check(view.option_buttons.size() == 3, "existing reward picker offers three cards")
 	view.free()
+	before = Game.state.duplicate(true)
+	Game.save_enabled = true
+	Game.save_path = save_file.path_join("blocked.json")
+	check(not Game.claim_reward_credits(Game.revision) and Game.state == before, "return credit write failure preserves unpaid reward and balance")
+	Game.save_path = save_file
+	check(Game.claim_reward_credits(Game.revision) and Game.state.credits == credits + 50, "return credit click pays exactly fifty")
+	check(not Game.claim_reward_credits(Game.revision), "return credit click cannot repeat")
+	Game.save_enabled = false
 	var card: String = Game.state.battleReward.options[0]
 	var count: int = int(Game.owned_card_counts().get(card, 0))
 	before = Game.state.duplicate(true)
@@ -185,7 +195,7 @@ func test_skip_card() -> void:
 	var options: Array = Game.state.battleReward.options.duplicate()
 	check(Game.claim_rewards(Game.revision) and Game.state.battleReward.status == "skipped", "leaving without a card records skipped")
 	check(Game.save_game() and Game.load_game(), "skipped return roundtrips")
-	check(Game.state.credits == credits and Game.state.deck == cards and not Game.choose_reward_card(options[0], Game.revision), "skipped card cannot be reclaimed after reload")
+	check(Game.state.credits == credits and Game.reward_credits_status() == "skipped" and Game.state.deck == cards and not Game.choose_reward_card(options[0], Game.revision) and not Game.claim_reward_credits(Game.revision), "skipped credits and card cannot be reclaimed after reload")
 
 func test_historical_return_receipts() -> void:
 	for status in ["pending", "claimed", "skipped"]:
@@ -198,6 +208,9 @@ func test_historical_return_receipts() -> void:
 		var card: String = Game.state.battleReward.options[0]
 		if status == "claimed": check(Game.choose_reward_card(card, Game.revision), "historical card already claimed")
 		elif status == "skipped": check(Game.claim_rewards(Game.revision), "historical card already skipped")
+		Game.state.battleReward.erase("creditsStatus")
+		Game.state.battleReward.erase("bonusCredits")
+		Game.state.credits += 50
 		# This reward was earned when E03 counted. E11 was not completed then.
 		Game.state.completedEventIds = ["E01", "E02", "E03", "E04", "E01R"]
 		var old := Game.state.duplicate(true)
@@ -212,6 +225,7 @@ func test_historical_return_receipts() -> void:
 		var options: Array = Game.state.battleReward.options.duplicate()
 		Game.prepare_battle_reward()
 		check(Game.state.credits == credits and Game.state.deck == cards and Game.state.battleReward.options == options, "historical receipt prevents new credits or option reroll: " + status)
+		check(Game.reward_credits_status() == "claimed" and not Game.claim_reward_credits(Game.revision), "historical paid return credits cannot be claimed again: " + status)
 		if status == "pending":
 			check(Game.choose_reward_card(card, Game.revision), "historical pending card remains claimable once")
 			check(not Game.choose_reward_card(card, Game.revision), "historical pending card cannot be claimed twice")

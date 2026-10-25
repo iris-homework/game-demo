@@ -40,7 +40,6 @@ func _build_task_briefing(available: Array) -> void:
 	cut_panel(self, Vector2(827,129), Vector2(542,641), Color("090b12ed"), CREAM)
 	rect(self,Vector2(860,217),Vector2(100,4),PINK)
 	label(self, "任务信息", Vector2(859,159), Vector2(455,55), 30)
-	label(self, "完成委托推进1天 · 开幕与领奖不耗时", Vector2(861,228), Vector2(453,45), 16, MUTED)
 	if available.is_empty():
 		# 兼容停在普通地点里的旧存档，以及当前已没有可用任务的地点。
 		label(self, "这里暂时没有新的任务。", Vector2(861,350), Vector2(455,100), 24, MUTED)

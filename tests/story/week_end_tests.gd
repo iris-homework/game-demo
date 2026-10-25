@@ -58,12 +58,13 @@ func reward_state(skip: bool = true) -> Dictionary:
 		check(visited == ["win_01", "win_02", "win_03", "win_04", "win_05"], "all five post-battle lines precede rewards")
 	check(Game.page == "result" and Game.state.currentScene == "result", "dialogue reaches original result page")
 	check(Game.has_battle_reward() and Game.state.battleReward.get("battleType") == "boss", "Boss card reward available")
-	check(Game.state.battleReward.get("status") == "pending" and Game.state.credits == credits + 50, "credits paid once and choice remains pending")
+	check(Game.state.battleReward.get("status") == "pending" and Game.reward_credits_status() == "pending" and Game.state.credits == credits, "credits and card choice remain unclaimed")
 	check(not Game.is_week_complete() and not Game.is_run_over() and Game.can_continue(), "pending reward remains resumable before completion")
 	return Game.state.duplicate(true)
 
 func completed_state() -> Dictionary:
 	reward_state(false)
+	check(Game.claim_reward_credits(Game.revision), "claim Boss credits explicitly")
 	var selected: String = Game.state.battleReward.options[0]
 	var count_before: int = Game.state.deck.count(selected)
 	check(Game.choose_reward_card(selected, Game.revision), "choose one Boss reward card")
@@ -88,6 +89,9 @@ func test_pending_roundtrip() -> void:
 	var selected: String = Game.state.battleReward.options[0]
 	check(Game.choose_reward_card(selected, Game.revision), "pending reward can be claimed after reload")
 	check(not Game.is_week_complete() and Game.state.battleReward.status == "claimed", "reload choice waits for explicit exit")
+	check(Game.save_game() and Game.load_game() and not Game.is_week_complete() and Game.reward_credits_status() == "pending", "Boss card-first reload keeps unclaimed credits accessible")
+	check(Game.claim_reward_credits(Game.revision), "Boss credits remain claimable after card-first reload")
+	check(Game.save_game() and Game.load_game() and not Game.is_week_complete(), "even fully claimed new rewards wait for explicit Boss exit")
 	var credits: int = Game.state.credits
 	check(Game.claim_rewards(Game.revision) and Game.is_week_complete(), "exit after reload reaches completion")
 	check(Game.state.credits == credits and selected in Game.state.deck, "reward exit does not repay credits or revoke card")
@@ -98,7 +102,7 @@ func test_skip_choice() -> void:
 	reward_state()
 	var deck: Array = Game.state.deck.duplicate()
 	check(Game.claim_rewards(Game.revision), "unselected card may be explicitly abandoned at week exit")
-	check(Game.is_week_complete() and Game.state.battleReward.status == "skipped" and Game.state.deck == deck, "abandoning card consumes offer and ends week without adding a card")
+	check(Game.is_week_complete() and Game.state.battleReward.status == "skipped" and Game.reward_credits_status() == "skipped" and Game.state.deck == deck, "abandoning unpaid rewards consumes both offers and ends week")
 
 func test_completion_save_retry() -> void:
 	reward_state()
@@ -147,6 +151,8 @@ func test_migration(done: Dictionary) -> void:
 		for status in ["claimed", "skipped", "pending"]:
 			var old := done.duplicate(true)
 			old.flags.erase("week1Complete")
+			old.battleReward.erase("creditsStatus")
+			old.battleReward.erase("bonusCredits")
 			old.currentScene = scene
 			old.battleReward.status = status
 			if status != "claimed": old.battleReward.selectedCardId = ""

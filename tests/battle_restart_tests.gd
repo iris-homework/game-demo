@@ -34,6 +34,10 @@ func begin_case(label: String, battle_id: String = "B04", hp: int = 63) -> Dicti
 	Game.save_path = OUTPUT + label + "-checkpoint.json"
 	Game.meta_path = OUTPUT + label + "-meta.json"
 	Game.state = Game.initial_state()
+	if label == "live":
+		# Explicit ownership for the technology persistence case; production starts empty.
+		Game.state.ownedCyberwareIds = ["backup_energy"]
+		Game.state.equippedCyberwareIds = ["backup_energy"]
 	Game.state.currentHp = hp
 	Game.state.targetId = "richard"
 	Game.state.activeEventId = Game.battles[battle_id].eventId
@@ -181,12 +185,13 @@ func test_terminal_results() -> void:
 		check(not Game.battle_exit(outcome, revision), outcome + ": rejects duplicate battle exit")
 		if outcome == "win":
 			finish_story()
-			check(Game.state.credits == int(Game.config.initialCredits) + 50 and Game.has_battle_reward(), "Victory pays exactly once after story")
+			check(Game.state.credits == int(Game.config.initialCredits) and Game.has_battle_reward() and Game.reward_credits_status() == "pending", "Victory offers unpaid credits after story")
 			var options: Array = Game.state.battleReward.options.duplicate()
 			Game.menu()
 			Game.resume()
 			Game.enter_node("finish")
-			check(Game.state.credits == int(Game.config.initialCredits) + 50 and Game.state.battleReward.options == options, "Finish and menu reentry do not repay or reroll")
+			check(Game.state.credits == int(Game.config.initialCredits) and Game.reward_credits_status() == "pending" and Game.state.battleReward.options == options, "Finish and menu reentry neither pay nor reroll")
+			check(Game.claim_reward_credits(Game.revision) and Game.state.credits == int(Game.config.initialCredits) + 50, "Explicit credit claim after restart pays once")
 			check(Game.choose_reward_card(options[0], Game.revision), "Claim one victory card")
 			check(not Game.choose_reward_card(options[1], Game.revision), "Second victory card is rejected")
 			Game.state = {}

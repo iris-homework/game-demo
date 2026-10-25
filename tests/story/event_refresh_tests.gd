@@ -264,7 +264,7 @@ func test_ui() -> void:
 	await get_tree().process_frame
 	var text := all_text(view)
 	check(not "刷新时间" in text, "task briefing hides event refresh time")
-	check("完成委托推进1天" in text and "开幕与领奖不耗时" in text, "place HUD distinguishes commission time from opening and return reward")
+	check(not "完成委托推进1天" in text and not "开幕与领奖不耗时" in text, "task briefing hides the event time helper text")
 	check(not "主线" in text and not "可选事件" in text and not "支线" in text, "place view uses unified event terminology")
 	check("第 7 天" in text, "date label displays day seven")
 	check(view.find_child("day_segment_7", true, false) != null and view.find_child("day_segment_8", true, false) == null, "date HUD has exactly seven segments")

@@ -212,7 +212,9 @@ func test_reward_deck() -> void:
 				Game.changed.emit()
 			await settle()
 			var reward: Control = app.view.reward_view
-			check(reward.exit_button.text == ("放弃卡牌并返回  →" if status == "pending" else "返回地图  →"), source + ": " + status + " exit explicitly describes whether the card will be forfeited")
+			var credits_pending: bool = Game.reward_credits_status() == "pending"
+			var forfeited := "奖励" if credits_pending and status == "pending" else "信用点" if credits_pending else "卡牌" if status == "pending" else ""
+			check(reward.exit_button.text == ("放弃%s并返回  →" % forfeited if not forfeited.is_empty() else "返回地图  →"), source + ": " + status + " exit describes pending credits and card independently")
 			var trigger: Button = reward.get_node("current_deck_button")
 			var before: Dictionary = Game.state.duplicate(true)
 			var revision: int = Game.revision

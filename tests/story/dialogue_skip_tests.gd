@@ -76,7 +76,7 @@ func _ready() -> void:
 	check(Game.state.currentScene == "battle", "Refusal starts battle")
 	Game.battle_exit("win", Game.revision)
 	Game.skip_dialogue(Game.revision)
-	check(Game.state.currentScene == "result" and Game.state.credits == int(Game.config.initialCredits) + 50 and Game.has_battle_reward(), "Victory skip grants reward once")
+	check(Game.state.currentScene == "result" and Game.state.credits == int(Game.config.initialCredits) and Game.has_battle_reward() and Game.reward_credits_status() == "pending", "Victory skip offers unpaid reward once")
 	initial = Game.state.duplicate(true)
 	Game.skip_dialogue(Game.revision)
 	check(Game.state == initial, "Result skip cannot duplicate reward")

@@ -128,7 +128,7 @@ func test_modal(source: String) -> void:
 	check(picker.option_buttons.size() == 3 and picker.cards.size() == 3 and picker.option_slots.size() == 3, source + " real result view displays three complete choices")
 	check(picker.owned_labels.size() == 3 and picker.owned_labels[0].text == "已拥有 2 张" and picker.owned_labels[1].text == "未拥有" and picker.owned_labels[2].text == "未拥有", source + " ownership captions count actual duplicate cards and distinguish new choices")
 	check(picker.active_index == -1 and get_viewport().gui_get_focus_owner() == null, source + " opens with no automatic highlighted or focused choice")
-	check(reward.option_buttons == picker.option_buttons and reward.exit_button.disabled and reward.card_reward_button.disabled, source + " underlying controls are suspended and keyboard choices point at the picker")
+	check(reward.option_buttons == picker.option_buttons and reward.exit_button.disabled and reward.card_reward_button.disabled and reward.credits_reward_button.disabled, source + " underlying controls are suspended and keyboard choices point at the picker")
 	check(Game.state == before and Game.revision == revision, source + " opening the picker never changes reward or credits")
 	for resolution in [Vector2i(1280,800),Vector2i(1600,1000)]:
 		get_window().size = resolution
@@ -184,11 +184,32 @@ func test_modal(source: String) -> void:
 	else: await click(picker.option_buttons[1].get_global_rect().get_center())
 	check(Game.state.battleReward.status == "claimed" and Game.state.battleReward.selectedCardId == offers[1] and Game.state.deck.count(offers[1]) == 1, source + " real key or pointer input grants exactly the selected card")
 	check(Game.state.credits == before.credits and Game.state.deck.size() == before.deck.size() + 1, source + " selection does not repeat the credit reward")
-	check(not is_instance_valid(app.view.reward_view.picker) and app.view.reward_view.exit_button.text == "返回地图  →", source + " successful selection returns to claimed reward view")
+	check(not is_instance_valid(app.view.reward_view.picker) and app.view.reward_view.exit_button.text == "放弃信用点并返回  →", source + " successful card selection leaves credit claim available")
 	await key(KEY_2)
 	check(Game.state.deck.count(offers[1]) == 1 and not Game.choose_reward_card(offers[0], revision), source + " repeat or stale selection cannot claim another card")
 	var file := JSON.parse_string(FileAccess.get_file_as_string(real_path)) as Dictionary
 	check(file.battleReward.status == "claimed" and file.deck.count(offers[1]) == 1 and Game.valid_save(file), source + " the selected card and consumed claim persist together")
+	var paid_before: int = Game.state.credits
+	var selected_deck: Array = Game.state.deck.duplicate()
+	var claimed_revision: int = Game.revision
+	reward = app.view.reward_view
+	check(is_instance_valid(reward.credits_reward_button) and not reward.credits_reward_button.disabled and Game.reward_credits_status() == "pending", source + " card-first reward keeps a credit claim button")
+	Game.save_path = failed_path
+	reward.credits_reward_button.pressed.emit()
+	await settle()
+	check(Game.state.credits == paid_before and Game.reward_credits_status() == "pending" and Game.revision == claimed_revision and Game.state.deck == selected_deck, source + " failed UI credit claim keeps balance and card and allows retry")
+	Game.save_path = real_path
+	if source == "battle":
+		reward.credits_reward_button.pressed.emit()
+		await settle()
+	else:
+		# Click the row away from its button to exercise the whole-row hit target.
+		await click(Vector2(500,420))
+	check(Game.state.credits == paid_before + 50 and Game.reward_credits_status() == "claimed" and Game.state.deck == selected_deck, source + " real reward button or row click pays only the offered credits")
+	check(not is_instance_valid(app.view.reward_view.credits_reward_button) and app.view.reward_view.exit_button.text == "返回地图  →", source + " paid reward removes credit action and restores ordinary exit")
+	check(not Game.claim_reward_credits(Game.revision), source + " paid UI receipt cannot be claimed twice")
+	file = JSON.parse_string(FileAccess.get_file_as_string(real_path)) as Dictionary
+	check(file.battleReward.creditsStatus == "claimed" and file.credits == paid_before + 50 and Game.valid_save(file), source + " paid credits and consumed claim persist together")
 	Game.save_enabled = false
 	await remove_app()
 

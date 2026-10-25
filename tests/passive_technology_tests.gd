@@ -51,7 +51,7 @@ func finish_story() -> void:
 	check(count < 100, "post-battle story terminates")
 
 func test_definitions() -> void:
-	check(Game.initial_state().ownedCyberwareIds == ["dimensional_pocket","accelerated_clock","backup_energy"], "new adventure still owns only original three active technologies")
+	check(Game.initial_state().ownedCyberwareIds.is_empty(), "production new adventure starts without technologies")
 	check(Game.initial_state().equippedCyberwareIds == Game.initial_state().ownedCyberwareIds, "default equipped technologies unchanged")
 	check(Game.technology_shop_offers().size() == 6 and Game.technology_shop_offers().all(func(o): return o.price == 150), "six offers all cost 150")
 	for id in PASSIVES:
@@ -146,14 +146,16 @@ func test_victory() -> void:
 		check(Game.battle_exit("win",Game.revision), "victory settles frozen equipped chips")
 		Game.prototype_rules.cyberware = definitions
 		var heal := mini(5,70-hp)
-		check(Game.state.credits == credits + 30 and Game.state.currentHp == hp + heal, "victory grants exact 30 and capped healing at HP " + str(hp))
+		check(Game.state.credits == credits and Game.state.battlePassiveReward.creditsStatus == "pending" and Game.state.currentHp == hp + heal, "victory defers frozen 30 credits and applies capped healing at HP " + str(hp))
 		check(Game.battle_passive_summary() == {"credits":30,"healing":heal}, "summary reports actual chip gains")
-		check(Game.state.currentScene == "dialogue" and Game.valid_save(Game.state), "chips are awarded before post-battle dialogue in a valid checkpoint")
+		check(Game.state.currentScene == "dialogue" and Game.valid_save(Game.state), "chip credit offer and immediate healing persist before post-battle dialogue")
 		var rev := Game.revision
-		check(not Game.battle_exit("win",rev) and Game.state.credits == credits+30, "duplicate end request cannot repeat chip reward")
+		check(not Game.battle_exit("win",rev) and Game.state.credits == credits, "duplicate end request cannot pay pending chip credits")
 		finish_story()
+		check(Game.state.credits == credits and Game.reward_credit_amount() == 30 + int(Game.reward_rules.credits), "reward freezes pending base and chip credits together")
+		check(Game.claim_reward_credits(Game.revision), "manual claim collects frozen chip and base credits")
 		var after: int = Game.state.credits
-		check(after == credits+30+int(Game.reward_rules.credits), "normal victory money remains separate from chip money")
+		check(after == credits+30+int(Game.reward_rules.credits) and Game.state.battlePassiveReward.creditsStatus == "claimed", "one click pays base and chip exactly once")
 		Game.prepare_battle_reward()
 		Game.enter_node("finish")
 		check(Game.state.credits == after and Game.state.currentHp == hp+heal, "reward preparation and finish reentry never repeat chips")
@@ -226,8 +228,22 @@ func test_failure_training_and_save_failure() -> void:
 	Game.save_path = save_file
 	check(Game.load_game() and Game.state.get("battlePassiveReward",{}).is_empty(), "reload after failed victory has no false reward claim")
 	check(Game.battle_exit("win",Game.revision), "victory retry succeeds after storage recovery")
-	check(Game.state.credits == before.credits+30 and Game.state.currentHp == before.currentHp+5, "retry grants each chip exactly once")
-	check(Game.load_game() and Game.state.credits == before.credits+30 and Game.state.currentHp == before.currentHp+5, "retry receipt and benefits are atomically persisted")
+	check(Game.state.credits == before.credits and Game.state.currentHp == before.currentHp+5 and Game.state.battlePassiveReward.creditsStatus == "pending", "victory retry heals once and keeps credits unpaid")
+	check(Game.load_game() and Game.state.credits == before.credits and Game.state.currentHp == before.currentHp+5, "victory retry preserves pending credits and immediate healing on disk")
+	finish_story()
+	var unpaid := Game.state.duplicate(true)
+	Game.save_path = OUTPUT.path_join("missing-folder/claim.json")
+	check(not Game.claim_reward_credits(Game.revision) and Game.state == unpaid, "failed combined credit claim restores both base and chip receipts")
+	Game.save_path = save_file
+	check(Game.claim_reward_credits(Game.revision) and Game.state.credits == before.credits + 80, "recovered credit claim pays frozen base and chip once")
+	check(Game.load_game() and Game.state.credits == before.credits + 80 and not Game.claim_reward_credits(Game.revision), "combined paid credit receipt survives reload without duplicate")
+	Game.save_enabled = false
+	reset(["money_chip"],40)
+	win_model()
+	Game.battle_exit("win", Game.revision)
+	finish_story()
+	var unclaimed_credits: int = Game.state.credits
+	check(Game.claim_rewards(Game.revision) and Game.state.credits == unclaimed_credits and Game.state.battlePassiveReward.creditsStatus == "skipped", "leaving skips unpaid chip credits without awarding them")
 
 func test_record_validation() -> void:
 	reset(["money_chip","healing_chip"])
