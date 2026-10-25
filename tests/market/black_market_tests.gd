@@ -261,6 +261,7 @@ func test_reward_card_sale_reload() -> void:
 	check(Game.choose_reward_card(earned, Game.revision), "reward sale: claim offered card")
 	check(Game.claim_rewards(Game.revision), "reward sale: leave reward page")
 	Game.visit("market")
+	Game.skip_dialogue(Game.revision)
 	check(Game.owned_card_counts().get(earned, 0) == 1, "reward sale: earned card has exactly one copy")
 	var credits_before := int(Game.state.credits)
 	check(Game.sell_market_card(earned, Game.revision), "reward sale: sell last earned copy")

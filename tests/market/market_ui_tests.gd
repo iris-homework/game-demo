@@ -34,6 +34,7 @@ func _ready() -> void:
 	app = preload("res://scenes/main.tscn").instantiate()
 	add_child(app)
 	Game.visit("market")
+	Game.skip_dialogue(Game.revision)
 	await settle()
 	var view = app.view
 	check(view.get_script().resource_path.ends_with("black_market.gd"),"Map visit routes to the real shop")

@@ -269,6 +269,7 @@ func _test_mall_sampling() -> void:
 	Game.changed.emit()
 	await _settle(0.1)
 	Game.visit("mall")
+	Game.skip_dialogue(Game.revision)
 	if not (await _wait_for_page("place")):
 		return
 	while Game.transition_locked or Game.battle_busy:

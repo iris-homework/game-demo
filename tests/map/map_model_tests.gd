@@ -61,6 +61,7 @@ func _ready() -> void:
 	for p in Game.places:
 		check(Game.map_place_state(p.id).open, "place open before any event " + p.id)
 		Game.visit(p.id)
+		Game.skip_dialogue(Game.revision)
 		check(Game.page == "place" and Game.state.currentPlaceId == p.id, "initial visit succeeds " + p.id)
 	check(not Game.start_event("E12"), "retired event cannot be started from an open place")
 	Game.state.currentHp = 50

@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-10-25新增[商店首次进入对白专项](story/shop_intro_tests.tscn)：覆盖黑市／沃斯商场逐句继续、跳过、同冒险不重播、新冒险重置、旧档补入口、中途存读续句、完成后读档、无效上下文拒绝、保存失败重试、真实主场景对白到商店路由，以及既有战斗奖励记录、日期和信用点保留。使用复制工程和独立用户目录、headless+Dummy运行；测试保存仅写`artifacts/qa/shop-intros-2026-10-25/`，不移动系统鼠标。实际执行结果以本轮验证记录为准，无窗口检查不代表像素或物理输入验收。
+
 2026-10-25新增[枪击特效专项](combat/presentation/gun_burst_tests.tscn)：91项检查局部顿帧跨帧delta、两端自然清理／舞台释放、左右镜像／纵深／枪口锚点及三段伤害／全挡／部分挡时的枪声、爆闪和回调同步。使用复制工程、独立用户目录及headless+Dummy；测试不调用模型或保存，不移动鼠标。实际结果与绘制命令预览的边界见[本轮验证](../artifacts/qa/gun-burst-upgrade-2026-10-25/verification.json)。
 
 2026-10-25新增[三选一界面专项](combat/cards/reward_picker_tests.tscn)：61项验证战斗／回访来源、两种窗口尺寸、卡片与返回按钮布局、已有卡数量、固定命中区域、鼠标／键盘切换、Tab／Shift-Tab、Esc返回、保存失败重试与成功后的防重领。必须使用复制工程和独立用户目录，默认拒绝正式用户目录；使用headless+Dummy和视口合成输入，不移动系统鼠标。配套牌库、奖励、回访共4套627项通过；2项鼠标接管失败先复现后修复，证据及既有牌库退出提示见[验证](../artifacts/qa/reward-picker-2026-10-25/verification.json)。静态节点导出预览非Godot截图。
@@ -302,3 +304,6 @@ $env:LOCALAPPDATA = Join-Path $qaRoot 'appdata'
 远程夹具使用已有noren素材，不冒充缺少idle的09a已完成接入。
 Node扫描、参数、发布与回退测试为
 `enemy_asset_pipeline/test/attack_templates.test.cjs`，已加入该工具的`npm test`。
+
+
+2026-10-25商店首次对白本轮验收：新增专项153项，配套黑市／黑市UI／科技交易／商场UI／剧情／跳过／地图／mipmap共9套1866项0失败，使用复制工程和独立用户目录、headless+Dummy。新专项显式等待音频释放后退出，无清理提示；三套既有界面回归有音频清理提示，未做像素或物理输入验收。见[验证汇总](../artifacts/qa/shop-intros-2026-10-25/verification.json)。

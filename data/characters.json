@@ -83,5 +83,17 @@
     "portraitAssetId": "",
     "battlePortraitAssetId": "",
     "portraitMode": "none"
+  },
+  "black_market_keeper": {
+    "displayName": "黑市店主",
+    "portraitAssetId": "",
+    "battlePortraitAssetId": "",
+    "portraitMode": "none"
+  },
+  "woss_clerk": {
+    "displayName": "商场店员",
+    "portraitAssetId": "",
+    "battlePortraitAssetId": "",
+    "portraitMode": "none"
   }
 }

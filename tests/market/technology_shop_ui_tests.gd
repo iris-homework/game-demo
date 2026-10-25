@@ -57,6 +57,7 @@ func _ready() -> void:
 	app = preload("res://scenes/main.tscn").instantiate()
 	add_child(app)
 	Game.visit("mall")
+	Game.skip_dialogue(Game.revision)
 	await settle()
 	var view = app.view
 	var layout: Array = []
@@ -127,12 +128,14 @@ func _ready() -> void:
 	await key(KEY_ESCAPE)
 	check(Game.page == "map","Escape exits shop to map")
 	Game.visit("mall")
+	Game.skip_dialogue(Game.revision)
 	await settle()
 	check(app.view.stock.get_node("buy_slot_0").disabled,"Re-entry preserves ownership")
 	app.view.get_node("return_map").pressed.emit()
 	await settle()
 	check(Game.page == "map","Exit button returns to map")
 	Game.visit("market")
+	Game.skip_dialogue(Game.revision)
 	await settle()
 	check(app.view.get_script().resource_path.ends_with("black_market.gd"),"Black-market routing retained")
 	app.queue_free()

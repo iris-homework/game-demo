@@ -24,6 +24,7 @@ const EVENT_REFRESH_LIMIT := 3
 var event_refresh_rng := RandomNumberGenerator.new()
 var places: Array
 var events: Dictionary
+var place_dialogues: Dictionary
 var battles: Dictionary
 var rewards: Dictionary
 var config: Dictionary
@@ -70,6 +71,7 @@ func _ready() -> void:
 	characters = read_data("characters.json")
 	places = read_data("places.json")
 	events = read_data("weeks/week1/events.json")
+	place_dialogues = read_data("place_dialogues.json")
 	battles = read_data("battles.json")
 	rewards = read_data("rewards.json")
 	config = read_data("config.json")
@@ -367,11 +369,15 @@ func objective() -> String:
 	if targets.size() > 1: return "%d 个可进行的事件" % targets.size()
 	return "探索城市，寻找新的委托"
 
+func in_place_dialogue() -> bool:
+	return not state.get("placeDialogue", {}).is_empty()
+
 func event_data() -> Dictionary:
+	if in_place_dialogue(): return place_dialogues.get(state.placeDialogue.placeId, {})
 	return events.get(state.get("activeEventId", ""), {})
 
 func node_data() -> Dictionary:
-	return event_data().get("nodes", {}).get(state.get("activeNodeId", ""), {})
+	return event_data().get("nodes", {}).get(state.placeDialogue.nodeId if in_place_dialogue() else state.get("activeNodeId", ""), {})
 
 func display_name(id: String) -> String:
 	return characters.get(resolve_character_id(id), {}).get("displayName", "旁白")
@@ -429,6 +435,7 @@ func retry_pending_save() -> bool:
 
 func go_map() -> void:
 	if not pending_save_kind.is_empty() or transition_locked or battle_busy or is_run_over(): return
+	state.erase("placeDialogue")
 	state.currentScene = "map"
 	checkpoint()
 
@@ -436,7 +443,13 @@ func visit(id: String) -> void:
 	if not pending_save_kind.is_empty() or transition_locked or battle_busy or is_run_over(): return
 	var p := place_data(id)
 	if p.is_empty(): return
+	state.erase("placeDialogue")
 	state.currentPlaceId = id
+	var intro: Dictionary = place_dialogues.get(id, {})
+	if not training_mode and not intro.is_empty() and not state.flags.get(intro.completionFlag, false):
+		state.placeDialogue = {"placeId":id, "nodeId":intro.startNodeId}
+		enter_node(intro.startNodeId)
+		return
 	state.currentScene = "place"
 	checkpoint()
 
@@ -446,6 +459,7 @@ func start_event(id: String) -> bool:
 	var e: Dictionary = events[id]
 	if not id in state.get("refreshedEventIds", []) or id in state.completedEventIds or not meets(e.unlockCondition) or not event_in_refresh_range(e): return false
 	if place_data(e.placeId).is_empty(): return false
+	state.erase("placeDialogue")
 	state.activeEventId = id
 	state.currentPlaceId = e.placeId
 	state.battleId = ""
@@ -521,6 +535,9 @@ func event_completion_days(id: String) -> int:
 
 func enter_node(id: String) -> void:
 	if not pending_save_kind.is_empty() or transition_locked or battle_busy or (not training_mode and is_run_over()): return
+	if in_place_dialogue():
+		_enter_place_dialogue_node(id)
+		return
 	if id == "@map":
 		go_map()
 		return
@@ -553,13 +570,29 @@ func enter_node(id: String) -> void:
 				state.portraits[side] = speaker
 	checkpoint()
 
+func _enter_place_dialogue_node(id: String) -> void:
+	var intro := event_data()
+	if not intro.get("nodes", {}).has(id):
+		notice.emit("地点对白节点不存在：" + id)
+		return
+	var n: Dictionary = intro.nodes[id]
+	if n.get("type", "dialogue") == "place":
+		state.flags[intro.completionFlag] = true
+		state.erase("placeDialogue")
+		state.currentScene = "place"
+	else:
+		state.placeDialogue.nodeId = id
+		state.currentScene = "dialogue"
+		record_dialogue()
+	checkpoint()
+
 func record_dialogue(choice_text: String = "") -> void:
 	# Store rendered snapshots, never traverse unseen branches to reconstruct a log.
 	if not state.has("dialogueHistory"): state.dialogueHistory = []
 	var n := node_data()
 	var speaker: String = n.get("speakerId", "")
 	state.dialogueHistory.append({
-		"eventId": state.activeEventId,
+		"eventId": event_data().id,
 		"title": event_data().title,
 		"speaker": "你的选择" if not choice_text.is_empty() else (display_name(speaker) if not speaker.is_empty() else "场景"),
 		"text": render_text(choice_text if not choice_text.is_empty() else n.get("text", "")),
@@ -579,7 +612,7 @@ func skip_dialogue(expected_revision: int) -> void:
 	while state.currentScene == "dialogue" and not transition_locked and not battle_busy and pending_save_kind.is_empty():
 		var n := node_data()
 		if not n.get("choices", []).is_empty() or not n.has("next"): return
-		visited[state.activeNodeId] = true
+		visited[state.placeDialogue.nodeId if in_place_dialogue() else state.activeNodeId] = true
 		if visited.has(n.next):
 			notice.emit("剧情路径存在循环，已停止跳过。")
 			return
@@ -866,6 +899,14 @@ func valid_save(s) -> bool:
 		if not portrait_id in ["", PLAYER_REFERENCE] and not characters.has(portrait_id): return false
 	if place_data(s.currentPlaceId).is_empty(): return false
 	if not events.has(s.activeEventId) or not events[s.activeEventId].nodes.has(s.activeNodeId): return false
+	if s.has("placeDialogue"):
+		var context = s.placeDialogue
+		if not context is Dictionary or context.size() != 2: return false
+		if not context.get("placeId") is String or not context.get("nodeId") is String: return false
+		var intro: Dictionary = place_dialogues.get(context.placeId, {})
+		if intro.is_empty() or s.currentScene != "dialogue" or s.currentPlaceId != context.placeId: return false
+		if s.flags.get(intro.completionFlag, false) or not intro.nodes.has(context.nodeId): return false
+		if intro.nodes[context.nodeId].get("type", "dialogue") != "dialogue": return false
 	if s.currentScene == "battle":
 		if not battles.has(s.battleId): return false
 		if not s.combat.is_empty() and (s.combat.battleId != s.battleId or s.combat.playerHp != s.currentHp): return false
@@ -1224,6 +1265,12 @@ func save_meta() -> bool:
 func migrate_save(data):
 	if not data is Dictionary: return data
 	data = data.duplicate(true)
+	# Continue older checkpoints past removed shop dialogue lines.
+	var place_context = data.get("placeDialogue")
+	if place_context is Dictionary and place_context.get("placeId") == "market" and place_context.get("nodeId") in ["intro_04", "intro_05"]:
+		place_context.nodeId = "intro_06"
+	if place_context is Dictionary and place_context.get("placeId") == "mall" and place_context.get("nodeId") in ["intro_02", "intro_03", "intro_04"]:
+		place_context.nodeId = "intro_05"
 	# Legacy checkpoints always belonged to Noren, even if the default changes.
 	if not data.has("playerCharacterId"):
 		data.playerCharacterId = LEGACY_PLAYER_CHARACTER_ID
