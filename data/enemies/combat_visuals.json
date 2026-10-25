@@ -213,5 +213,111 @@
         "scale": 0.127
       }
     }
+  },
+  "dancer_black": {
+    "id": "dancer_black",
+    "placeholder": false,
+    "sourceFacing": "left",
+    "targetRect": [
+      -56,
+      -150,
+      112,
+      158
+    ],
+    "attackStyleOverride": "pierce",
+    "poseAliases": {
+      "block": "idle"
+    },
+    "poses": {
+      "idle": {
+        "texture": "res://assets/combat_test/dancer_black/idle.png",
+        "anchor": [
+          460,
+          1390
+        ],
+        "scale": 0.105,
+        "whiteKey": false
+      },
+      "move": {
+        "texture": "res://assets/combat_test/dancer_black/move.png",
+        "anchor": [
+          610,
+          970
+        ],
+        "scale": 0.116,
+        "whiteKey": false
+      },
+      "pierce": {
+        "texture": "res://assets/combat_test/dancer_black/pierce.png",
+        "anchor": [
+          1250,
+          850
+        ],
+        "scale": 0.122,
+        "whiteKey": false
+      },
+      "damaged": {
+        "texture": "res://assets/combat_test/dancer_black/damaged.png",
+        "anchor": [
+          500,
+          1110
+        ],
+        "scale": 0.109,
+        "whiteKey": false
+      }
+    }
+  },
+  "dancer_white": {
+    "id": "dancer_white",
+    "placeholder": false,
+    "sourceFacing": "left",
+    "targetRect": [
+      -56,
+      -150,
+      112,
+      158
+    ],
+    "attackStyleOverride": "slash",
+    "poseAliases": {
+      "block": "idle"
+    },
+    "poses": {
+      "idle": {
+        "texture": "res://assets/combat_test/dancer_white/idle.png",
+        "anchor": [
+          710,
+          1380
+        ],
+        "scale": 0.105,
+        "whiteKey": false
+      },
+      "move": {
+        "texture": "res://assets/combat_test/dancer_white/move.png",
+        "anchor": [
+          1000,
+          975
+        ],
+        "scale": 0.112,
+        "whiteKey": false
+      },
+      "slash": {
+        "texture": "res://assets/combat_test/dancer_white/slash.png",
+        "anchor": [
+          930,
+          1000
+        ],
+        "scale": 0.096,
+        "whiteKey": false
+      },
+      "damaged": {
+        "texture": "res://assets/combat_test/dancer_white/damaged.png",
+        "anchor": [
+          870,
+          1140
+        ],
+        "scale": 0.109,
+        "whiteKey": false
+      }
+    }
   }
 }

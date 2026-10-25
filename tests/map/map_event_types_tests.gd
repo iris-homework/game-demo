@@ -15,8 +15,11 @@ func _ready() -> void:
 	Game.meta_path = "user://qa-map-event-types/meta.json"
 	Game.state = Game.initial_state()
 	Game.state.currentScene = "map"
+	Game.state.currentDay = 1
 	Game.state.completedEventIds = ["E01", "E11"]
 	Game.state.currentPlaceId = "junkyard"
+	# This suite checks marker types; random pool selection has its own coverage.
+	Game.state.refreshedEventIds = ["E02", "E04", "E13"]
 	Game.refresh_event_pool()
 	Game.page = "map"
 	var before: Dictionary = Game.state.duplicate(true)
@@ -24,7 +27,8 @@ func _ready() -> void:
 	var view = load("res://scripts/map.gd").new()
 	view.map_rect = Rect2(0, 76, 1440, 824)
 	for event in Game.events.values():
-		check(Game.map_event_type(event.id) == "normal", "authored events default normal " + event.id)
+		var expected: String = "boss" if event.id == "E16" else "normal"
+		check(Game.map_event_type(event.id) == expected, "authored event type " + event.id + " = " + expected)
 	for tier in ["normal", "elite", "boss"]:
 		Game.battles.B02.battleType = tier
 		check(Game.map_event_type("E02") == tier, "event follows configured battle " + tier)
@@ -106,15 +110,58 @@ func _ready() -> void:
 			var enter: Button = live.detail.find_child("enter_place", true, false)
 			check(enter.text == "进入黑市    →", "market entry has explicit destination")
 			check(enter.get_theme_stylebox("normal").bg_color == DemoUI.PINK, "market entry uses red accent style")
-		if id == "clinic": check(live.detail.find_child("heal_place", true, false) != null, "resident clinic keeps healing action")
+		if id == "clinic":
+			check(live.detail.find_child("heal_place", true, false) == null, "resident clinic map defers healing to service page")
+			check(live.detail.find_child("enter_place", true, false) != null, "resident clinic keeps a map entry without tasks")
 	live.select_place("tower")
 	var ordinary_text := ""
 	for node in live.detail.find_children("*", "Label", true, false): ordinary_text += node.text
 	check(ordinary_text.contains("暂无新的事件"), "ordinary eventless location retains existing notice")
-	check(live.detail.find_child("enter_place", true, false).text == "进入地点    →", "ordinary entry keeps generic label")
+	check(live.detail.find_child("enter_place", true, false) == null, "ordinary eventless location offers no entry action")
+	live.select_place("junkyard")
+	var task_enter: Button = live.detail.find_child("enter_place", true, false)
+	check(task_enter != null and task_enter.text == "进入地点    →", "ordinary location with task retains one generic entry")
+	check(live.detail.find_child("event_E02", true, false) == null, "map detail never starts the task directly")
 	check(Game.state == before, "resident detail changes do not modify adventure state")
 	live.queue_free()
 	await get_tree().process_frame
 	Game.battles = authored
+	# Verify the actual authored Boss survives the merged map -> briefing route.
+	Game.state = before.duplicate(true)
+	Game.state.currentDay = 7
+	Game.refresh_event_pool()
+	Game.page = "map"
+	var boss_before: Dictionary = Game.state.duplicate(true)
+	var boss_map = load("res://scripts/map.gd").new()
+	add_child(boss_map)
+	await get_tree().process_frame
+	check(Game.available_events("hive").map(func(e): return e.id) == ["E16"], "seventh-day hive presents the authored Boss")
+	check(boss_map.markers.hive.boss_effect and boss_map.markers.hive._badges.size() == 1 and boss_map.markers.hive._badges[0].kind == "boss", "actual Boss reaches hive skull and effect")
+	boss_map.select_place("hive")
+	var boss_enter: Button = boss_map.get_detail_button("enter_place")
+	check(boss_enter != null and boss_enter.text == "进入地点    →", "Boss location exposes generic entry before briefing")
+	check(boss_map.get_detail_button("event_E16") == null and Game.state == boss_before, "Boss map detail has no direct start and does not mutate state")
+	if boss_enter != null:
+		boss_enter.pressed.emit()
+		check(Game.page == "place" and Game.state.currentPlaceId == "hive" and Game.state.activeEventId == boss_before.activeEventId, "Boss entry opens briefing without accepting the event")
+		var briefing = load("res://scripts/place.gd").new()
+		add_child(briefing)
+		briefing.set_process(false)
+		var info: Label = briefing.find_child("task_info_E16", true, false)
+		var start: Button = briefing.find_child("event_E16", true, false)
+		check(info != null and start != null, "Boss briefing exposes authored task information and start action")
+		if info != null and start != null:
+			check(info.text.contains(Game.events.E16.title) and info.text.contains(Game.events.E16.description) and start.disabled, "Boss briefing begins with full authored text pending reveal")
+			briefing._process(10.0)
+			check(not start.disabled, "Boss start enables after briefing finishes")
+			start.pressed.emit()
+			check(Game.page == "dialogue" and Game.state.activeEventId == "E16" and Game.state.activeNodeId == Game.events.E16.startNodeId, "Boss start routes to authored introduction exactly once")
+			var accepted: Dictionary = Game.state.duplicate(true)
+			var accepted_revision: int = Game.revision
+			start.pressed.emit()
+			check(Game.state == accepted and Game.revision == accepted_revision, "repeated Boss start cannot restart accepted introduction")
+		briefing.queue_free()
+	boss_map.queue_free()
+	await get_tree().process_frame
 	print("MAP EVENT TYPES: %d checks, %d failures" % [checks, failures])
 	get_tree().quit(1 if failures else 0)

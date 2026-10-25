@@ -1192,5 +1192,75 @@
       "startDay": null,
       "endDay": null
     }
+  },
+  "E16": {
+    "id": "E16",
+    "title": "双人舞者",
+    "placeId": "hive",
+    "unlockCondition": {},
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "第七天，蜂巢城寨亮起舞台灯。黑舞者独自候场，暗处还藏着另一位舞者。",
+    "demoNote": "",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "type": "stage",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "蜂巢城寨的灯光逐一熄灭。街中央只剩一道光，黑舞者站在光里，缓缓举起长枪。",
+        "portraits": {
+          "left": "@player",
+          "right": ""
+        },
+        "next": "intro_02"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "封路等我？那就开始吧。",
+        "next": "battle"
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B16"
+      },
+      "win_01": {
+        "id": "win_01",
+        "type": "stage",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "黑白舞者同时停住。聚光灯逐渐暗下去，街道终于恢复寂静。",
+        "portraits": {
+          "right": ""
+        },
+        "next": "win_02"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "谢幕了。",
+        "next": "finish"
+      },
+      "lose": {
+        "id": "lose",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "舞台灯光熄灭。"
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": []
+      }
+    },
+    "refreshTimeRange": {
+      "startDay": 7,
+      "endDay": 7
+    }
   }
 }

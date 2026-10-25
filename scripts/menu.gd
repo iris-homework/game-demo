@@ -118,11 +118,11 @@ func _build_training_panel() -> void:
 	label(training_container, "选择对手，直接开始演练", Vector2(310, 166), Vector2(820, 30), 18, MUTED)
 	label(training_container, "经典战斗", Vector2(310, 218), Vector2(820, 30), 21, CYAN)
 	var focus_buttons: Array[Button] = []
-	var battles := [["B04", "黑帮三人组"], ["B11", "双变异鱼"], ["B02", "故障机器人"]]
+	var battles := [["B04", "黑帮三人组"], ["B11", "双变异鱼"], ["B02", "故障机器人"], ["B16", "双人舞者 · Boss"]]
 	for index in battles.size():
 		focus_buttons.append(_menu_button("training_" + battles[index][0], battles[index][1],
-			Vector2(310 + index * 280, 262), Vector2(260, 50),
-			_select_training_battle.bind(battles[index][0]), false, 19, training_container))
+			Vector2(310 + index * 210, 262), Vector2(195, 50),
+			_select_training_battle.bind(battles[index][0]), false, 17, training_container))
 	training_scenery_button = _menu_button("training_scenery", "黑帮" + _training_scenery_label(), Vector2(310, 326), Vector2(820, 42), open_scenery_picker, false, 16, training_container)
 	training_scenery_button.tooltip_text = "仅调整黑帮三人组的演练场景"
 	focus_buttons.append(training_scenery_button)

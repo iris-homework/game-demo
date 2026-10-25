@@ -121,7 +121,7 @@ func _ready() -> void:
 	check(app.shown_page == "battle" and app.view.initialized, "formal battle loads through Main's actual page transition")
 	var action_cues: Array[String] = []
 	app.view.stage.combat_audio.cue_played.connect(func(cue: String): action_cues.append(cue))
-	check("snap" in app.view.stage.combat_audio.muted_cues, "formal return snap is muted")
+	check(not "snap" in app.view.stage.combat_audio.muted_cues, "formal return snap remains enabled")
 	app.view.model.ammo = 10
 	Game.commit_combat(app.view.model)
 	var attack := ""
@@ -147,7 +147,7 @@ func _ready() -> void:
 	await settle()
 	check(app.view.model.turn > turn, "empty-hand formal end-turn completes real enemy actions")
 	check(not cues.has("energy") and not cues.has("turn_start") and not cues.has("ui_click"), "formal round reset has none of the removed extra feedback")
-	check(not action_cues.has("snap") and (action_cues.has("slash") or action_cues.has("shoot")), "formal return is quiet while attack audio remains active")
+	check(action_cues.count("snap") == 1 and (action_cues.has("slash") or action_cues.has("shoot")), "formal return plays exactly one snap while attack audio remains active")
 
 	fresh("map")
 	app.swap_view()

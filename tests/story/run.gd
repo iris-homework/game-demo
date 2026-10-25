@@ -44,7 +44,7 @@ func _ready() -> void:
 	Game.meta_path = "user://automated_test_meta.json"
 	# Validate authored references, including legacy saved result nodes.
 	check(Game.places.size() == 17, "17 places including church")
-	check(Game.events.size() == 8 and Game.events.has("E01R"), "opening, six commissions, and gated return reward event")
+	check(Game.events.size() == 9 and Game.events.has("E01R") and Game.events.has("E16"), "opening, six commissions, gated return reward, and day-seven boss")
 	for e in Game.events.values():
 		check(not Game.place_data(e.placeId).is_empty(), e.id + " place exists")
 		for n in e.nodes.values():
@@ -53,7 +53,8 @@ func _ready() -> void:
 			for c in n.get("choices", []): check(c.next == "@map" or e.nodes.has(c.next), "Choice target exists")
 		for id in e.rewardIds: check(Game.rewards.has(id), "Reward exists")
 	for b in Game.battles.values():
-		for result in ["win", "lose", "surrender"]:
+		check(b.returnNodeByResult.has("win") and b.returnNodeByResult.has("lose"), b.id + " required terminal routes")
+		for result in b.returnNodeByResult:
 			check(Game.events[b.eventId].nodes.has(b.returnNodeByResult[result]), b.id + " return " + result)
 	# Payment rejection is atomic; payment is committed once even under duplicate click.
 	preload("res://tests/fixtures/payment_choice.gd").install(Game)
@@ -100,6 +101,16 @@ func _ready() -> void:
 			var battle_rev := Game.revision
 			check(not Game.battle_exit("surrender", battle_rev), "Surrender rejected " + b.id)
 			check(Game.state == before_rejected and Game.revision == battle_rev and Game.page == "battle", "Rejected surrender preserves battle")
+			if b.id == "B16" and result == "win":
+				var boss := CombatModel.new()
+				boss.restore(Game.state.combat)
+				boss.enemy_damage(0, 999)
+				boss.resolve_outcome()
+				boss.advance_encounter_phase()
+				for i in boss.enemies.size(): boss.enemy_damage(i, 999)
+				boss.resolve_outcome()
+				Game.commit_combat(boss)
+				battle_rev = Game.revision
 			check(Game.battle_exit(result,battle_rev), b.id + " " + result)
 			check(not Game.battle_exit(result,battle_rev), "Duplicate battle result rejected")
 			check(Game.state.activeNodeId == b.returnNodeByResult.win if result == "win" else Game.page == "defeat" and Game.state.currentScene == "defeat", "Exact victory node or terminal defeat page")

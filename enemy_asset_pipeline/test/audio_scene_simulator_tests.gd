@@ -188,7 +188,7 @@ func _ready() -> void:
 	var stage_audio: Node = lab.view.stage.combat_audio
 	var action_cues: Array[String] = []
 	stage_audio.cue_played.connect(func(cue: String): action_cues.append(cue))
-	check("snap" in stage_audio.muted_cues,"test-only battle attachment mutes the return snap")
+	check(not "snap" in stage_audio.muted_cues,"battle attachment keeps the return snap enabled")
 	lab.view.model.energy = 1
 	Game.commit_combat(lab.view.model)
 	lab.hooks._process(0)
@@ -245,10 +245,10 @@ func _ready() -> void:
 	check(not cues.has("energy"),"empty-hand turn end does not announce automatic energy refill")
 	check(not cues.has("ui_click"),"end-turn button does not emit generic button feedback")
 	check(not played_paths.has("turn_start"),"real round advance no longer plays turn-start feedback")
-	check(not action_cues.has("snap"),"full enemy round no longer plays a return snap")
+	check(action_cues.count("snap") == 1,"full enemy round plays exactly one return snap")
 	check(action_cues.has("slash") or action_cues.has("shoot"),"ordinary attack sounds remain active")
 	lab.hooks.attach(null)
-	check(not "snap" in stage_audio.muted_cues,"detaching restores the original return-audio setting")
+	check(not "snap" in stage_audio.muted_cues,"detaching leaves the return snap enabled")
 	stage_audio.muted_cues.append("snap")
 	lab.hooks.attach(lab.view)
 	lab.hooks.attach(null)

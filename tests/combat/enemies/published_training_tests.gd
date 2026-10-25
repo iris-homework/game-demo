@@ -250,7 +250,7 @@ func test_menu() -> void:
 	var modal: Control = menu.training_container
 	check(menu.training_open and modal.is_visible_in_tree(), "Single entry opens unified practice modal")
 	var buttons := modal.find_children("*", "Button", true, false)
-	check(buttons.size() == 15, "Unified panel contains three battles, ten enemies, scenery and return")
+	check(buttons.size() == 16, "Unified panel contains four battles, ten enemies, scenery and return")
 	var choice_rects: Array[Rect2] = []
 	var canvas := Rect2(Vector2.ZERO, Vector2(1440, 900))
 	for button in buttons:
@@ -337,7 +337,7 @@ func _ready() -> void:
 		sentinel_paths.append(path)
 	original_battles = Game.battles.duplicate(true)
 	original_enemies = Game.enemy_catalog.duplicate(true)
-	check(original_battles.size() == 6 and original_enemies.size() == 14, "Formal baseline has six battles / fourteen enemies")
+	check(original_battles.size() == 7 and original_enemies.size() == 16, "Formal baseline has seven battles / sixteen enemies")
 	test_config()
 	test_start_and_restore()
 	test_rejections()

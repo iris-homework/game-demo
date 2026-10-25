@@ -1,0 +1,17 @@
+{
+  "note": "目视标定各原PNG头部发廓宽度，近似像素值；用于统一人物尺度，不按蹲身后的全身高度拉大。原图未修改。",
+  "headWidthPx": {
+    "dancer_black": {
+      "idle": 480,
+      "move": 430,
+      "pierce": 411,
+      "damaged": 462
+    },
+    "dancer_white": {
+      "idle": 502,
+      "move": 472,
+      "slash": 560,
+      "damaged": 485
+    }
+  }
+}

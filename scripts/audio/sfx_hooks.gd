@@ -12,15 +12,12 @@ var dialogue_label: Label
 var enabled := true
 var observe_choices := true
 var connections: Array[Dictionary] = []
-var muted_combat_audio: WeakRef
-var snap_was_muted := false
 
 func _ready() -> void:
 	get_tree().node_added.connect(_node_added)
 	Game.status_changed.connect(_state_changed)
 
 func attach(value: Control) -> void:
-	_restore_return_audio()
 	for item in connections:
 		var source: Object = item.source.get_ref()
 		if is_instance_valid(source) and source.is_connected(item.signal_name,item.callback):
@@ -34,11 +31,6 @@ func attach(value: Control) -> void:
 	dialogue_label = null
 	previous = _summary()
 	if not is_instance_valid(view): return
-	if _is_battle():
-		var audio: Node = view.stage.combat_audio
-		muted_combat_audio = weakref(audio)
-		snap_was_muted = "snap" in audio.muted_cues
-		if not snap_was_muted: audio.muted_cues.append("snap")
 	if view.get_script().resource_path == "res://scripts/dialogue.gd":
 		dialogue_label = view.text_label
 		_connect(view.advance_requested,_cue.bind("dialogue_advance"))
@@ -48,16 +40,6 @@ func attach(value: Control) -> void:
 		_connect(view.card_aim_cancelled,_cue.bind("card_deselect"))
 		_connect(view.card_played,func(_uid: String): _cue("card_play"))
 	_watch(ui_root if is_instance_valid(ui_root) else view)
-
-func _exit_tree() -> void:
-	_restore_return_audio()
-
-func _restore_return_audio() -> void:
-	if muted_combat_audio == null: return
-	var audio: Node = muted_combat_audio.get_ref()
-	if is_instance_valid(audio) and not snap_was_muted:
-		audio.muted_cues.erase("snap")
-	muted_combat_audio = null
 
 func _connect(source: Signal, callback: Callable) -> void:
 	source.connect(callback)

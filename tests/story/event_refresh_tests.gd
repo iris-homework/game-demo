@@ -24,6 +24,7 @@ func fixture_state() -> void:
 	Game.state.currentScene = "map"
 	Game.page = "map"
 	Game.state.completedEventIds = Game.events.keys()
+	Game.state.completedEventIds.erase("E16")
 	Game.state.refreshedEventIds = []
 	for index in range(6):
 		var id := "REFRESH_%02d" % index
@@ -226,7 +227,7 @@ func test_save() -> void:
 	reset_authored()
 	check(Game.eligible_events().size() == 7 and Game.state.refreshedEventIds.size() == 3, "new adventure has seven ungated candidates and three refreshed events")
 	for event in Game.events.values():
-		check(not event.has("optional") and event.get("refreshTimeRange") == {"startDay":null,"endDay":null}, "authored event uses anytime range and no category " + event.id)
+		check(not event.has("optional") and (Game.event_refresh_time_label(event) == "第7天" if event.id == "E16" else event.get("refreshTimeRange") == {"startDay":null,"endDay":null}), "authored event uses its declared window and no category " + event.id)
 	Game.state.currentDay = 7
 	Game.state.completedEventIds = ["E01", "E02"]
 	Game.state.targetId = "richard"
@@ -244,6 +245,7 @@ func test_save() -> void:
 	var legacy := Game.state.duplicate(true)
 	legacy.erase("refreshedEventIds")
 	legacy.currentDay = 4
+	legacy.flags.erase("dancerBossAppeared")
 	var migrated = Game.migrate_save(legacy)
 	check(Game.valid_save(migrated) and migrated.currentDay == 4, "old schema two fills fields without replaying completed event dates")
 	check(migrated.refreshedEventIds.size() == 3 and migrated.refreshedEventIds.all(func(id): return id in ["E04", "E11", "E13", "E14", "E15"]) and not legacy.has("refreshedEventIds"), "legacy pool initialized without modifying source")
@@ -254,7 +256,8 @@ func test_save() -> void:
 func test_ui() -> void:
 	start_contract()
 	Game.state.currentDay = 7
-	Game.state.currentPlaceId = "junkyard"
+	Game.refresh_event_pool()
+	Game.state.currentPlaceId = "hive"
 	Game.state.currentScene = "place"
 	var view: Node = load("res://scenes/place.tscn").instantiate()
 	add_child(view)
@@ -273,11 +276,11 @@ func test_ui() -> void:
 	add_child(map_view)
 	await get_tree().process_frame
 	check("第 7 天" in all_text(map_view), "map HUD displays day seven")
-	map_view.call("select_place", "junkyard")
+	map_view.call("select_place", "hive")
 	await get_tree().process_frame
 	var map_text := all_text(map_view)
 	check(not "刷新时间" in map_text, "map defers refresh details to task briefing")
-	check(map_view.get_detail_button("enter_place") != null and map_view.get_detail_button("event_E02") == null, "map offers one entry instead of starting task")
+	check(map_view.get_detail_button("enter_place") != null and map_view.get_detail_button("event_E16") == null, "map offers one entry instead of starting task")
 	check(not "主线" in map_text and not "可选事件" in map_text and not "支线" in map_text, "real map detail uses unified event terminology")
 	map_view.queue_free()
 	await get_tree().process_frame

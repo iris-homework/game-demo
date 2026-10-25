@@ -292,7 +292,16 @@ func event_refresh_time_label(event: Dictionary) -> String:
 	if start == null and end == null: return "随时"
 	if start == null: return "第%d天及以前" % int(end)
 	if end == null: return "第%d天起" % int(start)
+	if start == end: return "第%d天" % int(start)
 	return "第%d—%d天" % [int(start), int(end)]
+
+func boss_has_appeared(subject: Dictionary) -> bool:
+	var flags = subject.get("flags", {})
+	if not flags is Dictionary: return false
+	if flags.get("dancerBossAppeared", false) == true: return true
+	# Also guard old day-seven pools before migration/checkpoint refreshes them.
+	var day = subject.get("currentDay", 1)
+	return events.has("E16") and (day is int or day is float) and day == 7
 
 func eligible_events(subject: Dictionary = {}) -> Array:
 	var s: Dictionary = state if subject.is_empty() else subject
@@ -303,6 +312,7 @@ func eligible_events(subject: Dictionary = {}) -> Array:
 	if not is_finite(float(s.currentDay)) or s.currentDay < 1 or s.currentDay != floor(float(s.currentDay)): return []
 	var found: Array = []
 	for e in events.values():
+		if boss_has_appeared(s) and e.id != "E16" and not e.get("permanent", false): continue
 		if not e.id in s.get("completedEventIds", []) and meets(e.get("unlockCondition", {}), s) and event_in_refresh_range(e, s) and not place_data(e.placeId).is_empty():
 			found.append(e)
 	found.sort_custom(func(a, b): return str(a.id) < str(b.id))
@@ -311,8 +321,12 @@ func eligible_events(subject: Dictionary = {}) -> Array:
 func refresh_event_pool(subject: Dictionary = {}) -> void:
 	var s: Dictionary = state if subject.is_empty() else subject
 	if s.is_empty(): return
+	if boss_has_appeared(s) and s.get("flags") is Dictionary: s.flags.dancerBossAppeared = true
 	var candidates: Array = eligible_events(s).map(func(e): return e.id)
 	var kept: Array = []
+	if "E16" in candidates:
+		kept.append("E16")
+		candidates.erase("E16")
 	# The promised three-commission return must not wait for another random draw.
 	# Reserve one of the existing slots, including when loading an already full pool.
 	if "E01R" in candidates:
@@ -363,6 +377,7 @@ func map_place_state(id: String) -> Dictionary:
 		"completed":completed and available.is_empty(), "services":p.get("services", [])}
 
 func objective() -> String:
+	if "E16" in state.get("completedEventIds", []): return "双人舞者已击败 · 可继续使用常驻设施"
 	if state.get("flags", {}).get("week1Complete", false): return "第一周已完成 · 可继续探索剩余事件"
 	var targets := map_target_events()
 	if targets.size() == 1: return targets[0].title + "  /  " + place_data(targets[0].placeId).name
@@ -457,6 +472,7 @@ func start_event(id: String) -> bool:
 	if not pending_save_kind.is_empty() or transition_locked or battle_busy or is_run_over(): return false
 	if not events.has(id): return false
 	var e: Dictionary = events[id]
+	if boss_has_appeared(state) and id != "E16" and not e.get("permanent", false): return false
 	if not id in state.get("refreshedEventIds", []) or id in state.completedEventIds or not meets(e.unlockCondition) or not event_in_refresh_range(e): return false
 	if place_data(e.placeId).is_empty(): return false
 	state.erase("placeDialogue")
@@ -655,9 +671,13 @@ func battle_exit(result: String, expected_revision: int) -> bool:
 	if not training_mode and is_run_over() and result != "lose": return false
 	var b: Dictionary = battles.get(state.battleId, {})
 	if b.is_empty(): return false
+	# Training may simulate either result; it only restores the original adventure.
 	if training_mode:
 		finish_training(result)
 		return true
+	if result == "win" and b.get("encounterId", "") == "dancer_duet":
+		var combat: Dictionary = state.get("combat", {})
+		if combat.get("encounterPhase") != 2 or combat.get("outcome") != "win" or not valid_combat(combat): return false
 	if result == "win" and not b.get("returnNodeByResult", {}).has(result): return false
 	if result == "lose":
 		mark_run_failed(state)
@@ -875,6 +895,7 @@ func valid_save(s) -> bool:
 	if not valid_battle_start(s): return false
 	if not s.combat.is_empty() and s.combat.profile.get("playerCharacterId", s.playerCharacterId) != s.playerCharacterId: return false
 	if not s.completedEventIds is Array or not s.flags is Dictionary or not s.choiceHistory is Dictionary or not s.portraits is Dictionary: return false
+	if s.flags.has("dancerBossAppeared") and not s.flags.dancerBossAppeared is bool: return false
 	if not s.claimedRewardIds is Array or not s.battleHistory is Array: return false
 	if not s.deck is Array or not s.battleReward is Dictionary: return false
 	if not valid_removed_starting_cards(s): return false
@@ -1039,6 +1060,11 @@ func initialize_combat() -> void:
 	var rules := prototype_rules.duplicate(true)
 	var player := player_definition()
 	if player.get("combatRules", "") == "noren_v1": rules.merge(noren_rules, true)
+	if battle.get("encounterId", "") == "dancer_duet":
+		rules.encounterId = "dancer_duet"
+		rules.phaseTwoEnemies = []
+		for id in battle.phaseTwoEnemyIds:
+			rules.phaseTwoEnemies.append(enemy_catalog[id].duplicate(true))
 	rules.battleType = configured_battle_type(state.battleId)
 	rules.playerCharacterId = player_character_id()
 	rules.playerAttributes = player.attributes.duplicate(true)
@@ -1309,6 +1335,11 @@ func migrate_save(data):
 	# Make the new return visit available to eligible existing adventures, too.
 	elif data.get("refreshedEventIds") is Array and data.get("completedEventIds") is Array and data.get("flags") is Dictionary and not "E01R" in data.completedEventIds and events.has("E01R"):
 		if meets(events.E01R.unlockCondition, data): refresh_event_pool(data)
+	if data.get("flags") is Dictionary and data.get("completedEventIds") is Array and data.get("refreshedEventIds") is Array and boss_has_appeared(data):
+		refresh_event_pool(data)
+	# Relocate only an in-progress dancer encounter, never a later map visit.
+	if data.get("activeEventId") == "E16" and data.get("currentScene") in ["dialogue", "battle", "result"] and data.get("currentPlaceId") == "block5":
+		data.currentPlaceId = "hive"
 	# Additive schema-2 upgrade: old battles gain the temporary catalog, with
 	# no used cards or pending buff. Existing snapshots retain their own rules.
 	var combat = data.get("combat", {})
@@ -1386,6 +1417,8 @@ func valid_battle_start(s: Dictionary) -> bool:
 	# Both snapshots must describe the same frozen encounter and card instances.
 	for field in ["profile", "cardCatalog", "instances", "maxHp"]:
 		if opening[field] != s.combat[field]: return false
+	if opening.profile.get("encounterId", "") == "dancer_duet":
+		return opening.get("encounterPhase") == 1
 	if opening.enemies.size() != s.combat.enemies.size(): return false
 	for i in opening.enemies.size():
 		var enemy_id = opening.enemies[i].get("id")
@@ -1462,6 +1495,7 @@ func valid_combat(c: Dictionary) -> bool:
 		if not c[key] is Dictionary: return false
 	if not c.profile.get("battleType", "normal") is String or not BATTLE_TYPES.has(c.profile.get("battleType", "normal")): return false
 	if not c.outcome in ["", "win", "lose", "surrender"]: return false
+	if not valid_dancer_encounter(c): return false
 	if not valid_cyberware_state(c): return false
 	if c.profile.get("ruleset", "") == "noren_v1" and not valid_noren_state(c): return false
 	var seen: Array = []
@@ -1484,6 +1518,33 @@ func valid_combat(c: Dictionary) -> bool:
 		if not enemy.intent.get("hits",1) is float and not enemy.intent.get("hits",1) is int: return false
 		if enemy.intent.get("amount",0) < 0 or enemy.intent.get("hits",1) < 1: return false
 		if not valid_conditional_intent(enemy, c.enemies): return false
+	return true
+
+func valid_dancer_encounter(c: Dictionary) -> bool:
+	if c.profile.get("encounterId", "") != "dancer_duet":
+		return c.battleId != "B16" and not c.has("encounterPhase") and not c.profile.has("phaseTwoEnemies")
+	if c.battleId != "B16" or c.profile.get("battleType") != "boss": return false
+	if not buffs._valid_count(c.get("encounterPhase"), 2) or int(c.get("encounterPhase")) not in [1, 2]: return false
+	var definitions = c.profile.get("phaseTwoEnemies")
+	if not definitions is Array or definitions.size() != 2: return false
+	for i in 2:
+		var definition = definitions[i]
+		if not definition is Dictionary: return false
+		if definition.get("id") != ["dancer_black", "dancer_white"][i]: return false
+		for key in ["displayName", "battlePortraitAssetId", "combatVisualId"]:
+			if not definition.get(key) is String: return false
+		if not buffs._valid_count(definition.get("maxHp")) or definition.maxHp < 1: return false
+		if not definition.get("intentSequence") is Array or definition.intentSequence.is_empty(): return false
+		for intent in definition.intentSequence:
+			if not intent is Dictionary or intent.get("type") != "attack": return false
+			if not buffs._valid_count(intent.get("amount")) or not buffs._valid_count(intent.get("hits", 1)) or intent.get("hits", 1) < 1: return false
+	if c.enemies.size() != int(c.encounterPhase): return false
+	for i in c.enemies.size():
+		var enemy = c.enemies[i]
+		if not enemy is Dictionary or enemy.get("id") != definitions[i].id or enemy.get("maxHp") != definitions[i].maxHp: return false
+		if enemy.get("intentSequence") != definitions[i].intentSequence: return false
+		if not buffs._valid_count(enemy.get("hp")) or enemy.hp > enemy.maxHp: return false
+	if c.outcome == "win" and (c.encounterPhase != 2 or c.enemies.any(func(e): return e.get("hp", 0) > 0)): return false
 	return true
 
 func valid_conditional_intent(enemy: Dictionary, encounter: Array) -> bool:

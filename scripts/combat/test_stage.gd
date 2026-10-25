@@ -5,6 +5,7 @@ const Actor = preload("res://scripts/combat/pose_actor.gd")
 const ReturnGhost = preload("res://scripts/combat/return_ghost_fx.gd")
 const NeonSlash = preload("res://scripts/combat/prismatic_slash_fx.gd")
 const NorenSlash = preload("res://scripts/combat/noren_slash_fx.gd")
+const DancerStrike = preload("res://scripts/combat/dancer_strike_fx.gd")
 const GunBurst = preload("res://scripts/combat/gun_burst_fx.gd")
 const PalmLaser = preload("res://scripts/combat/palm_laser_fx.gd")
 const BiteHit = preload("res://scripts/combat/bite_hit_fx.gd")
@@ -44,6 +45,39 @@ var audio_rate := 22050
 var combat_audio := preload("res://scripts/combat/combat_audio.gd").new()
 var scenery: TextureRect
 var scenery_base_rect := Rect2()
+var dancer_duet := false
+var dancer_lights: Node2D
+
+func set_dancer_duet(enemy_visuals: Array[EnemyVisualResolver.Visual]) -> void:
+	# Called behind the blackout after the model has committed its second phase.
+	dancer_duet = true
+	for actor in enemies:
+		actors_root.remove_child(actor)
+		actor.queue_free()
+	enemies.clear()
+	player.home = Vector2(720, floor_y-30)
+	player.position = player.home
+	player.facing = 1.0
+	player.set_pose("idle")
+	# Spread both dancers along the player's horizontal foot line.
+	var black_home: Vector2 = player.home + Vector2(420, 0)
+	var white_home := Vector2(2.0 * player.home.x - black_home.x, black_home.y)
+	for i in enemy_visuals.size():
+		var actor := Actor.new()
+		actors_root.add_child(actor)
+		actor.setup_enemy(enemy_visuals[i], black_home if i == 0 else white_home, -1.0 if i == 0 else 1.0)
+		enemies.append(actor)
+	if not is_instance_valid(dancer_lights):
+		dancer_lights = preload("res://scripts/combat/dancer_spotlights.gd").new()
+		dancer_lights.name = "DancerSpotlights"
+		dancer_lights.z_index = -1
+		world.add_child(dancer_lights)
+	dancer_lights.actors.assign([enemies[1], player, enemies[0]])
+	zoom = 1.0
+	focus_x = 720
+	focus_y = floor_y-35
+	update_depth()
+	_update_camera()
 
 func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual], scenery_texture: Texture2D = null, ground_start: float = 0.5) -> void:
 	# This is the new-battle boundary. Refresh before the player is created so
@@ -431,6 +465,15 @@ func show_strike(point: Vector2, direction: float, style: String, blocked: bool,
 	var effect_scale := _effect_scale(active_attacker)
 	if apply_effect_offset:
 		point += _effect_offset(active_attacker)*depth_scale(active_defender.position)
+	if (active_attacker.kind == "dancer_black" and style == "pierce") or (active_attacker.kind == "dancer_white" and style == "slash"):
+		var strike := DancerStrike.new()
+		strike.mode = style
+		strike.position = point
+		strike.direction = direction
+		strike.blocked = blocked
+		strike.scale = Vector2.ONE * depth_scale(active_defender.position) * effect_scale
+		world.add_child(strike)
+		return
 	if style in ["slash", "pierce"] and active_attacker == player and player.kind == "noren":
 		var slash := NorenSlash.new()
 		slash.mode = style
@@ -510,7 +553,7 @@ func return_home() -> void:
 		var reveal := create_tween().set_parallel(true)
 		for actor in returning:
 			actor.position = actor.home
-			actor.facing = 1.0 if actor == player else -1.0
+			actor.facing = 1.0 if actor == player or (dancer_duet and actor.home.x < player.home.x) else -1.0
 			actor.set_pose("idle")
 			var ghost := ReturnGhost.new()
 			ghost.position = actor.home

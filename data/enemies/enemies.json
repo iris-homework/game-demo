@@ -245,5 +245,39 @@
     ],
     "prototype": false,
     "combatVisualId": "beacon_jellyfish"
+  },
+  "dancer_black": {
+    "id": "dancer_black",
+    "characterId": "dancer_black",
+    "displayName": "黑舞者",
+    "battlePortraitAssetId": "",
+    "maxHp": 10,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1,
+        "animation": "pierce"
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "dancer_black"
+  },
+  "dancer_white": {
+    "id": "dancer_white",
+    "characterId": "dancer_white",
+    "displayName": "白舞者",
+    "battlePortraitAssetId": "",
+    "maxHp": 10,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1,
+        "animation": "slash"
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "dancer_white"
   }
 }

@@ -58,6 +58,10 @@ var initialized := false
 var pending_battle_result := ""
 var stage: Control
 var shown_enemies: Array = []
+var shown_encounter_phase := 1
+var dancer_darkness: ColorRect
+var dancer_blackout: ColorRect
+var dancer_reveal_flash: ColorRect
 var shown_player_hp := -1
 var preview_attack_style := ""
 # Visual variation must not consume the global RNG used by deck shuffling.
@@ -109,6 +113,9 @@ func enter(params: Dictionary) -> void:
 	var stage_definition: Dictionary = Game.assets.get(stage_asset,{})
 	var stage_texture: Texture2D = Game.texture(stage_asset) if stage_definition.get("battleEnabled",true) else null
 	stage.setup(533+actor_offset.y,enemy_visuals,stage_texture,float(stage_definition.get("groundStart",0.5)))
+	shown_encounter_phase = model.encounter_phase
+	if model.profile.get("encounterId", "") == "dancer_duet" and shown_encounter_phase == 2:
+		setup_dancer_duet()
 	if stage.scenery != null:
 		var shade := Gradient.new()
 		shade.offsets = PackedFloat32Array([0.0,0.25,0.38,0.66,0.88,1.0])
@@ -150,6 +157,7 @@ func enter(params: Dictionary) -> void:
 	exhaust_button.visible = model.is_noren()
 	refresh_resources()
 	stage.player.set_combat_stance(model.stance if model.is_noren() else "melee")
+	enemy_portraits.clear()
 	for i in model.enemies.size():
 		var actor: Node2D = stage.enemies[i]
 		actor.alive = model.enemies[i].hp > 0
@@ -238,20 +246,20 @@ func refresh_enemy_hud() -> void:
 	add_child(enemy_hud)
 	var summary := Control.new()
 	enemy_hud.add_child(summary)
-	summary.size = Vector2(344,80*mini(3,model.enemies.size())-12)
+	summary.size = Vector2(344,80*mini(3,shown_enemies.size())-12)
 	summary.global_position = Vector2(1072,96)
 	summary.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	# A fixed-height viewport keeps larger encounters above the actor stage.
 	var summary_scroll := ScrollContainer.new()
 	summary_scroll.size = summary.size
 	summary_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	summary_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE if model.enemies.size() <= 3 else Control.MOUSE_FILTER_PASS
+	summary_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE if shown_enemies.size() <= 3 else Control.MOUSE_FILTER_PASS
 	summary.add_child(summary_scroll)
 	var rows := Control.new()
-	rows.custom_minimum_size = Vector2(328,80*model.enemies.size()-12)
+	rows.custom_minimum_size = Vector2(328,80*shown_enemies.size()-12)
 	rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	summary_scroll.add_child(rows)
-	for i in model.enemies.size():
+	for i in shown_enemies.size():
 		var enemy: Dictionary = shown_enemies[i]
 		var summary_plate := EnemyHPSummary.new()
 		rows.add_child(summary_plate)
@@ -598,7 +606,7 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 	# Choose once per committed card; all hits and targets share its attack motion.
 	var style := choose_player_attack_style(model.card(uid), result)
 	stage.player.set_combat_stance(result.get("stance", "melee"))
-	for index in model.enemies.size():
+	for index in shown_enemies.size():
 		var target_hits: Array = result.hits.filter(func(hit): return int(hit.get("target",target)) == index)
 		if target_hits.is_empty(): continue
 		await stage.attack(stage.player,stage.enemies[index],style,target_hits,func(hit: Dictionary, _index: int):
@@ -614,12 +622,17 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 			if int(hit.get("bleedDamage",0)) > 0: text += " (裂伤 %d)" % hit.bleedDamage
 			impact(stage.contact(stage.enemies[index]),text,PINK)
 		)
+	for event in result.get("phaseTurnEvents", []):
+		await present_status_event(event)
+	await present_encounter_phase()
 	shown_enemies = model.enemies.duplicate(true)
 	refresh_enemy_hud()
 	# Discard flight already runs in parallel; only attack playback precedes the shift.
 	await stage.player.transition_combat_stance(model.stance if model.is_noren() else "melee")
 	for retired_view in retired_views:
 		while is_instance_valid(retired_view) and retired_view.visible: await get_tree().process_frame
+	if result.get("phaseChanged", false):
+		await announce_turn("第%d回合" % model.turn)
 	stage.present_card_gain("draw", result.get("drawn", []).size())
 	await deal_hand(true)
 	arrange_hand()
@@ -701,8 +714,8 @@ func end_turn_pressed() -> void:
 			continue
 		var attacker_index := int(attack.get("index", -1))
 		if attacker_index < 0:
-			for i in model.enemies.size():
-				if model.enemies[i].id == attack.id: attacker_index = i
+			for i in shown_enemies.size():
+				if shown_enemies[i].id == attack.id: attacker_index = i
 		if attacker_index < 0: continue
 		shown_enemies[attacker_index].block = 0
 		refresh_enemy_hud()
@@ -742,6 +755,7 @@ func end_turn_pressed() -> void:
 		finish(model.outcome)
 		return
 	await stage.return_home()
+	await present_encounter_phase()
 	presenting_enemy_turn = false
 	refresh_resources()
 	stage.player.set_combat_stance(model.stance if model.is_noren() else "melee")
@@ -752,6 +766,65 @@ func end_turn_pressed() -> void:
 	await deal_hand(true)
 	refresh_counts()
 	set_busy(false)
+
+
+func setup_dancer_duet() -> void:
+	var visuals: Array[EnemyVisualResolver.Visual] = []
+	for enemy in model.enemies:
+		visuals.append(Game.enemy_combat_visual(enemy))
+	stage.set_dancer_duet(visuals)
+	if not is_instance_valid(dancer_darkness):
+		dancer_darkness = rect(self, Vector2.ZERO, Vector2(1440,900), Color(0.005,0.008,0.02,0.88))
+		dancer_darkness.name = "DancerStageDarkness"
+		dancer_darkness.z_index = -2
+		dancer_darkness.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for i in stage.enemies.size():
+		stage.enemies[i].alive = model.enemies[i].hp > 0
+		stage.enemies[i].visible = stage.enemies[i].alive
+	enemy_portraits.assign(stage.enemies)
+
+func present_encounter_phase() -> void:
+	if model.profile.get("encounterId", "") != "dancer_duet" or model.encounter_phase == shown_encounter_phase: return
+	# No HP or deck mutations here. Input stays locked across the entire reveal.
+	dancer_blackout = rect(self, Vector2.ZERO, Vector2(1440,900), Color.BLACK)
+	dancer_blackout.name = "DancerBlackout"
+	dancer_blackout.z_index = 100
+	dancer_blackout.mouse_filter = Control.MOUSE_FILTER_STOP
+	await get_tree().create_timer(1.0).timeout
+	setup_dancer_duet()
+	shown_encounter_phase = model.encounter_phase
+	shown_enemies = model.enemies.duplicate(true)
+	refresh_enemy_hud()
+	# Reveal the committed new-round resources together with the new formation.
+	shown_player_hp = model.player_hp
+	shown_player_block = model.block
+	shown_player_ammo = model.ammo
+	shown_player_parry = model.parry
+	shown_player_pollution = model.buffs.count(model, "pollution")
+	shown_player_buffs = model.buff_state.duplicate(true)
+	refresh_player_plate()
+	refresh_hp()
+	refresh_ammo()
+	turn_label.text = "双人舞者 / 第二幕"
+	# Hard light cue: reveal the complete formation in one frame, with no fade.
+	stage.dancer_lights.modulate.a = 1.0
+	var light_pulse: Tween = stage.dancer_lights.flash_on()
+	# A single warm exposure accent starts at full intensity with the light cue.
+	dancer_reveal_flash = rect(self, Vector2.ZERO, Vector2(1440,900), Color(1.0,0.96,0.84,0.32))
+	dancer_reveal_flash.name = "DancerRevealFlash"
+	dancer_reveal_flash.z_index = 80
+	dancer_reveal_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var exposure := create_tween()
+	exposure.tween_interval(0.045)
+	exposure.tween_property(dancer_reveal_flash,"color:a",0.0,0.18).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	exposure.tween_callback(dancer_reveal_flash.queue_free)
+	dancer_blackout.hide()
+	dancer_blackout.queue_free()
+	dancer_blackout = null
+	# Hold the tableau and input lock while the opening brightness settles.
+	await light_pulse.finished
+	dancer_reveal_flash = null
+	turn_label.text = "回合 %02d  / 你的回合" % model.turn
 
 func present_enemy_death_effect(hit: Dictionary) -> void:
 	if not hit.has("playerPollutionAfter"): return

@@ -15,6 +15,7 @@ var discard_pile: Array = []
 var instances: Dictionary = {}
 var enemies: Array = []
 var outcome := ""
+var encounter_phase := 1
 var profile: Dictionary = {}
 var card_catalog: Dictionary = {}
 var log_lines: Array = []
@@ -266,7 +267,9 @@ func play_legacy_card(uid: String, target_index: int) -> Dictionary:
 	for enemy in enemies:
 		if enemy.hp > 0: alive = true
 	if not alive: outcome = "win"
-	return {"uid":uid, "target":target_index, "damage":damage, "hits":hits, "outcome":outcome}
+	var transition: Dictionary = {}
+	var phase_changed := advance_encounter_phase(false, transition)
+	return {"phaseChanged":phase_changed,"phaseTurnEvents":transition.get("turnEvents", []),"uid":uid, "target":target_index, "damage":damage, "hits":hits,"discarded":transition.get("discarded", []),"drawn":transition.get("drawn", []), "outcome":outcome}
 
 func end_turn() -> Dictionary:
 	if is_noren(): return end_noren_turn()
@@ -292,13 +295,16 @@ func end_turn() -> Dictionary:
 		if player_hp == 0:
 			outcome = "lose"
 			break
-	if outcome.is_empty():
+	var transition: Dictionary = {}
+	var phase_changed := advance_encounter_phase(true, transition)
+	if outcome.is_empty() and not phase_changed:
 		turn += 1
 		advance_cyberware_cooldowns()
 		for enemy in enemies:
 			enemy.intentIndex += 1
 			enemy.intent = intent_for(enemy, int(enemy.intentIndex))
-	return {"discarded":discarded, "attacks":attacks, "drawn":draw_cards(), "outcome":outcome}
+	var drawn: Array = transition.drawn if phase_changed else draw_cards()
+	return {"phaseChanged":phase_changed,"discarded":discarded, "attacks":attacks, "drawn":drawn, "outcome":outcome}
 
 func use_item(_item_id: String, _target_index: int, _inventory: Dictionary, _catalog: Dictionary) -> Dictionary:
 	# No item effect contract is approved yet. Fail closed; never invent an effect.
@@ -306,11 +312,13 @@ func use_item(_item_id: String, _target_index: int, _inventory: Dictionary, _cat
 
 func snapshot() -> Dictionary:
 	var saved := {"battleId":battle_id,"turn":turn,"playerHp":player_hp,"maxHp":max_hp,"drawPile":draw_pile.duplicate(),"hand":hand.duplicate(),"discardPile":discard_pile.duplicate(),"instances":instances.duplicate(true),"enemies":enemies.duplicate(true),"outcome":outcome,"log":log_lines.slice(-30),"profile":profile.duplicate(true),"cardCatalog":card_catalog.duplicate(true),"usedCyberware":used_cyberware.duplicate(),"nextAttackBonus":next_attack_bonus,"norenState":{"energy":energy,"block":block,"stance":stance,"ammo":ammo,"parry":parry,"exhaustPile":exhaust_pile.duplicate(),"powers":powers.duplicate(),"turnDamageBonus":turn_damage_bonus,"turnDiscount":turn_discount,"stanceDiscount":stance_discount,"pressureUsed":pressure_used,"dissectionUsed":dissection_used},"openingDrawDone":opening_draw_done}
+	if profile.get("encounterId", "") == "dancer_duet": saved.encounterPhase = encounter_phase
 	if not buff_state.is_empty(): saved.buffs = buff_state.duplicate(true)
 	if not cyberware_cooldowns.is_empty(): saved.cyberwareCooldowns = cyberware_cooldowns.duplicate()
 	return saved
 
 func restore(data: Dictionary) -> void:
+	encounter_phase = int(data.get("encounterPhase", 1))
 	battle_id = data.battleId
 	turn = int(data.turn)
 	player_hp = int(data.playerHp)
@@ -421,6 +429,46 @@ func resolve_outcome() -> void:
 	if player_hp <= 0: outcome = "lose"
 	elif enemies.all(func(enemy): return enemy.hp <= 0): outcome = "win"
 
+func advance_encounter_phase(player_turn_ended: bool = false, transition: Dictionary = {}) -> bool:
+	# Resolve only at whole-card / whole-turn boundaries. A killing AoE, bleed,
+	# counter or multi-hit never spills into the newly spawned second phase.
+	if player_hp <= 0:
+		outcome = "lose"
+		return false
+	if outcome != "win" or encounter_phase != 1 or profile.get("encounterId", "") != "dancer_duet": return false
+	transition.discarded = []
+	transition.drawn = []
+	transition.turnEvents = []
+	if not player_turn_ended:
+		# A card finishes in the old encounter before the old player turn closes.
+		# The end-turn caller has already done both operations and must not repeat them.
+		transition.discarded = hand.duplicate()
+		discard_pile.append_array(hand)
+		hand.clear()
+		transition.turnEvents = buffs.player_turn_end(self)
+		resolve_outcome()
+		if player_hp <= 0: return false
+	encounter_phase = 2
+	outcome = ""
+	enemies.clear()
+	for definition in profile.phaseTwoEnemies:
+		var enemy: Dictionary = definition.duplicate(true)
+		enemy.hp = int(enemy.maxHp)
+		enemy.block = 0
+		enemy.bleed = 0
+		enemy.weak = 0
+		enemy.erase("buffs")
+		enemy.intentIndex = 0
+		enemy.intent = intent_for(enemy, 0)
+		enemies.append(enemy)
+	turn += 1
+	buffs.own_turn_start(self)
+	energy = int(profile.get("energyPerTurn", 3))
+	advance_cyberware_cooldowns()
+	transition.drawn = draw_cards()
+	log_lines.append("灯光熄灭。双人舞者 · 第二幕。")
+	return true
+
 func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_ammo: int) -> Dictionary:
 	if not play_error(uid).is_empty(): return {}
 	var definition := card(uid)
@@ -505,8 +553,14 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 	if exhausted: exhaust_pile.append(uid)
 	else: discard_pile.append(uid)
 	resolve_outcome()
+	var transition: Dictionary = {}
+	var phase_changed := advance_encounter_phase(false, transition)
+	if transition.has("drawn"):
+		# Mid-card draws belong to the closed turn and have just been discarded.
+		drawn = transition.drawn
+		discarded.append_array(transition.discarded)
 	log_lines.append("%s · %s · 伤害 %d" % [definition.name, "近战" if at_start == "melee" else "远程", damage])
-	return {"uid":uid,"target":target_index,"damage":damage,"hits":hits,"drawn":drawn,"discarded":discarded,"exhaustedCards":exhausted_cards,"exhausted":exhausted,"stance":at_start,"outcome":outcome}
+	return {"phaseChanged":phase_changed,"phaseTurnEvents":transition.get("turnEvents", []),"uid":uid,"target":target_index,"damage":damage,"hits":hits,"drawn":drawn,"discarded":discarded,"exhaustedCards":exhausted_cards,"exhausted":exhausted,"stance":at_start,"outcome":outcome}
 
 func end_noren_turn() -> Dictionary:
 	if not outcome.is_empty(): return {}
@@ -557,7 +611,9 @@ func end_noren_turn() -> Dictionary:
 		turn_events.append_array(buffs.own_turn_end(self, index))
 		resolve_outcome()
 		if not outcome.is_empty(): break
-	if outcome.is_empty():
+	var transition: Dictionary = {}
+	var phase_changed := advance_encounter_phase(true, transition)
+	if outcome.is_empty() and not phase_changed:
 		turn += 1
 		buffs.own_turn_start(self)
 		energy = int(profile.get("energyPerTurn", 3))
@@ -566,4 +622,5 @@ func end_noren_turn() -> Dictionary:
 			enemy.intentIndex += 1
 			enemy.intent = intent_for(enemy, int(enemy.intentIndex))
 		turn_events.append_array(begin_round_intents())
-	return {"discarded":discarded,"attacks":attacks,"turnEvents":turn_events,"drawn":draw_cards(),"outcome":outcome}
+	var drawn: Array = transition.drawn if phase_changed else draw_cards()
+	return {"phaseChanged":phase_changed,"discarded":discarded,"attacks":attacks,"turnEvents":turn_events,"drawn":drawn,"outcome":outcome}

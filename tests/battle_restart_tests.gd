@@ -65,7 +65,7 @@ func finish_story() -> void:
 func test_live_and_disk() -> void:
 	var baseline := begin_case("live")
 	if baseline.is_empty(): return
-	check(baseline.playerHp == 63 and baseline.maxHp == 100, "Entry preserves non-full HP")
+	check(baseline.playerHp == 63 and baseline.maxHp == Game.state.maxHp, "Entry preserves non-full HP")
 	check(baseline.turn == 1 and not baseline.openingDrawDone and baseline.hand.is_empty(), "Baseline precedes the opening draw")
 	check(baseline.drawPile.size() == baseline.instances.size(), "Baseline includes the shuffled complete deck")
 	var original_enemy_hp: int = Game.state.combat.enemies[0].hp
@@ -155,6 +155,8 @@ func test_terminal_results() -> void:
 		var model := current_model()
 		model.draw_cards(10)
 		if outcome == "win":
+			# This case tests terminal persistence, independent of robot balance.
+			model.enemies[0].hp = 1
 			for uid in model.hand.duplicate():
 				if model.card(uid).type == "attack":
 					model.play_card(uid, 0)
@@ -214,6 +216,7 @@ func test_next_battle_and_training() -> void:
 		else: Game.finish_training(exit_kind)
 		check(not Game.training_mode and same(Game.state, adventure), exit_kind + ": training restores exact adventure and baseline")
 	Game.state.completedEventIds = ["E01"]
+	Game.state.refreshedEventIds = ["E02"]
 	Game.go_map()
 	check(Game.start_event("E02"), "A different available event starts")
 	check(Game.state.battleStart.is_empty() and Game.state.combat.is_empty(), "Starting an event clears the old encounter baseline")
@@ -249,6 +252,7 @@ func test_legacy() -> void:
 	var upgraded: Dictionary = Game.migrate_save(schema_one)
 	check(Game.valid_save(upgraded) and upgraded.battleStart.is_empty() and upgraded.currentHp == 100 and upgraded.credits == 123, "Schema 1 retains its established migration defaults")
 	Game.state.completedEventIds = ["E01"]
+	Game.state.refreshedEventIds = ["E02"]
 	Game.go_map()
 	Game.start_event("E02")
 	var entry_hp: int = Game.state.currentHp
