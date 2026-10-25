@@ -798,7 +798,8 @@ func prepare_battle_reward() -> void:
 	if options.size() != 3:
 		notice.emit("奖励卡牌配置错误：无法生成三个不同选项，请检查概率与卡牌池。")
 		return
-	var credits := int(reward_rules.credits)
+	# Roll once when the receipt is generated, never when it is shown or claimed.
+	var credits := randi_range(int(reward_rules.creditsMin), int(reward_rules.creditsMax))
 	state.claimedRewardIds.append(claim_id)
 	var passive: Dictionary = state.get("battlePassiveReward", {})
 	var bonus: int = int(passive.get("credits", 0)) if not event_reward and passive.get("eventId") == state.activeEventId and passive.get("battleId") == state.battleId and passive.get("creditsStatus", "claimed") == "pending" else 0
@@ -1517,9 +1518,10 @@ func valid_battle_reward(s: Dictionary) -> bool:
 		if not battles.has(r.battleId) or battles[r.battleId].eventId != r.eventId: return false
 		if r.claimId != r.eventId + ":" + r.battleId + ":victory": return false
 	else: return false
-	# Preserve receipts already paid before the battle reward changed from 1000 to 50.
+	# Preserve legacy 50/1000 receipts alongside the new integer reward range.
 	if not (r.get("credits") is int or r.get("credits") is float): return false
-	if r.credits != int(reward_rules.credits) and r.credits != 1000: return false
+	if not is_finite(float(r.credits)) or r.credits != floor(float(r.credits)): return false
+	if r.credits != 1000 and (r.credits < int(reward_rules.creditsMin) or r.credits > int(reward_rules.creditsMax)): return false
 	if r.has("creditsStatus") and r.creditsStatus not in ["pending", "claimed", "skipped"]: return false
 	var bonus = r.get("bonusCredits", 0)
 	if not (bonus is int or bonus is float) or not is_finite(float(bonus)) or bonus < 0 or bonus != floor(float(bonus)): return false

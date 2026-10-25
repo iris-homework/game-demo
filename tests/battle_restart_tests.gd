@@ -186,16 +186,18 @@ func test_terminal_results() -> void:
 		if outcome == "win":
 			finish_story()
 			check(Game.state.credits == int(Game.config.initialCredits) and Game.has_battle_reward() and Game.reward_credits_status() == "pending", "Victory offers unpaid credits after story")
+			var credit_amount: int = Game.reward_credit_amount()
+			check(credit_amount >= 40 and credit_amount <= 60, "Victory reward base stays within 40–60")
 			var options: Array = Game.state.battleReward.options.duplicate()
 			Game.menu()
 			Game.resume()
 			Game.enter_node("finish")
-			check(Game.state.credits == int(Game.config.initialCredits) and Game.reward_credits_status() == "pending" and Game.state.battleReward.options == options, "Finish and menu reentry neither pay nor reroll")
-			check(Game.claim_reward_credits(Game.revision) and Game.state.credits == int(Game.config.initialCredits) + 50, "Explicit credit claim after restart pays once")
+			check(Game.state.credits == int(Game.config.initialCredits) and Game.reward_credits_status() == "pending" and Game.state.battleReward.options == options and Game.reward_credit_amount() == credit_amount, "Finish and menu reentry neither pay nor reroll")
+			check(Game.claim_reward_credits(Game.revision) and Game.state.credits == int(Game.config.initialCredits) + credit_amount, "Explicit credit claim after restart pays once")
 			check(Game.choose_reward_card(options[0], Game.revision), "Claim one victory card")
 			check(not Game.choose_reward_card(options[1], Game.revision), "Second victory card is rejected")
 			Game.state = {}
-			check(Game.load_game() and Game.state.credits == int(Game.config.initialCredits) + 50 and Game.state.deck == [options[0]], "Claimed reward survives cold continue exactly once")
+			check(Game.load_game() and Game.state.credits == int(Game.config.initialCredits) + credit_amount and Game.state.deck == [options[0]], "Claimed reward survives cold continue exactly once")
 		else:
 			check(Game.state.currentHp == 0 and Game.state.battleReward.is_empty() and Game.state.credits == int(Game.config.initialCredits), "Defeat retains zero HP without rewards")
 			check(not Game.choose(0, Game.revision) and Game.page == "defeat", "Defeat cannot choose the legacy map exit")

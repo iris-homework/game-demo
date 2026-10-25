@@ -152,10 +152,11 @@ func test_victory() -> void:
 		var rev := Game.revision
 		check(not Game.battle_exit("win",rev) and Game.state.credits == credits, "duplicate end request cannot pay pending chip credits")
 		finish_story()
-		check(Game.state.credits == credits and Game.reward_credit_amount() == 30 + int(Game.reward_rules.credits), "reward freezes pending base and chip credits together")
+		var credit_amount: int = Game.reward_credit_amount()
+		check(Game.state.credits == credits and Game.state.battleReward.credits >= 40 and Game.state.battleReward.credits <= 60 and credit_amount == 30 + int(Game.state.battleReward.credits), "reward freezes random base and chip credits together")
 		check(Game.claim_reward_credits(Game.revision), "manual claim collects frozen chip and base credits")
 		var after: int = Game.state.credits
-		check(after == credits+30+int(Game.reward_rules.credits) and Game.state.battlePassiveReward.creditsStatus == "claimed", "one click pays base and chip exactly once")
+		check(after == credits + credit_amount and Game.state.battlePassiveReward.creditsStatus == "claimed", "one click pays base and chip exactly once")
 		Game.prepare_battle_reward()
 		Game.enter_node("finish")
 		check(Game.state.credits == after and Game.state.currentHp == hp+heal, "reward preparation and finish reentry never repeat chips")
@@ -231,12 +232,14 @@ func test_failure_training_and_save_failure() -> void:
 	check(Game.state.credits == before.credits and Game.state.currentHp == before.currentHp+5 and Game.state.battlePassiveReward.creditsStatus == "pending", "victory retry heals once and keeps credits unpaid")
 	check(Game.load_game() and Game.state.credits == before.credits and Game.state.currentHp == before.currentHp+5, "victory retry preserves pending credits and immediate healing on disk")
 	finish_story()
+	var credit_amount: int = Game.reward_credit_amount()
+	check(Game.state.battleReward.credits >= 40 and Game.state.battleReward.credits <= 60 and credit_amount == int(Game.state.battleReward.credits) + 30, "retried victory freezes random base plus chip 30")
 	var unpaid := Game.state.duplicate(true)
 	Game.save_path = OUTPUT.path_join("missing-folder/claim.json")
 	check(not Game.claim_reward_credits(Game.revision) and Game.state == unpaid, "failed combined credit claim restores both base and chip receipts")
 	Game.save_path = save_file
-	check(Game.claim_reward_credits(Game.revision) and Game.state.credits == before.credits + 80, "recovered credit claim pays frozen base and chip once")
-	check(Game.load_game() and Game.state.credits == before.credits + 80 and not Game.claim_reward_credits(Game.revision), "combined paid credit receipt survives reload without duplicate")
+	check(Game.claim_reward_credits(Game.revision) and Game.state.credits == before.credits + credit_amount, "recovered credit claim pays frozen base and chip once")
+	check(Game.load_game() and Game.state.credits == before.credits + credit_amount and not Game.claim_reward_credits(Game.revision), "combined paid credit receipt survives reload without duplicate")
 	Game.save_enabled = false
 	reset(["money_chip"],40)
 	win_model()

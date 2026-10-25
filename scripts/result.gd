@@ -45,3 +45,7 @@ func _ready() -> void:
 func handle_escape() -> bool:
 	if is_instance_valid(week_end_view): return week_end_view.handle_escape()
 	return is_instance_valid(reward_view) and reward_view.handle_escape()
+
+func refresh_reward() -> bool:
+	if Game.is_week_complete() or not is_instance_valid(reward_view): return false
+	return reward_view.refresh_reward()

@@ -53,20 +53,22 @@ func _ready() -> void:
 		if id == "B02": check(roundtrip(),"Resume post-battle dialogue from disk")
 		finish_dialogue()
 		check(Game.page == "result" and Game.has_battle_reward(),id + " opens victory reward after dialogue")
-		check(Game.state.credits == int(Game.config.initialCredits) and Game.reward_credit_amount() == 50 and Game.reward_credits_status() == "pending" and Game.state.battleReward.options.size() == 3,"Base credits await explicit claim alongside three offers")
+		var credit_amount: int = Game.reward_credit_amount()
+		check(credit_amount >= 40 and credit_amount <= 60, "Generated base credits stay within 40–60")
+		check(Game.state.credits == int(Game.config.initialCredits) and Game.reward_credit_amount() == credit_amount and Game.reward_credits_status() == "pending" and Game.state.battleReward.options.size() == 3,"Base credits await explicit claim alongside three offers")
 		Game.enter_node("finish")
-		check(Game.state.credits == int(Game.config.initialCredits) and Game.reward_credits_status() == "pending","Finish reentry cannot automatically claim credits")
+		check(Game.state.credits == int(Game.config.initialCredits) and Game.reward_credits_status() == "pending" and Game.reward_credit_amount() == credit_amount,"Finish reentry cannot automatically claim or reroll credits")
 		var options: Array = Game.state.battleReward.options.duplicate()
-		check(roundtrip() and Game.state.battleReward.options == options and Game.reward_credits_status() == "pending" and Game.state.credits == int(Game.config.initialCredits),"Pending reward and unpaid credits persist unchanged")
+		check(roundtrip() and Game.state.battleReward.options == options and Game.reward_credit_amount() == credit_amount and Game.reward_credits_status() == "pending" and Game.state.credits == int(Game.config.initialCredits),"Pending reward and unpaid credits persist unchanged")
 		rev = Game.revision
 		check(not Game.claim_reward_credits(rev - 1), "Stale credit request rejected")
-		check(Game.claim_reward_credits(rev) and Game.state.credits == int(Game.config.initialCredits) + 50 and Game.reward_credits_status() == "claimed", "Explicit credit claim pays exactly once")
+		check(Game.claim_reward_credits(rev) and Game.state.credits == int(Game.config.initialCredits) + credit_amount and Game.reward_credits_status() == "claimed", "Explicit credit claim pays exactly once")
 		check(not Game.claim_reward_credits(rev) and not Game.claim_reward_credits(Game.revision), "Repeated credit claim rejected")
 		rev = Game.revision
 		check(not Game.choose_reward_card("unknown",rev),"Invalid reward rejected")
 		check(Game.choose_reward_card(options[1],rev),"Select one offered card")
 		check(not Game.choose_reward_card(options[0],rev) and not Game.choose_reward_card(options[2],Game.revision),"Duplicate and second choice rejected")
-		check(Game.state.deck == [options[1]] and Game.state.credits == int(Game.config.initialCredits) + 50,"One card added with no repeated credits")
+		check(Game.state.deck == [options[1]] and Game.state.credits == int(Game.config.initialCredits) + credit_amount,"One card added with no repeated credits")
 		check(roundtrip() and Game.state.battleReward.status == "claimed" and Game.state.deck == [options[1]],"Claimed reward persists")
 		if id == "B16":
 			check(Game.page == "result" and not Game.is_week_complete() and Game.can_continue(), "New Boss receipt remains in rewards until explicit exit after reload")
@@ -76,15 +78,16 @@ func _ready() -> void:
 		else:
 			check(Game.claim_rewards(Game.revision) and Game.page == "map","Exit reward to map")
 			check(not Game.choose_reward_card(options[0],Game.revision),"No claiming from map")
-	# The money chip remains an additional reward, separate from the base 50.
+	# The money chip remains an additional reward, separate from the random base.
 	start_battle("B02")
 	Game.state.ownedCyberwareIds.append("money_chip")
 	Game.state.equippedCyberwareIds = ["money_chip"]
 	Game.initialize_combat()
 	check(Game.battle_exit("win", Game.revision) and Game.state.credits == int(Game.config.initialCredits), "Money chip waits for reward credit claim")
 	finish_dialogue()
-	check(Game.state.credits == int(Game.config.initialCredits) and Game.reward_credit_amount() == 80 and Game.state.battleReward.credits == 50, "Base 50 plus frozen chip 30 remains unpaid")
-	check(Game.claim_reward_credits(Game.revision) and Game.state.credits == int(Game.config.initialCredits) + 80, "Explicit claim pays base plus chip together exactly once")
+	var chip_credit_amount: int = Game.reward_credit_amount()
+	check(Game.state.credits == int(Game.config.initialCredits) and Game.state.battleReward.credits >= 40 and Game.state.battleReward.credits <= 60 and chip_credit_amount == int(Game.state.battleReward.credits) + 30, "Random base plus frozen chip 30 remains unpaid")
+	check(Game.claim_reward_credits(Game.revision) and Game.state.credits == int(Game.config.initialCredits) + chip_credit_amount, "Explicit claim pays base plus chip together exactly once")
 	check(not Game.claim_reward_credits(Game.revision), "Chip-inclusive credit claim cannot repeat")
 	# Nonvictories end the run without a reward.
 	for outcome in ["lose"]:
@@ -130,23 +133,28 @@ func _ready() -> void:
 	check(not Game.claim_reward_credits(Game.revision), "Credits cannot be claimed from map after skipping")
 	# Historical receipts keep the old amount and never repay on reload/reentry.
 	var current := Game.state.duplicate(true)
-	for reward_status in ["pending", "claimed", "skipped"]:
-		Game.state = current.duplicate(true)
-		Game.state.credits = int(Game.config.initialCredits) + 1000
-		Game.state.battleReward.credits = 1000
-		Game.state.battleReward.erase("creditsStatus")
-		Game.state.battleReward.erase("bonusCredits")
-		Game.state.battleReward.status = reward_status
-		if reward_status == "claimed":
-			Game.state.battleReward.selectedCardId = Game.state.battleReward.options[0]
-			Game.state.deck.append(Game.state.battleReward.selectedCardId)
-		var legacy_options: Array = Game.state.battleReward.options.duplicate()
-		check(roundtrip(), "Legacy 1000-credit receipt reloads: " + reward_status)
-		Game.enter_node("finish")
-		check(Game.state.credits == int(Game.config.initialCredits) + 1000 and Game.state.battleReward.credits == 1000 and Game.state.battleReward.options == legacy_options and Game.state.battleReward.status == reward_status, "Legacy receipt stays paid and frozen: " + reward_status)
-		check(Game.reward_credits_status() == "claimed" and not Game.claim_reward_credits(Game.revision), "Legacy already-paid credits never become claimable: " + reward_status)
+	for legacy_amount in [50, 1000]:
+		for reward_status in ["pending", "claimed", "skipped"]:
+			Game.state = current.duplicate(true)
+			Game.state.credits = int(Game.config.initialCredits) + legacy_amount
+			Game.state.battleReward.credits = legacy_amount
+			Game.state.battleReward.erase("creditsStatus")
+			Game.state.battleReward.erase("bonusCredits")
+			Game.state.battleReward.status = reward_status
+			if reward_status == "claimed":
+				Game.state.battleReward.selectedCardId = Game.state.battleReward.options[0]
+				Game.state.deck.append(Game.state.battleReward.selectedCardId)
+			var legacy_options: Array = Game.state.battleReward.options.duplicate()
+			check(roundtrip(), "Legacy %d-credit receipt reloads: " % legacy_amount + reward_status)
+			Game.enter_node("finish")
+			check(Game.state.credits == int(Game.config.initialCredits) + legacy_amount and Game.state.battleReward.credits == legacy_amount and Game.state.battleReward.options == legacy_options and Game.state.battleReward.status == reward_status, "Legacy %d-credit receipt stays paid and frozen: " % legacy_amount + reward_status)
+			check(Game.reward_credits_status() == "claimed" and not Game.claim_reward_credits(Game.revision), "Legacy already-paid credits never become claimable: " + reward_status)
 	Game.state = current
-	for bad_amount in [-1, 0, 49, 51, 50.5, INF, "50"]:
+	for valid_amount in [40, 49, 50, 51, 60]:
+		var compatible := Game.state.duplicate(true)
+		compatible.battleReward.credits = valid_amount
+		check(Game.valid_save(compatible), "Integer reward within inclusive 40–60 range remains loadable: " + str(valid_amount))
+	for bad_amount in [-1, 0, 39, 61, 50.5, INF, "50"]:
 		var bad := Game.state.duplicate(true)
 		bad.battleReward.credits = bad_amount
 		check(not Game.valid_save(bad), "Malformed reward amount rejected: " + str(bad_amount))
@@ -156,6 +164,7 @@ func _ready() -> void:
 	finish_dialogue()
 	check(Game.choose_reward_card(Game.state.battleReward.options[0], Game.revision) and Game.reward_credits_status() == "pending", "Card-first choice leaves credit claim available")
 	check(roundtrip() and Game.reward_credits_status() == "pending" and Game.state.credits == int(Game.config.initialCredits), "Card-first save preserves unpaid credits")
+	var retry_credit_amount: int = Game.reward_credit_amount()
 	var unpaid := Game.state.duplicate(true)
 	var real_path := Game.save_path
 	var unpaid_revision := Game.revision
@@ -163,8 +172,8 @@ func _ready() -> void:
 	Game.save_path = real_path.path_join("blocked.json")
 	check(not Game.claim_reward_credits(Game.revision) and Game.state == unpaid and Game.revision == unpaid_revision, "Failed credit save restores balance, claim status and revision")
 	Game.save_path = real_path
-	check(Game.claim_reward_credits(Game.revision) and Game.state.credits == int(Game.config.initialCredits) + 50, "Credit retry succeeds once after card selection")
-	check(roundtrip() and Game.reward_credits_status() == "claimed" and not Game.claim_reward_credits(Game.revision), "Paid credit save cannot pay twice")
+	check(Game.claim_reward_credits(Game.revision) and Game.state.credits == int(Game.config.initialCredits) + retry_credit_amount, "Credit retry succeeds once after card selection")
+	check(roundtrip() and Game.state.credits == int(Game.config.initialCredits) + retry_credit_amount and Game.reward_credit_amount() == retry_credit_amount and Game.reward_credits_status() == "claimed" and not Game.claim_reward_credits(Game.revision), "Paid credit save cannot pay twice")
 	Game.save_enabled = false
 	for bad_status in [null, 1, "unknown"]:
 		var bad := Game.state.duplicate(true)

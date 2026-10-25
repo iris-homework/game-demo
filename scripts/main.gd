@@ -83,6 +83,9 @@ func quit_after_audio_cleanup() -> void:
 
 func show_page() -> void:
 	if Game.transition_locked: return
+	# A committed reward updates its existing controls; rebuilding it replays the
+	# full-screen fade and discards the balance counter animation.
+	if shown_page == "result" and Game.page == "result" and is_instance_valid(view) and view.refresh_reward(): return
 	if shown_page != Game.page and (shown_page == "battle" or Game.page == "battle") and is_instance_valid(view):
 		play_transition()
 	else: swap_view()

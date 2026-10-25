@@ -131,7 +131,9 @@ func test_real_flow() -> void:
 	check(Game.choose(0, Game.revision), "reward succeeds after restoring save path")
 	Game.save_enabled = false
 	check(Game.state.currentDay == 4 and Game.state.currentHp == 42 and Game.state.battleHistory == history, "reward spends no day and triggers no victory chip or fake battle")
-	check(Game.state.credits == credits and Game.reward_credits_status() == "pending" and Game.reward_credit_amount() == 50 and Game.state.battleReward.source == "event" and Game.state.battleReward.battleType == "normal", "return generates unpaid credits with ordinary rarity rules")
+	var credit_amount: int = Game.reward_credit_amount()
+	check(credit_amount >= 40 and credit_amount <= 60, "return generates base credits within 40–60")
+	check(Game.state.credits == credits and Game.reward_credits_status() == "pending" and Game.reward_credit_amount() == credit_amount and Game.state.battleReward.source == "event" and Game.state.battleReward.battleType == "normal", "return generates unpaid credits with ordinary rarity rules")
 	check(Game.state.battleReward.options.size() == 3 and Game.state.battleReward.options.all(func(id): return Game.card_catalog[id].rarity in ["B", "A", "S"]), "three non-starting card options")
 	check(Game.state.claimedRewardIds.count("E01R:commission") == 1 and Game.valid_save(Game.state), "reward receipt is valid and unique")
 	var legacy := Game.state.duplicate(true)
@@ -157,7 +159,7 @@ func test_real_flow() -> void:
 	Game.save_path = save_file.path_join("blocked.json")
 	check(not Game.claim_reward_credits(Game.revision) and Game.state == before, "return credit write failure preserves unpaid reward and balance")
 	Game.save_path = save_file
-	check(Game.claim_reward_credits(Game.revision) and Game.state.credits == credits + 50, "return credit click pays exactly fifty")
+	check(Game.claim_reward_credits(Game.revision) and Game.state.credits == credits + credit_amount, "return credit click pays the exact frozen amount")
 	check(not Game.claim_reward_credits(Game.revision), "return credit click cannot repeat")
 	Game.save_enabled = false
 	var card: String = Game.state.battleReward.options[0]
@@ -210,6 +212,7 @@ func test_historical_return_receipts() -> void:
 		elif status == "skipped": check(Game.claim_rewards(Game.revision), "historical card already skipped")
 		Game.state.battleReward.erase("creditsStatus")
 		Game.state.battleReward.erase("bonusCredits")
+		Game.state.battleReward.credits = 50
 		Game.state.credits += 50
 		# This reward was earned when E03 counted. E11 was not completed then.
 		Game.state.completedEventIds = ["E01", "E02", "E03", "E04", "E01R"]

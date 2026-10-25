@@ -101,8 +101,10 @@ func _ready() -> void:
 		return
 	await shot("reward")
 	var reward = app.view.reward_view
+	var first_credit_amount: int = Game.reward_credit_amount()
+	check(first_credit_amount >= 40 and first_credit_amount <= 60, "First visual reward base stays within 40–60")
 	await click(reward.credits_reward_button.get_global_rect().get_center())
-	check(Game.state.credits == int(Game.config.initialCredits) + 50 and Game.reward_credits_status() == "claimed", "Credit reward button pays offered credits once")
+	check(Game.state.credits == int(Game.config.initialCredits) + first_credit_amount and Game.reward_credits_status() == "claimed", "Credit reward button pays offered credits once")
 	reward = app.view.reward_view
 	check(reward.exit_button.get_global_rect().end.x <= 1440 and reward.exit_button.position.y > 750,"Map exit is inside lower-right corner")
 	await click(Vector2(540,591))
@@ -148,7 +150,7 @@ func _ready() -> void:
 	check(Game.state.deck == ["test_reward_02"] and Game.state.battleReward.status == "claimed","Mouse picks only second card")
 	await shot("claimed")
 	await click(Vector2(1246,813))
-	check(Game.page == "map" and Game.state.credits == int(Game.config.initialCredits) + 50,"Lower-right button returns to map with rewards")
+	check(Game.page == "map" and Game.state.credits == int(Game.config.initialCredits) + first_credit_amount,"Lower-right button returns to map with rewards")
 	# Keyboard selection and reload while the card is still pending.
 	Game.state.activeEventId = "E11"
 	Game.state.currentPlaceId = "pump"
@@ -157,14 +159,16 @@ func _ready() -> void:
 	Game.state.result = "win"
 	Game.state.battleHistory.append({"battleId":"B11","result":"win"})
 	Game.enter_node("finish")
-	check(Game.save_game() and Game.load_game(),"Pending reward reloads")
+	var second_credit_amount: int = Game.reward_credit_amount()
+	check(second_credit_amount >= 40 and second_credit_amount <= 60, "Second visual reward base stays within 40–60")
+	check(Game.save_game() and Game.load_game() and Game.reward_credit_amount() == second_credit_amount,"Pending reward reloads with frozen amount")
 	await settle()
 	reward = app.view.reward_view
 	await click(reward.credits_reward_button.get_global_rect().get_center())
-	check(Game.state.credits == int(Game.config.initialCredits) + 100 and Game.reward_credits_status() == "claimed", "Reloaded reward credits still require one explicit click")
+	check(Game.state.credits == int(Game.config.initialCredits) + first_credit_amount + second_credit_amount and Game.reward_credits_status() == "claimed", "Reloaded reward credits still require one explicit click")
 	await click(Vector2(1080,599))
 	await key(KEY_3)
-	check(Game.state.deck == ["test_reward_02","test_reward_03"] and Game.state.credits == int(Game.config.initialCredits) + 100,"Keyboard selects after reload without repeating credits")
+	check(Game.state.deck == ["test_reward_02","test_reward_03"] and Game.state.credits == int(Game.config.initialCredits) + first_credit_amount + second_credit_amount,"Keyboard selects after reload without repeating credits")
 	# Expanded deck: empty first-turn hand must stay empty after a view restore.
 	Game.state.activeEventId = "E02"
 	Game.state.currentPlaceId = "junkyard"

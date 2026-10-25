@@ -12,6 +12,9 @@ var button_font: FontVariation
 var hp_fill: ColorRect
 var hp_label: Label
 var credits_label: Label
+var credits_tween: Tween
+var credits_target := -1
+var displayed_credits := 0.0
 var hp_bar_width := 166.0
 
 func _init() -> void:
@@ -231,13 +234,36 @@ func chrome(section: String, show_days: bool = true) -> void:
 		label(self,"● 自动保存    /    F1 开发面板",Vector2(1100,859),Vector2(310,27),12,MUTED)
 
 func refresh_hp() -> void:
-	if is_instance_valid(credits_label):
-		credits_label.text = "%d" % int(Game.state.get("credits", 0))
+	refresh_credits()
 	if not is_instance_valid(hp_fill): return
 	var maximum := int(Game.state.get("maxHp",100))
 	var hp := int(Game.state.get("currentHp",100))
 	hp_fill.size.x = hp_bar_width*hp/maxi(maximum,1)
 	hp_label.text = "%d / %d" % [hp,maximum]
+
+## Display-only counter. Game has already committed the full amount to its save.
+func refresh_credits(animate_increase: bool = false) -> void:
+	if not is_instance_valid(credits_label): return
+	var target := int(Game.state.get("credits", 0))
+	if target == credits_target: return
+	var previous_target := credits_target
+	credits_target = target
+	if credits_tween: credits_tween.kill()
+	credits_label.scale = Vector2.ONE
+	credits_label.add_theme_color_override("font_color", CREAM)
+	if not animate_increase or previous_target < 0 or target <= displayed_credits:
+		set_displayed_credits(float(target))
+		return
+	credits_label.pivot_offset = Vector2(0, credits_label.size.y * 0.5)
+	credits_label.scale = Vector2(1.12, 1.12)
+	credits_tween = create_tween().set_parallel(true)
+	credits_tween.tween_method(set_displayed_credits, displayed_credits, float(target), 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	credits_tween.tween_property(credits_label, "scale", Vector2.ONE, 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	credits_tween.tween_method(func(weight: float): credits_label.add_theme_color_override("font_color", Color("ffda83").lerp(CREAM, weight)), 0.0, 1.0, 0.7)
+
+func set_displayed_credits(value: float) -> void:
+	displayed_credits = value
+	credits_label.text = "%d" % int(round(value))
 
 func tag(text: String, pos: Vector2, color: Color = CYAN, width: float = 180) -> void:
 	cut_panel(self, pos, Vector2(width,32), INK, color, 9)

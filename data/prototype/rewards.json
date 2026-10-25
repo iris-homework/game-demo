@@ -1,5 +1,6 @@
 {
-  "credits": 50,
+  "creditsMin": 40,
+  "creditsMax": 60,
   "note": "战后奖励占位：三张不同 ID 的测试攻击卡，均造成 1 点伤害，无费用。",
   "cards": {
     "test_reward_01": {

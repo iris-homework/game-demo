@@ -189,6 +189,8 @@ func test_modal(source: String) -> void:
 	check(Game.state.deck.count(offers[1]) == 1 and not Game.choose_reward_card(offers[0], revision), source + " repeat or stale selection cannot claim another card")
 	var file := JSON.parse_string(FileAccess.get_file_as_string(real_path)) as Dictionary
 	check(file.battleReward.status == "claimed" and file.deck.count(offers[1]) == 1 and Game.valid_save(file), source + " the selected card and consumed claim persist together")
+	var credit_amount: int = Game.reward_credit_amount()
+	check(credit_amount >= 40 and credit_amount <= 60, source + " generated base credit reward stays within 40–60")
 	var paid_before: int = Game.state.credits
 	var selected_deck: Array = Game.state.deck.duplicate()
 	var claimed_revision: int = Game.revision
@@ -205,11 +207,11 @@ func test_modal(source: String) -> void:
 	else:
 		# Click the row away from its button to exercise the whole-row hit target.
 		await click(Vector2(500,420))
-	check(Game.state.credits == paid_before + 50 and Game.reward_credits_status() == "claimed" and Game.state.deck == selected_deck, source + " real reward button or row click pays only the offered credits")
-	check(not is_instance_valid(app.view.reward_view.credits_reward_button) and app.view.reward_view.exit_button.text == "返回地图  →", source + " paid reward removes credit action and restores ordinary exit")
+	check(Game.state.credits == paid_before + credit_amount and Game.reward_credits_status() == "claimed" and Game.state.deck == selected_deck, source + " real reward button or row click pays only the offered credits")
+	check(not app.view.reward_view.credits_reward_button.visible and app.view.reward_view.credits_reward_button.disabled and app.view.reward_view.exit_button.text == "返回地图  →", source + " paid reward removes credit action and restores ordinary exit")
 	check(not Game.claim_reward_credits(Game.revision), source + " paid UI receipt cannot be claimed twice")
 	file = JSON.parse_string(FileAccess.get_file_as_string(real_path)) as Dictionary
-	check(file.battleReward.creditsStatus == "claimed" and file.credits == paid_before + 50 and Game.valid_save(file), source + " paid credits and consumed claim persist together")
+	check(file.battleReward.creditsStatus == "claimed" and file.credits == paid_before + credit_amount and Game.valid_save(file), source + " paid credits and consumed claim persist together")
 	Game.save_enabled = false
 	await remove_app()
 
