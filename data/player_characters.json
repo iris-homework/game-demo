@@ -16,11 +16,7 @@
       "noren_04"
     ],
     "skills": [],
-    "cyberwareIds": [
-      "dimensional_pocket",
-      "accelerated_clock",
-      "backup_energy"
-    ],
+    "cyberwareIds": [],
     "combatRules": "noren_v1"
   }
 }

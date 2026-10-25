@@ -295,6 +295,9 @@ func test_map_modal() -> void:
 	check(Game.load_game() and Game.equipped_cyberware_ids() == [owned()[0]], "Cold load preserves changes made only through automatic UI saving")
 
 func _ready() -> void:
+	check(Game.initial_state().ownedCyberwareIds.is_empty() and Game.initial_state().equippedCyberwareIds.is_empty(), "Production new adventure starts with no owned or equipped technologies")
+	# Explicit in-memory ownership fixture for nonempty loadout and legacy-save coverage.
+	Game.player_characters.noren.cyberwareIds = ["dimensional_pocket", "accelerated_clock", "backup_energy"]
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUTPUT))
 	get_tree().create_timer(60).timeout.connect(func(): push_error("Technology loadout tests timed out"); get_tree().quit(2))
 	test_validation_and_commit()

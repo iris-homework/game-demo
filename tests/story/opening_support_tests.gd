@@ -48,7 +48,7 @@ func test_catalog_and_branches() -> void:
 		var rev := Game.revision
 		check(Game.choose(index, rev), "chip choice succeeds: " + id)
 		check(Game.state.ownedCyberwareIds == original_owned + [id], "only selected chip is acquired: " + id)
-		check(Game.state.equippedCyberwareIds == original_equipped + [id], "selected chip fills fourth slot: " + id)
+		check(Game.state.equippedCyberwareIds == original_equipped + [id], "selected chip fills an available slot: " + id)
 		check(Game.state.flags.get("openingSupportChipId") == id and Game.state.choiceHistory.get("E01:contract") == id, "choice and support receipt agree: " + id)
 		check(Game.state.targetId.is_empty() and Game.state.credits == credits, "support assigns no target and spends no credits")
 		var chosen := Game.state.duplicate(true)
@@ -65,6 +65,9 @@ func test_catalog_and_branches() -> void:
 
 func test_grant_atomicity_and_full_slots() -> void:
 	fresh()
+	# Explicit four-slot fixture; production characters start without technologies.
+	Game.state.ownedCyberwareIds = ["dimensional_pocket", "accelerated_clock", "backup_energy"]
+	Game.state.equippedCyberwareIds = Game.state.ownedCyberwareIds.duplicate()
 	Game.state.ownedCyberwareIds.append("money_chip")
 	Game.state.equippedCyberwareIds.append("money_chip")
 	var equipped: Array = Game.state.equippedCyberwareIds.duplicate()

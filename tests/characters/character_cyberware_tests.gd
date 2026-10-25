@@ -4,7 +4,7 @@ var failures := 0
 const FIRST := "test_cyberware_01"
 const SECOND := "test_cyberware_02"
 const FIFTH := "test_cyberware_05"
-const CURRENT_IDS := ["dimensional_pocket", "accelerated_clock", "backup_energy"]
+const CURRENT_IDS := []
 const LEGACY_IDS := [FIRST, SECOND, "test_cyberware_03", "test_cyberware_04"]
 
 func check(ok: bool, message: String) -> void:
@@ -37,9 +37,9 @@ func _ready() -> void:
 	check(Game.player_characters.keys() == ["noren"], "Only Noren ships as playable")
 	var original: Dictionary = Game.player_characters.noren.duplicate(true)
 	var ids: Array = original.cyberwareIds.duplicate()
-	check(ids == CURRENT_IDS, "Noren references the three authored technologies in order")
+	check(ids == CURRENT_IDS, "Noren starts without authored technologies")
 	var current := battle_for()
-	check(current.cyberware_cards().size() == 3 and current.profile.playerCyberwareIds == ids, "Noren battle freezes the three configured IDs")
+	check(current.cyberware_cards().is_empty() and current.profile.playerCyberwareIds == ids and Game.owned_cyberware_ids().is_empty() and Game.equipped_cyberware_ids().is_empty(), "New adventure owns and equips no technologies and battle freezes the empty list")
 	check(current.cyberware_cards() == Game.player_cyberware("noren").cards and Game.valid_combat(current.snapshot()), "Current names, effects and cooldowns freeze in valid battle")
 	# Keep historical stacking coverage on an explicit legacy actor loadout.
 	Game.player_characters.noren.cyberwareIds = LEGACY_IDS.duplicate()
@@ -99,7 +99,7 @@ func _ready() -> void:
 	var rules := Game.player_cyberware("qa_subset")
 	rules.cards[0].nextAttackBonus = 99
 	rules.cards.clear()
-	check(Game.cyberware_definition(FIFTH).nextAttackBonus == 1 and Game.player_cyberware("noren").cards.size() == 3, "Returned data cannot mutate shared catalog or another actor")
+	check(Game.cyberware_definition(FIFTH).nextAttackBonus == 1 and Game.player_cyberware("noren").cards.is_empty(), "Returned data cannot mutate shared catalog or another actor")
 	for bad in ["bad", [FIRST, FIRST], ["missing"], [3], [FIRST,SECOND,FIFTH,"test_cyberware_03","test_cyberware_04"]]:
 		Game.player_characters.noren.cyberwareIds = bad
 		var before := Game.state.duplicate(true)
@@ -138,7 +138,7 @@ func _ready() -> void:
 	missing.combat.erase("cyberwareCooldowns")
 	missing.combat.erase("nextAttackBonus")
 	migrated = Game.migrate_save(missing)
-	check(Game.valid_save(migrated) and migrated.combat.profile.cyberware.cards.size() == 3, "Old pre-cyberware Noren battle gains three configured items")
+	check(Game.valid_save(migrated) and migrated.combat.profile.cyberware.cards.is_empty(), "Old pre-cyberware Noren battle uses the empty configured list")
 	missing = Game.state.duplicate(true)
 	missing.playerCharacterId = "qa_empty"
 	missing.combat.profile.playerCharacterId = "qa_empty"
