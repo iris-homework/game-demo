@@ -123,8 +123,9 @@ func test_real_modal_and_combat() -> void:
 	var main := preload("res://scripts/main.gd").new()
 	add_child(main)
 	Game.state.currentHp = 40
+	Game.state.credits = 150
 	block_writes()
-	Game.heal_at("hospital")
+	Game.heal_at("clinic")
 	check(is_instance_valid(main.save_dialog) and main.view.process_mode == Node.PROCESS_MODE_DISABLED, "Real main view opens blocking save modal and suspends background")
 	var escape := InputEventKey.new()
 	escape.keycode = KEY_ESCAPE

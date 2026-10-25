@@ -71,7 +71,8 @@ func _ready() -> void:
 	add_child(app)
 	await get_tree().create_timer(0.6).timeout
 	var choices := Game.training_scenery_choices()
-	check(choices.size() == 12,"Default and eleven completed scenes are offered")
+	check(choices.size() == 13,"Default and twelve completed scenes are offered")
+	check(choices.any(func(choice): return choice.id == "hospital"),"Laboratory battle background is offered")
 	check(Game.set_b04_scenery_choice("alley"),"Completed alley can be selected")
 	check(Game.set_b04_scenery_choice("bar"),"Midnight bar can be selected")
 	Game.set_b04_scenery_choice("")

@@ -111,7 +111,19 @@
       ],
       "sha256": "fdac0b98b7de1483a5bb2a493bc827f13d2e61a45d6eab3c797e0ee83dea0e1e",
       "importedOn": "2026-10-23"
+    },
+    {
+      "assetId": "hospital",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/实验室背景_2026-10-25/实验室_对话背景_v1.png",
+      "path": "res://assets/backgrounds/laboratory_dialogue_v1.png",
+      "size": [
+        1659,
+        948
+      ],
+      "sha256": "e37ab239bdffd771e1918af9a20655402759aa522e53bf2938e3834c807f2e42",
+      "generatedWith": "built-in image_gen",
+      "date": "2026-10-25"
     }
   ],
-  "updated": "2026-10-23"
+  "updated": "2026-10-25"
 }

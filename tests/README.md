@@ -1,5 +1,11 @@
 # 测试目录索引
 
+2026-10-25新增[三选一界面专项](combat/cards/reward_picker_tests.tscn)：61项验证战斗／回访来源、两种窗口尺寸、卡片与返回按钮布局、已有卡数量、固定命中区域、鼠标／键盘切换、Tab／Shift-Tab、Esc返回、保存失败重试与成功后的防重领。必须使用复制工程和独立用户目录，默认拒绝正式用户目录；使用headless+Dummy和视口合成输入，不移动系统鼠标。配套牌库、奖励、回访共4套627项通过；2项鼠标接管失败先复现后修复，证据及既有牌库退出提示见[验证](../artifacts/qa/reward-picker-2026-10-25/verification.json)。静态节点导出预览非Godot截图。
+
+2026-10-25流程走查修复：`commission_return_tests`新增自然三委托后必现、稳定池不重抽、满池旧档优先补回礼且不发奖／不改日期、领取后普通事件补回，共350项；`card_library_filters`验证战斗／回访奖励pending／claimed／skipped三态的退出按钮，共92项。修复前分别15／2项失败，修复后通过。
+
+同步修订`combat_tests`、`passive_technology_tests`、`new_commissions_tests`、`defeat_tests`、`published_training_tests`和`battle_restart_integration`的过时夹具。新冒险70HP／新奖励50、机器人40HP／攻击10；原型夹具独立冻结，坏档拒绝演练保留。最终14套15次共4422项0失败；真实重启write/read按顺序在两个进程执行。另12局72战完成全部8事件、三委托回礼缺失0/12。全部使用复制工程和独立`custom_user_dir_name`、headless+Dummy，不代表像素或物理输入验收。牌库界面既有4对象／2资源退出提示、原失败和首轮夹具解析错误保留，见[验证](../artifacts/qa/flow-fixes-2026-10-25/verification.json)。下文旧统计保留对应历史范围。
+
 2026-10-25空手牌回合／三角色音调：旧代码58项中1项失败，复现自动回能误发提示；修复后音频库576／场景65／工作台15，共656项无窗口Dummy检查通过。覆盖能量整体静音、真实角色音高和播放器复位；首次随机手牌夹具失败保留，固定种子后复测通过。正式存档未变，工作台保留既有2对象／1资源退出提示。见[本轮汇总](../artifacts/qa/audio-turn-dialogue-2026-10-25/verification.json)。
 
 2026-10-25关闭六类测试台音效：五个候选cue默认静音，归位响指仅在测试台战斗实例静音；候选库562／场景56／工作台15／原战斗音效113，共746项无窗口Dummy检查通过。验证空绑定重扫、奖励／胜败／转场／回合静音、响指隔离恢复及原战斗回归；正式存档未变。工作台保留既有2对象／1资源退出提示，详见[本轮汇总](../artifacts/qa/audio-disabled-2026-10-25/verification.json)。

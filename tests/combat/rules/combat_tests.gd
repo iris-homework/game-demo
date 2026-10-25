@@ -11,16 +11,14 @@ func model_for(id: String, hp: int = 100) -> CombatModel:
 	var m := CombatModel.new()
 	var definitions: Array = []
 	for enemy_id in Game.battles[id].enemyIds: definitions.append(Game.enemy_catalog[enemy_id])
-	# Freeze historical single-enemy prototypes independently of authored
-	# encounters (covered by fish_rules_tests and gang_rules_tests).
-	if id in ["B02", "B04", "B11"]:
-		var legacy_fish: Dictionary = definitions[0].duplicate(true)
-		legacy_fish.maxHp = null
-		legacy_fish.intentSequence = []
-		legacy_fish.erase("attackPollution")
-		legacy_fish.erase("allyDeathIntentSequence")
-		legacy_fish.erase("formationSlot")
-		definitions = [legacy_fish]
+	# This helper deliberately exercises the retained legacy prototype rules.
+	# Freeze every encounter independently; current authored numbers are checked below.
+	var legacy_enemy: Dictionary = definitions[0].duplicate(true)
+	legacy_enemy.maxHp = null
+	legacy_enemy.intentSequence = []
+	for field in ["attackPollution", "deathPollution", "allyDeathIntentSequence", "formationSlot"]:
+		legacy_enemy.erase(field)
+	definitions = [legacy_enemy]
 	m.initialize(id,hp,100,Game.prototype_rules,definitions)
 	return m
 
@@ -32,7 +30,12 @@ func _ready() -> void:
 	Game.meta_path = output + "combat-meta.json"
 	var current_robot := CombatModel.new()
 	current_robot.initialize("B02",100,100,Game.prototype_rules,[Game.enemy_catalog.robot])
-	check(current_robot.enemies[0].intent.amount == 10,"Current B02 keeps its authored attack 10 separately from legacy fixtures")
+	check(current_robot.enemies[0].maxHp == 40 and current_robot.enemies[0].intent.amount == 10,"Current B02 keeps authored HP 40 / attack 10 separately from legacy fixtures")
+	for authored in [["B13",36,6],["B14",48,8],["B15",36,6]]:
+		var current := CombatModel.new()
+		var enemy_id: String = Game.battles[authored[0]].enemyIds[0]
+		current.initialize(authored[0],70,70,Game.prototype_rules,[Game.enemy_catalog[enemy_id]])
+		check(current.enemies[0].maxHp == authored[1] and current.enemies[0].intent.amount == authored[2], str(authored[0])+" retains its authored HP and attack separately from legacy fixtures")
 	for id in Game.battles:
 		var m := model_for(id)
 		check(m.enemies[0].hp == 3,id+" HP 3")
@@ -65,18 +68,22 @@ func _ready() -> void:
 	var dead := model_for("B04",0)
 	check(dead.outcome == "lose","Reenter at zero HP cannot bypass defeat")
 	Game.state = Game.initial_state()
-	check(Game.state.currentHp == 100 and Game.state.maxHp == 100 and Game.state.currentDay == 1,"Initial HP and date")
+	check(Game.state.currentHp == 70 and Game.state.maxHp == 70 and Game.state.currentDay == 1,"Initial HP and date")
 	Game.state.completedEventIds = ["E01"]
 	Game.state.currentScene = "map"
-	for place in ["hospital","clinic"]:
-		for hp in [50,90]:
-			Game.state.currentHp = hp
-			Game.state.credits = 150 # Clinic is paid; this case checks successful treatment.
-			check(Game.heal_at(place),place+" service")
-			check(Game.state.currentHp == (80 if hp == 50 else 100),place+" heal30% capped")
-			check(Game.state.credits == (0 if place == "clinic" else 150),place+" correct treatment cost")
-			check(Game.state.currentDay == 1,place+" no automatic time cost")
+	for hp in [40,65]:
+		Game.state.currentHp = hp
+		Game.state.credits = 150
+		check(Game.heal_at("clinic"),"clinic service")
+		check(Game.state.currentHp == (61 if hp == 40 else 70),"clinic heal30% capped")
+		check(Game.state.credits == 0,"clinic correct treatment cost")
+		check(Game.state.currentDay == 1,"clinic no automatic time cost")
 	Game.state.currentHp = 50
+	var laboratory_before := JSON.stringify(Game.state)
+	var laboratory_revision := Game.revision
+	check(Game.healing_service("hospital").is_empty(), "Laboratory has no healing service")
+	check(not Game.heal_at("hospital"), "Laboratory rejects healing")
+	check(JSON.stringify(Game.state) == laboratory_before and Game.revision == laboratory_revision, "Rejected laboratory healing preserves state and revision")
 	check(not Game.heal_at("bar"),"No healing at non-service location")
 	Game.apply_actions([{"op":"advanceDay","days":2}])
 	check(Game.state.currentDay == 3,"Explicit day advance")
@@ -106,7 +113,7 @@ func _ready() -> void:
 	check(Game.read_data("cards/cards.json").size() == 40 and Game.item_catalog.is_empty(),"Forty Noren cards and unchanged empty items")
 	var original := Game.state.duplicate(true)
 	Game.start_training("B02")
-	check(Game.training_mode and Game.state.currentHp == 100,"Practice isolated")
+	check(Game.training_mode and Game.state.currentHp == 70 and Game.state.maxHp == 70,"Practice isolated")
 	Game.battle_exit("win",Game.revision)
 	check(not Game.training_mode and Game.state == original,"Practice restores exact adventure")
 	var legacy := Game.initial_state()

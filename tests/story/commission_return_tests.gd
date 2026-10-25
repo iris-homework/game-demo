@@ -41,6 +41,48 @@ func texts(node: Node) -> String:
 	for child in node.get_children(): result += texts(child)
 	return result
 
+func test_guaranteed_return() -> void:
+	# Follow the authored routes without injecting an event into the refreshed pool.
+	for random_seed in range(25000, 25012):
+		Game.event_refresh_rng.seed = random_seed
+		fresh()
+		for index in 3:
+			var available: Array = Game.available_events()
+			check(not available.is_empty(), "natural commission available")
+			if available.is_empty(): return
+			check(Game.start_event(available[0].id), "start naturally refreshed commission")
+			Game.skip_dialogue(Game.revision)
+			check(Game.battle_exit("win", Game.revision), "natural commission victory route")
+			Game.skip_dialogue(Game.revision)
+			check(Game.claim_rewards(Game.revision), "natural commission returns to map")
+		check(Game.available_events("bar").any(func(e): return e.id == "E01R"), "third commission guarantees visible return, seed " + str(random_seed))
+		check(Game.state.refreshedEventIds.size() == 3, "guaranteed return respects three-event cap")
+		var pool: Array = Game.state.refreshedEventIds.duplicate()
+		var rng_state: int = Game.event_refresh_rng.state
+		Game.refresh_event_pool()
+		check(Game.state.refreshedEventIds == pool and Game.event_refresh_rng.state == rng_state, "stable eligible pool does not reroll")
+		check(Game.start_event("E01R"), "return starts immediately after third commission")
+	# An old save can already have three ordinary commissions occupying every slot.
+	fresh()
+	Game.state.completedEventIds = ["E01", "E02", "E04", "E11"]
+	Game.state.currentDay = 4
+	Game.state.refreshedEventIds = ["E13", "E14", "E15"]
+	var previous := Game.state.duplicate(true)
+	check(Game.save_game(), "save saturated legacy pool")
+	Game.state = {}
+	check(Game.load_game(), "load saturated legacy pool")
+	check(Game.state.refreshedEventIds == ["E01R", "E13", "E14"], "legacy load reserves return slot and retains first two ordinary events")
+	for field in ["currentHp", "credits", "deck", "currentDay", "completedEventIds", "claimedRewardIds", "battleReward"]:
+		check(Game.state[field] == previous[field], "priority migration preserves " + field)
+	var before_query := Game.state.duplicate(true)
+	Game.available_events("bar")
+	check(Game.state == before_query, "availability query remains read only")
+	check(Game.start_event("E01R"), "legacy return can start without another battle")
+	Game.skip_dialogue(Game.revision)
+	check(Game.choose(0, Game.revision) and Game.claim_rewards(Game.revision), "legacy return can be collected")
+	check(Game.state.refreshedEventIds == ["E13", "E14", "E15"], "collecting return restores displaced ordinary commission")
+	check(not Game.start_event("E01R"), "collected return cannot reappear")
+
 func test_unlock() -> void:
 	for last in ["E02", "E04", "E11"]:
 		fresh()
@@ -201,6 +243,7 @@ func test_uncollected_old_return_dialogue() -> void:
 func _ready() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output))
 	save_file = output.path_join("checkpoint.json")
+	test_guaranteed_return()
 	test_unlock()
 	test_real_flow()
 	test_skip_card()

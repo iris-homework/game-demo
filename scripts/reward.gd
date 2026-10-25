@@ -59,7 +59,7 @@ func _ready() -> void:
 	var time_text := "领奖不消耗时间。可以继续探索城市。" if event_reward else "时间推进1天。事件已更新到城市地图。"
 	label(self,"第一周 · 落幕。可返回地图探索剩余事件。" if complete else time_text,Vector2(216,754),Vector2(820,35),20,CYAN)
 	label(self,"离开将放弃本次未选择的卡牌。" if pending else "奖励已保存，可继续探索城市。",Vector2(216,803),Vector2(775,31),16,MUTED)
-	exit_button = button(self,"返回地图  →",Vector2(1110,782),Vector2(276,61),leave_rewards,true)
+	exit_button = button(self,"放弃卡牌并返回  →" if pending else "返回地图  →",Vector2(1110,782),Vector2(276,61),leave_rewards,true)
 	fade_in()
 
 func leave_rewards() -> void:
@@ -76,48 +76,12 @@ func open_picker() -> void:
 			if node.has_focus(): node.release_focus()
 			node.disabled = true
 			suspended_buttons.append(node)
-	picker = Control.new()
-	picker.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	picker.mouse_filter = Control.MOUSE_FILTER_STOP
-	picker.z_index = 60
+	picker = preload("res://scripts/reward_picker.gd").new()
+	picker.setup(Game.state.battleReward.options, Game.reward_rules.cards, Game.owned_card_counts(), Game.state.battleReward.get("source", "battle") == "event")
+	picker.card_picked.connect(func(id: String): Game.choose_reward_card(id,expected_revision))
+	picker.closed.connect(close_picker)
 	add_child(picker)
-	rect(picker,Vector2.ZERO,Vector2(1440,900),Color(0.015,0.025,0.04,0.94))
-	cut_panel(picker,Vector2(129,117),Vector2(1182,670),Color("101920"),CYAN,25)
-	label(picker,"选择一张奖励卡牌",Vector2(191,157),Vector2(1030,65),40)
-	option_buttons.clear()
-	for i in range(3):
-		var id: String = Game.state.battleReward.options[i]
-		var pos := Vector2(225+i*360,316)
-		var card := CombatCard.new()
-		card.managed_input = true
-		card.setup(id,Game.reward_rules.cards[id],true)
-		card.pivot_offset = Vector2.ZERO
-		card.position = pos
-		card.scale = Vector2.ONE * 1.5
-		picker.add_child(card)
-		var b := Button.new()
-		b.name = "RewardOption%d" % (i+1)
-		b.position = pos-Vector2(10,10)
-		b.size = Vector2(290,403)
-		b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-		for mode in ["normal","pressed","hover","focus"]:
-			var box := StyleBoxFlat.new()
-			box.bg_color = Color(0.25,0.9,0.8,0.06) if mode in ["hover","focus"] else Color.TRANSPARENT
-			box.border_color = CYAN if mode != "pressed" else PINK
-			box.set_border_width_all(2 if mode in ["hover","focus","pressed"] else 0)
-			b.add_theme_stylebox_override(mode,box)
-		b.pressed.connect(func(): Game.choose_reward_card(id,expected_revision))
-		picker.add_child(b)
-		option_buttons.append(b)
-		var caption := label(picker,"选择这张  [%d]" % (i+1),pos+Vector2(0,357),Vector2(270,35),19,CYAN)
-		caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var back := button(picker,"返回奖励  /  Esc",Vector2(1052,717),Vector2(212,44),close_picker)
-	var focus_buttons: Array[Button] = option_buttons.duplicate()
-	focus_buttons.append(back)
-	for i in focus_buttons.size():
-		focus_buttons[i].focus_next = focus_buttons[i].get_path_to(focus_buttons[(i+1)%focus_buttons.size()])
-		focus_buttons[i].focus_previous = focus_buttons[i].get_path_to(focus_buttons[(i+focus_buttons.size()-1)%focus_buttons.size()])
-	# Start neutral; Tab can enter the focus loop when using the keyboard.
+	option_buttons = picker.option_buttons
 
 func _input(event: InputEvent) -> void:
 	if not is_instance_valid(picker): return

@@ -86,7 +86,12 @@ func _ready() -> void:
 	check(target_ids() == ["E02", "E04"], "all initially refreshed events are targets")
 	check(Game.map_place_state("bar").current, "current avatar at bar")
 	check(Game.map_place_state("bar").completed, "bar completed and no new event")
-	check(Game.map_place_state("hospital").open and Game.map_place_state("hospital").available.is_empty(), "open service place without task")
+	check(Game.map_place_state("hospital").open and Game.map_place_state("hospital").available.is_empty(), "laboratory remains open without task")
+	check(Game.healing_service("hospital").is_empty(), "laboratory exposes no healing service")
+	var laboratory_before := JSON.stringify(Game.state)
+	var laboratory_revision := Game.revision
+	check(not Game.heal_at("hospital"), "laboratory rejects healing")
+	check(JSON.stringify(Game.state) == laboratory_before and Game.revision == laboratory_revision, "laboratory healing rejection preserves state and revision")
 	check(Game.map_place_state("alley").target and Game.map_place_state("junkyard").target, "all refreshed places are targets")
 	check(Game.map_place_state("junkyard").available.size() == 1, "unified event badge data")
 	var previous := JSON.stringify(Game.state)
@@ -148,9 +153,10 @@ func _ready() -> void:
 	var healed_expected := mini(int(Game.state.maxHp), int(Game.state.currentHp) + roundi(Game.state.maxHp * 0.3))
 	var current: String = Game.state.currentPlaceId
 	var day: int = Game.state.currentDay
-	check(Game.heal_at("hospital") and Game.state.currentHp == healed_expected, "existing healing 30 percent of configured maximum")
+	Game.state.credits = 300
+	check(Game.heal_at("clinic") and Game.state.currentHp == healed_expected and Game.state.credits == 150, "clinic heals 30 percent of configured maximum for 150 credits")
 	check(Game.state.currentPlaceId == current and Game.state.currentDay == day, "healing preserves place and day")
-	check(Game.heal_at("hospital") and Game.state.currentHp == Game.state.maxHp, "healing clamps HP")
+	check(Game.heal_at("clinic") and Game.state.currentHp == Game.state.maxHp and Game.state.credits == 0, "clinic healing clamps HP and charges once per treatment")
 	var expected: Dictionary = Game.state.duplicate(true)
 	check(Game.save_game(), "test-path checkpoint written")
 	Game.state = {}

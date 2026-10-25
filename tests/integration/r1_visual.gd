@@ -66,14 +66,23 @@ func _ready() -> void:
 	await idle()
 	verify(Game.state.currentScene == "dialogue" and Game.state.activeNodeId == "lose" and Game.state.currentHp == 0,"Natural defeat returns lose node")
 	await shot("defeat")
+	# The service fixture starts a separate healthy adventure after terminal defeat.
+	Game.state = Game.initial_state()
 	Game.go_map()
 	await shot("map")
 	Game.visit("hospital")
+	Game.state.maxHp = 100
 	Game.state.currentHp = 50
 	Game.checkpoint()
 	await shot("hospital")
-	Game.heal_at("hospital")
-	verify(Game.state.currentHp == 80,"Healing wired")
+	verify(app.view.find_child("heal_place", true, false) == null,"Laboratory has no healing entry")
+	var laboratory_before := JSON.stringify(Game.state)
+	verify(not Game.heal_at("hospital") and JSON.stringify(Game.state) == laboratory_before,"Laboratory rejects healing without state changes")
+	Game.visit("clinic")
+	Game.state.credits = 150
+	Game.checkpoint()
+	Game.heal_at("clinic")
+	verify(Game.state.currentHp == 80 and Game.state.credits == 0,"Clinic healing and payment wired")
 	Game.open_cyberware()
 	await shot("cyberware")
 	print("VISUAL INTEGRATION: %d failures; screenshots: %s" % [failures,out])

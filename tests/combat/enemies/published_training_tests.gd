@@ -29,11 +29,14 @@ func reset(subject: Dictionary = {}) -> void:
 	Game.battle_busy = false
 	Game.state = subject.duplicate(true)
 	Game.page = "menu"
+	# Cold no-save cases must use an absent checkpoint, not the corrupt sentinel.
+	Game.save_path = OUTPUT + ("empty-checkpoint.json" if subject.is_empty() else "sentinel-checkpoint.json")
 
 func check_catalogs(label: String) -> void:
 	check(same(Game.battles, original_battles) and same(Game.enemy_catalog, original_enemies), label + ": temporary definitions removed; all formal definitions unchanged")
 
 func check_disk(label: String) -> void:
+	check(not FileAccess.file_exists(OUTPUT + "empty-checkpoint.json") and not FileAccess.file_exists(OUTPUT + "empty-checkpoint.json.bak"), label + ": no-save practice never creates an adventure checkpoint")
 	for path in sentinel_paths:
 		check(FileAccess.get_file_as_string(path) == "published-training-sentinel:" + path.get_file(), label + ": unchanged " + path.get_file())
 	for path in [Game.save_path + ".tmp", Game.meta_path + ".tmp"]:
@@ -106,6 +109,13 @@ func test_start_and_restore() -> void:
 			check_disk(label)
 
 func test_rejections() -> void:
+	for id in IDS:
+		reset()
+		Game.save_path = OUTPUT + "sentinel-checkpoint.json"
+		Game.start_enemy_training(id)
+		check(not Game.training_mode and Game.state.is_empty() and Game.page == "menu", "Unreadable main and backup reject cold practice: " + id)
+		check_catalogs("Unreadable checkpoint " + id)
+		check_disk("Unreadable checkpoint " + id)
 	for lock in ["unknown", "transition", "battle_busy", "page"]:
 		reset(adventure())
 		if lock == "transition": Game.transition_locked = true
@@ -317,6 +327,9 @@ func _ready() -> void:
 	Game.save_path = OUTPUT + "sentinel-checkpoint.json"
 	Game.meta_path = OUTPUT + "sentinel-meta.json"
 	Game.save_enabled = false
+	for suffix in ["", ".bak", ".tmp"]:
+		var empty_path: String = OUTPUT + "empty-checkpoint.json" + suffix
+		if FileAccess.file_exists(empty_path): DirAccess.remove_absolute(empty_path)
 	for path in [Game.save_path, Game.save_path + ".bak", Game.meta_path, Game.meta_path + ".bak"]:
 		var file := FileAccess.open(path, FileAccess.WRITE)
 		file.store_string("published-training-sentinel:" + path.get_file())

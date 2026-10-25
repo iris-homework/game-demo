@@ -311,6 +311,11 @@ func refresh_event_pool(subject: Dictionary = {}) -> void:
 	if s.is_empty(): return
 	var candidates: Array = eligible_events(s).map(func(e): return e.id)
 	var kept: Array = []
+	# The promised three-commission return must not wait for another random draw.
+	# Reserve one of the existing slots, including when loading an already full pool.
+	if "E01R" in candidates:
+		kept.append("E01R")
+		candidates.erase("E01R")
 	for id in s.get("refreshedEventIds", []):
 		if id in candidates and not id in kept and kept.size() < EVENT_REFRESH_LIMIT:
 			kept.append(id)
@@ -1064,7 +1069,7 @@ func heal_at(place_id: String) -> bool:
 
 func training_scenery_choices() -> Array[Dictionary]:
 	var choices: Array[Dictionary] = [{"id":"", "name":"默认场景（后巷）"}]
-	for place_id in ["garden","hive","port","pump","junkyard","hotel","tower","block5","church","alley","bar"]:
+	for place_id in ["garden","hive","port","pump","junkyard","hotel","tower","block5","church","alley","bar","hospital"]:
 		var place: Dictionary = place_data(place_id)
 		var asset_id: String = assets.get(place.get("backgroundAssetId",""),{}).get("battleAssetId","")
 		var definition: Dictionary = assets.get(asset_id,{})

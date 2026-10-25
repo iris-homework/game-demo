@@ -59,6 +59,30 @@ func verify_views(credits: int, hp: int, disabled: bool, context: String) -> voi
 	place_view.queue_free()
 	await get_tree().process_frame
 
+func verify_laboratory_views() -> void:
+	reset()
+	var map_view = load("res://scenes/map.tscn").instantiate()
+	add_child(map_view)
+	var content: Dictionary = map_view._card_content("hospital")
+	check(not content.has_service and content.healing_service.is_empty(), "laboratory map query has no healing service")
+	map_view._build_detail("hospital")
+	check(map_view.get_detail_button("enter_place") != null, "laboratory map retains visit action")
+	check(map_view.get_detail_button("heal_place") == null, "laboratory map has no healing action")
+	remove_child(map_view)
+	map_view.queue_free()
+	Game.state.currentScene = "place"
+	Game.state.currentPlaceId = "hospital"
+	Game.page = "place"
+	var place_view = load("res://scenes/place.tscn").instantiate()
+	add_child(place_view)
+	check(place_view.find_child("heal_place", true, false) == null, "laboratory place has no healing action")
+	check(place_view.find_child("healing_hint", true, false) == null, "laboratory place has no healing hint")
+	check(place_view.find_child("return_map", true, false) != null, "laboratory place retains return action")
+	rejected("hospital", "laboratory place treatment")
+	remove_child(place_view)
+	place_view.queue_free()
+	await get_tree().process_frame
+
 func _ready() -> void:
 	Game.save_enabled = false
 	var evidence_dir := ProjectSettings.globalize_path("res://artifacts/qa/clinic-credits-2026-10-23/payment-test-files")
@@ -69,7 +93,7 @@ func _ready() -> void:
 	reset()
 	var clinic: Dictionary = Game.healing_service("clinic")
 	check(clinic.credits_cost == 150 and is_equal_approx(clinic.percent, 0.3), "authored clinic price and rate")
-	check(Game.healing_service("hospital").credits_cost == 0, "hospital defaults to free")
+	check(Game.healing_service("hospital").is_empty(), "laboratory has no healing service")
 	var before := JSON.stringify(Game.state)
 	Game.healing_service("clinic")
 	check(before == JSON.stringify(Game.state), "service query is read only")
@@ -96,9 +120,11 @@ func _ready() -> void:
 	reset(0, 300)
 	check(Game.heal_at("clinic") and Game.heal_at("clinic") and Game.state.currentHp == 60 and Game.state.credits == 0, "each accepted treatment costs 150")
 	reset(50, 0)
-	check(Game.heal_at("hospital") and Game.state.currentHp == 80 and Game.state.credits == 0, "hospital remains free at zero credits")
-	check(Game.heal_at("hospital") and Game.state.currentHp == 100, "hospital retains healing cap")
-	rejected("hospital", "full hospital treatment is a no-op")
+	rejected("hospital", "laboratory treatment at zero credits")
+	reset(50, 300)
+	rejected("hospital", "laboratory treatment with sufficient credits")
+	reset(100, 300)
+	rejected("hospital", "full HP laboratory treatment")
 	reset()
 	Game.transition_locked = true
 	rejected("clinic", "transition lock")
@@ -134,6 +160,7 @@ func _ready() -> void:
 	await verify_views(150, 50, false, "affordable")
 	await verify_views(149, 50, true, "insufficient")
 	await verify_views(300, 100, true, "full HP")
+	await verify_laboratory_views()
 	var report := {"checks":checks, "failures":failures, "scope":"headless logic and UI structure; no visual or physical-input acceptance"}
 	var file := FileAccess.open(evidence_dir.path_join("result.json"), FileAccess.WRITE)
 	file.store_string(JSON.stringify(report, "\t"))

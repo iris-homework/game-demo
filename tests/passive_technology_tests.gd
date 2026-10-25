@@ -136,7 +136,7 @@ func test_activation_and_snapshot() -> void:
 	check(combat.draw_cards().size() == 5, "fifth frozen swift cannot grant opening cards")
 
 func test_victory() -> void:
-	for hp in [70,98,100]:
+	for hp in [40,68,70]:
 		reset(["money_chip","healing_chip"],hp)
 		var credits: int = Game.state.credits
 		Game.state.equippedCyberwareIds = []
@@ -145,7 +145,7 @@ func test_victory() -> void:
 		win_model()
 		check(Game.battle_exit("win",Game.revision), "victory settles frozen equipped chips")
 		Game.prototype_rules.cyberware = definitions
-		var heal := mini(5,100-hp)
+		var heal := mini(5,70-hp)
 		check(Game.state.credits == credits + 30 and Game.state.currentHp == hp + heal, "victory grants exact 30 and capped healing at HP " + str(hp))
 		check(Game.battle_passive_summary() == {"credits":30,"healing":heal}, "summary reports actual chip gains")
 		check(Game.state.currentScene == "dialogue" and Game.valid_save(Game.state), "chips are awarded before post-battle dialogue in a valid checkpoint")
@@ -206,7 +206,7 @@ func test_failure_training_and_save_failure() -> void:
 		if outcome == "exit": Game.menu()
 		else: check(Game.battle_exit(outcome,Game.revision), "training ends with " + outcome)
 		check(Game.state == adventure and not Game.training_mode, "training " + outcome + " restores full adventure without chip gains")
-	reset(["money_chip","healing_chip"])
+	reset(["money_chip","healing_chip"],40)
 	win_model()
 	check(Game.save_game(), "pre-transaction winning snapshot saved")
 	var original_disk := FileAccess.get_file_as_string(save_file)

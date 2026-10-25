@@ -102,7 +102,21 @@
       ],
       "date": "2026-10-23",
       "version": "v1"
+    },
+    {
+      "placeAssetId": "hospital",
+      "battleAssetId": "hospital_battle_simplified",
+      "name": "实验室",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/实验室背景_2026-10-25/实验室_战斗背景_v1.png",
+      "sha256": "a004cb2ac0125606208af990a46ffd37b202c243db0c8e6d8b99d8632cb80736",
+      "size": [
+        1584,
+        993
+      ],
+      "date": "2026-10-25",
+      "version": "v1",
+      "groundStart": 0.533
     }
   ],
-  "updated": "2026-10-23"
+  "updated": "2026-10-25"
 }

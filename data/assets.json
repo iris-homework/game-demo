@@ -86,8 +86,9 @@
     "kind": "pending"
   },
   "hospital": {
-    "path": "",
-    "kind": "pending"
+    "path": "res://assets/backgrounds/laboratory_dialogue_v1.png",
+    "kind": "background",
+    "battleAssetId": "hospital_battle_simplified"
   },
   "clinic": {
     "path": "",
@@ -335,5 +336,15 @@
     "path": "res://assets/characters/enemies_dialogue_v1/beacon_jellyfish_dialogue_v1.png",
     "kind": "portrait",
     "whiteKey": false
+  },
+  "hospital_battle_simplified": {
+    "path": "res://assets/backgrounds/battle_simplified/laboratory_v1.png",
+    "kind": "battle_background",
+    "groundStart": 0.533,
+    "actorOffset": [
+      0,
+      0
+    ],
+    "trainingSelectable": true
   }
 }

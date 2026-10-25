@@ -29,7 +29,7 @@ func _ready() -> void:
 	var mode := OS.get_cmdline_user_args()[0] if not OS.get_cmdline_user_args().is_empty() else "read"
 	if mode == "write":
 		Game.state = Game.initial_state()
-		Game.state.currentHp = 73
+		Game.state.currentHp = 63
 		Game.state.activeEventId = "E04"
 		Game.state.currentPlaceId = "alley"
 		Game.enter_node("battle")
@@ -48,26 +48,26 @@ func _ready() -> void:
 		var file := FileAccess.open(OUTPUT + "expected-opening.json", FileAccess.WRITE)
 		file.store_string(JSON.stringify(expected))
 		file.close()
-		check(app.view.model.player_hp == 73 and app.view.model.turn == 1, "Actual battle opens with adventure HP")
+		check(app.view.model.player_hp == 63 and app.view.model.turn == 1, "Actual battle opens with adventure HP")
 		app.view.show_cyberware()
-		app.view.activate_cyberware("test_cyberware_01")
+		await app.view.activate_cyberware("dimensional_pocket")
 		app.view.close_pile()
-		check(app.view.model.used_cyberware.size() == 1, "Actual technology callback commits")
-		var uid: String = app.view.model.hand[0]
+		check(app.view.model.used_cyberware == ["dimensional_pocket"] and app.view.model.stance == "ranged", "Actual carried technology callback commits its stance change")
+		var uid: String = app.view.model.hand.filter(func(card_uid): return app.view.model.card_cost(card_uid) > 0)[0]
 		app.view.selected_uid = uid
 		var target := 0 if app.view.model.card_target(uid) == "enemy" else -1
 		await app.view.play_selected(target)
 		check(app.view.model.energy < 3, "Actual card callback spends energy")
 		await app.view.end_turn_pressed()
-		check(app.view.model.turn == 2 and app.view.model.player_hp < 73, "Actual enemy turn commits damage")
+		check(app.view.model.turn == 2 and app.view.model.player_hp < 63, "Actual enemy turn commits damage")
 		var disk = JSON.parse_string(FileAccess.get_file_as_string(Game.save_path))
-		check(disk.combat.turn == 1 and disk.currentHp == 73 and disk.combat.hand.is_empty(), "Disk contains opening while live view is turn two")
+		check(disk.combat.turn == 1 and disk.currentHp == 63 and disk.combat.hand.is_empty(), "Disk contains opening while live view is turn two")
 		# Quit the first process directly with a progressed live battle.
 	else:
 		var expected = JSON.parse_string(FileAccess.get_file_as_string(OUTPUT + "expected-opening.json"))
 		check(JSON.parse_string(JSON.stringify(app.view.model.snapshot())) == expected.combat, "Fresh process restores exact opening including HP, hands, statuses and enemies")
 		check(app.view.model.hand == expected.firstHand, "Fresh process keeps initial shuffled hand")
-		var uid: String = app.view.model.hand[0]
+		var uid: String = app.view.model.hand.filter(func(card_uid): return app.view.model.card_cost(card_uid) > 0)[0]
 		app.view.selected_uid = uid
 		await app.view.play_selected(0 if app.view.model.card_target(uid) == "enemy" else -1)
 		check(app.view.model.energy < 3, "Resumed battle remains playable")

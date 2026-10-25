@@ -305,28 +305,39 @@ func _ready() -> void:
 	start_place = Game.state.currentPlaceId
 	app.view.close_detail()
 	await click(app.view.get_marker_center("hospital"))
-	check(map_button("enter_place") != null and map_button("heal_place") != null, "open no-event hospital retains enter and service")
+	check(map_button("enter_place") != null and map_button("heal_place") == null, "laboratory retains enter without healing action")
+	await click(button_center(map_button("enter_place")))
+	check(Game.page == "place" and Game.state.currentPlaceId == "hospital", "laboratory remains visitable")
+	check(app.view.find_child("heal_place", true, false) == null, "laboratory place has no healing action")
+	Game.go_map()
+	await settle()
+	start_place = Game.state.currentPlaceId
+	Game.state.maxHp = 100
 	Game.state.currentHp = 50
+	Game.state.credits = 300
+	await click(app.view.get_marker_center("clinic"))
 	var heal := map_button("heal_place")
+	check(heal != null, "clinic retains healing service")
 	if heal != null:
 		await click(button_center(heal))
-		check(Game.state.currentHp == 80, "one real heal click resolves once")
+		check(Game.state.currentHp == 80 and Game.state.credits == 150, "one real clinic heal click resolves and charges once")
 		check(Game.state.currentPlaceId == start_place, "heal does not move current avatar")
-		check(app.view.selected_id == "hospital" and is_instance_valid(app.view.detail), "heal-triggered rebuild restores selected hospital")
+		check(app.view.selected_id == "clinic" and is_instance_valid(app.view.detail), "heal-triggered rebuild restores selected clinic")
 		await shot("08-heal-detail")
 		var enter := map_button("enter_place")
 		if enter != null:
 			await click(button_center(enter))
-			check(Game.page == "place" and Game.state.currentPlaceId == "hospital", "explicit enter updates place")
+			check(Game.page == "place" and Game.state.currentPlaceId == "clinic", "explicit enter updates place")
 			Game.go_map()
 			await settle()
 			check(not is_instance_valid(app.view.detail), "returning from location starts with clean overview")
-			check(Game.map_place_state("hospital").current, "returned avatar reflects actual visited hospital")
+			check(Game.map_place_state("clinic").current, "returned avatar reflects actual visited clinic")
 	app.view.close_detail()
+	Game.state.maxHp = 100
 	Game.state.currentHp = 50
 	await click(app.view.get_marker_center("clinic"))
 	await click(button_center(map_button("heal_place")))
-	check(Game.state.currentHp == 80 and Game.state.currentPlaceId == "hospital", "clinic heal resolves once without moving avatar")
+	check(Game.state.currentHp == 80 and Game.state.currentPlaceId == "clinic" and Game.state.credits == 0, "second clinic heal resolves and charges once without moving avatar")
 	check(app.view.selected_id == "clinic", "clinic heal rebuild preserves fixed card")
 	await stage()
 	await click(app.view.get_marker_center("hive"))

@@ -219,12 +219,17 @@ func finish_story() -> void:
 
 func test_victory_training_new_game() -> void:
 	var model := begin_battle("victory", "B02", 63)
-	model.draw_cards(10)
-	for uid in model.hand.duplicate():
-		if model.card(uid).type == "attack":
-			model.play_card(uid, 0)
-			if model.outcome == "win": break
-	check(model.outcome == "win", "Victory regression reaches real B02 win")
+	check(model.enemies[0].maxHp == 40, "Victory fixture uses the current authored robot")
+	model.draw_cards()
+	var rounds := 0
+	while model.outcome.is_empty() and rounds < 20:
+		for uid in model.hand.duplicate():
+			if model.outcome.is_empty() and model.card(uid).type == "attack": model.play_card(uid, 0)
+		for uid in model.hand.duplicate():
+			if model.outcome.is_empty() and model.card(uid).id == "noren_02": model.play_card(uid, -1)
+		if model.outcome.is_empty(): model.end_turn()
+		rounds += 1
+	check(model.outcome == "win" and rounds < 20, "Victory regression reaches real B02 win through legal turns")
 	Game.commit_combat(model)
 	check(not Game.is_run_over() and Game.can_continue(), "Winning battle is resumable")
 	check(Game.battle_exit("win", Game.revision) and Game.state.currentScene == "dialogue", "Victory retains authored post-battle story")

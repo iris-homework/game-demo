@@ -212,6 +212,7 @@ func test_reward_deck() -> void:
 				Game.changed.emit()
 			await settle()
 			var reward: Control = app.view.reward_view
+			check(reward.exit_button.text == ("放弃卡牌并返回  →" if status == "pending" else "返回地图  →"), source + ": " + status + " exit explicitly describes whether the card will be forfeited")
 			var trigger: Button = reward.get_node("current_deck_button")
 			var before: Dictionary = Game.state.duplicate(true)
 			var revision: int = Game.revision
