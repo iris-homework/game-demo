@@ -6,7 +6,7 @@ extends DemoUI
 ##   selected_id:String、detail:Control、markers:Dictionary、
 ##   map_rect:Rect2、get_marker_center(id)->Vector2、select_place(id)、
 ##   close_detail()、handle_escape()->bool；详情按钮命名为
-##   enter_place／heal_place／event_<事件ID>，可用 find_child 查找。
+##   enter_place，可用 find_child 查找；任务开始按钮位于地点页。
 
 const CANVAS := Vector2(1440.0, 900.0)
 const HUD_HEIGHT := 76.0
@@ -593,8 +593,11 @@ func _on_card_action(kind: String, id: String) -> bool:
 	match kind:
 		"enter":
 			if not selected_id.is_empty():
+				var place := Game.place_data(selected_id)
+				if not bool(place.get("mapDisplay", {}).get("resident", false)) and Game.available_events(selected_id).is_empty():
+					return false
 				Game.visit(selected_id)
-				return Game.page == "place"
+				return Game.page in ["place", "dialogue"]
 		"heal":
 			var place := selected_id
 			if place.is_empty():
@@ -604,9 +607,6 @@ func _on_card_action(kind: String, id: String) -> bool:
 			if not healed:
 				pending_selection_id = ""
 			return healed
-		"event":
-			if not id.is_empty():
-				return Game.start_event(id)
 		"close":
 			close_detail()
 			return true

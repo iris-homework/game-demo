@@ -2,8 +2,7 @@ class_name MidnightMapCard
 extends Control
 ## 地图浮动信息卡：只读悬停预览与可操作固定详情共用同一内容来源。
 ## 预览整卡 mouse_ignore，不抢地图事件；详情拦截点击与滚轮，不穿透到底图。
-## 详情只把名称／状态固定在上方，完整简介与全部事件都在 detail_scroll 里，
-## 长文不会被截断，也不会把事件按钮推出卡片；进入／治疗固定在 footer。
+## 地图只展示地点简介；有事件或常驻地点提供唯一进入按钮，任务信息在地点页展示。
 
 const CREAM := Color("f3ebde")
 const MUTED := Color("aaa4b8")
@@ -79,12 +78,8 @@ func _build() -> void:
 		_build_detail(accent, name_text, state_text, desc_text, lock_text, open, events, inner_w, max_h, name_h, state_h)
 
 func _build_detail(accent: Color, name_text: String, state_text: String, desc_text: String, lock_text: String, open: bool, events: Array, inner_w: float, max_h: float, name_h: float, state_h: float) -> void:
-	var has_heal := open and bool(_content.get("has_service", false))
-	var healing: Dictionary = _content.get("healing_service", {})
-	var has_enter := open
+	var has_enter := open and (bool(_content.get("resident", false)) or not events.is_empty())
 	var footer_h := 14.0
-	if has_heal:
-		footer_h += BUTTON_HEIGHT + 8.0
 	if has_enter:
 		footer_h += BUTTON_HEIGHT + 8.0
 	var header_h := 14.0 + name_h + 2.0 + state_h + 10.0
@@ -128,15 +123,6 @@ func _build_detail(accent: Color, name_text: String, state_text: String, desc_te
 		if not bool(_content.get("resident", false)):
 			var none := _label_into(list, "此地暂无新的事件。", 16, MUTED)
 			none.custom_minimum_size = Vector2(0.0, 24.0)
-		if has_heal:
-			var hint_text := str(healing.get("hint", "可以使用现有服务；进入地点查看区域。"))
-			var hint := _label_into(list, hint_text, 14, MUTED)
-			hint.custom_minimum_size = Vector2(0.0, _text_height(hint_text, 14, content_w))
-	else:
-		var head := _label_into(list, "可用事件", 15, accent)
-		head.custom_minimum_size = Vector2(0.0, 20.0)
-		for event in events:
-			_add_event_block(list, event, content_w)
 	# 尾部留白：滚到最底时最后一个动作也不会贴住裁剪边缘与 footer。
 	var tail := Control.new()
 	tail.name = "list_tail_spacer"
@@ -156,19 +142,10 @@ func _build_detail(accent: Color, name_text: String, state_text: String, desc_te
 	strip.add_theme_stylebox_override("panel", strip_style)
 	add_child(strip)
 	var footer_y := height - footer_h + 6.0
-	if has_heal:
-		var heal_button := _add_button(str(healing.get("label", "治疗")), "heal_place", Rect2(PAD, footer_y, inner_w, BUTTON_HEIGHT), false, func(): _emit("heal", ""))
-		heal_button.disabled = not bool(healing.get("can_heal", false))
-		heal_button.tooltip_text = str(healing.get("hint", ""))
-		if int(healing.get("credits_cost", 0)) > 0:
-			heal_button.icon = DemoUI.CREDIT_ICON
-			heal_button.expand_icon = true
-			heal_button.add_theme_constant_override("icon_max_width",24)
-		footer_y += BUTTON_HEIGHT + 8.0
 	if has_enter:
 		var market := str(_content.get("id", "")) == "market"
-		var enter_button := _add_button("进入黑市    →" if market else "进入商场    →" if str(_content.get("id", "")) == "mall" else "进入地点    →", "enter_place", Rect2(PAD, footer_y, inner_w, BUTTON_HEIGHT), market, func(): _emit("enter", ""))
-		if market: enter_button.add_theme_color_override("font_hover_color", DemoUI.INK)
+		var enter_button := _add_button("进入黑市    →" if market else "进入商场    →" if str(_content.get("id", "")) == "mall" else "进入地点    →", "enter_place", Rect2(PAD, footer_y, inner_w, BUTTON_HEIGHT), true, func(): _emit("enter", ""))
+		enter_button.add_theme_color_override("font_hover_color", DemoUI.INK)
 	_add_button("关闭", "close_place", Rect2(card_width - PAD - 56.0, 12.0, 56.0, 24.0), false, func(): _emit("close", "")).add_theme_font_size_override("font_size", 12)
 
 func _build_preview(accent: Color, name_text: String, state_text: String, desc_text: String, lock_text: String, open: bool, events: Array, inner_w: float, max_h: float, name_h: float, state_h: float) -> void:
@@ -231,46 +208,11 @@ func _detail_body_height(desc_text: String, lock_text: String, open: bool, event
 	if events.is_empty():
 		if not bool(_content.get("resident", false)):
 			heights.append(24.0)
-		if bool(_content.get("has_service", false)):
-			var healing: Dictionary = _content.get("healing_service", {})
-			heights.append(_text_height(str(healing.get("hint", "可以使用现有服务；进入地点查看区域。")), 14, width))
-	else:
-		heights.append(20.0)
-		for event in events:
-			var row_h := 18.0 + _text_height(str(event.get("title", "")), 17, width) + BUTTON_HEIGHT + 8.0
-			var description := str(event.get("description", ""))
-			if not description.is_empty():
-				row_h += _text_height(description, 15, width) + 4.0
-			heights.append(row_h)
 	heights.append(LIST_TAIL)
 	var total := EVENT_SEPARATION * float(heights.size() - 1)
 	for height in heights:
 		total += height
 	return total
-
-func _add_event_block(list: VBoxContainer, event: Dictionary, width: float) -> void:
-	var event_id := str(event.get("id", ""))
-	var block := VBoxContainer.new()
-	block.name = "event_block_" + event_id
-	block.add_theme_constant_override("separation", 4)
-	block.mouse_filter = Control.MOUSE_FILTER_PASS
-	list.add_child(block)
-	var tag := _label_into(block, "刷新时间：" + str(event.get("refresh_time", "随时")), 13, CYAN)
-	tag.custom_minimum_size = Vector2(0.0, 18.0)
-	var title_text := str(event.get("title", event_id))
-	var title := _label_into(block, title_text, 17, CREAM)
-	title.custom_minimum_size = Vector2(0.0, _text_height(title_text, 17, width))
-	var desc_text := str(event.get("description", ""))
-	if not desc_text.is_empty():
-		var desc := _label_into(block, desc_text, 15, MUTED)
-		desc.custom_minimum_size = Vector2(0.0, _text_height(desc_text, 15, width))
-	# 可见文案保持简短；内部事件 ID 只留在节点名里供输入测试查找。
-	var button := _button_into(block, "开始事件", "event_" + event_id, BUTTON_HEIGHT, true, func(): _emit("event", event_id))
-	button.custom_minimum_size = Vector2(0.0, BUTTON_HEIGHT)
-	# 滚轮事件继续传给 detail_scroll（force_pass_scroll_events 默认开启），点击仍由按钮自己处理。
-	button.mouse_filter = Control.MOUSE_FILTER_PASS
-	button.mouse_force_pass_scroll_events = true
-	_action_hits.append({"node": button, "kind": "event", "id": event_id})
 
 func _build_header(accent: Color, name_text: String, state_text: String, desc_text: String, lock_text: String, open: bool, inner_w: float) -> void:
 	# 名称可用宽度在这里自行推导；固定详情为右侧关闭按钮留出空间。

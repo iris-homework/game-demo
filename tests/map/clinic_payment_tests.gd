@@ -43,7 +43,8 @@ func verify_views(credits: int, hp: int, disabled: bool, context: String) -> voi
 	var content: Dictionary = map_view._card_content("clinic")
 	check(content.healing_service.credits_cost == 150 and content.healing_service.can_heal != disabled, context + " map consumes shared query")
 	map_view._build_detail("clinic")
-	verify_button(map_view.get_detail_button("heal_place"), 150, disabled, context + " map")
+	check(map_view.get_detail_button("heal_place") == null, context + " map defers healing to service page")
+	check(map_view.get_detail_button("enter_place") != null, context + " clinic has direct service entry")
 	remove_child(map_view)
 	map_view.queue_free()
 	Game.state.currentScene = "place"
@@ -66,7 +67,7 @@ func verify_laboratory_views() -> void:
 	var content: Dictionary = map_view._card_content("hospital")
 	check(not content.has_service and content.healing_service.is_empty(), "laboratory map query has no healing service")
 	map_view._build_detail("hospital")
-	check(map_view.get_detail_button("enter_place") != null, "laboratory map retains visit action")
+	check(map_view.get_detail_button("enter_place") == null, "empty nonresident laboratory has no visit action")
 	check(map_view.get_detail_button("heal_place") == null, "laboratory map has no healing action")
 	remove_child(map_view)
 	map_view.queue_free()

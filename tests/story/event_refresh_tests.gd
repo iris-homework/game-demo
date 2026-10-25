@@ -260,7 +260,7 @@ func test_ui() -> void:
 	add_child(view)
 	await get_tree().process_frame
 	var text := all_text(view)
-	check("刷新时间" in text and "随时" in text, "place view shows event refresh time")
+	check(not "刷新时间" in text, "task briefing hides event refresh time")
 	check("完成委托推进1天" in text and "开幕与领奖不耗时" in text, "place HUD distinguishes commission time from opening and return reward")
 	check(not "主线" in text and not "可选事件" in text and not "支线" in text, "place view uses unified event terminology")
 	check("第 7 天" in text, "date label displays day seven")
@@ -276,7 +276,8 @@ func test_ui() -> void:
 	map_view.call("select_place", "junkyard")
 	await get_tree().process_frame
 	var map_text := all_text(map_view)
-	check("刷新时间：随时" in map_text, "real map detail displays refresh time")
+	check(not "刷新时间" in map_text, "map defers refresh details to task briefing")
+	check(map_view.get_detail_button("enter_place") != null and map_view.get_detail_button("event_E02") == null, "map offers one entry instead of starting task")
 	check(not "主线" in map_text and not "可选事件" in map_text and not "支线" in map_text, "real map detail uses unified event terminology")
 	map_view.queue_free()
 	await get_tree().process_frame
