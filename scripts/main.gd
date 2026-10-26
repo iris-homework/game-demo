@@ -22,6 +22,7 @@ var debug_previous_focus: Control
 var toast: Control
 var card_console: Control
 var console_buttons: Array = []
+var console_revision := -1
 var view_process_mode := Node.PROCESS_MODE_INHERIT
 var shown_page := ""
 var transition: ColorRect
@@ -95,7 +96,7 @@ func swap_view() -> void:
 	if is_instance_valid(technology_browser): close_technology_loadout()
 	if is_instance_valid(exit_dialog): close_exit_confirmation()
 	if is_instance_valid(deck_browser): close_current_deck()
-	if is_instance_valid(card_console): close_card_console()
+	if is_instance_valid(card_console): close_card_console(false)
 	if is_instance_valid(debug_panel): close_debug()
 	if is_instance_valid(view):
 		remove_child(view)
@@ -394,6 +395,7 @@ func open_card_console() -> void:
 	if "pile_overlay" in view and is_instance_valid(view.pile_overlay): return
 	if view.has_method("cancel_selection"): view.cancel_selection()
 	view_process_mode = view.process_mode
+	console_revision = Game.revision
 	view.process_mode = Node.PROCESS_MODE_DISABLED
 	console_buttons.clear()
 	for node in view.find_children("*", "BaseButton", true, false):
@@ -405,8 +407,10 @@ func open_card_console() -> void:
 	card_console.closed.connect(close_card_console)
 	add_child(card_console)
 
-func close_card_console() -> void:
+func close_card_console(refresh_page: bool = true) -> void:
 	if not is_instance_valid(card_console): return
+	var changed_revision := Game.revision != console_revision
+	console_revision = -1
 	remove_child(card_console)
 	card_console.queue_free()
 	card_console = null
@@ -416,6 +420,13 @@ func close_card_console() -> void:
 			item[0].disabled = item[1]
 			item[0].focus_mode = item[2]
 	console_buttons.clear()
+	# A scene swap already rebuilds the page; never re-enter it from cleanup.
+	if not refresh_page: return
+	# Non-battle controls retain the revision captured when their page was built.
+	# Refresh after the final command, keeping the console open for repeated adds.
+	if changed_revision and Game.page != "battle":
+		show_page()
+		return
 	if is_instance_valid(view) and view.has_method("refresh_library"): view.refresh_library()
 	if is_instance_valid(view) and view.has_method("resume_console_combat"): view.resume_console_combat()
 
