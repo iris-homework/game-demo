@@ -55,10 +55,10 @@ func run_rules() -> void:
 	check(m.enemies[1].block == 0 and m.buffs.count(m,"strength",0) == 0, "entry player round grants no soul-link buffs")
 	check(m.instances.values().count("dancer_black_card") == 1 and m.instances.values().count("dancer_white_card") == 1, "exactly one card each generated")
 	check(Game.valid_combat(m.snapshot()), "phase two snapshot valid")
-	check(m.enemies[0].intentSequence.map(func(i): return int(i.amount)) == [15,3,10], "black base intentions are attack fifteen, vulnerable three, attack ten")
+	check(m.enemies[0].intentSequence.map(func(i): return int(i.amount)) == [10,8,3], "black base intentions are attack ten, attack eight, vulnerable three")
 	check(m.enemies[1].intentSequence.map(func(i): return int(i.amount)) == [2,4,10], "white base intentions are weak two, attack four times three, heal ten")
 	var preview_saved := m.snapshot()
-	check(m.enemy_intent_damage(m.enemies[0]) == 17, "initial attack preview includes pending two soul strength")
+	check(m.enemy_intent_damage(m.enemies[0]) == 12, "initial attack preview includes pending two soul strength")
 	check(m.snapshot() == preview_saved, "pending soul-link preview never mutates model")
 	var phase_saved := m.snapshot()
 	var copy := CombatModel.new()
@@ -66,20 +66,21 @@ func run_rules() -> void:
 	check(JSON.parse_string(JSON.stringify(copy.snapshot())) == JSON.parse_string(JSON.stringify(phase_saved)), "all phase mechanics JSON roundtrip")
 	for cycle in 2:
 		for step in 3:
-			check(m.enemies[0].intent.type == ["attack","vulnerable","attack"][step], "black three-step cycle")
+			check(m.enemies[0].intent.type == ["attack","attack","vulnerable"][step], "black three-step cycle")
 			check(m.enemies[1].intent.type == ["weak","attack","heal_ally"][step], "white three-step cycle")
 			m.block = 1000
 			if step == 2: m.enemies[0].hp = 75
 			var result := m.end_turn()
 			var link_events: Array = result.turnEvents.filter(func(e): return e.type == "status_apply" and e.get("target",-1) >= 0 and e.buffId in ["block","strength"])
 			check(link_events.size() == 2, "one pair of soul-link events per enemy phase")
-			check(result.turnEvents.find(link_events[1]) < result.turnEvents.find(result.attacks[0]), "both soul links trigger before the first attack")
+			var first_action: Dictionary = result.attacks[0] if step < 2 else result.turnEvents.filter(func(e): return e.type == "status_apply" and e.get("target",0) == -1 and e.buffId == "vulnerable")[0]
+			check(result.turnEvents.find(link_events[1]) < result.turnEvents.find(first_action), "both soul links trigger before the first enemy action")
 			if cycle == 0 and step == 0:
-				check(result.attacks[0].hits[0].blocked == 17, "first black attack resolves fifteen plus two new strength")
+				check(result.attacks[0].hits[0].blocked == 12, "first black attack resolves ten plus two new strength")
 			if step == 1:
-				check(result.attacks.size() == 1 and result.attacks[0].hits.size() == 3, "white hits exactly three times")
-				check(m.buffs.count(m,"vulnerable") == 3, "black applies three vulnerable")
+				check(result.attacks.size() == 2 and result.attacks[0].index == 0 and result.attacks[0].hits.size() == 1 and result.attacks[1].index == 1 and result.attacks[1].hits.size() == 3, "black attacks once before white hits exactly three times")
 			if step == 2:
+				check(result.attacks.is_empty() and m.buffs.count(m,"vulnerable") == 3, "third step applies three vulnerable without attacking")
 				check(m.enemies[0].hp == 80, "heal caps at max HP")
 				check(result.turnEvents.any(func(e): return e.type == "heal" and e.amount == 5 and e.hpAfter == 80), "heal event records actual restoration")
 			check(m.enemies[1].block == 10, "white receives fixed ten block survives enemy actions into player round")
@@ -90,21 +91,21 @@ func run_rules() -> void:
 	m.energy = 20
 	var remove_uid := to_hand(m,"dancer_black_card")
 	m.play_card(remove_uid)
-	check(m.enemy_intent_damage(m.enemies[0]) == 17, "one remaining white link still predicts full bonus")
+	check(m.enemy_intent_damage(m.enemies[0]) == 12, "one remaining white link still predicts full bonus")
 	to_hand(m,"dancer_black_card")
 	m.play_card(remove_uid)
-	check(m.enemy_intent_damage(m.enemies[0]) == 15, "removing final white link updates preview before enemy phase")
+	check(m.enemy_intent_damage(m.enemies[0]) == 10, "removing final white link updates preview before enemy phase")
 	copy.restore(m.snapshot())
 	check(copy.buffs.count(copy,"strength",0) == 0 and copy.enemies[1].block == 0, "restore does not trigger soul links")
 	var unlinked := copy.end_turn()
-	check(unlinked.attacks[0].damage == 15 and copy.buffs.count(copy,"strength",0) == 0, "removed white link prevents imminent strength and attack bonus")
+	check(unlinked.attacks[0].damage == 10 and copy.buffs.count(copy,"strength",0) == 0, "removed white link prevents imminent strength and attack bonus")
 	check(copy.enemies[1].block == 10, "other dancer's link still supplies white shield")
 	copy.buffs.clear(copy,"soul_link",0)
 	copy.end_turn()
 	check(copy.enemies[1].block == 0, "old shield expires before disabled link can regrant it")
 	m = phase_two()
 	m.enemy_damage(1,999)
-	check(m.enemy_intent_damage(m.enemies[0]) == 15, "dead white source grants no predicted strength")
+	check(m.enemy_intent_damage(m.enemies[0]) == 10, "dead white source grants no predicted strength")
 	m.end_turn()
 	check(m.buffs.count(m,"strength",0) == 0, "dead white source grants no actual strength")
 	for dead_index in 2:
@@ -120,7 +121,7 @@ func run_rules() -> void:
 		if dead_index == 0:
 			check(m.enemies[1].block == 0, "surviving white's old shield expires without being replenished")
 		else:
-			check(m.enemy_intent_damage(m.enemies[0]) == 18, "surviving black predicts attack ten plus existing strength under vulnerability, no new link bonus")
+			check(m.enemy_intent_text(m.enemies[0]) == "易伤 3", "surviving black advances to third-step vulnerable after its second attack")
 	m = phase_two()
 	m.player_hp = 1
 	m.buffs.apply(m,"pollution",2)

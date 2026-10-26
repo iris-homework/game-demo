@@ -217,7 +217,7 @@ func _ready() -> void:
 	check(view.stage.player.position.is_equal_approx(view.stage.player.home),"round end returns player to center")
 	check(view.stage.enemies[0].facing == -1 and view.stage.enemies[1].facing == 1,"round return preserves inward facing")
 	check(view.stage.enemies[0].position.is_equal_approx(phase_two_black_home) and view.stage.enemies[1].position.is_equal_approx(mirrored_home),"enemy attacks return dancers to wider horizontally aligned homes")
-	check(view.model.player_hp == phase_two_hp-phase_two_pollution-17,"black dancer attacks once with soul-link strength after the player's normal pollution tick")
+	check(view.model.player_hp == phase_two_hp-phase_two_pollution-12,"black dancer attacks once with soul-link strength after the player's normal pollution tick")
 	check(view.shown_player_weak == 2 and view.model.buffs.count(view.model,"weak") == 2,"white dancer's first weakness intent appears in the displayed player statuses")
 	check(first_round.sawSoulBlock and first_round.sawSoulStrength and first_round.blockPreserved,"first round preserves white's ten block while the white connection gives black strength")
 	# Isolated in-memory durability fixture keeps later animation checks independent
@@ -227,22 +227,22 @@ func _ready() -> void:
 	Game.state.maxHp = 1000
 	view.shown_player_hp = 1000
 	view.refresh_hp()
-	check(view.model.enemies[0].intent.type == "vulnerable" and view.model.enemies[1].intent.hits == 3,"second step displays black vulnerability and white's three-hit attack")
+	check(view.model.enemies[0].intent.type == "attack" and view.model.enemies[0].intent.amount == 8 and view.model.enemies[1].intent.hits == 3,"second step displays black attack eight and white's three-hit attack")
 	view.end_turn_pressed()
 	var second_round: Dictionary = await observe_enemy_round(view)
-	check(second_round.hpSteps == [999,993,987,981],"white's three attack impacts display separately after the one-point pollution tick")
-	check(second_round.sawVulnerable and view.shown_player_buffs.get("vulnerable",0) == 3 and view.model.buffs.count(view.model,"vulnerable") == 3,"black vulnerability applies before white's three attacks and remains synchronized")
+	check(second_round.hpSteps == [999,987,983,979,975],"black attack and white's three impacts display separately after the one-point pollution tick")
+	check(not second_round.sawVulnerable and view.shown_player_buffs.get("vulnerable",0) == 0 and view.model.buffs.count(view.model,"vulnerable") == 0,"second step has no vulnerability before either dancer attacks")
 	check(view.shown_player_hp == view.model.player_hp and view.shown_player_weak == 1 and view.model.buffs.count(view.model,"weak") == 1,"second-step player HP and weakness match the committed model")
 	check(second_round.sawSoulBlock and second_round.sawSoulStrength and second_round.blockPreserved,"second round keeps white's block through both connection events")
 	view.model.enemies[0].hp = 70
 	view.shown_enemies[0].hp = 70
 	view.refresh_enemy_hud()
-	check(view.model.enemies[0].intent.type == "attack" and view.model.enemies[1].intent.type == "heal_ally","third step displays black attack and white healing")
+	check(view.model.enemies[0].intent.type == "vulnerable" and view.model.enemies[1].intent.type == "heal_ally","third step displays black vulnerability and white healing")
 	view.end_turn_pressed()
 	var third_round: Dictionary = await observe_enemy_round(view)
 	check(third_round.sawHeal and view.model.enemies[0].hp == 80 and view.shown_enemies[0].hp == 80,"white healing traverses the real event and popup path exactly once")
-	check(third_round.hpSteps == [957] and view.shown_player_hp == view.model.player_hp,"third-step black attack uses strength and remaining vulnerability in the displayed HP")
-	check(view.shown_player_weak == 0 and view.model.buffs.count(view.model,"weak") == 0 and view.shown_player_buffs.get("vulnerable",0) == 2,"third step synchronizes weak expiration and vulnerable decay")
+	check(third_round.hpSteps.is_empty() and view.model.player_hp == 975 and view.shown_player_hp == view.model.player_hp,"third-step vulnerability and healing cause no player HP loss")
+	check(view.shown_player_weak == 0 and view.model.buffs.count(view.model,"weak") == 0 and view.shown_player_buffs.get("vulnerable",0) == 3 and third_round.sawVulnerable,"third step synchronizes weak expiration and applies three vulnerable")
 	check(third_round.sawSoulBlock and third_round.sawSoulStrength and third_round.blockPreserved and view.shown_enemies[1].block == 10,"third round retains white's ten block throughout connection strength playback")
 	check(view.model.enemies[0].intentIndex == 3 and view.model.enemies[1].intentIndex == 3 and view.model.enemies[1].intent.type == "weak","both three-step intent sequences wrap to the first action")
 	# Rebuild view from the committed phase-two snapshot, without replaying blackout.
