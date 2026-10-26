@@ -288,9 +288,12 @@ func approach(attacker: Node2D, defender: Node2D, destination: Vector2) -> void:
 
 func frame_attack(attacker: Node2D, defender: Node2D, destination: Vector2) -> void:
 	var magnification := 1.65*ATTACK_ZOOM_FACTOR
+	var target_x := (destination.x+defender.position.x)*0.5
 	var target_y := (destination.y+defender.position.y)*0.5
 	if enemies.size() > 1:
 		# Keep all living opponents available for the next card while closing in.
+		var left := INF
+		var right := -INF
 		var top := INF
 		var bottom := -INF
 		for actor in actors_root.get_children():
@@ -300,11 +303,18 @@ func frame_attack(attacker: Node2D, defender: Node2D, destination: Vector2) -> v
 			var feet: Array[Vector2] = [actor.position]
 			if actor == attacker: feet = approach_path(attacker,defender,destination)
 			for foot in feet:
+				left = minf(left,foot.x+actor.target_bounds.position.x*depth_scale(foot))
+				right = maxf(right,foot.x+actor.target_bounds.end.x*depth_scale(foot))
 				top = minf(top,foot.y+minf(-135,actor.target_bounds.position.y)*depth_scale(foot))
 				bottom = maxf(bottom,foot.y+maxf(20,actor.target_bounds.end.y)*depth_scale(foot))
 		magnification = maxf(1.0,minf(magnification,ATTACK_ZOOM_FACTOR*(size.y-48)/(bottom-top)))
+		magnification = maxf(1.0,minf(magnification,ATTACK_ZOOM_FACTOR*(size.x-128)/(right-left)))
+		# An attack-centered close-up can clip the opposite flanking dancer.
+		# Leave room for the hit-stop zoom, camera shake and defender recoil.
+		var half_width := (size.x*0.5-64)/magnification
+		target_x = clampf(target_x,right-half_width,left+half_width)
 		target_y = (top+bottom)*0.5+(floor_y-35-size.y*0.5)/magnification
-	camera_to((destination.x+defender.position.x)*0.5,magnification,0.25,target_y)
+	camera_to(target_x,magnification,0.25,target_y)
 
 func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_hit: Callable) -> void:
 	# Visual profiles select presentation only; supplied model hits remain authoritative.
