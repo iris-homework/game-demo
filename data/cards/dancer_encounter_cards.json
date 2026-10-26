@@ -5,15 +5,16 @@
     "type": "special",
     "cost": 1,
     "target": "self",
-    "description": "使白舞者失去1层灵魂连接。",
-    "cardText": "使白舞者失去1层灵魂连接。",
+    "description": "使白舞者失去1层灵魂连接。\n消耗。",
+    "cardText": "使白舞者失去1层灵魂连接。\n消耗。",
     "effects": [
       {
         "type": "remove_soul_link",
         "amount": 1,
         "enemyId": "dancer_white"
       }
-    ]
+    ],
+    "exhaust": true
   },
   "dancer_white_card": {
     "id": "dancer_white_card",
@@ -21,14 +22,15 @@
     "type": "special",
     "cost": 1,
     "target": "self",
-    "description": "使黑舞者失去1层灵魂连接。",
-    "cardText": "使黑舞者失去1层灵魂连接。",
+    "description": "使黑舞者失去1层灵魂连接。\n消耗。",
+    "cardText": "使黑舞者失去1层灵魂连接。\n消耗。",
     "effects": [
       {
         "type": "remove_soul_link",
         "amount": 1,
         "enemyId": "dancer_black"
       }
-    ]
+    ],
+    "exhaust": true
   }
 }

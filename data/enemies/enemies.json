@@ -323,14 +323,17 @@
         "animation": "pierce"
       },
       {
-        "type": "vulnerable",
-        "amount": 3
+        "type": "strength_allies",
+        "amount": 2,
+        "targetIds": [
+          "dancer_white"
+        ]
       }
     ],
     "prototype": false,
     "combatVisualId": "dancer_black",
     "buffs": {
-      "soul_link": 2
+      "soul_link": 1
     }
   },
   "dancer_white": {
@@ -346,7 +349,7 @@
       },
       {
         "type": "attack",
-        "amount": 4,
+        "amount": 3,
         "hits": 3,
         "animation": "slash"
       },
@@ -361,7 +364,7 @@
     "prototype": false,
     "combatVisualId": "dancer_white",
     "buffs": {
-      "soul_link": 2
+      "soul_link": 1
     }
   },
   "dancer_black_phase_one": {

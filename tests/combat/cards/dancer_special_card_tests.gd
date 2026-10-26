@@ -40,7 +40,7 @@ func test_presentation(definition: Dictionary, color: String) -> void:
 	var card := card_node(definition,true)
 	var labels: Array = card.find_children("*","Label",true,false).map(func(node): return node.text)
 	check(is_instance_valid(card.cost_label) and card.cost_label.text == "1" and card.cost_label.visible,color+" fallback shows its one-energy cost")
-	check("特殊" in labels and definition.name in labels,color+" fallback displays the exact title and special type")
+	check("特殊 · 消耗" in labels and definition.name in labels,color+" fallback displays the exact title, special type and exhaust tag")
 	check(not labels.any(func(text): return "LEGACY" in text or "无费用" in text),color+" fallback is a costed special card")
 	check(not is_instance_valid(card.rank_label),color+" special card has no invented rarity rank")
 	card.show_cost(0)
@@ -61,6 +61,9 @@ func test_presentation(definition: Dictionary, color: String) -> void:
 	card.show_cost(1)
 	check(not card.cost_changed and not card.cost_label.visible,color+" returning to authored cost restores the exact face")
 	var old := definition.duplicate(true)
+	old.erase("exhaust")
+	old.description = "使%s舞者失去1层灵魂连接。" % ("白" if color == "black" else "黑")
+	old.cardText = old.description
 	old.type = "skill"
 	old.name = "黑卡" if color == "black" else "白卡"
 	check(FaceArt.resolve(old).is_empty(),color+" legacy skill definition retains its own fallback instead of receiving new text art")
@@ -88,23 +91,31 @@ func _ready() -> void:
 		var energy: int = model.energy
 		var layers: int = model.buffs.count(model,"soul_link",target)
 		var result := model.play_card(uid)
-		check(not result.is_empty() and model.energy == energy-1 and uid in model.discard_pile,color+" special card executes once for one energy and normally discards")
+		check(not result.is_empty() and model.energy == energy-1 and result.exhausted and uid in model.exhaust_pile and not uid in model.discard_pile,color+" special card executes once for one energy and exhausts")
 		check(model.buffs.count(model,"soul_link",target) == layers-1,color+" special card removes one opposing dancer connection")
+		check(layers == 1 and model.buffs.count(model,"soul_link",target) == 0,color+" one play removes the only opposing connection")
+		check(model.play_card(uid).is_empty(),color+" exhausted card cannot replay")
 		test_presentation(definition,color)
 	check(Game.valid_combat(model.snapshot()),"special-card plays preserve a valid encounter snapshot")
 	for color in ["black","white"]:
 		var id: String = "dancer_" + color + "_card"
 		var old: Dictionary = original.cardCatalog[id].duplicate(true)
+		old.erase("exhaust")
+		old.description = "使%s舞者失去1层灵魂连接。" % ("白" if color == "black" else "黑")
+		old.cardText = old.description
 		old.type = "skill"
 		old.name = "黑卡" if color == "black" else "白卡"
 		original.cardCatalog[id] = old
 		original.profile.phaseTwoCards[id] = old.duplicate(true)
+	for enemy in original.enemies: enemy.buffs.soul_link = 2
+	for definition_old in original.profile.phaseTwoEnemies: definition_old.buffs.soul_link = 2
 	check(Game.valid_combat(original),"older frozen skill definitions and their original titles remain valid")
 	var restored := CombatModel.new()
 	restored.restore(JSON.parse_string(JSON.stringify(original)))
 	check(restored.card_catalog.dancer_black_card.type == "skill" and restored.card_catalog.dancer_black_card.name == "黑卡","restoring an older battle never rewrites its frozen definitions")
 	var old_uid := card_in_hand(restored,"dancer_black_card")
 	check(not restored.play_card(old_uid).is_empty() and restored.buffs.count(restored,"soul_link",1) == 1,"older skill-version encounter card still resolves its original effect")
+	check(old_uid in restored.discard_pile and not old_uid in restored.exhaust_pile,"older frozen non-exhaust card keeps its original discard behavior")
 	await get_tree().process_frame
 	print("DANCER SPECIAL CARDS: %d checks, %d failures" % [checks,failures])
 	get_tree().quit(0 if failures == 0 else 1)

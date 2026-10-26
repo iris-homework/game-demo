@@ -27,13 +27,16 @@ func _ready() -> void:
 	data = tooltip.describe(heal_enemy,"治疗 10")
 	check(data.title == "治疗同伴" and data.value == "+10", "heal intent shows positive healing amount")
 	check(data.plain.contains("黑舞者") and data.plain.contains("不会复活"), "heal tooltip names the black dancer and prevents revival")
+	var reinforcement := {"displayName":"黑舞者","intent":{"type":"strength_allies","amount":2,"targetIds":["dancer_white"]}}
+	data = tooltip.describe(reinforcement,"强化 +2")
+	check(data.title == "强化同伴" and data.value == "+2" and data.plain.contains("存活的白舞者") and not data.plain.contains("小弟"), "reinforcement tooltip names living white instead of gang henchmen")
 	data = tooltip.describe({"displayName":"黑舞者","intent":{"type":"attack","amount":10,"onHitWeak":2}},"攻击 10")
 	check(data.plain.contains("2 层虚弱") and data.plain.contains("即使攻击被格挡"), "attack tooltip includes unconditional post-attack weakness")
 	var font := ThemeDB.fallback_font
-	for intent in [weak_enemy.intent,heal_enemy.intent]:
+	for intent in [weak_enemy.intent,heal_enemy.intent,reinforcement.intent]:
 		var icon = preload("res://scripts/combat/enemy_intent.gd").new()
 		icon.setup(intent,"测试",font)
-		check(icon.value_label.text == ("2" if intent.type == "weak" else "+10"), "new intent icon keeps a numeric value")
+		check(icon.value_label.text == ("2" if intent.type == "weak" else ("+10" if intent.type == "heal_ally" else "+2")), "new intent icon keeps a numeric value")
 		icon.free()
 	var view := DisplayProbe.new()
 	view.model = CombatModel.new()

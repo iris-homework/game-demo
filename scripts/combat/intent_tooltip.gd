@@ -48,6 +48,9 @@ static func describe(enemy: Dictionary, preview: String) -> Dictionary:
 			data.value = "+%d" % amount
 			data.unit = "层力量 / 每名存活小弟"
 			data.summary = "为每名存活的小弟增加 %d 层力量。" % amount
+			if "dancer_white" in intent.get("targetIds", []):
+				data.unit = "层力量 / 存活白舞者"
+				data.summary = "为存活的白舞者增加 %d 层力量。" % amount
 			data.notes.append({"title":"力量","body":"每层使每段基础攻击伤害 +1，持续至本场战斗结束。"})
 		"pollution":
 			data.title = "施加污染"

@@ -103,11 +103,11 @@ def render(card, color):
     d.line([(413,864),(668,864)],fill=light,width=3)
     write(d,(542,891),'特殊',65,palette['ink'])
     # Keep source rules verbatim, with the same font/area as all forty cards.
-    rules=card['cardText']; lines=[rules[:8],rules[8:]]
-    assert ''.join(lines)==rules and '\\n' not in rules and all(lines)
+    rules=card['cardText']; lines=[paragraph[i:i+8] for paragraph in rules.split('\n') for i in range(0,len(paragraph),8)]
+    assert ''.join(lines)==rules.replace('\n','') and '\\n' not in rules and all(lines)
     boxes=[]
     for index,line in enumerate(lines):
-        y=1136+(index-.5)*90
+        y=1136+(index-(len(lines)-1)/2)*90
         write(d,(544,y),line,70,'#f5f0e7',2)
         box=list(d.textbbox((544,y),line,font=font(70),anchor='mm',stroke_width=2))
         assert 118<=box[0]<box[2]<=971 and 956<=box[1]<box[3]<=1325,box
@@ -128,7 +128,7 @@ def main():
         'font':'res://assets/fonts/NotoSerifCJKsc-Bold.otf',
         'cards':{r['definition']['id']:{'path':'res://'+r['path'],'definition':r['definition']} for r in records}}
     (ROOT/'data/cards/card_faces_special.json').write_text(json.dumps(config,ensure_ascii=False,indent=2)+'\n')
-    manifest={'templateId':TEMPLATE,'parentTemplate':'neon-comic-title-v3','date':'2026-10-25',
+    manifest={'templateId':TEMPLATE,'parentTemplate':'neon-comic-title-v3','date':'2026-10-26',
         'rendererSha256':sha(__file__),'sourceDefinitionSha256':sha(DATA),'fonts':{str(p.relative_to(ROOT)):sha(p) for p in [FONT,TITLE_FONT]},
         'software':{'pillow':PIL_VERSION},'cards':records}
     (OUTPUT/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')

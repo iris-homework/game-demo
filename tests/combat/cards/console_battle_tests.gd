@@ -141,7 +141,7 @@ func test_kill() -> void:
 	Game.console_command("addcard 36 2")
 	Game.console_command("kill")
 	check(Game.state.combat.encounterPhase == 2 and Game.state.combat.outcome.is_empty(), "First Boss kill advances to second phase")
-	check(Game.state.combat.enemies.all(func(enemy): return enemy.hp == 90), "First kill leaves newly spawned phase alive")
+	check(Game.state.combat.enemies.all(func(enemy): return enemy.hp == 80), "First kill leaves newly spawned phase alive at authored eighty HP")
 	check(Game.valid_battle_start(Game.state) and Game.valid_save(Game.state), "Boss phase with console additions remains loadable")
 	zones(Game.state.combat, "Boss phase transition")
 	Game.console_command("addcard 23")

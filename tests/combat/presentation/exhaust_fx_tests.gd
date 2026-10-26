@@ -184,7 +184,7 @@ func _ready() -> void:
 	check(app.view.model.powers.has("ranged_mastery"),"Power resolves once and persists after its card dissolves")
 	await install_hand([12,1,13,2])
 	await exercise("12 拆卸弹药",["card_002"],["card_000"],"card_002")
-	check(app.view.model.ammo == 4,"Dismantle grants its actual ammo once")
+	check(app.view.model.ammo == 5,"Dismantle grants three ammo once on top of the initial two")
 	await install_hand([2,1])
 	await exercise("02 普通弃牌",[],["card_000"])
 	await install_hand([5,1])

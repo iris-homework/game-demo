@@ -703,7 +703,10 @@ func end_noren_turn() -> Dictionary:
 					if enemies[ally_index].hp <= 0 or not enemies[ally_index].id in intent.get("targetIds", []): continue
 					buffs.apply(self, "strength", amount, ally_index)
 					turn_events.append({"type":"status_apply","source":index,"target":ally_index,"buffId":"strength","amount":amount,"stacksAfter":buffs.count(self, "strength", ally_index)})
-				log_lines.append("%s 强化小弟，力量 +%d。" % [enemy.displayName, amount])
+					if enemies[ally_index].id == "dancer_white":
+						log_lines.append("%s 强化白舞者，力量 +%d。" % [enemy.displayName, amount])
+					else:
+						log_lines.append("%s 强化小弟，力量 +%d。" % [enemy.displayName, amount])
 			turn_events.append_array(buffs.own_turn_end(self, index))
 			resolve_outcome()
 			continue

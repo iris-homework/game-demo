@@ -1622,11 +1622,11 @@ func valid_combat(c: Dictionary) -> bool:
 	return true
 
 func valid_dancer_intent(intent, expected_ids: Array) -> bool:
-	if not intent is Dictionary or intent.get("type") not in ["attack", "weak", "vulnerable", "heal_ally"]: return false
+	if not intent is Dictionary or intent.get("type") not in ["attack", "weak", "vulnerable", "heal_ally", "strength_allies"]: return false
 	if not buffs._valid_count(intent.get("amount"), 999): return false
 	if not buffs._valid_count(intent.get("hits", 1)) or intent.get("hits", 1) < 1: return false
 	if intent.has("onHitWeak") and (intent.type != "attack" or not buffs._valid_count(intent.onHitWeak, 999)): return false
-	if intent.type == "heal_ally":
+	if intent.type in ["heal_ally", "strength_allies"]:
 		if not intent.get("targetIds") is Array or intent.targetIds.is_empty(): return false
 		for id in intent.targetIds:
 			if not id is String or not id in expected_ids: return false
