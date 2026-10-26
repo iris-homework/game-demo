@@ -2,27 +2,27 @@
   "offers": [
     {
       "id": "dimensional_pocket",
-      "price": 150
+      "price": 125
     },
     {
       "id": "accelerated_clock",
-      "price": 150
+      "price": 125
     },
     {
       "id": "backup_energy",
-      "price": 150
+      "price": 125
     },
     {
       "id": "money_chip",
-      "price": 150
+      "price": 125
     },
     {
       "id": "healing_chip",
-      "price": 150
+      "price": 125
     },
     {
       "id": "swift_chip",
-      "price": 150
+      "price": 125
     }
   ]
 }

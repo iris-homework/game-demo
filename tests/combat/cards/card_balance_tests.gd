@@ -26,7 +26,7 @@ func test_card_values() -> void:
 		var expected: Array = starters[number]
 		check(card.cost == expected[0] and card.effects[0].type == expected[1] and card.effects[0].amount == expected[2], "Starter unchanged: %02d" % number)
 	check(Game.card_catalog.noren_03.effects[1].value == "melee" and Game.card_catalog.noren_04.effects[1].value == "ranged", "Starter stance effects unchanged")
-	var exact := {5:["ammo",2],6:["block",6],11:["block",9],12:["ammo",3],13:["damage",10],14:["damage",6],15:["next_damage",5],16:["damage",9],17:["damage",16],18:["next_damage",4],19:["damage",8],21:["damage",8],25:["damage",14],27:["damage",6],29:["damage",14],31:["block",6],32:["block",14],33:["block",16],37:["damage",6],38:["damage",6]}
+	var exact := {5:["ammo",2],6:["block",8],11:["block",11],12:["ammo",3],13:["damage",10],14:["damage",6],15:["next_damage",5],16:["damage",9],17:["damage",16],18:["next_damage",4],19:["damage",8],21:["damage",8],25:["damage",14],27:["damage",6],29:["damage",14],31:["block",8],32:["block",14],33:["block",16],37:["damage",6],38:["damage",6]}
 	for number in exact:
 		var effects: Array = Game.card_catalog["noren_%02d" % number].effects
 		var expected: Array = exact[number]
@@ -37,6 +37,38 @@ func test_card_values() -> void:
 	check(Game.card_catalog.noren_35.effects[0].amount == 2 and Game.card_catalog.noren_35.effects[0].hits == 3, "Triple attack remains two times three")
 	for card in Game.card_catalog.values():
 		check(FaceArt.matches_definition(card, FaceArt.config().cards[card.id]), "Art binds current definition: " + card.id)
+
+func test_one_cost_skills() -> void:
+	for form in ["melee", "ranged"]:
+		for number in [7,24,39]:
+			for bleed in ([2,3] if number == 39 else [0]):
+				var model: CombatModel = fixtures.fixture([number], form)
+				model.enemies[0].bleed = bleed
+				var before := model.snapshot()
+				var preview := model.card_preview("card_000",0)
+				check(model.snapshot() == before and not preview.is_empty(), "Skill preview stays read only: %d %s" % [number,form])
+				var expected := (2 if number == 24 else 3) + (1 if number == 39 and bleed >= 3 else 0)
+				var result := play(model)
+				check(result.drawn.size() == expected and model.hand.size() == expected and model.energy == 2, "One-cost skill exact total draw: %d %s bleed %d" % [number,form,bleed])
+				check(Game.valid_combat(model.snapshot()), "Extra draw preserves card zones: %d" % number)
+	# Restore old frozen definitions without substituting today's catalogue or art.
+	for number in [6,7,11,24,31,39]:
+		var model: CombatModel = fixtures.fixture([number])
+		var id := "noren_%02d" % number
+		var definition: Dictionary = model.card_catalog[id]
+		var kind := "block" if number in [6,11,31] else "draw"
+		for effect in definition.effects:
+			if effect.type == kind:
+				effect.amount -= 2 if kind == "block" else 1
+				break
+		var saved: Dictionary = JSON.parse_string(JSON.stringify(model.snapshot()))
+		check(Game.valid_combat(saved), "Old frozen skill is valid: " + id)
+		var restored := CombatModel.new()
+		restored.restore(saved)
+		check(restored.card_catalog[id] == saved.cardCatalog[id] and FaceArt.resolve(restored.card_catalog[id]).is_empty(), "Restore preserves old rules and rejects mismatched current art: " + id)
+		var result := play(restored)
+		var expected := 9 if number == 11 else (6 if kind == "block" else (1 if number == 24 else 2))
+		check((restored.block if kind == "block" else result.drawn.size()) == expected, "Old frozen skill retains original value: " + id)
 
 func test_each_attack_segment() -> void:
 	var model := fixture([35,1])
@@ -157,6 +189,7 @@ func test_save_duplicate_and_legacy() -> void:
 func _ready() -> void:
 	Game.save_enabled = false
 	test_card_values()
+	test_one_cost_skills()
 	test_each_attack_segment()
 	test_targets_and_card_bleed()
 	test_stance_and_other_damage()

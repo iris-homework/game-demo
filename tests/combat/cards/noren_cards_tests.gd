@@ -108,7 +108,7 @@ func _ready() -> void:
 	check(Game.owned_card_counts() == {"noren_01":4,"noren_02":4,"noren_03":1,"noren_04":1},"Exact initial ownership")
 	var base_damage := {1:6,9:8,13:10,14:6,16:9,17:16,19:8,20:9,21:8,25:14,26:30,27:6,28:6,29:14,35:6,37:6,38:6}
 	var ranged_damage := {1:9,9:12,13:15,14:9,16:14,17:24,19:12,20:42,21:12,25:21,26:66,27:9,28:10,29:21,35:9,37:9,38:9}
-	var blocks := {2:5,4:6,6:6,11:9,31:6,32:14,33:16}
+	var blocks := {2:5,4:6,6:8,11:11,31:8,32:14,33:16}
 	for form in ["melee","ranged"]:
 		for number in range(1,41):
 			var m := fixture([number,1],form)
@@ -154,7 +154,7 @@ func _ready() -> void:
 	check(m.enemies.all(func(e): return e.bleed == 5),"AoE new bleed applied after every hit")
 	m = fixture([39]);m.enemies[0].bleed = 4
 	result = play(m)
-	check(m.block == 0 and result.drawn.size() == 3,"Tracking draws a third card on starting bleed threshold")
+	check(m.block == 0 and result.drawn.size() == 4,"Tracking draws a fourth card on starting bleed threshold")
 	m = fixture([15,35],"ranged")
 	play(m);result = play(m,1)
 	check(result.hits[0].attackDamage == 11 and result.hits[1].attackDamage == 3,"First-segment buff before multiplier; round each segment")
@@ -235,7 +235,7 @@ func _ready() -> void:
 	m=fixture([17]);m.ammo=9;play(m)
 	check(m.ammo==10,"Ammo cap applies to normal and extra gains")
 	m=fixture([14]);play(m);check(m.enemies[0].weak==1,"Melee butt applies weak")
-	m=fixture([11],"ranged");play(m);check(m.enemies[0].weak==1 and m.block==9,"Ranged steady targets enemy and grants nine block")
+	m=fixture([11],"ranged");play(m);check(m.enemies[0].weak==1 and m.block==11,"Ranged steady targets enemy and grants eleven block")
 	for form in ["melee","ranged"]:
 		m=fixture([19],form);result=play(m)
 		check(result.damage==(8 if form=="melee" else 12) and m.enemies[0].weak==2,"Suppression deals eight base damage and applies two weak in both stances")
@@ -341,9 +341,9 @@ func _ready() -> void:
 	m=fixture([24]);play(m);m.end_turn()
 	check(m.buffs.count(m,"next_hit_damage")==0,"Unused per-hit bonus expires at turn end")
 	m=fixture([39]);m.enemies[0].bleed=2
-	check(play(m).drawn.size()==2 and m.block==0,"Tracking below three bleed draws only two")
+	check(play(m).drawn.size()==3 and m.block==0,"Tracking below three bleed draws three")
 	m=fixture([39]);m.enemies[0].bleed=3
-	check(play(m).drawn.size()==3 and m.block==0,"Tracking includes exactly three bleed and draws a third")
+	check(play(m).drawn.size()==4 and m.block==0,"Tracking includes exactly three bleed and draws a fourth")
 	m=fixture([16]);result=play(m)
 	check(result.damage==9 and result.drawn.size()==2 and m.energy==2,"Backstep Slash costs one and draws two in melee")
 	m=fixture([16],"ranged");result=play(m)

@@ -10,7 +10,7 @@ func check(ok: bool, message: String) -> void:
 		failures.append(message)
 		push_error("CLINIC: " + message)
 
-func reset(hp: int = 50, credits: int = 150, max_hp: int = 100) -> void:
+func reset(hp: int = 50, credits: int = 100, max_hp: int = 100) -> void:
 	Game.state = Game.initial_state()
 	Game.state.currentScene = "map"
 	Game.state.currentHp = hp
@@ -41,7 +41,7 @@ func verify_views(credits: int, hp: int, disabled: bool, context: String) -> voi
 	var map_view = load("res://scenes/map.tscn").instantiate()
 	add_child(map_view)
 	var content: Dictionary = map_view._card_content("clinic")
-	check(content.healing_service.credits_cost == 150 and content.healing_service.can_heal != disabled, context + " map consumes shared query")
+	check(content.healing_service.credits_cost == 100 and content.healing_service.can_heal != disabled, context + " map consumes shared query")
 	map_view._build_detail("clinic")
 	check(map_view.get_detail_button("heal_place") == null, context + " map defers healing to service page")
 	check(map_view.get_detail_button("enter_place") != null, context + " clinic has direct service entry")
@@ -52,7 +52,7 @@ func verify_views(credits: int, hp: int, disabled: bool, context: String) -> voi
 	Game.page = "place"
 	var place_view = load("res://scenes/place.tscn").instantiate()
 	add_child(place_view)
-	verify_button(place_view.find_child("heal_place", true, false), 150, disabled, context + " place")
+	verify_button(place_view.find_child("heal_place", true, false), 100, disabled, context + " place")
 	var hint: Label = place_view.find_child("healing_hint", true, false)
 	var back: Button = place_view.find_child("return_map", true, false)
 	check(hint != null and back != null and not hint.get_rect().intersects(back.get_rect()), context + " two-line service hint clears return button")
@@ -93,7 +93,7 @@ func _ready() -> void:
 	Game.notice.connect(func(message: String): notices.append(message))
 	reset()
 	var clinic: Dictionary = Game.healing_service("clinic")
-	check(clinic.credits_cost == 150 and is_equal_approx(clinic.percent, 0.3), "authored clinic price and rate")
+	check(clinic.credits_cost == 100 and is_equal_approx(clinic.percent, 0.3), "authored clinic price and rate")
 	check(Game.healing_service("hospital").is_empty(), "laboratory has no healing service")
 	var before := JSON.stringify(Game.state)
 	Game.healing_service("clinic")
@@ -101,25 +101,25 @@ func _ready() -> void:
 	var day: int = Game.state.currentDay
 	var place: String = Game.state.currentPlaceId
 	var revision := Game.revision
-	check(Game.heal_at("clinic"), "exactly 150 pays for treatment")
-	check(Game.state.currentHp == 80 and Game.state.credits == 0, "30 HP and 150 credits commit together")
+	check(Game.heal_at("clinic"), "exactly 100 pays for treatment")
+	check(Game.state.currentHp == 80 and Game.state.credits == 0, "30 HP and 100 credits commit together")
 	check(Game.revision == revision + 1 and Game.state.currentDay == day and Game.state.currentPlaceId == place, "one checkpoint preserves day and current location")
-	check(notices.back().contains("150") and notices.back().contains("+30"), "success reports payment and actual healing")
+	check(notices.back().contains("100") and notices.back().contains("+30"), "success reports payment and actual healing")
 	rejected("clinic", "second treatment without funds")
 	check(notices.back().contains("不足"), "insufficient funds has explicit feedback")
-	reset(50, 149)
-	rejected("clinic", "149 credits")
+	reset(50, 99)
+	rejected("clinic", "99 credits")
 	reset(50, 0)
 	rejected("clinic", "zero credits")
 	reset(100, 300)
 	rejected("clinic", "full HP does not charge")
 	check(notices.back().contains("已满"), "full HP has explicit feedback")
-	reset(95, 150)
+	reset(95, 100)
 	check(Game.heal_at("clinic") and Game.state.currentHp == 100 and Game.state.credits == 0, "partial healing caps at max and costs one treatment")
-	reset(50, 150, 105)
+	reset(50, 100, 105)
 	check(Game.heal_at("clinic") and Game.state.currentHp == 82, "uses maximum HP with existing roundi rounding")
-	reset(0, 300)
-	check(Game.heal_at("clinic") and Game.heal_at("clinic") and Game.state.currentHp == 60 and Game.state.credits == 0, "each accepted treatment costs 150")
+	reset(0, 200)
+	check(Game.heal_at("clinic") and Game.heal_at("clinic") and Game.state.currentHp == 60 and Game.state.credits == 0, "each accepted treatment costs 100")
 	reset(50, 0)
 	rejected("hospital", "laboratory treatment at zero credits")
 	reset(50, 300)
@@ -142,11 +142,11 @@ func _ready() -> void:
 	authored_service.creditsCost = 75
 	authored_service.percent = 0.2
 	check(Game.healing_service("clinic").label.contains("75") and Game.healing_service("clinic").label.contains("20%"), "query text follows configuration")
-	check(Game.heal_at("clinic") and Game.state.currentHp == 70 and Game.state.credits == 75, "commit follows configuration")
-	for bad_cost in [-1, 1.5, "150"]:
+	check(Game.heal_at("clinic") and Game.state.currentHp == 70 and Game.state.credits == 25, "commit follows configuration")
+	for bad_cost in [-1, 1.5, "100"]:
 		authored_service.creditsCost = bad_cost
 		rejected("clinic", "invalid price " + str(bad_cost))
-	authored_service.creditsCost = 150
+	authored_service.creditsCost = 100
 	authored_service.percent = 1.1
 	rejected("clinic", "invalid healing rate")
 	authored_service.percent = 0.3
@@ -158,8 +158,8 @@ func _ready() -> void:
 	check(Game.save_game(), "test-only save succeeds")
 	Game.state = {}
 	check(Game.load_game() and Game.state.currentHp == 80 and Game.state.credits == 0 and Game.state.currentPlaceId == "clinic", "paid treatment restores together")
-	await verify_views(150, 50, false, "affordable")
-	await verify_views(149, 50, true, "insufficient")
+	await verify_views(100, 50, false, "affordable")
+	await verify_views(99, 50, true, "insufficient")
 	await verify_views(300, 100, true, "full HP")
 	await verify_laboratory_views()
 	var report := {"checks":checks, "failures":failures, "scope":"headless logic and UI structure; no visual or physical-input acceptance"}

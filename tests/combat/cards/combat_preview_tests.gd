@@ -426,7 +426,7 @@ func _ready() -> void:
 	check(m.card_preview("card_000", 1).cardText.replace(" ","").ends_with("额外抽1张牌。"), "Conditional third draw stays one above threshold: "+m.card_preview("card_000",1).cardText)
 	m = fixture([6])
 	m.ammo = 9
-	check(m.card_preview("card_000").cardText == "获得1颗弹药和6点格挡。", "Only authored ammo and block numbers update")
+	check(m.card_preview("card_000").cardText == "获得1颗弹药和8点格挡。", "Only authored ammo and block numbers update")
 	m = fixture([8])
 	check(m.card_preview("card_000").cardText == m.card("card_000").cardText, "Stance card gets no implicit draw or discount text")
 	m = fixture([33])

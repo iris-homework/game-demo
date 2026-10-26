@@ -51,6 +51,9 @@ func _ready() -> void:
 	Game.save_path = OUT+"ui-checkpoint.json"
 	Game.meta_path = OUT+"ui-meta.json"
 	Game.state = Game.initial_state()
+	# Existing-ownership fixture; new adventures start without technologies.
+	Game.state.ownedCyberwareIds = ["dimensional_pocket", "accelerated_clock", "backup_energy"]
+	Game.state.equippedCyberwareIds = Game.state.ownedCyberwareIds.duplicate()
 	Game.state.credits = 1000
 	Game.state.currentScene = "map"
 	Game.page = "map"
@@ -82,7 +85,7 @@ func _ready() -> void:
 		view.close_modal()
 		check(Game.state.credits == 1000,"Cancel passive purchase preserves money")
 	for i in 3:
-		check(view.stock.get_node("buy_slot_%d" % i).disabled,"Default character already owns existing technology")
+		check(view.stock.get_node("buy_slot_%d" % i).disabled,"Fixture already owns existing technology")
 	view.open_purchase(0)
 	check(not is_instance_valid(view.modal),"Starter technology cannot be bought twice")
 	# Isolated purchase fixture; production defaults and saves remain unchanged.
@@ -107,11 +110,11 @@ func _ready() -> void:
 	view.open_purchase(0)
 	view.modal.get_node("confirm_trade").pressed.emit()
 	await settle()
-	check(Game.state.credits == 850,"Confirm charges configured price once")
+	check(Game.state.credits == 875,"Confirm charges configured price once")
 	check(Game.owned_cyberware_ids().has("dimensional_pocket"),"Purchased technology owned")
 	check(not Game.equipped_cyberware_ids().has("dimensional_pocket"),"Purchase does not silently equip")
 	check(view.stock.get_node("buy_slot_0").disabled,"Owned purchase disabled")
-	check(view.credits_label.text == "850","HUD balance refreshed")
+	check(view.credits_label.text == "875","HUD balance refreshed")
 	view.open_purchase(0)
 	check(not is_instance_valid(view.modal),"Owned offer cannot reopen")
 	Game.state.credits = 0

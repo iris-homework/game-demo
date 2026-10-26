@@ -320,7 +320,7 @@ func _ready() -> void:
 	check(heal != null, "clinic retains healing service")
 	if heal != null:
 		await click(button_center(heal))
-		check(Game.state.currentHp == 80 and Game.state.credits == 150, "one real clinic heal click resolves and charges once")
+		check(Game.state.currentHp == 80 and Game.state.credits == 200, "one real clinic heal click resolves and charges once")
 		check(Game.state.currentPlaceId == start_place, "heal does not move current avatar")
 		check(app.view.selected_id == "clinic" and is_instance_valid(app.view.detail), "heal-triggered rebuild restores selected clinic")
 		await shot("08-heal-detail")

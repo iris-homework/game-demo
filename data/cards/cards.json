@@ -116,7 +116,7 @@
     "cost": 1,
     "type": "skill",
     "archetype": "通用",
-    "description": "获得 2 颗弹药和 6 点格挡。",
+    "description": "获得 2 颗弹药和 8 点格挡。",
     "target": "self",
     "sortOrder": 6,
     "artAssetId": "",
@@ -127,10 +127,10 @@
       },
       {
         "type": "block",
-        "amount": 6
+        "amount": 8
       }
     ],
-    "cardText": "获得2颗弹药和6点格挡。"
+    "cardText": "获得2颗弹药和8点格挡。"
   },
   {
     "id": "noren_07",
@@ -140,17 +140,17 @@
     "cost": 1,
     "type": "skill",
     "archetype": "通用",
-    "description": "抽 2 张牌。",
+    "description": "抽 3 张牌。",
     "target": "self",
     "sortOrder": 7,
     "artAssetId": "",
     "effects": [
       {
         "type": "draw",
-        "amount": 2
+        "amount": 3
       }
     ],
-    "cardText": "抽2张牌。"
+    "cardText": "抽3张牌。"
   },
   {
     "id": "noren_08",
@@ -230,14 +230,14 @@
     "cost": 1,
     "type": "skill",
     "archetype": "通用",
-    "description": "获得 9 点格挡。近身技：获得 1 颗弹药。远程技：对一名敌人施加 1 层虚弱。",
+    "description": "获得 11 点格挡。近身技：获得 1 颗弹药。远程技：对一名敌人施加 1 层虚弱。",
     "target": "stance",
     "sortOrder": 11,
     "artAssetId": "",
     "effects": [
       {
         "type": "block",
-        "amount": 9
+        "amount": 11
       },
       {
         "type": "ammo",
@@ -250,7 +250,7 @@
         "when": "ranged"
       }
     ],
-    "cardText": "获得9点格挡。近身技：获得1颗弹药。远程技：对一名敌人施加1层虚弱。"
+    "cardText": "获得11点格挡。近身技：获得1颗弹药。远程技：对一名敌人施加1层虚弱。"
   },
   {
     "id": "noren_12",
@@ -531,14 +531,14 @@
     "cost": 1,
     "type": "skill",
     "archetype": "爆发直伤流",
-    "description": "抽 1 张牌。本回合下一张攻击牌的每段基础伤害增加 6。",
+    "description": "抽 2 张牌。本回合下一张攻击牌的每段基础伤害增加 6。",
     "target": "self",
     "sortOrder": 24,
     "artAssetId": "",
     "effects": [
       {
         "type": "draw",
-        "amount": 1
+        "amount": 2
       },
       {
         "type": "buff",
@@ -546,7 +546,7 @@
         "amount": 6
       }
     ],
-    "cardText": "抽 1 张牌。本回合下一张攻击牌的每段基础伤害增加 6。"
+    "cardText": "抽 2 张牌。本回合下一张攻击牌的每段基础伤害增加 6。"
   },
   {
     "id": "noren_25",
@@ -693,14 +693,14 @@
     "cost": 1,
     "type": "skill",
     "archetype": "裂伤流",
-    "description": "获得 6 点格挡。若自身没有弹反，获得 1 层弹反。",
+    "description": "获得 8 点格挡。若自身没有弹反，获得 1 层弹反。",
     "target": "self",
     "sortOrder": 31,
     "artAssetId": "",
     "effects": [
       {
         "type": "block",
-        "amount": 6
+        "amount": 8
       },
       {
         "type": "parry",
@@ -708,7 +708,7 @@
         "cap": 1
       }
     ],
-    "cardText": "获得6点格挡。若自身没有弹反，获得1层弹反。"
+    "cardText": "获得8点格挡。若自身没有弹反，获得1层弹反。"
   },
   {
     "id": "noren_32",
@@ -874,14 +874,14 @@
     "cost": 1,
     "type": "skill",
     "archetype": "裂伤流",
-    "description": "选择一名敌人，抽 2 张牌。若该敌人在本牌使用前拥有至少 3 层裂伤，额外抽 1 张牌。",
+    "description": "选择一名敌人，抽 3 张牌。若该敌人在本牌使用前拥有至少 3 层裂伤，额外抽 1 张牌。",
     "target": "enemy",
     "sortOrder": 39,
     "artAssetId": "",
     "effects": [
       {
         "type": "draw",
-        "amount": 2
+        "amount": 3
       },
       {
         "type": "draw",
@@ -889,7 +889,7 @@
         "requiresBleed": 3
       }
     ],
-    "cardText": "选择一名敌人，抽 2 张牌。若该敌人在本牌使用前拥有至少 3 层裂伤，额外抽 1 张牌。"
+    "cardText": "选择一名敌人，抽 3 张牌。若该敌人在本牌使用前拥有至少 3 层裂伤，额外抽 1 张牌。"
   },
   {
     "id": "noren_40",

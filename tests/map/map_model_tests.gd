@@ -66,7 +66,7 @@ func _ready() -> void:
 	check(not Game.start_event("E12"), "retired event cannot be started from an open place")
 	Game.state.currentHp = 50
 	var clinic_expected := mini(int(Game.state.maxHp), 50 + roundi(Game.state.maxHp * 0.3))
-	Game.state.credits = 150
+	Game.state.credits = 100
 	check(Game.heal_at("clinic") and Game.state.currentHp == clinic_expected and Game.state.credits == 0, "clinic service available before E01 at configured price")
 	var last_place: String = Game.state.currentPlaceId
 	Game.visit("unknown")
@@ -154,8 +154,8 @@ func _ready() -> void:
 	var healed_expected := mini(int(Game.state.maxHp), int(Game.state.currentHp) + roundi(Game.state.maxHp * 0.3))
 	var current: String = Game.state.currentPlaceId
 	var day: int = Game.state.currentDay
-	Game.state.credits = 300
-	check(Game.heal_at("clinic") and Game.state.currentHp == healed_expected and Game.state.credits == 150, "clinic heals 30 percent of configured maximum for 150 credits")
+	Game.state.credits = 200
+	check(Game.heal_at("clinic") and Game.state.currentHp == healed_expected and Game.state.credits == 100, "clinic heals 30 percent of configured maximum for 100 credits")
 	check(Game.state.currentPlaceId == current and Game.state.currentDay == day, "healing preserves place and day")
 	check(Game.heal_at("clinic") and Game.state.currentHp == Game.state.maxHp and Game.state.credits == 0, "clinic healing clamps HP and charges once per treatment")
 	var expected: Dictionary = Game.state.duplicate(true)

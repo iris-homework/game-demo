@@ -103,7 +103,7 @@ func _ready() -> void:
 	var confirm: Button = app.view.modal.get_node("confirm_trade")
 	confirm.pressed.emit()
 	await get_tree().process_frame
-	check(Game.state.credits == balance - 150 and "swift_chip" in Game.owned_cyberware_ids(), "formal purchase uses real payment and ownership rules")
+	check(Game.state.credits == balance - 125 and "swift_chip" in Game.owned_cyberware_ids(), "formal purchase uses real payment and ownership rules")
 	check(cues.has("ui_click") and cues.has("trade_success"), "formal shop confirmation and trade feedback are connected")
 	clear_audio()
 	Game.notice.emit("信用点不足。")
