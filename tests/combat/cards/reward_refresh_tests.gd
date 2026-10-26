@@ -121,6 +121,7 @@ func test_credit_claim(source: String, money_chip: bool = false) -> void:
 	reward.card_reward_button.pressed.emit()
 	await settle()
 	check(is_instance_valid(reward.picker), source + " card picker still opens after credit revision changes")
+	await get_tree().create_timer(0.6).timeout
 	reward.picker.option_buttons[0].pressed.emit()
 	await settle()
 	check(same_view(result_id, reward_id) and not is_instance_valid(reward.picker), source + " card settlement closes its modal without rebuilding the background")
@@ -152,6 +153,7 @@ func test_failure_and_card_first() -> void:
 	Game.save_path = good_path
 	reward.card_reward_button.pressed.emit()
 	await settle()
+	await get_tree().create_timer(0.6).timeout
 	reward.picker.option_buttons[1].pressed.emit()
 	await settle()
 	check(same_view(result_id, reward_id) and reward.expected_revision == Game.revision, "card-first choice refreshes revision without replacing the reward view")
@@ -175,6 +177,7 @@ func test_card_during_counter() -> void:
 	check(intermediate > before and intermediate < before + amount, "counter is active before selecting a card")
 	reward.card_reward_button.pressed.emit()
 	await settle()
+	await get_tree().create_timer(0.6).timeout
 	reward.picker.option_buttons[2].pressed.emit()
 	await settle()
 	check(same_view(result_id, reward_id) and int(reward.credits_label.text) >= intermediate, "card selection during credit animation retains counter progress")

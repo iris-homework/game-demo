@@ -171,6 +171,7 @@ func test_battle_rewards() -> void:
 	if is_instance_valid(reward.picker):
 		var selected: String = Game.state.battleReward.options[0]
 		var copies: int = Game.state.deck.count(selected)
+		await get_tree().create_timer(0.6).timeout
 		reward.picker.option_buttons[0].pressed.emit()
 		await settle()
 		check(Game.state.battleReward.status == "claimed" and Game.state.deck.count(selected) == copies + 1, "Picker actually grants its generated candidate exactly once")

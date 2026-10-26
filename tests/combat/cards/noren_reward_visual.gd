@@ -20,7 +20,7 @@ func _ready() -> void:
 	add_child(app)
 	await get_tree().create_timer(0.5).timeout
 	app.view.reward_view.open_picker()
-	await get_tree().create_timer(0.4).timeout
+	await get_tree().create_timer(0.6).timeout
 	await shot("reward-verified")
 	await key(KEY_2)
 	check(Game.state.deck==["noren_23"] and Game.state.battleReward.status=="claimed","Formal reward ownership")

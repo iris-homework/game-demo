@@ -111,6 +111,7 @@ func _ready() -> void:
 	check(is_instance_valid(reward.picker) and reward.option_buttons.size() == 3,"Click reward entry opens three cards")
 	check(reward.exit_button.disabled,"Modal blocks underlying exit")
 	check(get_viewport().gui_get_focus_owner() == null,"Opening picker does not highlight the first card by default")
+	await settle(0.6)
 	await shot("choice")
 	for i in range(3):
 		await move_mouse(reward.option_buttons[i].get_global_rect().get_center())
@@ -144,6 +145,7 @@ func _ready() -> void:
 	await key(KEY_ESCAPE)
 	check(Game.page == "result" and not is_instance_valid(reward.picker) and Game.state.deck.is_empty(),"Escape closes picker without claiming or exiting")
 	await click(Vector2(1080,599))
+	await settle(0.6)
 	check(get_viewport().gui_get_focus_owner() == null,"Reopening picker does not restore stale card focus")
 	await click(Vector2(712,483))
 	await settle()
@@ -167,6 +169,7 @@ func _ready() -> void:
 	await click(reward.credits_reward_button.get_global_rect().get_center())
 	check(Game.state.credits == int(Game.config.initialCredits) + first_credit_amount + second_credit_amount and Game.reward_credits_status() == "claimed", "Reloaded reward credits still require one explicit click")
 	await click(Vector2(1080,599))
+	await settle(0.6)
 	await key(KEY_3)
 	check(Game.state.deck == ["test_reward_02","test_reward_03"] and Game.state.credits == int(Game.config.initialCredits) + first_credit_amount + second_credit_amount,"Keyboard selects after reload without repeating credits")
 	# Expanded deck: empty first-turn hand must stay empty after a view restore.

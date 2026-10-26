@@ -164,6 +164,10 @@ func _input(event: InputEvent) -> void:
 		# press, so normal pointer drift would swallow the following release.
 		if event.button_mask == 0 and is_instance_valid(focused) and picker.is_ancestor_of(focused):
 			focused.release_focus()
+	elif picker.entrance_running:
+		# Do not let focus navigation or confirmation reach locked card buttons.
+		if event.is_action("ui_focus_next") or event.is_action("ui_focus_prev") or event.is_action("ui_accept"):
+			get_viewport().set_input_as_handled()
 	elif not is_instance_valid(focused):
 		# Enter the modal's focus loop explicitly when it starts without focus.
 		if event.is_action_pressed("ui_focus_next"):
@@ -193,4 +197,4 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if not is_instance_valid(picker) or not event.is_pressed() or event.is_echo() or not event is InputEventKey: return
 	if event.keycode >= KEY_1 and event.keycode <= KEY_3:
 		get_viewport().set_input_as_handled()
-		Game.choose_reward_card(Game.state.battleReward.options[event.keycode-KEY_1],expected_revision)
+		picker.request_pick(event.keycode-KEY_1)

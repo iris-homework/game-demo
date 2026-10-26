@@ -7,6 +7,8 @@ const CARD_SCALE := 1.62
 const CARD_HOME := Vector2(18.2, 65)
 const SLOT_ORIGIN := Vector2(164, 235)
 const SLOT_STEP := 392.0
+const ENTRANCE_HOLD := 0.10
+const ENTRANCE_SPREAD := 0.42
 var option_buttons: Array[Button] = []
 var option_slots: Array[Control] = []
 var cards: Array[CombatCard] = []
@@ -24,6 +26,8 @@ var action_labels: Array[Label] = []
 var rarity_colors: Array[Color] = []
 var card_tweens: Array[Tween] = []
 var glows: Array[TextureRect] = []
+var entrance_running := true
+var entrance_tween: Tween
 
 func setup(ids: Array, definitions: Dictionary, counts: Dictionary, from_event: bool) -> void:
 	options = ids.duplicate()
@@ -67,6 +71,7 @@ func _ready() -> void:
 		focus_buttons[i].focus_next = focus_buttons[i].get_path_to(focus_buttons[(i+1)%focus_buttons.size()])
 		focus_buttons[i].focus_previous = focus_buttons[i].get_path_to(focus_buttons[(i+focus_buttons.size()-1)%focus_buttons.size()])
 	# No preselection: mouse or keyboard focus makes one offer stand out.
+	play_entrance()
 
 func texture_rect(parent: Node, texture: Texture2D, pos: Vector2, dimensions: Vector2) -> TextureRect:
 	var item := TextureRect.new()
@@ -143,7 +148,7 @@ func build_option(index: int) -> void:
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	b.tooltip_text = str(definition.get("name", ""))
 	for mode in ["normal","pressed","hover","focus"]: b.add_theme_stylebox_override(mode,StyleBoxEmpty.new())
-	b.pressed.connect(func(): card_picked.emit(id))
+	b.pressed.connect(func(): request_pick(index))
 	b.mouse_entered.connect(func(): hovered_index = index; refresh_active())
 	b.mouse_exited.connect(func():
 		if hovered_index == index: hovered_index = -1
@@ -156,13 +161,43 @@ func build_option(index: int) -> void:
 		refresh_active())
 	add_child(b)
 	option_buttons.append(b)
-	card.modulate.a = 0.0
-	card.position.y += 16
-	var entrance := create_tween().set_parallel(true)
-	entrance.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	entrance.tween_property(card,"modulate:a",1.0,0.22).set_delay(index*0.06)
-	entrance.tween_property(card,"position:y",CARD_HOME.y+115*(CARD_SCALE-1),0.3).set_delay(index*0.06)
-	card_tweens.append(entrance)
+	card_tweens.append(null)
+
+func play_entrance() -> void:
+	entrance_running = true
+	var center := SLOT_ORIGIN + Vector2((option_slots.size()-1)*SLOT_STEP*0.5,0)
+	for i in option_slots.size():
+		option_slots[i].position = center
+		# Keep the middle offer on top until the stack has opened.
+		option_slots[i].z_index = 1 if i == option_slots.size()/2 else 0
+		option_buttons[i].disabled = true
+		option_buttons[i].mouse_filter = Control.MOUSE_FILTER_IGNORE
+		option_buttons[i].focus_mode = Control.FOCUS_NONE
+	entrance_tween = create_tween()
+	entrance_tween.tween_interval(ENTRANCE_HOLD)
+	for i in option_slots.size():
+		if i > 0: entrance_tween.parallel()
+		entrance_tween.tween_property(option_slots[i], "position", SLOT_ORIGIN+Vector2(i*SLOT_STEP,0), ENTRANCE_SPREAD).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	entrance_tween.chain().tween_callback(finish_entrance)
+
+func finish_entrance() -> void:
+	entrance_running = false
+	hovered_index = -1
+	for i in option_slots.size():
+		option_slots[i].z_index = 0
+		option_buttons[i].disabled = false
+		option_buttons[i].mouse_filter = Control.MOUSE_FILTER_STOP
+		option_buttons[i].focus_mode = Control.FOCUS_ALL
+		if option_buttons[i].get_global_rect().has_point(get_global_mouse_position()): hovered_index = i
+	refresh_active()
+
+func request_pick(index: int) -> void:
+	# All pointer, keyboard and callback selection paths share the entrance lock.
+	if entrance_running or not is_inside_tree() or index < 0 or index >= options.size(): return
+	card_picked.emit(str(options[index]))
+
+func _exit_tree() -> void:
+	if entrance_tween and entrance_tween.is_valid(): entrance_tween.kill()
 
 func frame_style(color: Color, active: bool) -> StyleBoxFlat:
 	var box := StyleBoxFlat.new()
@@ -177,6 +212,7 @@ func frame_style(color: Color, active: bool) -> StyleBoxFlat:
 	return box
 
 func refresh_active() -> void:
+	if entrance_running: return
 	# Keep physical hover while keyboard focus takes precedence. Mouse motion in
 	# reward.gd releases focus, including movement within the same button.
 	var next_index := focused_index if focused_index >= 0 else hovered_index
