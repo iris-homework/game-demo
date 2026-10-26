@@ -62,7 +62,7 @@ func _ready() -> void:
 	text_label = label(self, Game.render_text(node.get("text", "")), Vector2(330,706), Vector2(1004,118), 25, STORY_WHITE)
 	text_label.add_theme_constant_override("line_spacing", 8)
 	text_label.visible_characters = 0
-	var hint := "点击继续    ·    SPACE / ENTER" if node.has("next") and choice_buttons.is_empty() else "点击选项    ·    数字键选择"
+	var hint := "点击继续    ·    %s" % PlayerSettings.key_label("advance") if node.has("next") and choice_buttons.is_empty() else "点击选项    ·    数字键选择"
 	label(self, hint, Vector2(330,842), Vector2(650,26), 13, MUTED)
 
 func _build_advance_area() -> void:
@@ -278,7 +278,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			KEY_END: scroll.value = scroll.max_value
 		get_viewport().set_input_as_handled()
 		return
-	if event.keycode in [KEY_SPACE, KEY_ENTER]:
+	if event.keycode >= KEY_1 and event.keycode <= KEY_9 and not choice_buttons.is_empty():
+		get_viewport().set_input_as_handled()
+		select(event.keycode - KEY_1)
+	elif PlayerSettings.matches(event, "advance"):
 		get_viewport().set_input_as_handled()
 		advance()
 	elif event.keycode >= KEY_1 and event.keycode <= KEY_9:

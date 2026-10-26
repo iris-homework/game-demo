@@ -24,6 +24,7 @@ config/icon="res://assets/icon.svg"
 
 [autoload]
 
+PlayerSettings="*res://scripts/player_settings.gd"
 Game="*res://scripts/game.gd"
 
 [display]

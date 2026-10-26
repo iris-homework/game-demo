@@ -14,6 +14,7 @@ var muted_cues: Array[String] = []
 func play_cue(cue: String) -> void:
 	if not CLIPS.has(cue) or cue in muted_cues: return
 	var voice := AudioStreamPlayer.new()
+	voice.bus = "SFX"
 	voice.stream = CLIPS[cue]
 	voice.volume_db = LEVELS[cue]
 	add_child(voice)

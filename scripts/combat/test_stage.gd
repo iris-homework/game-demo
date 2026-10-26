@@ -119,6 +119,7 @@ func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual], scen
 			marker.modulate = Color("8babb8")
 			actor.add_child(marker)
 	update_depth()
+	sound.bus = "SFX"
 	add_child(sound)
 	sound.volume_db = -16
 	add_child(combat_audio)

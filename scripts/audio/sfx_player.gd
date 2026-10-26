@@ -183,6 +183,7 @@ func _ensure_players() -> void:
 	for index in MAX_VOICES:
 		var player := AudioStreamPlayer.new()
 		player.name = "Voice%02d" % (index + 1)
+		player.bus = "SFX"
 		player.volume_db = master_volume_db
 		add_child(player)
 		_players.append(player)

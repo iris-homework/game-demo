@@ -187,6 +187,15 @@ func _input(event: InputEvent) -> void:
 			close_current_deck()
 		return
 	if is_instance_valid(card_console): return
+	if Game.page == "menu" and is_instance_valid(view) and is_instance_valid(view.settings_dialog):
+		var settings: Control = view.settings_dialog
+		if event is InputEventKey:
+			if not settings.listening_action.is_empty() or event.is_action("ui_cancel"):
+				get_viewport().set_input_as_handled()
+				settings.handle_key(event)
+			elif not (event.is_action("ui_accept") or event.is_action("ui_focus_next") or event.is_action("ui_focus_prev") or event.is_action("ui_left") or event.is_action("ui_right") or event.is_action("ui_up") or event.is_action("ui_down")):
+				get_viewport().set_input_as_handled()
+		return
 	if preload("res://scripts/card_console.gd").is_toggle_event(event):
 		get_viewport().set_input_as_handled()
 		if Game.config.developmentMode and not Game.battle_busy and not Game.transition_locked and not Game.is_run_over():
@@ -260,7 +269,7 @@ func open_exit_confirmation(action: String) -> void:
 	if action == "quit":
 		if Game.page != "menu": return
 		if is_instance_valid(view.confirm_dialog) and view.confirm_dialog.visible: return
-		if view.training_open or is_instance_valid(view.scenery_dialog): return
+		if view.training_open or is_instance_valid(view.scenery_dialog) or is_instance_valid(view.settings_dialog): return
 	elif Game.page == "menu": return
 	if view.has_method("cancel_selection"): view.cancel_selection()
 	exit_action = action

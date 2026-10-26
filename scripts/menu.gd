@@ -27,6 +27,9 @@ var training_cancel: Button
 var training_button_states: Dictionary = {}
 var motion_button: Button
 var quit_button: Button
+var settings_button: Button
+var settings_dialog: Control
+var settings_button_states: Dictionary = {}
 var progress_summary: Label
 var confirm_dialog: Control
 var confirm_ok: Button
@@ -172,6 +175,7 @@ func _training_scenery_label() -> String:
 	return "场景：默认场景（后巷）"
 
 func open_scenery_picker() -> void:
+	if is_instance_valid(settings_dialog): return
 	if Game.training_mode or Game.battle_busy or Game.transition_locked: return
 	if is_instance_valid(confirm_dialog) and confirm_dialog.visible: return
 	if is_instance_valid(scenery_dialog): return
@@ -233,7 +237,34 @@ func close_scenery_picker() -> void:
 	scenery_button_states.clear()
 	if training_open: training_scenery_button.grab_focus()
 
+func open_settings() -> void:
+	if is_instance_valid(settings_dialog) or training_open or is_instance_valid(scenery_dialog): return
+	if is_instance_valid(confirm_dialog) and confirm_dialog.visible: return
+	if Game.battle_busy or Game.transition_locked: return
+	settings_button_states.clear()
+	for node in ui_layer.find_children("*", "Button", true, false):
+		settings_button_states[node] = {"disabled": node.disabled, "focus": node.focus_mode}
+		node.disabled = true
+		node.focus_mode = Control.FOCUS_NONE
+	settings_dialog = preload("res://scripts/menu/settings_panel.gd").new()
+	settings_dialog.closed.connect(close_settings)
+	add_child(settings_dialog)
+
+func close_settings() -> void:
+	if not is_instance_valid(settings_dialog): return
+	get_viewport().gui_release_focus()
+	settings_dialog.hide()
+	settings_dialog.queue_free()
+	settings_dialog = null
+	for node in settings_button_states:
+		if is_instance_valid(node):
+			node.disabled = settings_button_states[node].disabled
+			node.focus_mode = settings_button_states[node].focus
+	settings_button_states.clear()
+	settings_button.grab_focus()
+
 func _build_bottom_right() -> void:
+	settings_button = _menu_button("settings", "设置", Vector2(COLUMN_X, 680), Vector2(COLUMN_WIDTH, 48), open_settings, false, 18)
 	motion_button = _menu_button("motion_toggle", _motion_label(), Vector2(COLUMN_X, 828), Vector2(165, 44), _toggle_motion, false, 16)
 	quit_button = _menu_button("quit_game", "退出游戏", Vector2(COLUMN_X + 185, 828), Vector2(165, 44), Game.request_quit, false, 16)
 	var version := str(ProjectSettings.get_setting("application/config/version", "0.2.6-r1"))
@@ -260,6 +291,7 @@ func _summary_text() -> String:
 	return "暂无委托记录"
 
 func request_new() -> void:
+	if is_instance_valid(settings_dialog): return
 	if training_open: return
 	if is_instance_valid(scenery_dialog): return
 	if Game.has_save() or not Game.state.is_empty():
@@ -310,6 +342,7 @@ func _close_confirm() -> void:
 	new_button.refresh_feedback()
 
 func _input(event: InputEvent) -> void:
+	if is_instance_valid(settings_dialog): return
 	if is_instance_valid(scenery_dialog):
 		if event.is_action_pressed("ui_cancel"):
 			get_viewport().set_input_as_handled()
@@ -345,6 +378,7 @@ func _toggle_training() -> void:
 	_set_training_open(not training_open)
 
 func _set_training_open(value: bool) -> void:
+	if is_instance_valid(settings_dialog): return
 	if value == training_open: return
 	if is_instance_valid(scenery_dialog): return
 	if value:
@@ -389,6 +423,12 @@ func _motion_label() -> String:
 
 ## 主流程 Esc 接口：先关场景选择／确认弹窗，再关演练面板；其余交回全局处理。
 func handle_escape() -> bool:
+	if is_instance_valid(settings_dialog):
+		var event := InputEventKey.new()
+		event.keycode = KEY_ESCAPE
+		event.pressed = true
+		settings_dialog.handle_key(event)
+		return true
 	if is_instance_valid(scenery_dialog):
 		close_scenery_picker()
 		return true

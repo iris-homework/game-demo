@@ -94,7 +94,7 @@ func _ready() -> void:
 	var swift := -1
 	for i in offers.size():
 		if offers[i].id == "swift_chip": swift = i
-	check(swift >= 0 and int(offers[swift].price) == 150, "formal Swift Chip price is still 150")
+	check(swift >= 0 and int(offers[swift].price) == 125, "formal Swift Chip price matches current 125-credit configuration")
 	var balance: int = Game.state.credits
 	clear_audio()
 	app.view.open_purchase(swift)

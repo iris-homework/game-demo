@@ -324,6 +324,7 @@ func _next_audio_player() -> AudioStreamPlayer:
 		if not player.playing: return player
 	if frame_audio_players.size() < 4:
 		var created := AudioStreamPlayer.new()
+		created.bus = "SFX"
 		created.volume_db = -10.0
 		add_child(created)
 		frame_audio_players.append(created)

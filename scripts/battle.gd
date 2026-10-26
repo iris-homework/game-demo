@@ -1199,13 +1199,21 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if event.ctrl_pressed or event.alt_pressed or event.meta_pressed or event.shift_pressed: return
 	if not initialized or Game.battle_busy or Game.transition_locked or is_instance_valid(pile_overlay): return
 	if not model.outcome.is_empty(): return
-	# Use the current hand order, independent of hovered or lifted card positions.
-	var index := [KEY_1,KEY_2,KEY_3,KEY_4,KEY_5,KEY_6,KEY_7,KEY_8,KEY_9,KEY_0].find(event.keycode)
-	if index < 0:
-		index = [KEY_KP_1,KEY_KP_2,KEY_KP_3,KEY_KP_4,KEY_KP_5,KEY_KP_6,KEY_KP_7,KEY_KP_8,KEY_KP_9,KEY_KP_0].find(event.keycode)
-	if index < 0 or index >= model.hand.size(): return
-	select_card(model.hand[index], false)
-	get_viewport().set_input_as_handled()
+	for action in ["end_turn", "technology", "draw_pile", "discard_pile"]:
+		if not PlayerSettings.matches(event, action): continue
+		get_viewport().set_input_as_handled()
+		match action:
+			"end_turn": end_turn_pressed()
+			"technology": show_cyberware()
+			"draw_pile": show_pile("抽牌堆", model.draw_pile)
+			"discard_pile": show_pile("弃牌堆", model.discard_pile)
+		return
+	# Resolve bindings against the current hand order, including default keypad aliases.
+	for index in mini(10, model.hand.size()):
+		if PlayerSettings.matches(event, "hand_%d" % (index + 1)):
+			select_card(model.hand[index], false)
+			get_viewport().set_input_as_handled()
+			return
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_F5,KEY_F6,KEY_F7]:

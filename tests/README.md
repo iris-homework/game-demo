@@ -1,5 +1,8 @@
 # 测试目录索引
 
+2026-10-27新增[主菜单设置专项](menu/settings_tests.tscn)：自动保存／重读、坏配置／保存失败自动重试、音量与SFX静音、改键冲突／默认别名、Tab焦点／Esc捕获及真实对白、战斗手牌／科技／牌堆／回合。须复制工程并设定包含`settings-qa`的独立用户目录，证据路径由`QA_OUT_DIR`指定；使用headless／Dummy与合成视口输入，不移动指针。专项两种窗口参数各167项，配套及冷启动读取共615项通过；实际范围与首轮日志见[验证](../artifacts/qa/menu-settings-2026-10-27/verification.json)。
+
+
 2026-10-27增伤跨回合／逐段回归：`combat/cards/noren_cards_tests`新增真实跨回合重复／混合累加、恢复、预览与拒绝不消费、群攻／多个damage效果逐段收益、整张攻击消费及下一攻击复原；Buff、旧科技、命中事件、Boss转阶段与动态卡面预期同步。最终11套5932项无窗口断言通过，范围与首轮夹具修正见[修改记录](../docs/修改记录.md)及[验证](../artifacts/qa/attack-bonus-stacking-2026-10-27/verification.json)。
 
 2026-10-27价格及一费技能：同步诊所100／科技125、非初始一费格挡＋2及一费抽牌＋1的既有断言；卡牌增强专项增加双形态实际抽牌、裂伤2／3门槛及六张旧冻结技能恢复。独立工程／TestQA用户目录、headless／Dummy，9套5643项断言0失败；商场UI退出有4实例／2资源残留，未做GPU像素／实体输入或平衡验收，见[本轮验证](../artifacts/qa/skill-prices-2026-10-27/verification.json)。
