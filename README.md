@@ -24,6 +24,8 @@
 
 macOS 安装 Godot 后，也可双击 `启动Demo.command` 启动。
 
+Windows 可将 **Godot 4.7 标准版**解压后的 exe 放在本目录，然后双击 [`启动Demo.bat`](启动Demo.bat)。脚本会先导入资源再启动游戏，首次启动请耐心等待。也支持从 `PATH` 查找 `godot.exe`／`godot4.exe`，或通过 `GODOT_PATH` 环境变量指定 exe 完整路径（值不加引号）。需要保留完整工程文件，本脚本不包含 Godot 引擎。
+
 ## 基本操作
 
 | 操作 | 方式 |
