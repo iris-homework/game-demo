@@ -77,7 +77,7 @@
         "type": "dialogue",
         "speakerId": "woss_clerk",
         "speakerSide": "right",
-        "text": "本专区提供六款科技，每款售价一百五十信用点。您可返回地图调整携带配置，已拥有的商品无需重复购买。",
+        "text": "本专区提供六款科技，每款售价一百二十五信用点。您可返回地图调整携带配置，已拥有的商品无需重复购买。",
         "next": "intro_06",
         "portraits": {
           "left": "@player",

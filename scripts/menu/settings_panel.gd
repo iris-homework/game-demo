@@ -152,12 +152,10 @@ func begin_rebind(action: String) -> void:
 
 func handle_key(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo: return
+	if event.keycode == KEY_ESCAPE:
+		cancel_or_close()
+		return
 	if not listening_action.is_empty():
-		if event.keycode == KEY_ESCAPE:
-			listening_action = ""
-			_refresh()
-			_status_changed(not PlayerSettings.pending_save)
-			return
 		if event.ctrl_pressed or event.alt_pressed or event.shift_pressed or event.meta_pressed:
 			status_label.text = "请选择单个按键，不支持组合键。"
 			return
@@ -168,5 +166,11 @@ func handle_key(event: InputEvent) -> void:
 		listening_action = ""
 		_refresh()
 		_status_changed(not PlayerSettings.pending_save)
-	elif event.keycode == KEY_ESCAPE:
+
+func cancel_or_close() -> void:
+	if not listening_action.is_empty():
+		listening_action = ""
+		_refresh()
+		_status_changed(not PlayerSettings.pending_save)
+	else:
 		closed.emit()

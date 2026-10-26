@@ -43,7 +43,7 @@ func key(code: Key, shift := false, ctrl := false) -> void:
 		get_viewport().push_input(event,true)
 		await settle()
 
-func click(control: Control) -> void:
+func click(control: Control, button_index := MOUSE_BUTTON_LEFT) -> void:
 	if not is_instance_valid(control):
 		check(false,"required clickable control exists")
 		return
@@ -57,7 +57,7 @@ func click(control: Control) -> void:
 		var event := InputEventMouseButton.new()
 		event.position = point
 		event.global_position = point
-		event.button_index = MOUSE_BUTTON_LEFT
+		event.button_index = button_index
 		event.pressed = down
 		get_viewport().push_input(event,true)
 		await settle()
@@ -273,6 +273,19 @@ func test_panel() -> bool:
 	check(PlayerSettings.bindings == PlayerSettings.DEFAULT_BINDINGS and is_equal_approx(PlayerSettings.master_volume,1.0) and is_equal_approx(PlayerSettings.sfx_volume,1.0) and PlayerSettings.sfx_enabled,"Restore Defaults applies and automatically saves all settings")
 	await click(settings.close_button)
 	check(not is_instance_valid(menu.settings_dialog),"close button returns to main menu")
+	menu.open_settings()
+	await settle()
+	settings = menu.settings_dialog
+	var bindings_before: Dictionary = PlayerSettings.bindings.duplicate()
+	var saved_before := file_text(PlayerSettings.settings_path)
+	settings.begin_rebind("hand_1")
+	await click(settings.binding_buttons.hand_1,MOUSE_BUTTON_RIGHT)
+	check(is_instance_valid(menu.settings_dialog) and settings.listening_action.is_empty(),"right click cancels key capture without closing settings")
+	check(PlayerSettings.bindings == bindings_before and file_text(PlayerSettings.settings_path) == saved_before,"canceling capture by right click preserves bindings and saved preferences")
+	await click(settings.close_button,MOUSE_BUTTON_RIGHT)
+	check(not is_instance_valid(menu.settings_dialog),"next right click closes settings")
+	check(not menu.new_button.disabled and not menu.quit_button.disabled,"right click restores background menu buttons")
+	check(Game.page == "menu" and Game.state == state_before and Game.revision == revision_before,"right click returns without changing adventure or triggering the underlying menu")
 	return true
 
 func test_display_panel() -> void:

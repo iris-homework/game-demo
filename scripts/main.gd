@@ -189,7 +189,10 @@ func _input(event: InputEvent) -> void:
 	if is_instance_valid(card_console): return
 	if Game.page == "menu" and is_instance_valid(view) and is_instance_valid(view.settings_dialog):
 		var settings: Control = view.settings_dialog
-		if event is InputEventKey:
+		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
+			get_viewport().set_input_as_handled()
+			if event.pressed: settings.cancel_or_close()
+		elif event is InputEventKey:
 			if not settings.listening_action.is_empty() or event.is_action("ui_cancel"):
 				get_viewport().set_input_as_handled()
 				settings.handle_key(event)
