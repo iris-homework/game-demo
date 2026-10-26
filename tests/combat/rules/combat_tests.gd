@@ -76,7 +76,7 @@ func _ready() -> void:
 	Game.state.currentScene = "map"
 	for hp in [40,65]:
 		Game.state.currentHp = hp
-		Game.state.credits = 150
+		Game.state.credits = 100
 		check(Game.heal_at("clinic"),"clinic service")
 		check(Game.state.currentHp == (61 if hp == 40 else 70),"clinic heal30% capped")
 		check(Game.state.credits == 0,"clinic correct treatment cost")

@@ -297,16 +297,14 @@ func play_legacy_card(uid: String, target_index: int) -> Dictionary:
 		if effect.amount < 0: return {}
 	var damage := 0
 	var hits: Array = []
-	# Apply once to the first damage effect of a valid attack, never per hit.
+	# Capture once for the resolving attack, then apply to every damage segment.
 	var bonus := next_attack_bonus if definition.get("type", "") == "attack" else 0
 	for effect in effects:
 		var amount := mini(int(effect.amount) + bonus, int(enemies[target_index].hp))
 		enemies[target_index].hp -= amount
 		damage += amount
 		hits.append({"damage":amount,"blocked":0,"hpAfter":enemies[target_index].hp,"killed":enemies[target_index].hp == 0})
-		if bonus > 0:
-			buffs.clear(self, "technology")
-			bonus = 0
+	if bonus > 0 and not hits.is_empty(): buffs.clear(self, "technology")
 	hand.erase(uid)
 	discard_pile.append(uid)
 	log_lines.append("%s → %s，造成 %d 点伤害。" % [definition.name, enemies[target_index].displayName, damage])
@@ -609,7 +607,7 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 					var count := attack_hit_count(effect, at_start, before[index],ammo_before)
 					for segment in count:
 						if enemies[index].hp <= 0: break
-						var amount_per_hit := attack_hit_amount(definition, effect, at_start, ammo_before, before[index], segment_bonus + (bonus if segment == 0 else 0), extra_ammo)
+						var amount_per_hit := attack_hit_amount(definition, effect, at_start, ammo_before, before[index], segment_bonus + bonus, extra_ammo)
 						var hit := enemy_damage(index, amount_per_hit, at_start == "ranged" and effect.get("rangedIgnoreBlock", false), attack)
 						if attack: buffs.apply_melee_attack_bleed(self, index, at_start)
 						buffs.after_attack_hit(self, index, at_start, hit,int(effect.get("bleedTriggers",-1)))
@@ -621,7 +619,6 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 							hit.ammoAfter = ammo
 						damage += hit.damage
 						hits.append(hit)
-				bonus = 0
 			"remove_soul_link": remove_soul_link(effect)
 			"ammo": gain_ammo(amount)
 			"draw": drawn.append_array(draw_cards(amount))

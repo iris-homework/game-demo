@@ -69,13 +69,14 @@
     "field": "turn_damage_bonus",
     "saveKey": "turnDamageBonus",
     "stacking": "add",
-    "duration": "player_turn_end",
+    "duration": "battle",
     "handler": "attack_bonus",
     "icon": "damage",
     "color": "f17988",
     "showBadge": true,
-    "description": "下次攻击增伤 · +{count}\n本回合下一张攻击牌的第一段基础伤害增加该数值；使用后消耗，回合结束清除。",
-    "consumeOnAttack": true
+    "description": "下次攻击增伤 · +{count}\n下一张攻击牌的每段基础伤害增加该数值；可叠加并跨回合保留，使用后消耗全部增伤。",
+    "consumeOnAttack": true,
+    "everyHit": true
   },
   {
     "id": "technology",
@@ -90,9 +91,10 @@
     "icon": "technology",
     "color": "c095ff",
     "showBadge": true,
-    "description": "科技增伤 · +{count}\n下一张攻击牌的第一段基础伤害增加该数值；使用后消耗，未使用时跨回合保留。",
+    "description": "科技增伤 · +{count}\n下一张攻击牌的每段基础伤害增加该数值；使用后消耗，未使用时跨回合保留。",
     "consumeOnAttack": true,
-    "cardApply": false
+    "cardApply": false,
+    "everyHit": true
   },
   {
     "id": "next_discount",
@@ -139,7 +141,7 @@
     "icon": "high_pressure",
     "color": "f2b969",
     "showBadge": true,
-    "description": "高压枪机 · 本场持续\n每回合首次远程攻击的第一段基础伤害 +3；同名能力不叠加。\n本回合：{triggered}",
+    "description": "高压枪机 · 本场持续\n每回合首次远程攻击的每段基础伤害 +3；同名能力不叠加。\n本回合：{triggered}",
     "usedField": "pressure_used",
     "usedSaveKey": "pressureUsed"
   },
@@ -224,12 +226,12 @@
     "category": "positive",
     "target": "player",
     "stacking": "add",
-    "duration": "player_turn_end",
+    "duration": "battle",
     "handler": "attack_bonus",
     "icon": "damage",
     "color": "f17988",
     "showBadge": true,
-    "description": "逐段攻击增伤 · +{count}\n本回合下一张攻击牌的每段基础伤害增加该数值；使用后消耗，回合结束清除。",
+    "description": "逐段攻击增伤 · +{count}\n下一张攻击牌的每段基础伤害增加该数值；可叠加并跨回合保留，使用后消耗全部增伤。",
     "consumeOnAttack": true,
     "everyHit": true
   },

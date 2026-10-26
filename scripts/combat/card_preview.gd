@@ -186,7 +186,7 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 					for index in ammo_targets:
 						for segment in copy.attack_hit_count(effect, form, before[index],ammo_before):
 							if ammo_model.enemies[index].hp <= 0: break
-							var requested: int = copy.attack_hit_amount(definition, effect, form, ammo_before, before[index],segment_bonus+(bonus if segment == 0 else 0),extra)
+							var requested: int = copy.attack_hit_amount(definition, effect, form, ammo_before, before[index],segment_bonus+bonus,extra)
 							var hit: Dictionary = ammo_model.enemy_damage(index,requested,false,true)
 							ammo_model.buffs.apply_melee_attack_bleed(ammo_model,index,form)
 							ammo_model.buffs.after_attack_hit(ammo_model,index,form,hit,int(effect.get("bleedTriggers",-1)))
@@ -199,7 +199,7 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 				var attack_bleed := 0
 				var count: int = copy.attack_hit_count(effect, form, before[target],ammo_before) if copy.is_noren() else 1
 				for segment in count:
-					var per_hit: int = copy.attack_hit_amount(definition, effect, form, ammo_before, before[target], segment_bonus+(bonus if segment == 0 else 0), extra) if copy.is_noren() else amount + bonus
+					var per_hit: int = copy.attack_hit_amount(definition, effect, form, ammo_before, before[target], segment_bonus+bonus, extra) if copy.is_noren() else amount + bonus
 					if copy.is_noren() and attack: per_hit = copy.buffs.incoming_damage(copy, per_hit, target)
 					hits.append(per_hit)
 					if copy.is_noren() and attack and active:
@@ -210,7 +210,6 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 						bleeding.append(layers)
 						# Keep HP/block intact for potential damage, advancing only nominal layers.
 						if active and layers>0 and copy.buffs.count(copy,"persistent_bleed")==0: copy.enemies[target].bleed=layers-1
-				bonus = 0
 				rows.append({"type":"damage", "values":hits if active else [0], "dynamicHits":effect.get("allAmmoHits", false), "bypass":copy.is_noren() and form == "ranged" and effect.get("rangedIgnoreBlock", false)})
 				rows.append({"type":"bleed_damage", "values":bleeding if active else [0]})
 				if copy.is_noren() and attack and form == "melee" and copy.buffs.count(copy, "melee_attack_bleed") > 0:

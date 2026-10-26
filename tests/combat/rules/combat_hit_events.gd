@@ -20,8 +20,8 @@ func _ready() -> void:
 	model.card_catalog[model.instances[uid]].effects = [{"type":"damage","amount":1},{"type":"damage","amount":2}]
 	model.next_attack_bonus = 2
 	var result := model.play_card(uid,0)
-	check(result.damage == 5 and result.hits.size() == 2,"Multi-hit total and event count")
-	check(result.hits[0].damage == 3 and result.hits[0].hpAfter == 17 and result.hits[1].damage == 2 and result.hits[1].hpAfter == 15,"Bonus applies once; intermediate HP preserved")
+	check(result.damage == 7 and result.hits.size() == 2,"Multi-hit total and event count")
+	check(result.hits[0].damage == 3 and result.hits[0].hpAfter == 17 and result.hits[1].damage == 4 and result.hits[1].hpAfter == 13,"Bonus applies to every hit; intermediate HP preserved")
 	check(model.hand.size() == 4 and model.discard_pile == [uid] and model.next_attack_bonus == 0,"One card consumed")
 	check(model.play_card(uid,0).is_empty(),"Replayed UID rejected")
 	var snapshot := model.snapshot()

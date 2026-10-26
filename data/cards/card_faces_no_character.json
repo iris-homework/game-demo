@@ -380,7 +380,7 @@
         "cost": 0,
         "type": "skill",
         "archetype": "爆发直伤流",
-        "description": "本回合下一张攻击牌的第一段基础伤害增加 5。消耗。",
+        "description": "下一张攻击牌的每段基础伤害增加 5。可叠加，跨回合保留。消耗。",
         "target": "self",
         "sortOrder": 15,
         "artAssetId": "",
@@ -391,7 +391,7 @@
           }
         ],
         "exhaust": true,
-        "cardText": "本回合下一张攻击牌的第一段基础伤害增加5。消耗。"
+        "cardText": "下一张攻击牌的每段基础伤害增加5。可叠加，跨回合保留。消耗。"
       }
     },
     "noren_16": {
@@ -460,7 +460,7 @@
         "cost": 1,
         "type": "skill",
         "archetype": "爆发直伤流",
-        "description": "获得 2 颗弹药。本回合下一张攻击牌的第一段基础伤害增加 4。",
+        "description": "获得 2 颗弹药。下一张攻击牌的每段基础伤害增加 4。可叠加，跨回合保留。",
         "target": "self",
         "sortOrder": 18,
         "artAssetId": "",
@@ -474,7 +474,7 @@
             "amount": 4
           }
         ],
-        "cardText": "获得2颗弹药。本回合下一张攻击牌的第一段基础伤害增加4。"
+        "cardText": "获得2颗弹药。下一张攻击牌的每段基础伤害增加4。可叠加，跨回合保留。"
       }
     },
     "noren_19": {
@@ -610,7 +610,7 @@
         "cost": 1,
         "type": "skill",
         "archetype": "爆发直伤流",
-        "description": "抽 2 张牌。本回合下一张攻击牌的每段基础伤害增加 6。",
+        "description": "抽 2 张牌。下一张攻击牌的每段基础伤害增加 6。可叠加，跨回合保留。",
         "target": "self",
         "sortOrder": 24,
         "artAssetId": "",
@@ -625,7 +625,7 @@
             "amount": 6
           }
         ],
-        "cardText": "抽 2 张牌。本回合下一张攻击牌的每段基础伤害增加 6。"
+        "cardText": "抽 2 张牌。下一张攻击牌的每段基础伤害增加 6。可叠加，跨回合保留。"
       }
     },
     "noren_25": {

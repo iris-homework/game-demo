@@ -86,6 +86,87 @@ func test_hand_exhaust() -> void:
 	check(restored.ammo == 4 and restored.discard_pile == ["card_001"] and restored.exhaust_pile == ["card_000"] and restored.hand == ["card_002"],"Old Dismantle still discards the chosen attack and exhausts itself")
 	check(result.discarded == ["card_001"] and result.exhaustedCards.is_empty() and result.exhausted and Game.valid_combat(restored.snapshot()),"Old discard results remain separate from new exhaustedCards results")
 
+func test_persistent_attack_bonuses() -> void:
+	for form in ["melee", "ranged"]:
+		var m := fixture([15,18,24,15,18,24,35,1,2], form)
+		for i in [0,1,2]:
+			check(not play(m,i).is_empty(), "First-turn bonus card plays: %s %d" % [form,i])
+		check(m.turn_damage_bonus == 9 and m.buffs.count(m,"next_hit_damage") == 6, "Both bonus sources coexist")
+		m.end_turn()
+		check(m.turn_damage_bonus == 9 and m.buffs.count(m,"next_hit_damage") == 6, "Both bonuses survive a full enemy turn")
+		for i in [3,4,5]:
+			var uid := "card_%03d" % i
+			m.draw_pile.erase(uid)
+			m.discard_pile.erase(uid)
+			if uid not in m.hand: m.hand.append(uid)
+			check(not play(m,i).is_empty(), "Second-turn duplicate bonus card plays: %s %d" % [form,i])
+		check(m.turn_damage_bonus == 18 and m.buffs.count(m,"next_hit_damage") == 12, "Duplicate and mixed cards accumulate across turns")
+		m.end_turn()
+		m.end_turn()
+		check(m.turn_damage_bonus == 18 and m.buffs.count(m,"next_hit_damage") == 12, "Unused bonuses survive multiple turns without decay")
+		var saved: Dictionary = JSON.parse_string(JSON.stringify(m.snapshot()))
+		check(Game.valid_combat(saved), "Persistent stacked bonuses validate in the existing snapshot format")
+		var restored := CombatModel.new()
+		restored.restore(saved)
+		check(restored.turn_damage_bonus == 18 and restored.buffs.count(restored,"next_hit_damage") == 12, "Restore retains both complete stacked totals")
+		m = restored
+		for i in [6,7,8]:
+			var uid := "card_%03d" % i
+			m.draw_pile.erase(uid)
+			m.discard_pile.erase(uid)
+			if uid not in m.hand: m.hand.append(uid)
+		check(not play(m,8).is_empty() and m.turn_damage_bonus == 18 and m.buffs.count(m,"next_hit_damage") == 12, "A non-attack skill preserves both bonuses")
+		var before := m.snapshot()
+		var preview := m.card_preview("card_006",0)
+		check(m.snapshot() == before and preview.cardText.contains("48" if form == "ranged" else "32"), "Preview includes accumulated per-segment damage without consuming it")
+		check(play(m,6,99).is_empty() and m.snapshot() == before, "Rejected target preserves all pending bonuses")
+		var energy_before := m.energy
+		m.energy = 0
+		before = m.snapshot()
+		check(play(m,6).is_empty() and m.snapshot() == before, "Rejected energy payment preserves all pending bonuses")
+		m.energy = energy_before
+		if form == "ranged":
+			var ammo_before := m.ammo
+			m.ammo = 0
+			before = m.snapshot()
+			check(play(m,6).is_empty() and m.snapshot() == before, "Rejected ammo payment preserves all pending bonuses")
+			m.ammo = ammo_before
+		var badges := m.buffs.player_badges(m)
+		check(badges.any(func(b): return b.buffId == "next_damage" and b.count == 18 and b.description.contains("跨回合")), "Attack bonus badge shows the complete persistent total")
+		check(badges.any(func(b): return b.buffId == "next_hit_damage" and b.count == 12 and b.description.contains("跨回合")), "Every-segment badge shows the complete persistent total")
+		var result := play(m,6)
+		check(result.hits.map(func(h): return h.attackDamage) == ([48,48,48] if form == "ranged" else [32,32,32]), "All stacked bonuses apply to every segment before stance multiplication")
+		check(m.turn_damage_bonus == 0 and m.buffs.count(m,"next_hit_damage") == 0, "Successful attack consumes all stacked bonuses once")
+		check(play(m,7).damage == (9 if form == "ranged" else 6), "The following attack receives no consumed bonus")
+		check(Game.valid_combat(m.snapshot()), "Final card zones and consumed bonuses remain valid")
+
+func test_all_damage_bonus_sources_per_segment() -> void:
+	for form in ["melee", "ranged"]:
+		var m := fixture([35,1], form, 3)
+		m.card_catalog.noren_35.target = "all"
+		m.card_catalog.noren_35.effects = [{"type":"damage","amount":2,"hits":2},{"type":"damage","amount":1,"hits":2}]
+		m.buffs.apply(m,"next_damage",5)
+		m.buffs.apply(m,"technology",2)
+		m.buffs.apply(m,"next_hit_damage",6)
+		m.powers = ["high_pressure"]
+		var before := m.snapshot()
+		var preview := m.card_preview("card_000",0)
+		check(m.snapshot() == before and preview.cardText.contains("27" if form == "ranged" else "15"), "Mixed card and technology bonuses preview per segment")
+		var result := play(m)
+		var expected: Array = []
+		for i in 6: expected.append(27 if form == "ranged" else 15)
+		for i in 6: expected.append(26 if form == "ranged" else 14)
+		check(result.hits.map(func(h): return h.attackDamage) == expected, "All bonus sources cover every target, hit and damage effect")
+		check(m.turn_damage_bonus == 0 and m.next_attack_bonus == 0 and m.buffs.count(m,"next_hit_damage") == 0, "All pending sources clear after one successful attack")
+		check(m.pressure_used == (form == "ranged"), "Legacy ranged pressure triggers once for the complete attack")
+		check(play(m,1).damage == (9 if form == "ranged" else 6), "Following attack receives no pending or already-used pressure bonus")
+		check(Game.valid_combat(m.snapshot()), "Per-segment mixed-source attack preserves valid state")
+	var m := fixture([35])
+	m.enemies[0].block = 1000
+	m.buffs.apply(m,"next_damage",5)
+	m.buffs.apply(m,"technology",2)
+	check(play(m).damage == 0 and m.turn_damage_bonus == 0 and m.next_attack_bonus == 0, "Fully blocked successful attack still consumes its pending bonuses")
+
 func _ready() -> void:
 	Game.save_enabled = false
 	var output := "res://artifacts/qa/battle-restart-2026-10-22/"
@@ -157,7 +238,7 @@ func _ready() -> void:
 	check(m.block == 0 and result.drawn.size() == 4,"Tracking draws a fourth card on starting bleed threshold")
 	m = fixture([15,35],"ranged")
 	play(m);result = play(m,1)
-	check(result.hits[0].attackDamage == 11 and result.hits[1].attackDamage == 3,"First-segment buff before multiplier; round each segment")
+	check(result.hits[0].attackDamage == 11 and result.hits[1].attackDamage == 11,"Every-segment buff before multiplier; round each segment")
 	m = fixture([23,35,13],"ranged")
 	play(m);result = play(m,1)
 	check(result.hits.map(func(h): return h.damage)==[4,4,4],"Ranged mastery doubles all segments")
@@ -231,6 +312,8 @@ func _ready() -> void:
 	check(play(m).is_empty() and m.snapshot()==before,"No-energy attack fails atomically")
 	m=fixture([1]);before=m.snapshot()
 	check(play(m,0,4).is_empty() and m.snapshot()==before,"Invalid enemy fails atomically")
+	test_all_damage_bonus_sources_per_segment()
+	test_persistent_attack_bonuses()
 	test_hand_exhaust()
 	m=fixture([17]);m.ammo=9;play(m)
 	check(m.ammo==10,"Ammo cap applies to normal and extra gains")
@@ -337,9 +420,9 @@ func _ready() -> void:
 	check(result.hits.map(func(h): return h.attackDamage)==[12,12,12] and m.buffs.count(m,"next_hit_damage")==0,"Weakpoint Lock applies six base damage to each segment of one attack")
 	check(play(m,2).damage==9,"Per-hit bonus is consumed by the first attack only")
 	m=fixture([24,35],"ranged");play(m);m.turn_damage_bonus=4;result=play(m,1)
-	check(result.hits.map(func(h): return h.attackDamage)==[18,12,12],"First-segment and every-segment bonuses compose independently")
+	check(result.hits.map(func(h): return h.attackDamage)==[18,18,18],"All pending bonus sources compose on every segment")
 	m=fixture([24]);play(m);m.end_turn()
-	check(m.buffs.count(m,"next_hit_damage")==0,"Unused per-hit bonus expires at turn end")
+	check(m.buffs.count(m,"next_hit_damage")==6,"Unused per-hit bonus survives turn end")
 	m=fixture([39]);m.enemies[0].bleed=2
 	check(play(m).drawn.size()==3 and m.block==0,"Tracking below three bleed draws three")
 	m=fixture([39]);m.enemies[0].bleed=3

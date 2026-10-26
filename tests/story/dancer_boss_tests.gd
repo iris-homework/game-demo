@@ -153,7 +153,7 @@ func test_phase_turn_state_and_draws() -> void:
 	check(model.player_hp == hp_before - 2 and model.block == 0, "old block absorbs pollution once before new-turn block reset")
 	check(model.buffs.count(model, "pollution") == 2 and model.buffs.count(model, "vulnerable") == 1, "old player pollution and vulnerable decay once")
 	check(result.phaseTurnEvents.filter(func(e): return e.get("buffId") == "pollution").size() == 1 and result.phaseTurnEvents.filter(func(e): return e.get("buffId") == "vulnerable").size() == 1, "phase exposes one event per old-player status settlement")
-	check(model.turn_damage_bonus == 0 and model.turn_discount == 0 and model.buffs.count(model, "next_hit_damage") == 0, "temporary turn attack bonuses and discount clear")
+	check(model.turn_damage_bonus == 7 and model.turn_discount == 0 and model.buffs.count(model, "next_hit_damage") == 6, "unspent attack bonuses survive phase turn closure while turn discount clears")
 	check(not model.pressure_used and not model.dissection_used, "new-turn ability markers reset")
 	check(model.stance == "ranged" and model.ammo == 4 and model.parry == 2 and model.stance_discount, "stance ammo parry and pending stance discount survive")
 	check(model.powers.size() == 4 and model.buffs.count(model, "strength") == 3 and model.next_attack_bonus == 3, "battle powers strength and unspent technology bonus survive")

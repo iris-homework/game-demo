@@ -54,7 +54,7 @@ func normalize_dynamic_damage(text: String) -> String:
 	pattern.compile("首段造成([0-9–]+)点伤害，后续每段造成[0-9–]+点伤害")
 	return pattern.sub(text, "造成 $1 点伤害", true)
 
-func test_barrage_first_hit_wording() -> void:
+func test_barrage_every_hit_wording() -> void:
 	for form in ["melee", "ranged"]:
 		for bullets in [0, 1, 3, 10]:
 			var m := fixture([20], form)
@@ -63,7 +63,7 @@ func test_barrage_first_hit_wording() -> void:
 			m.energy = 10
 			var before := m.snapshot()
 			var preview := m.card_preview("card_000", 0)
-			var expected := "首段造成20点伤害，后续每段造成14点伤害。" if form == "ranged" and bullets > 0 else ("造成 20 点伤害。" if form == "ranged" else "造成 13 点伤害。")
+			var expected := "造成 20 点伤害。" if form == "ranged" else "造成 13 点伤害。"
 			check(preview.cardText.begins_with(expected), "Barrage card face distinguishes segment values: %s %d" % [form, bullets])
 			check(preview.description.begins_with(expected), "Barrage tooltip distinguishes segment values: %s %d" % [form, bullets])
 			check(preview.cardText.ends_with("总段数为 1 加打出前的弹药数。"), "Barrage keeps authored ammo count rule")
@@ -74,13 +74,13 @@ func test_barrage_first_hit_wording() -> void:
 			check(played.hits.size() == expected_hits, "Barrage execution keeps declared segment count")
 			check(played.hits[0].damage == (20 if form == "ranged" else 13), "Barrage actual first hit matches preview")
 			if form == "ranged":
-				check(played.hits.slice(1).all(func(hit): return hit.damage == 14), "Barrage subsequent actual hits match lower preview value")
+				check(played.hits.slice(1).all(func(hit): return hit.damage == 20), "Barrage every actual hit receives the same bonus")
 	var m := fixture([20], "ranged", 2)
 	m.ammo = 10
 	m.next_attack_bonus = 4
 	m.buffs.apply(m, "vulnerable", 1, 1)
 	var preview := m.card_preview("card_000", -1)
-	check(preview.cardText.begins_with("首段造成20–30点伤害，后续每段造成14–21点伤害。"), "Untargeted barrage keeps separate first/later vulnerability ranges")
+	check(preview.cardText.begins_with("造成 20–30 点伤害。"), "Untargeted barrage shows each segment with its vulnerability range")
 
 func contains(actual: String, expected: String, label: String) -> void:
 	check(expected in actual, "%s expected <%s>, got <%s>" % [label, expected, actual])
@@ -131,13 +131,13 @@ func test_numeric_effects() -> void:
 	contains(preview_text(m), "造成3×3点伤害。", "Round each 3 * 1.5 segment, not total")
 	m.next_attack_bonus = 2
 	m.turn_damage_bonus = 4
-	contains(preview_text(m), "造成12＋3＋3点伤害。", "Technology and next damage apply only to first segment")
+	contains(preview_text(m), "造成12×3点伤害。", "Technology and next damage apply to every segment")
 	m.enemies[0].block = 999
 	m.enemies[0].hp = 1
-	contains(preview_text(m), "造成12＋3＋3点伤害。", "Neither block nor remaining HP truncates displayed attacks")
+	contains(preview_text(m), "造成12×3点伤害。", "Neither block nor remaining HP truncates displayed attacks")
 	m = fixture([35], "ranged")
 	m.powers = ["high_pressure"]
-	contains(preview_text(m), "造成8＋3＋3点伤害。", "Unused pressure boosts first segment only")
+	contains(preview_text(m), "造成8×3点伤害。", "Unused pressure boosts every segment")
 	m.pressure_used = true
 	contains(preview_text(m), "造成3×3点伤害。", "Used pressure does not boost again")
 	m.stance = "melee"
@@ -198,9 +198,9 @@ func test_numeric_effects() -> void:
 	m.enemies[0].hp=1
 	contains(preview_text(m),"回弹1。","Separate damage effects stop ammo on an already dead target")
 	m=fixture([35],"ranged");m.buffs.apply(m,"next_hit_damage",6);m.turn_damage_bonus=4
-	contains(preview_text(m),"造成18＋12＋12点伤害。","Every-hit and first-hit preview bonuses compose")
+	contains(preview_text(m),"造成18×3点伤害。","All pending damage bonuses compose per segment")
 	m.powers=["ranged_mastery"]
-	contains(preview_text(m),"造成24＋16＋16点伤害。","Mastery multiplier applies after all base bonuses")
+	contains(preview_text(m),"造成24×3点伤害。","Mastery multiplier applies after all base bonuses")
 	m=fixture([35],"ranged");m.powers=["persistent_bleed"];m.enemies[0].bleed=5
 	contains(preview_text(m),"裂伤追加5×3点伤害。","Persistent bleed preview does not decay layers")
 	m=fixture([37]);m.powers=["persistent_bleed"];m.enemies[0].bleed=5
@@ -413,7 +413,7 @@ func _ready() -> void:
 	contains(preview_text(exhaust_preview), "消耗另一张手牌。", "Dismantle previews hand exhaustion")
 	check(exhaust_preview.snapshot() == exhaust_before, "Dismantle preview never moves candidate cards")
 	test_numeric_effects()
-	test_barrage_first_hit_wording()
+	test_barrage_every_hit_wording()
 	test_read_only_catalog()
 	test_potential_status_and_conditional_wording()
 	test_melee_ammo_hit_hooks()

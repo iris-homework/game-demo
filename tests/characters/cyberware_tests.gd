@@ -36,7 +36,7 @@ func _ready() -> void:
 	check(m.play_card(m.hand[0],0).damage == 1,"Following attack returns to base damage")
 	m.activate_cyberware(m.cyberware_cards()[2].id)
 	m.card_catalog.test_attack.effects = [{"type":"damage","amount":1},{"type":"damage","amount":1}]
-	check(m.play_card(m.hand[0],0).damage == 3,"Multi-effect attack receives bonus once, not per hit")
+	check(m.play_card(m.hand[0],0).damage == 4,"Multi-effect attack receives its pending bonus on every hit")
 	m.end_turn()
 	m.activate_cyberware(m.cyberware_cards()[3].id)
 	m.card_catalog.test_attack.effects = []
@@ -53,6 +53,7 @@ func _ready() -> void:
 	Game.state.activeEventId = "E04"
 	Game.state.activeNodeId = "battle"
 	Game.state.battleId = "B04"
+	Game.state.maxHp = m.max_hp
 	Game.commit_combat(m)
 	check(Game.valid_save(Game.state),"Cyberware snapshot passes validation")
 	check(Game.save_game(),"Dedicated battle save written")
@@ -71,7 +72,7 @@ func _ready() -> void:
 	var migrated = Game.migrate_save(legacy)
 	check(Game.valid_save(migrated),"Legacy schema-2 battle remains loadable")
 	restored.restore(migrated.combat)
-	check(restored.cyberware_cards().size() == 3 and restored.next_attack_bonus == 0 and restored.used_cyberware.is_empty(),"Legacy battle gains three configured cards, no free buff")
+	check(restored.cyberware_cards().is_empty() and restored.next_attack_bonus == 0 and restored.used_cyberware.is_empty(),"Legacy battle follows the current empty starting technology configuration, with no free buff")
 	check(not legacy.combat.profile.has("cyberware"),"Migration does not mutate input")
 	for bad_bonus in [-1,0.5,"1",999]:
 		var corrupt := m.snapshot()

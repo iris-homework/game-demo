@@ -17,6 +17,9 @@ func same(a, b) -> bool:
 
 func model_for() -> CombatModel:
 	Game.state = Game.initial_state()
+	# Active technologies are purchased/equipped explicitly, not starting gifts.
+	Game.state.ownedCyberwareIds = [POCKET, CLOCK, ENERGY]
+	Game.state.equippedCyberwareIds = [POCKET, CLOCK, ENERGY]
 	Game.state.targetId = "richard"
 	Game.state.activeEventId = "E04"
 	Game.state.activeNodeId = "battle"
@@ -46,7 +49,9 @@ func check_piles(model: CombatModel, message: String) -> void:
 
 func test_authored_loadout() -> void:
 	check(Game.valid_player_character("noren"), "Noren accepts all three effect definitions")
-	check(Game.player_cyberware("noren").cards.map(func(c): return c.id) == [POCKET, CLOCK, ENERGY], "New battles select authored order")
+	check(Game.player_cyberware("noren").cards.is_empty(), "New adventures have no starting technologies")
+	model_for()
+	check(Game.player_cyberware().cards.map(func(c): return c.id) == [POCKET, CLOCK, ENERGY], "Explicitly equipped technologies retain loadout order")
 	for row in [[POCKET, "异次元口袋", 3], [CLOCK, "加速时钟", 999], [ENERGY, "后备能源", 3]]:
 		var definition := Game.cyberware_definition(row[0])
 		check(definition.name == row[1] and definition.cooldownTurns == row[2], "Authored name and cooldown: " + row[1])
@@ -186,12 +191,15 @@ func test_snapshot_and_validation() -> void:
 
 func test_definition_validation() -> void:
 	var original: Dictionary = Game.prototype_rules.cyberware.duplicate(true)
+	var original_ids: Array = Game.player_characters.noren.cyberwareIds.duplicate()
+	Game.player_characters.noren.cyberwareIds = [POCKET, CLOCK, ENERGY]
 	for change in [{"cooldownTurns":0}, {"cooldownTurns":-1}, {"cooldownTurns":1.5}, {"cooldownTurns":"3"}, {"effect":"unknown"}, {"amount":0}, {"amount":0.5}]:
 		var definition := Game.cyberware_definition(ENERGY)
 		for key in change: definition[key] = change[key]
 		check(not Game.valid_player_character("noren"), "Reject invalid referenced technology definition: " + str(change))
 		Game.prototype_rules.cyberware = original.duplicate(true)
 	check(Game.valid_player_character("noren"), "Valid definitions remain available after invalid fixtures")
+	Game.player_characters.noren.cyberwareIds = original_ids
 
 func test_battle_start_reset() -> void:
 	var m := model_for()

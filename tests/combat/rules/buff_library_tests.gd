@@ -65,7 +65,7 @@ func _ready() -> void:
 	check(badges.all(func(b): return b.category == "positive") and m.snapshot() == state, "Display read-only and positive classification")
 	check(Buffs.enemy_badges(m.enemies[0])[0].description.contains("固定降低 25%"), "Weak tooltip values")
 	Buffs.player_turn_end(m)
-	check(m.turn_damage_bonus == 0 and m.turn_discount == 0 and m.next_attack_bonus == 2 and m.stance_discount and m.parry == 2, "Exact expiration boundaries")
+	check(m.turn_damage_bonus == 4 and m.turn_discount == 0 and m.next_attack_bonus == 2 and m.stance_discount and m.parry == 2, "Exact expiration boundaries")
 	check(m.enemies[0].weak == 6 and m.powers.size() == 2, "Weak waits for enemy turn end; abilities retained")
 	Buffs.apply(m, "bleed", 5, 0)
 	Buffs.apply(m, "block", 100, 0)
@@ -95,6 +95,8 @@ func _ready() -> void:
 	# HUD, snapshot or Game whitelist changes. These are never shipped as game buffs.
 	var extra := Buffs.definition("next_damage")
 	extra.id = "qa_focus"
+	extra.duration = "player_turn_end"
+	extra.everyHit = false
 	extra.erase("field")
 	extra.erase("saveKey")
 	extra.maxStacks = 6
