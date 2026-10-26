@@ -58,6 +58,7 @@ var held_card_moved := false
 var held_confirmation := false
 var exhaust_button: Button
 var pile_overlay: Control
+var choice_hidden_cards: Array[CombatCard] = []
 var initialized := false
 var pending_battle_result := ""
 var stage: Control
@@ -572,7 +573,7 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 			var options: Array = []
 			for candidate in model.exhaust_candidates(uid):
 				options.append({"value":candidate,"text":"%s · 费用 %d\n%s" % [model.card(candidate).name,model.card_cost(candidate),model.card_preview(candidate).text]})
-			show_card_choice("选择消耗另一张手牌",options,func(value): play_selected(target,value,extra_ammo))
+			show_card_choice("选择消耗另一张手牌",options,func(value): play_selected(target,value,extra_ammo),true)
 			return
 		if effect.type == "discard_attack" and discard_uid.is_empty():
 			var options: Array = []
@@ -666,11 +667,27 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 	set_busy(false)
 	if not model.outcome.is_empty(): finish(model.outcome)
 
-func show_card_choice(title: String, options: Array, callback: Callable) -> void:
+func show_card_choice(title: String, options: Array, callback: Callable, show_cards := false) -> void:
 	clear_card_drag()
 	pile_overlay = preload("res://scripts/combat/choice_picker.gd").new()
 	pile_overlay.heading = title
+	pile_overlay.card_mode = show_cards
+	pile_overlay.model = model
 	pile_overlay.options = options
+	if show_cards:
+		for option in options:
+			var candidate: CombatCard = cards.get(str(option.value))
+			if not is_instance_valid(candidate): continue
+			pile_overlay.hand_layout[str(option.value)] = {
+				"position":candidate.home+candidate.pivot_offset-(candidate.pivot_offset*candidate.home_scale).rotated(candidate.home_rotation),
+				"scale":candidate.home_scale,"rotation":candidate.home_rotation}
+			if candidate.visible:
+				choice_hidden_cards.append(candidate)
+				candidate.hide()
+		# The pending source card must not remain lifted behind the chosen card.
+		if cards.has(selected_uid) and cards[selected_uid].visible:
+			choice_hidden_cards.append(cards[selected_uid])
+			cards[selected_uid].hide()
 	pile_overlay.closed.connect(close_pile)
 	pile_overlay.picked.connect(func(value):
 		close_pile()
@@ -1158,6 +1175,9 @@ func close_pile() -> void:
 	pile_overlay = null
 	remove_child(previous)
 	previous.queue_free()
+	for candidate in choice_hidden_cards:
+		if is_instance_valid(candidate): candidate.show()
+	choice_hidden_cards.clear()
 	end_button.grab_focus()
 
 func show_debug_results() -> void:

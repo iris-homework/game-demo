@@ -1,5 +1,9 @@
 # 测试目录索引
 
+2026-10-26[消耗选牌专项](combat/interaction/exhaust_picker_tests.tscn)改为底部手牌＋单张飞中央：初始无中央卡、选中只有一个原view居中、改选回位、隐藏原卡及取消恢复；17候选保留可见输入区并可键盘到达。新57项及原文字49项通过，见[验证](../artifacts/qa/exhaust-hand-center-2026-10-26/verification.json)。下方首版网格滚动44项为历史记录。
+
+2026-10-26新增[消耗选牌专项](combat/interaction/exhaust_picker_tests.tscn)：真实12号牌入口、完整卡面及重复实例、暂选／改选不结算、确认只结算一次、四种取消、键盘与快捷键隔离、17候选滚动。44项通过，配套原文字选择49及消耗动画76项通过；最终卡牌模式纯样式调整后重跑新专项44项。独立复制工程、QA用户目录、关闭保存并指定测试路径，无窗口合成输入、不移动系统鼠标。另有最小化窗口SubViewport两种分辨率GPU截图与目视检查；不代表物理输入或完整游玩。见[验证](../artifacts/qa/exhaust-picker-2026-10-26/verification.json)。
+
 2026-10-26同步[控制台页面刷新专项](console_page_refresh_tests.tscn)：真实主场景中覆盖对白继续／选择／跳过、任务开始、普通结算、奖励领取／离开及原地刷新、查询与非法命令、连续加牌、外部换页防重入、战斗实时模型保留。使用真实页面与控件回调，不截图、不移动系统鼠标；须复制工程与独立用户目录，新增测试关闭保存并指定测试专用路径，支持绝对`QA_OUT_DIR`。本轮game-demo新专项82项及配套共5套653项0失败；见[验证](../artifacts/qa/console-page-sync-2026-10-26/verification.json)。不代表像素、物理输入或完整通关验收。
 
 2026-10-26新增[双舞者牌堆计数专项](combat/presentation/dancer_pile_count_tests.tscn)：独立真实Battle子类记录每次数量刷新、发牌回调和洗牌转移；原抽牌堆5／3／1／0张、普通击杀／弹反／控制台转阶段、自然抽到专用卡后消耗，以及恢复快照不重复加牌共6场景74项。`-- --repro`限定两场首轮复现，原代码30项中6项失败；修复后配套Boss表现、机制、控制台及消耗表现，共5套500项0失败。须使用复制工程及独立用户目录，headless+Dummy，不截图、不移动鼠标；逐事件观测及日志见[验证](../artifacts/qa/dancer-pile-counts-2026-10-26/verification.json)。
