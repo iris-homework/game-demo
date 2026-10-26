@@ -4,6 +4,12 @@ const TechnologyIcons = preload("res://scripts/technology_icons.gd")
 const TEXT := Color("352d3b")
 const SOFT := Color("756877")
 const ROSE := Color("a7446a")
+const SOFT_BUTTON_FILL := Color("f5e7ee")
+const SOFT_BUTTON_HOVER_FILL := Color("efd0dc")
+const SOFT_BUTTON_PRESSED_FILL := Color("dfb4c6")
+const SOFT_BUTTON_BORDER := Color("8f3a58")
+const SOFT_BUTTON_HOVER_TEXT := Color("9b3158")
+const SOFT_BUTTON_PRESSED_TEXT := Color("77243f")
 const EDGE := Color("d9cbd1")
 const PAPER := Color("fffdf8f2")
 const ORIGIN := Vector2(484,202)
@@ -26,7 +32,9 @@ func _ready() -> void:
 	label(self,"战斗科技  /  六个展示位",Vector2(920,123),Vector2(472,28),17,SOFT).horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	rect(self,Vector2(484,174),Vector2(896,1),EDGE)
 	rect(self,Vector2(484,173),Vector2(72,3),ROSE)
-	shop_button(self,"← 离开商场",Vector2(28,830),Vector2(244,48),Game.go_map).name = "return_map"
+	var leave := shop_button(self,"← 离开商场",Vector2(28,830),Vector2(244,48),Game.go_map)
+	leave.name = "return_map"
+	apply_soft_button_style(leave)
 	label(self,"购买后，在地图「科技配置」中携带",Vector2(744,837),Vector2(648,34),18,TEXT).horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	refresh_stock()
 	fade_in()
@@ -59,6 +67,27 @@ func shop_button(parent: Node, caption: String, pos: Vector2, dimensions: Vector
 	b.pressed.connect(action)
 	parent.add_child(b)
 	return b
+
+func apply_soft_button_style(button: Button) -> void:
+	button.add_theme_color_override("font_color",ROSE)
+	button.add_theme_color_override("font_hover_color",SOFT_BUTTON_HOVER_TEXT)
+	button.add_theme_color_override("font_pressed_color",SOFT_BUTTON_PRESSED_TEXT)
+	button.add_theme_color_override("font_hover_pressed_color",SOFT_BUTTON_PRESSED_TEXT)
+	button.add_theme_color_override("font_focus_color",ROSE)
+	_set_soft_button_surface(button,"normal",SOFT_BUTTON_FILL,SOFT_BUTTON_BORDER,1)
+	_set_soft_button_surface(button,"hover",SOFT_BUTTON_HOVER_FILL,ROSE,2)
+	_set_soft_button_surface(button,"pressed",SOFT_BUTTON_PRESSED_FILL,SOFT_BUTTON_PRESSED_TEXT,2)
+	# Transparent fill keeps the active pink surface visible under focus.
+	var focus_frame := style(Color.TRANSPARENT,SOFT_BUTTON_PRESSED_TEXT,2)
+	focus_frame.border_width_left = 2
+	focus_frame.shadow_color = Color(ROSE,0.28)
+	focus_frame.shadow_size = 5
+	button.add_theme_stylebox_override("focus",focus_frame)
+
+func _set_soft_button_surface(button: Button, state_name: String, fill: Color, border: Color, width: int) -> void:
+	var frame := style(fill,border,width)
+	frame.border_width_left = width
+	button.add_theme_stylebox_override(state_name,frame)
 
 func icon(parent: Node, id: String, pos: Vector2, dimensions: Vector2) -> TextureRect:
 	return TechnologyIcons.create(parent,id,pos,dimensions)
@@ -128,12 +157,7 @@ func open_purchase(index: int) -> void:
 	label(modal,"余额 %d → %d  ·  购买后请到地图配置携带" % [int(Game.state.credits),int(Game.state.credits)-int(offer.price)],Vector2(370,553),Vector2(700,31),17,SOFT)
 	var cancel := shop_button(modal,"取消",Vector2(370,615),Vector2(195,48),close_modal)
 	cancel.name = "cancel_trade"
-	for color_name in ["font_color","font_hover_color","font_pressed_color","font_focus_color"]:
-		cancel.add_theme_color_override(color_name,ROSE)
-	for state_name in ["normal","hover","pressed"]:
-		var cancel_frame := style(Color("f5e7ee"),Color("483446"))
-		cancel_frame.border_width_left = 1
-		cancel.add_theme_stylebox_override(state_name,cancel_frame)
+	apply_soft_button_style(cancel)
 	var confirm := shop_button(modal,"确认购买",Vector2(589,615),Vector2(481,48),complete_trade.bind(index),true)
 	confirm.name = "confirm_trade"
 	cancel.grab_focus()

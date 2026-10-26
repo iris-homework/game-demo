@@ -37,7 +37,7 @@ func _ready() -> void:
 	label(self,Game.event_data().title + "  /  " + Game.battle_type_label(reward.get("battleType", "normal")) + "  /  战利品",Vector2(216,239),Vector2(980,40),20,MUTED)
 	rect(self,Vector2(214,296),Vector2(1012,1),Color("3a5155"))
 	label(self,"本次战利品",Vector2(214,314),Vector2(500,35),22)
-	label(self,"REWARDS / 02",Vector2(1040,320),Vector2(195,28),14,CYAN)
+	label(self,"REWARDS",Vector2(1040,320),Vector2(195,28),14,CYAN)
 
 	var credits := cut_panel(self,Vector2(214,371),Vector2(1012,128),Color("172025"),Color("655a3f"),18)
 	credits_row = credits
