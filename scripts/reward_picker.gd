@@ -7,8 +7,10 @@ const CARD_SCALE := 1.62
 const CARD_HOME := Vector2(18.2, 65)
 const SLOT_ORIGIN := Vector2(164, 235)
 const SLOT_STEP := 392.0
-const ENTRANCE_HOLD := 0.10
-const ENTRANCE_SPREAD := 0.42
+const ENTRANCE_DURATION := 0.52
+const REVEAL_MARGIN := Vector2(70, 26)
+const REVEAL_SIZE := Vector2i(468, 582)
+const REVEAL_SHADER := preload("res://shaders/reward_reveal.gdshader")
 var option_buttons: Array[Button] = []
 var option_slots: Array[Control] = []
 var cards: Array[CombatCard] = []
@@ -28,6 +30,9 @@ var card_tweens: Array[Tween] = []
 var glows: Array[TextureRect] = []
 var entrance_running := true
 var entrance_tween: Tween
+var entrance_surfaces: Array[SubViewport] = []
+var entrance_images: Array[TextureRect] = []
+var entrance_materials: Array[ShaderMaterial] = []
 
 func setup(ids: Array, definitions: Dictionary, counts: Dictionary, from_event: bool) -> void:
 	options = ids.duplicate()
@@ -147,7 +152,7 @@ func build_option(index: int) -> void:
 	b.size = SLOT_SIZE
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	b.tooltip_text = str(definition.get("name", ""))
-	for mode in ["normal","pressed","hover","focus"]: b.add_theme_stylebox_override(mode,StyleBoxEmpty.new())
+	for mode in ["normal","pressed","hover","focus","disabled"]: b.add_theme_stylebox_override(mode,StyleBoxEmpty.new())
 	b.pressed.connect(func(): request_pick(index))
 	b.mouse_entered.connect(func(): hovered_index = index; refresh_active())
 	b.mouse_exited.connect(func():
@@ -165,30 +170,53 @@ func build_option(index: int) -> void:
 
 func play_entrance() -> void:
 	entrance_running = true
-	var center := SLOT_ORIGIN + Vector2((option_slots.size()-1)*SLOT_STEP*0.5,0)
 	for i in option_slots.size():
-		option_slots[i].position = center
-		# Keep the middle offer on top until the stack has opened.
-		option_slots[i].z_index = 1 if i == option_slots.size()/2 else 0
 		option_buttons[i].disabled = true
 		option_buttons[i].mouse_filter = Control.MOUSE_FILTER_IGNORE
 		option_buttons[i].focus_mode = Control.FOCUS_NONE
+		# Composite text, card art and frame together, including fallback text cards.
+		# These temporary surfaces never receive input or read back GPU pixels.
+		var surface := SubViewport.new()
+		surface.size = REVEAL_SIZE
+		surface.transparent_bg = true
+		surface.disable_3d = true
+		surface.gui_disable_input = true
+		surface.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+		add_child(surface)
+		option_slots[i].reparent(surface, false)
+		option_slots[i].position = REVEAL_MARGIN
+		entrance_surfaces.append(surface)
+		var ink := ShaderMaterial.new()
+		ink.shader = REVEAL_SHADER
+		ink.set_shader_parameter("progress", 0.0)
+		ink.set_shader_parameter("seed", float(i)*7.13)
+		var image := texture_rect(self, surface.get_texture(), SLOT_ORIGIN+Vector2(i*SLOT_STEP,0)-REVEAL_MARGIN, Vector2(REVEAL_SIZE))
+		image.material = ink
+		entrance_images.append(image)
+		entrance_materials.append(ink)
 	entrance_tween = create_tween()
-	entrance_tween.tween_interval(ENTRANCE_HOLD)
-	for i in option_slots.size():
-		if i > 0: entrance_tween.parallel()
-		entrance_tween.tween_property(option_slots[i], "position", SLOT_ORIGIN+Vector2(i*SLOT_STEP,0), ENTRANCE_SPREAD).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
-	entrance_tween.chain().tween_callback(finish_entrance)
+	entrance_tween.tween_method(update_entrance, 0.0, 1.0, ENTRANCE_DURATION)
+	entrance_tween.tween_callback(finish_entrance)
+
+func update_entrance(progress: float) -> void:
+	for ink in entrance_materials: ink.set_shader_parameter("progress", progress)
 
 func finish_entrance() -> void:
 	entrance_running = false
 	hovered_index = -1
 	for i in option_slots.size():
-		option_slots[i].z_index = 0
+		option_slots[i].reparent(self, false)
+		option_slots[i].position = SLOT_ORIGIN+Vector2(i*SLOT_STEP,0)
+		entrance_images[i].hide()
+		entrance_images[i].queue_free()
+		entrance_surfaces[i].queue_free()
 		option_buttons[i].disabled = false
 		option_buttons[i].mouse_filter = Control.MOUSE_FILTER_STOP
 		option_buttons[i].focus_mode = Control.FOCUS_ALL
 		if option_buttons[i].get_global_rect().has_point(get_global_mouse_position()): hovered_index = i
+	entrance_images.clear()
+	entrance_surfaces.clear()
+	entrance_materials.clear()
 	refresh_active()
 
 func request_pick(index: int) -> void:
