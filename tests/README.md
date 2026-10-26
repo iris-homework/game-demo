@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-10-26新增[双舞者牌堆计数专项](combat/presentation/dancer_pile_count_tests.tscn)：独立真实Battle子类记录每次数量刷新、发牌回调和洗牌转移；原抽牌堆5／3／1／0张、普通击杀／弹反／控制台转阶段、自然抽到专用卡后消耗，以及恢复快照不重复加牌共6场景74项。`-- --repro`限定两场首轮复现，原代码30项中6项失败；修复后配套Boss表现、机制、控制台及消耗表现，共5套500项0失败。须使用复制工程及独立用户目录，headless+Dummy，不截图、不移动鼠标；逐事件观测及日志见[验证](../artifacts/qa/dancer-pile-counts-2026-10-26/verification.json)。
+
 2026-10-26审计修复：新增[战斗选择与商场排版专项](combat/interaction/choice_picker_input_tests.tscn)，覆盖真实战斗弹窗的确认／导航／取消、防重复、底层快捷键隔离及六项商场商品文字实际布局；使用复制工程和名称含QA的独立用户目录。扩展[预览专项](combat/cards/combat_preview_tests.tscn)覆盖柔软／裂伤致死／群攻共享回弹，扩展[Boss专项](story/dancer_boss_tests.tscn)覆盖六委托到第7天的回礼清场豁免、旧档补入口及正常领取／终局保护。本轮结果及范围见修改记录。
 
 2026-10-25意图矢量图标：新增[intent_icon_asset_tests](combat/presentation/intent_icon_asset_tests.tscn)，检查九类意图／未知回退资源、单图标与复合虚弱双列、调用者伤害预览、只读输入及重用清理；配合原[附带虚弱](combat/presentation/attack_weak_intent_tests.tscn)和[意图时序](combat/presentation/enemy_intent_phase_tests.tscn)专项。使用独立工程／用户目录及headless+Dummy，实测结果见[验证汇总](../artifacts/qa/intent-icons-2026-10-25/verification.json)，CPU图标预览不等同于GPU战斗画面或物理输入验收。

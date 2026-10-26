@@ -844,6 +844,7 @@ func present_encounter_phase() -> void:
 	refresh_player_plate()
 	refresh_hp()
 	refresh_ammo()
+	prepare_phase_deal_counts()
 	turn_hud.set_state(model.turn,"reveal")
 	# Hard light cue: reveal the complete formation in one frame, with no fade.
 	stage.dancer_lights.modulate.a = 1.0
@@ -985,6 +986,19 @@ func impact(pos: Vector2, text: String, color: Color, text_scale: float = 1.0) -
 	floating.start(text,button_font,color,pos,lane,text_scale)
 	# Preserve enemy-action pacing while the visual tail finishes independently.
 	await get_tree().create_timer(timing("impactDuration",0.36)+0.1).timeout
+
+func prepare_phase_deal_counts() -> void:
+	# The model has already drawn the fresh hand, but its flights/shuffles have
+	# not played. Rebuild their starting counts, including generated cards.
+	var upcoming_draws := 0
+	var upcoming_recycles := 0
+	for uid in model.hand:
+		if cards.has(uid): continue
+		upcoming_draws += 1
+		upcoming_recycles += int(pending_recycles.get(uid,0))
+	shown_draw_count = model.draw_pile.size()+upcoming_draws-upcoming_recycles
+	shown_discard_count = model.discard_pile.size()+upcoming_recycles
+	render_counts()
 
 func refresh_counts() -> void:
 	# Initialize/reset after a complete deal, never during an in-flight discard.
