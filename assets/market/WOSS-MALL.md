@@ -1,6 +1,8 @@
 # 沃斯商场素材记录
 
-2026-10-25首次到访对白改为标准左右独立立绘：商场店员复用`assets/characters/reception.png`（与原参考`诺斯商场前台.png`哈希相同），沿用对白去白材质；诺伦位于左侧，店员位于右侧，说话者高亮。对白背景为`assets/backgrounds/woss_mall_dialogue.tres`，以AtlasTexture引用本店原图右侧无人区域`Rect2(680,0,906,992)`，不修改原PNG像素，避免出现背景店员与独立立绘重复。交易页仍使用完整原图。
+2026-10-27已接入专属无人对白背景`assets/backgrounds/woss_mall_dialogue_v1.png`，由`data/assets.json`的`mall`绑定，替代下述旧裁切图。1586×992，内置image_gen生成；描线、块面阴影与空间层次参考现有对白背景，沿用商场浅色建筑与淡粉灯光，新增中庭、扶梯和科技橱窗。左右独立立绘保持，交易页继续使用原合层图。原PNG字节与制作工程相同，无损导入并启用mipmap。完整提示词见[生成提示词](../backgrounds/woss_mall_dialogue_v1.prompt.txt)，来源和SHA256见[场景清单](../backgrounds/scene-art-manifest.json)。原图已目视检查；用户美术认可及Godot像素验收未单独进行。接入验证见`artifacts/qa/mall-dialogue-background-2026-10-27/verification.json`。
+
+历史（背景裁切方案已被专属图替代）：2026-10-25首次到访对白改为标准左右独立立绘：商场店员复用`assets/characters/reception.png`（与原参考`诺斯商场前台.png`哈希相同），沿用对白去白材质；诺伦位于左侧，店员位于右侧，说话者高亮。对白背景为`assets/backgrounds/woss_mall_dialogue.tres`，以AtlasTexture引用本店原图右侧无人区域`Rect2(680,0,906,992)`，不修改原PNG像素，避免出现背景店员与独立立绘重复。交易页仍使用完整原图。
 
 
 2026-10-25角色清晰度修复只改显示配置，继续使用本文件登记的原合层图。

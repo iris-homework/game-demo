@@ -78,7 +78,7 @@
     "battleAssetId": "hotel_battle_simplified"
   },
   "mall": {
-    "path": "res://assets/backgrounds/woss_mall_dialogue.tres",
+    "path": "res://assets/backgrounds/woss_mall_dialogue_v1.png",
     "kind": "background"
   },
   "market": {

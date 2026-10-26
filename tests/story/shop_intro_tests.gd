@@ -275,9 +275,8 @@ func test_real_views() -> void:
 			check(has_texture(app.view, Game.texture("black_market_background")), "market conversation uses existing empty environment plate")
 		else:
 			var backdrop := Game.texture("mall")
-			check(backdrop is AtlasTexture and has_texture(app.view, backdrop), "mall conversation uses environment region as standard background")
-			if backdrop is AtlasTexture:
-				check(backdrop.atlas == Game.texture("woss_mall_shop") and backdrop.region == Rect2(680,0,906,992), "mall background region excludes character embedded at storefront left")
+			check(backdrop != null and not backdrop is AtlasTexture and has_texture(app.view, backdrop), "mall conversation uses a complete independent environment background")
+			check(backdrop != null and backdrop.resource_path == "res://assets/backgrounds/woss_mall_dialogue_v1.png", "mall conversation loads the dedicated unoccupied mall illustration")
 			check(not has_texture(app.view, Game.texture("woss_mall_shop")), "mall conversation omits full storefront plate with duplicate clerk")
 		var steps := 0
 		while Game.state.currentScene == "dialogue" and Game.node_data().get("speakerId", "") != Game.PLAYER_REFERENCE and steps < 10:

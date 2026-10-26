@@ -123,7 +123,20 @@
       "sha256": "e37ab239bdffd771e1918af9a20655402759aa522e53bf2938e3834c807f2e42",
       "generatedWith": "built-in image_gen",
       "date": "2026-10-25"
+    },
+    {
+      "assetId": "mall",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/沃斯商场背景_2026-10-27/沃斯商场_对话背景_v1.png",
+      "path": "res://assets/backgrounds/woss_mall_dialogue_v1.png",
+      "size": [
+        1586,
+        992
+      ],
+      "sha256": "3ea19a2be37d9695b660ab36bcb8538753993b0ea00f58024eb805264450823f",
+      "generatedWith": "built-in image_gen",
+      "date": "2026-10-27",
+      "prompt": "res://assets/backgrounds/woss_mall_dialogue_v1.prompt.txt"
     }
   ],
-  "updated": "2026-10-25"
+  "updated": "2026-10-27"
 }
