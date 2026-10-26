@@ -138,6 +138,59 @@ func test_invalid_file() -> void:
 	check(PlayerSettings.bindings == PlayerSettings.DEFAULT_BINDINGS and PlayerSettings.sfx_enabled and is_equal_approx(PlayerSettings.master_volume,1.0),"unparseable settings file does not block boot and restores defaults")
 	PlayerSettings.reset_defaults()
 
+func test_display_storage() -> void:
+	PlayerSettings.reset_defaults()
+	check(PlayerSettings.display_mode == "windowed" and PlayerSettings.display_window_mode() == DisplayServer.WINDOW_MODE_WINDOWED,"display defaults to a normal window")
+	var actual_mode := DisplayServer.window_get_mode()
+	var modes := [["windowed",DisplayServer.WINDOW_MODE_WINDOWED],["borderless",DisplayServer.WINDOW_MODE_FULLSCREEN],["exclusive",DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN]]
+	for choice in modes:
+		check(PlayerSettings.set_display_mode(choice[0]),"display mode automatically saves: " + str(choice[0]))
+		check(PlayerSettings.display_mode == choice[0] and PlayerSettings.display_window_mode() == choice[1],"display mode maps to expected native enum: " + str(choice[0]))
+		var saved := ConfigFile.new()
+		check(saved.load(PlayerSettings.settings_path) == OK and saved.get_value("display","mode","") == choice[0],"display mode immediately reaches config: " + str(choice[0]))
+		PlayerSettings.display_mode = "temporary-invalid-memory-value"
+		PlayerSettings.reload_settings()
+		check(PlayerSettings.display_mode == choice[0] and PlayerSettings.display_window_mode() == choice[1],"display mode survives reload: " + str(choice[0]))
+	check(PlayerSettings.DISPLAY_MODES["exclusive"] == 4 and PlayerSettings.DISPLAY_MODES["exclusive"] != DisplayServer.WINDOW_MODE_MAXIMIZED,"true fullscreen uses exclusive enum 4 rather than maximized")
+	if DisplayServer.get_name() == "headless":
+		check(DisplayServer.window_get_mode() == actual_mode,"headless display settings do not attempt real window mode changes")
+	var before_text := file_text(PlayerSettings.settings_path)
+	check(not PlayerSettings.set_display_mode("maximized") and PlayerSettings.display_mode == "exclusive","unsupported display mode is rejected without replacing valid preference")
+	check(file_text(PlayerSettings.settings_path) == before_text,"invalid display mode does not overwrite saved settings")
+	PlayerSettings.set_master_volume(0.42)
+	PlayerSettings.set_sfx_volume(0.61)
+	PlayerSettings.set_sfx_enabled(false)
+	PlayerSettings.bind_key("hand_1",KEY_Z)
+	PlayerSettings.reload_settings()
+	check(PlayerSettings.display_mode == "exclusive","sound and hotkey writes retain selected display mode")
+	check(is_equal_approx(PlayerSettings.master_volume,0.42) and is_equal_approx(PlayerSettings.sfx_volume,0.61) and not PlayerSettings.sfx_enabled and PlayerSettings.bindings.hand_1 == KEY_Z,"display mode shares config safely with sound and hotkeys")
+	var config := ConfigFile.new()
+	config.set_value("audio","master_volume",0.36)
+	config.set_value("keys","hand_1",KEY_Z)
+	config.save(PlayerSettings.settings_path)
+	PlayerSettings.display_mode = "exclusive"
+	PlayerSettings.reload_settings()
+	check(PlayerSettings.display_mode == "windowed","legacy config without display section defaults to a window")
+	check(is_equal_approx(PlayerSettings.master_volume,0.36) and PlayerSettings.bindings.hand_1 == KEY_Z,"legacy display default preserves existing sound and hotkeys")
+	for invalid in ["maximized",17,false]:
+		config.set_value("display","mode",invalid)
+		config.save(PlayerSettings.settings_path)
+		PlayerSettings.display_mode = "exclusive"
+		PlayerSettings.reload_settings()
+		check(PlayerSettings.display_mode == "windowed" and PlayerSettings.display_window_mode() == DisplayServer.WINDOW_MODE_WINDOWED,"unknown or wrong-type saved display mode falls back safely: " + str(invalid))
+	var good_path: String = PlayerSettings.settings_path
+	PlayerSettings.settings_path = output.path_join("absent-display-parent/settings.cfg")
+	check(not PlayerSettings.set_display_mode("exclusive"),"display change reports save failure on unavailable storage")
+	check(PlayerSettings.display_mode == "exclusive" and PlayerSettings.pending_save,"failed display save retains selected mode and schedules automatic retry")
+	PlayerSettings.settings_path = good_path
+	PlayerSettings._process(2.1)
+	PlayerSettings.reload_settings()
+	check(PlayerSettings.display_mode == "exclusive" and not PlayerSettings.pending_save,"automatic retry persists the retained display mode")
+	PlayerSettings.reset_defaults()
+	PlayerSettings.display_mode = "exclusive"
+	PlayerSettings.reload_settings()
+	check(PlayerSettings.display_mode == "windowed","Restore Defaults automatically persists windowed display mode")
+
 func test_bindings() -> void:
 	for i in 10:
 		var action := "hand_%d" % (i + 1)
@@ -221,6 +274,44 @@ func test_panel() -> bool:
 	await click(settings.close_button)
 	check(not is_instance_valid(menu.settings_dialog),"close button returns to main menu")
 	return true
+
+func test_display_panel() -> void:
+	var menu = app.view
+	var state_before: Dictionary = Game.state.duplicate(true)
+	var revision_before: int = Game.revision
+	menu.open_settings()
+	await settle()
+	check(is_instance_valid(menu.settings_dialog),"settings reopens for display mode controls")
+	if not is_instance_valid(menu.settings_dialog): return
+	var settings = menu.settings_dialog
+	var picker: OptionButton = settings.display_mode_picker
+	check(is_instance_valid(picker) and picker.item_count == 3,"display picker exposes three modes")
+	if not is_instance_valid(picker):
+		menu.handle_escape()
+		return
+	check(settings.focus_controls.has(picker),"display picker participates in settings keyboard focus loop")
+	var labels := ["窗口","无边框全屏","独占全屏（真全屏）"]
+	var ids := [DisplayServer.WINDOW_MODE_WINDOWED,DisplayServer.WINDOW_MODE_FULLSCREEN,DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN]
+	var names := ["windowed","borderless","exclusive"]
+	for i in mini(3,picker.item_count):
+		check(picker.get_item_text(i) == labels[i],"display choice has explicit player label: " + labels[i])
+		check(picker.get_item_id(i) == ids[i],"display choice carries correct native enum: " + labels[i])
+		picker.select(i)
+		picker.item_selected.emit(i)
+		await settle()
+		check(PlayerSettings.display_mode == names[i],"picker selection immediately applies preference: " + names[i])
+		var config := ConfigFile.new()
+		check(config.load(PlayerSettings.settings_path) == OK and config.get_value("display","mode","") == names[i],"picker selection saves without separate Save action: " + names[i])
+	check(picker.get_item_id(2) == 4,"true fullscreen picker option is exclusive, not maximized")
+	await click(settings.close_button)
+	menu.open_settings()
+	await settle()
+	settings = menu.settings_dialog
+	check(settings.display_mode_picker.get_selected_id() == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN,"reopening settings reflects saved exclusive fullscreen preference")
+	await click(settings.reset_button)
+	check(PlayerSettings.display_mode == "windowed" and settings.display_mode_picker.get_selected_id() == DisplayServer.WINDOW_MODE_WINDOWED,"Restore Defaults updates display preference and picker together")
+	await click(settings.close_button)
+	check(Game.page == "menu" and Game.state == state_before and Game.revision == revision_before,"display settings do not alter adventure state or menu route")
 
 func test_dialogue_input() -> void:
 	Game.new_game()
@@ -326,6 +417,7 @@ func _ready() -> void:
 	PlayerSettings.status_changed.connect(func(success: bool): statuses.append(success))
 	test_storage()
 	test_invalid_file()
+	test_display_storage()
 	test_bindings()
 	app = preload("res://scenes/main.tscn").instantiate()
 	add_child(app)
@@ -333,6 +425,7 @@ func _ready() -> void:
 	check(ready,"main scene initializes menu with isolated settings")
 	if ready:
 		await test_panel()
+		await test_display_panel()
 		await test_dialogue_input()
 		await test_hand_input()
 	if is_instance_valid(app.audio_hooks): app.audio_hooks.attach(null)
@@ -341,7 +434,7 @@ func _ready() -> void:
 	await settle()
 	check(not FileAccess.file_exists(Game.save_path) and not FileAccess.file_exists(Game.meta_path),"settings QA never writes adventure or meta save files")
 	var file := FileAccess.open(output.path_join("settings-results.json"),FileAccess.WRITE)
-	file.store_string(JSON.stringify({"checks":checks,"failures":failures,"records":records,"userDataDirectory":OS.get_user_data_dir(),"scope":"isolated settings storage, audio buses, real viewport synthetic input; no pixels, listening or physical input"},"\t"))
+	file.store_string(JSON.stringify({"checks":checks,"failures":failures,"records":records,"userDataDirectory":OS.get_user_data_dir(),"scope":"isolated settings storage, audio buses, display mode enums and preferences, real viewport synthetic input; no physical fullscreen, pixels, listening or physical input"},"\t"))
 	file.close()
 	print("SETTINGS TESTS: %d checks, %d failures" % [checks,failures.size()])
 	get_tree().quit(0 if failures.is_empty() else 1)

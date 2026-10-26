@@ -2,6 +2,14 @@ extends Node
 ## Player preferences are independent of adventure checkpoints.
 signal status_changed(success: bool)
 
+const DISPLAY_MODES := {
+	"windowed": DisplayServer.WINDOW_MODE_WINDOWED,
+	"borderless": DisplayServer.WINDOW_MODE_FULLSCREEN,
+	"exclusive": DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN,
+}
+const DISPLAY_LABELS := {
+	"windowed": "窗口", "borderless": "无边框全屏", "exclusive": "独占全屏（真全屏）",
+}
 const DEFAULT_BINDINGS := {
 	"advance": KEY_SPACE, "end_turn": KEY_E, "technology": KEY_Q,
 	"draw_pile": KEY_D, "discard_pile": KEY_F,
@@ -17,6 +25,10 @@ var settings_path := "user://settings.cfg"
 var master_volume := 1.0
 var sfx_volume := 1.0
 var sfx_enabled := true
+var display_mode := "windowed"
+var _windowed_size := Vector2i(1280, 800)
+var _windowed_position := Vector2i.ZERO
+var _has_windowed_geometry := false
 var bindings: Dictionary = DEFAULT_BINDINGS.duplicate()
 var pending_save := false
 var retry_seconds := 0.0
@@ -46,6 +58,7 @@ func reload_settings() -> void:
 	master_volume = 1.0
 	sfx_volume = 1.0
 	sfx_enabled = true
+	display_mode = "windowed"
 	bindings = DEFAULT_BINDINGS.duplicate()
 	pending_save = false
 	if config.load(settings_path) == OK:
@@ -53,6 +66,8 @@ func reload_settings() -> void:
 		sfx_volume = _volume_value(config.get_value("audio", "sfx_volume", 1.0))
 		var enabled: Variant = config.get_value("audio", "sfx_enabled", true)
 		sfx_enabled = enabled if typeof(enabled) == TYPE_BOOL else true
+		var mode: Variant = config.get_value("display", "mode", "windowed")
+		if typeof(mode) == TYPE_STRING and DISPLAY_MODES.has(mode): display_mode = mode
 		# Validate the complete candidate map before accepting it (supports key swaps).
 		var candidate := DEFAULT_BINDINGS.duplicate()
 		for action in candidate:
@@ -64,6 +79,7 @@ func reload_settings() -> void:
 				break
 		bindings = candidate
 	_apply_audio()
+	_apply_display_mode()
 
 func _apply_audio() -> void:
 	_ensure_audio_bus()
@@ -78,6 +94,7 @@ func _save() -> bool:
 	config.set_value("audio", "master_volume", master_volume)
 	config.set_value("audio", "sfx_volume", sfx_volume)
 	config.set_value("audio", "sfx_enabled", sfx_enabled)
+	config.set_value("display", "mode", display_mode)
 	for action in bindings: config.set_value("keys", action, bindings[action])
 	var temporary := settings_path + ".tmp"
 	var result := config.save(temporary)
@@ -87,6 +104,45 @@ func _save() -> bool:
 	retry_seconds = 0.0
 	status_changed.emit(not pending_save)
 	return not pending_save
+
+func display_window_mode() -> int:
+	return DISPLAY_MODES.get(display_mode, DisplayServer.WINDOW_MODE_WINDOWED)
+
+func set_display_mode(value: String) -> bool:
+	if not DISPLAY_MODES.has(value): return false
+	display_mode = value
+	_apply_display_mode()
+	return _save()
+
+func _apply_display_mode() -> void:
+	# Headless can validate preferences but cannot perform native window transitions.
+	if DisplayServer.get_name() == "headless": return
+	var window := get_window()
+	var requested := display_window_mode()
+	if window.mode == requested:
+		if requested == Window.MODE_WINDOWED: window.borderless = false
+		return
+	if window.mode == Window.MODE_WINDOWED:
+		_windowed_size = window.size
+		_windowed_position = window.position
+		_has_windowed_geometry = true
+	window.mode = requested as Window.Mode
+	if requested == Window.MODE_WINDOWED:
+		window.borderless = false
+		_restore_windowed_geometry.call_deferred()
+
+func _restore_windowed_geometry() -> void:
+	# A deferred callback must not resize a new fullscreen request made meanwhile.
+	var window := get_window()
+	if display_mode != "windowed" or window.mode != Window.MODE_WINDOWED: return
+	var area := DisplayServer.screen_get_usable_rect(window.current_screen)
+	if area.size.x <= 0 or area.size.y <= 0: return
+	var dimensions := _windowed_size.min(area.size)
+	window.size = dimensions
+	var origin := _windowed_position if _has_windowed_geometry else area.position + (area.size - dimensions) / 2
+	window.position = Vector2i(
+		clampi(origin.x, area.position.x, area.end.x - dimensions.x),
+		clampi(origin.y, area.position.y, area.end.y - dimensions.y))
 
 func set_master_volume(value: float) -> bool:
 	master_volume = _volume_value(value)
@@ -145,6 +201,8 @@ func reset_defaults() -> bool:
 	master_volume = 1.0
 	sfx_volume = 1.0
 	sfx_enabled = true
+	display_mode = "windowed"
 	bindings = DEFAULT_BINDINGS.duplicate()
 	_apply_audio()
+	_apply_display_mode()
 	return _save()
