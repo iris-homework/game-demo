@@ -50,11 +50,16 @@ func _build_task_briefing(available: Array) -> void:
 	scroll.size = Vector2(485,450)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(scroll)
+	# Keep the slanted button border and hover glow inside the scroll clip.
+	var padding := MarginContainer.new()
+	padding.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for side in ["left", "right", "top", "bottom"]:
+		padding.add_theme_constant_override("margin_" + side, 12)
+	scroll.add_child(padding)
 	var content := VBoxContainer.new()
-	content.custom_minimum_size.x = 455
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation", 28)
-	scroll.add_child(content)
+	padding.add_child(content)
 	for event in available:
 		var block := VBoxContainer.new()
 		block.add_theme_constant_override("separation", 18)
