@@ -193,9 +193,6 @@ func enter(params: Dictionary) -> void:
 		if state_name != "focus": purple_style.bg_color = Color("482866") if state_name == "hover" else Color("251638")
 		cyberware_button.add_theme_stylebox_override(state_name,purple_style)
 	refresh_cyberware()
-	if Game.config.developmentMode:
-		var debug_position := Vector2(1240,96) if model.profile.get("battleType","normal") == "boss" else Vector2(900,163)
-		button(self,"调试结果",debug_position,Vector2(160,36),show_debug_results).add_theme_font_size_override("font_size",15)
 	aim = Node2D.new()
 	aim.set_script(preload("res://scripts/combat/targeting_line.gd"))
 	aim.z_index = 35
