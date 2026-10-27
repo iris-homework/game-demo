@@ -63,7 +63,7 @@ func _ready() -> void:
 	await idle()
 	var menu = app.view
 	menu.training_toggle.pressed.emit()
-	var entrance: Button = menu.find_child("training_B02", true, false)
+	var entrance: Button = menu.find_child("enemy_choice_robot", true, false)
 	check(is_instance_valid(entrance) and entrance.is_visible_in_tree(), "Expanded menu exposes robot test entrance")
 	check(menu.training_container.get_global_rect().encloses(entrance.get_global_rect()), "Robot entrance fits the expanded training menu")
 	check(not entrance.get_global_rect().intersects(menu.motion_button.get_global_rect()), "Robot entrance clears the motion setting below")

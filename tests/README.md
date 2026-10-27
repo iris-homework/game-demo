@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-10-27[演练专项](combat/enemies/published_training_tests.tscn)改查第一周七组正式对手、完整阵容及Boss两阶段、菜单焦点／布局、旧测试敌人拒绝、胜负恢复和禁写存档；[原B04选景专项](combat/presentation/b04_scenery_choice_visual.tscn)现在验证七组固定正式背景及演员站位，不再选景。两者均要求绝对`QA_OUT_DIR`与名称含QA的隔离用户目录，支持无窗口运行；本轮结果见[验证](../artifacts/qa/week1-training-2026-10-27/verification.json)。
+
 2026-10-27[奖励选择专项](combat/cards/reward_picker_tests.tscn)增加24项入场字体回归：分别在初始／中段SubViewport、完成及重开时检查三个槽位的等级、类别、拥有数和操作文字字体及字形，跳过卡面独立字体。旧代码129项中18项失败，修复后129项全通过，配套刷新90项通过；GPU截图及隔离范围见[验证](../artifacts/qa/reward-font-2026-10-27/verification.json)。
 
 2026-10-27新增[悬停说明字体专项](rendering/card_hover_font_tests.tscn)：通过正式鼠标进入／离开信号与0.45秒延时，核对伤口追猎及拉开距离的原始／动态说明、关闭重开、实际解析的字体及全部可见字符字形。须复制工程并设置名称含QA的独立用户目录；关闭保存、无系统鼠标操作，结果写入`QA_OUT_DIR`。此专项检查字体和节点，不代替GPU像素验收；本轮实际结果见修改记录。
@@ -166,7 +168,7 @@
 
 无人物版卡面专项：[card_face_style_tests](card_face_style_tests.tscn)。保留原入口名，当前以隔离用户目录及独立存档路径headless运行，覆盖40张无人物实图、主菜单无卡面按钮、旧偏好不影响显示、浏览与放大复用、40牌双形态动态排版及快照不变。不能代替实际像素和物理输入验收；本轮结果见修改记录。`artifacts/qa/card-face-style-2026-10-23/`及本页较早双卡面数量为移除切换前的历史证据。
 
-十种已发布敌人的菜单演练专项：[published_training_tests](combat/enemies/published_training_tests.tscn)，在隔离复制工程中headless运行；覆盖十选择、真实战斗视图及攻击回调、咬击／射击演出、胜负与退出恢复、临时注册清理、存档哨兵、原三入口及模态焦点／Esc／锁定。只验证逻辑和节点时序，不替代像素渲染或真实鼠标验收，不启动桌面窗口。
+第一周七组正式对手的菜单演练专项：[published_training_tests](combat/enemies/published_training_tests.tscn)，在隔离复制工程中headless运行；覆盖七选择与第一周事件战斗集合一致、动态正式数据与Boss两阶段、旧测试敌人拒绝、胜负及退出恢复、临时战斗清理、存档哨兵与模态焦点／Esc／锁定。只验证逻辑和节点时序，不替代像素渲染或真实鼠标验收，不启动桌面窗口。
 
 ## 2026-10-23 事件删减与无前置回归
 

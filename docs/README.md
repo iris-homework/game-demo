@@ -1,5 +1,7 @@
 # 午夜委托文档索引
 
+2026-10-27 game-demo战斗演练整理为第一周七组正式对手，固定各自战斗地点；移除场景选择与未接入第一周的测试敌人入口。七项仅引用正式阵容及数值，Boss两阶段和演练恢复隔离保留。仅源码修改，发行包未更新；见[规则](游戏规则.md#战斗演练)、[修改记录](修改记录.md#2026-10-27-战斗演练限定第一周七组对手)与[验证](../artifacts/qa/week1-training-2026-10-27/verification.json)。
+
 2026-10-27字体与中文断行修复版已替换现有[GitHub试玩发行版](https://github.com/iris-homework/game-demo/releases/tag/v0.4.0-demo.1)，原Windows／macOS下载链接及发行标题、正文保持不变。构建锁定main提交`089535a54dc717bc586b37fab37ac928b42a7b1b`，包含卡牌悬停主题、奖励入场主题及ICU断行数据；两个最终PCK共2040项检查通过，均含4,797,472字节ICU数据且SHA256与模板一致。实际macOS发行模板的隔离QA副本复现旧包照片式换行，新包两尺寸断行及字体检查通过；不是Windows实机验收。ZIP、961项源文件哈希、架构、Mac临时签名、模板启动及线上附件摘要与原下载链接检查通过。正式存档与设置哈希未变；上传同期仅日志变化，并观察到正式源工程游戏进程，未覆盖或恢复用户文件。未做Windows／Intel实机、完整流程、实际听音或实体输入验收。详见[本轮验证](../artifacts/qa/font-release-2026-10-27/verification.json)。
 
 2026-10-27 game-demo启用导出中文断行数据：`project.godot`设置`internationalization/locale/include_text_server_data=true`，供后续独立发行包携带ICU断词／断行规则。已静态核对配置、隔离构建复制路径及本机ICU模板文件；本轮未运行、打包或更新线上发行版，旧包仍须重新导出后生效。见[发行说明](发行版制作.md)、[修改记录](修改记录.md)与[验证](../artifacts/qa/chinese-line-break-export-2026-10-27/verification.json)。

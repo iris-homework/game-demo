@@ -1,108 +1,18 @@
 [
   {
-    "id": "warden_shield",
-    "displayName": "巡界盾手",
-    "placeId": "camp",
-    "combatVisualId": "warden_shield",
-    "maxHp": 100,
-    "intentSequence": [
-      {
-        "type": "attack",
-        "amount": 6,
-        "hits": 1,
-        "animation": "pierce"
-      }
-    ]
+    "id": "robot",
+    "displayName": "故障机器人",
+    "battleId": "B02"
   },
   {
-    "id": "chip_broker",
-    "displayName": "筹码掮客",
-    "placeId": "bar",
-    "combatVisualId": "chip_broker",
-    "maxHp": 100,
-    "intentSequence": [
-      {
-        "type": "attack",
-        "amount": 6,
-        "hits": 1,
-        "animation": "pierce"
-      }
-    ]
+    "id": "gang",
+    "displayName": "黑帮三人组",
+    "battleId": "B04"
   },
   {
-    "id": "mutant_mouse",
-    "displayName": "爬墙线鼠",
-    "placeId": "hive",
-    "combatVisualId": "mutant_mouse",
-    "maxHp": 100,
-    "intentSequence": [
-      {
-        "type": "attack",
-        "amount": 6,
-        "hits": 1,
-        "animation": "pierce"
-      }
-    ]
-  },
-  {
-    "id": "luggage_lurker",
-    "displayName": "行李潜伏客",
-    "placeId": "hotel",
-    "combatVisualId": "luggage_lurker",
-    "maxHp": 100,
-    "intentSequence": [
-      {
-        "type": "attack",
-        "amount": 6,
-        "hits": 1,
-        "animation": "bite"
-      }
-    ]
-  },
-  {
-    "id": "penitent_ascetic",
-    "displayName": "赎罪苦修者",
-    "placeId": "church",
-    "combatVisualId": "penitent_ascetic",
-    "maxHp": 100,
-    "intentSequence": [
-      {
-        "type": "attack",
-        "amount": 6,
-        "hits": 1,
-        "animation": "pierce"
-      }
-    ]
-  },
-  {
-    "id": "rogue_drone",
-    "displayName": "失控配送蜂",
-    "placeId": "block5",
-    "combatVisualId": "rogue_drone",
-    "maxHp": 100,
-    "intentSequence": [
-      {
-        "type": "attack",
-        "amount": 6,
-        "hits": 1,
-        "animation": "pierce"
-      }
-    ]
-  },
-  {
-    "id": "mirror_inspector",
-    "displayName": "镜面监察员",
-    "placeId": "tower",
-    "combatVisualId": "mirror_inspector",
-    "maxHp": 100,
-    "intentSequence": [
-      {
-        "type": "attack",
-        "amount": 6,
-        "hits": 1,
-        "animation": "shoot"
-      }
-    ]
+    "id": "fish",
+    "displayName": "双变异鱼",
+    "battleId": "B11"
   },
   {
     "id": "pruning_hound",
@@ -118,5 +28,10 @@
     "id": "beacon_jellyfish",
     "displayName": "信标水母",
     "battleId": "B15"
+  },
+  {
+    "id": "dancer_duet",
+    "displayName": "双人舞者 · Boss",
+    "battleId": "B16"
   }
 ]

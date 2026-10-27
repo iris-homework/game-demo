@@ -79,7 +79,7 @@ func _ready() -> void:
 	await get_tree().create_timer(0.6).timeout
 	var toggle: Button = app.view.find_child("training_toggle",true,false)
 	await click_at(toggle.get_global_rect().get_center())
-	var entrance: Button = app.view.find_child("training_B11",true,false)
+	var entrance: Button = app.view.find_child("enemy_choice_fish",true,false)
 	check(entrance != null and entrance.text == "双变异鱼" and entrance.is_visible_in_tree(),"Menu exposes the renamed enemy test")
 	check(app.view.find_child("training_B12",true,false) == null,"Old mech training button is replaced")
 	await shot("menu")

@@ -58,8 +58,7 @@ var training_backup: Dictionary = {}
 var training_enemies: Array = []
 var training_enemy_id := ""
 var training_battle_id := ""
-# Session-only presentation preferences; neither field belongs to adventure saves.
-var b04_scenery_choice := ""
+# Developer background-preview override; player training always uses its authored place.
 var training_scenery_place_id := ""
 
 func read_data(path: String):
@@ -1175,36 +1174,17 @@ func heal_at(place_id: String) -> bool:
 	notice.emit(payment + "生命恢复 +%d  /  %d HP" % [int(state.currentHp)-previous, state.maxHp])
 	return true
 
-func training_scenery_choices() -> Array[Dictionary]:
-	var choices: Array[Dictionary] = [{"id":"", "name":"默认场景（后巷）"}]
-	for place_id in ["garden","hive","port","pump","junkyard","hotel","tower","block5","church","alley","bar","hospital"]:
-		var place: Dictionary = place_data(place_id)
-		var asset_id: String = assets.get(place.get("backgroundAssetId",""),{}).get("battleAssetId","")
-		var definition: Dictionary = assets.get(asset_id,{})
-		if definition.get("battleEnabled",true) and definition.get("trainingSelectable",false) and texture(asset_id) != null:
-			choices.append({"id":place_id,"name":place.name})
-	return choices
-
-func set_b04_scenery_choice(place_id: String) -> bool:
-	if training_mode or transition_locked or battle_busy: return false
-	for choice in training_scenery_choices():
-		if choice.id == place_id:
-			b04_scenery_choice = place_id
-			return true
-	return false
-
 func training_enemy_choices() -> Array[Dictionary]:
 	var choices: Array[Dictionary] = []
 	for definition in training_enemies:
 		var choice: Dictionary = definition.duplicate(true)
-		if choice.has("battleId"):
-			var battle: Dictionary = battles.get(choice.battleId, {})
-			var ids: Array = battle.get("enemyIds", [])
-			if ids.is_empty() or ids.any(func(id): return not enemy_catalog.has(id)): continue
-			# Display metadata and practice snapshots share the current formal source.
-			choice.merge(enemy_catalog[ids[0]].duplicate(true), false)
-			choice.enemyIds = ids.duplicate()
-			choice.placeId = battle.placeId
+		var battle: Dictionary = battles.get(choice.get("battleId", ""), {})
+		var ids: Array = battle.get("enemyIds", [])
+		if ids.is_empty() or ids.any(func(id): return not enemy_catalog.has(id)): continue
+		# Display metadata and practice snapshots share the current formal source.
+		choice.merge(enemy_catalog[ids[0]].duplicate(true), false)
+		choice.enemyIds = ids.duplicate()
+		choice.placeId = battle.placeId
 		choices.append(choice)
 	return choices
 
@@ -1214,21 +1194,9 @@ func start_enemy_training(id: String) -> void:
 		if definition.id != id: continue
 		var temporary_id := "training_" + id
 		if battles.has(temporary_id) or enemy_catalog.has(temporary_id): return
-		var practice: Dictionary
-		if definition.has("battleId"):
-			practice = battles[definition.battleId].duplicate(true)
-			# Reuse every authored enemy, including encounter size and phase data.
-			# No temporary enemy or second set of HP/intents is created.
-			training_enemy_id = ""
-		else:
-			var enemy: Dictionary = definition.duplicate(true)
-			enemy.id = temporary_id
-			enemy.characterId = id
-			enemy.battlePortraitAssetId = ""
-			enemy.prototype = false
-			enemy_catalog[temporary_id] = enemy
-			practice = {"battleType":"normal", "placeId":definition.placeId, "enemyIds":[temporary_id]}
-			training_enemy_id = temporary_id
+		# Reuse the complete formal encounter, including multi-enemy and Boss phases.
+		var practice: Dictionary = battles[definition.battleId].duplicate(true)
+		training_enemy_id = ""
 		practice.id = temporary_id
 		practice.eventId = ""
 		practice.name = definition.displayName + "演练"
@@ -1263,11 +1231,6 @@ func start_training(battle_id: String = "B04") -> void:
 		fresh.equippedCyberwareIds = source.equippedCyberwareIds.duplicate()
 	training_backup = state.duplicate(true)
 	training_scenery_place_id = ""
-	if battle_id == "B04":
-		for choice in training_scenery_choices():
-			if choice.id == b04_scenery_choice:
-				training_scenery_place_id = b04_scenery_choice
-				break
 	training_mode = true
 	state = fresh
 	state.targetId = "richard"
@@ -1633,9 +1596,13 @@ func valid_dancer_intent(intent, expected_ids: Array) -> bool:
 	return true
 
 func valid_dancer_encounter(c: Dictionary) -> bool:
+	# Only the currently active, session-only Boss copy may use a temporary ID.
+	var practice: Dictionary = battles.get(c.battleId, {})
+	var training_boss: bool = training_mode and c.battleId == training_battle_id and practice.get("trainingOnly", false) and practice.get("encounterId", "") == "dancer_duet"
+	var dancer_battle: bool = c.battleId == "B16" or training_boss
 	if c.profile.get("encounterId", "") != "dancer_duet":
-		return c.battleId != "B16" and not c.has("encounterPhase") and not c.profile.has("phaseTwoEnemies") and not c.profile.has("phaseTwoCards") and not c.profile.has("phaseOneEnemies")
-	if c.battleId != "B16" or c.profile.get("battleType") != "boss": return false
+		return not dancer_battle and not c.has("encounterPhase") and not c.profile.has("phaseTwoEnemies") and not c.profile.has("phaseTwoCards") and not c.profile.has("phaseOneEnemies")
+	if not dancer_battle or c.profile.get("battleType") != "boss": return false
 	if not buffs._valid_count(c.get("encounterPhase"), 2) or int(c.get("encounterPhase")) not in [1, 2]: return false
 	var definitions = c.profile.get("phaseTwoEnemies")
 	if not definitions is Array or definitions.size() != 2: return false

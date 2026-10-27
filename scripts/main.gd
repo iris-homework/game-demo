@@ -274,7 +274,7 @@ func open_exit_confirmation(action: String) -> void:
 	if action == "quit":
 		if Game.page != "menu": return
 		if is_instance_valid(view.confirm_dialog) and view.confirm_dialog.visible: return
-		if view.training_open or is_instance_valid(view.scenery_dialog) or is_instance_valid(view.settings_dialog): return
+		if view.training_open or is_instance_valid(view.settings_dialog): return
 	elif Game.page == "menu": return
 	if view.has_method("cancel_selection"): view.cancel_selection()
 	exit_action = action

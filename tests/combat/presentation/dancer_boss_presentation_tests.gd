@@ -148,7 +148,7 @@ func _ready() -> void:
 	app = preload("res://scenes/main.tscn").instantiate()
 	add_child(app)
 	await get_tree().process_frame
-	check(is_instance_valid(app.view.find_child("training_B16",true,false)),"menu exposes Boss training")
+	check(is_instance_valid(app.view.find_child("enemy_choice_dancer_duet",true,false)),"menu exposes Boss training")
 	var backup := Game.state.duplicate(true)
 	Game.start_training("B16")
 	await idle()

@@ -188,8 +188,8 @@ func input_suite() -> void:
 	await settle(0.5)
 	check(env.frame_index != advanced_frame,"frames keep advancing while the dynamic clock runs")
 	await click(button("training_toggle"))
-	check(app.view.training_open and button("training_B04").is_visible_in_tree(),"training group expands with actual input")
-	for code in ["training_B04","training_B11"]:
+	check(app.view.training_open and button("enemy_choice_gang").is_visible_in_tree(),"training group expands with actual input")
+	for code in ["enemy_choice_gang","enemy_choice_fish"]:
 		check(get_viewport().get_visible_rect().encloses(button(code).get_global_rect()),"expanded button inside canvas " + code)
 	await shot("04-training-expanded")
 	await key(KEY_ESCAPE)
