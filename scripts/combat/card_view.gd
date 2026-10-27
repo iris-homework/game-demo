@@ -390,6 +390,8 @@ func show_zoom_preview() -> void:
 	zoom_layer.layer = 15
 	add_child(zoom_layer)
 	var holder := Control.new()
+	# CanvasLayer breaks Control theme inheritance; keep the bundled CJK font.
+	holder.theme = theme
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	zoom_layer.add_child(holder)
 	var zoom_size := Vector2(180, 230) * ZOOM_SCALE

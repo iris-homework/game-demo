@@ -1,5 +1,7 @@
 # 午夜委托文档索引
 
+2026-10-27将桌面工程的悬停说明字体修复同步到game-demo：为独立CanvasLayer下的holder显式传递中文主题，修复说明文字退回默认字体导致“远”字方框。隔离专项36项通过；仅本地源码同步，未打包、更新线上发行版或提交／推送。见[修改记录](修改记录.md)与[验证](../artifacts/qa/hover-font-sync-2026-10-27/verification.json)。
+
 2026-10-27已按最新main提交`508913459adacd913b856ff05df501c29928af0e`重新构建并替换现有[GitHub试玩发行版](https://github.com/iris-homework/game-demo/releases/tag/v0.4.0-demo.1)，Windows x86_64与macOS Universal附件及校验文件已更新，原下载链接不变；发行标题与正文按用户要求逐字保留。相较上一发行仅`battle.gd`与`test_stage.gd`运行文件变化，包含调试按钮移除与双舞者存活目标朝向修复。两个最终PCK共2388项检查通过，ZIP、961项源文件哈希、架构、Mac临时签名与解压应用无窗口启动通过；三个线上附件SHA256一致、下载返回200。同期有正式源工程游戏运行，正式存档与设置哈希出现变化，全目录保护审计未通过；未覆盖或恢复这些文件，不声明本轮正式目录哈希未变。未做Windows／Intel实机、完整七天、GPU画面、听音或实体输入验收。详见[本轮验证](../artifacts/qa/main-refresh-5089134-2026-10-27/verification.json)。
 
 2026-10-27转场修复版已替换现有[GitHub试玩发行版](https://github.com/iris-homework/game-demo/releases/tag/v0.4.0-demo.1)，原下载链接保持不变。Windows x86_64与macOS Universal包基于main提交`dff15bbc6b24a0dbb4c7de258321eebc4e7cd314`隔离构建，发行标签同步指向该提交；相较上一发行仅运行文件`main.gd`变化。两个最终PCK共2296项检查通过（资源／运行逻辑1990项、空格输入250项、转场输入56项），源码同步另通过本轮设置专项241项。ZIP完整性、961项源文件哈希、架构、Mac临时签名及解压应用无窗口启动通过；三个线上附件SHA256与本地一致，下载链接返回200。构建及测试结束时正式存档与设置哈希未变；未做Windows／Intel实机、完整七天流程、GPU画面、实际听音或实体输入验收。详见[本轮验证](../artifacts/qa/transition-release-2026-10-27/verification.json)及同目录`github-release.json`。
