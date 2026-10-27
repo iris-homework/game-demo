@@ -1,5 +1,7 @@
 # 午夜委托文档索引
 
+2026-10-27将桌面制作工程已验证的战斗返回菜单转场修复同步到game-demo源码：转场输入锁先于设置弹窗属性访问，并核对`shown_page`；本轮隔离设置专项241项通过，正式用户目录哈希未变。此条仅记录源码同步，发行替换另行记录。见[修改记录](修改记录.md)及[验证](../artifacts/qa/transition-sync-release-2026-10-27/verification.json)。
+
 2026-10-27修复自定义Space战斗快捷键与焦点按钮确认冲突，按下／重复／释放由对应操作接管，弹窗确认保留；同步诊所100信用点及机器人45HP两项旧断言。6套1045项隔离无窗口检查通过；原代码复现与范围见[修改记录](修改记录.md)及[验证](../artifacts/qa/battle-shortcut-fix-2026-10-27/verification.json)。
 
 2026-10-27空格修复版已替换现有[GitHub试玩发行版](https://github.com/iris-homework/game-demo/releases/tag/v0.4.0-demo.1)，原下载链接保持不变。Windows x86_64与macOS Universal包基于main提交`0a4ddeec61116ceb53d589a82ef306b1b64762bd`隔离构建，发行标签同步指向该提交。两个最终PCK共2240项检查通过（资源／运行逻辑1990项、空格输入专项250项），ZIP完整性、架构、Mac临时签名与解压应用无窗口启动通过；三个线上附件SHA256与本地一致。构建及测试结束时正式用户目录10个文件集合与哈希未变；上传期间设置及日志出现后续变化，未覆盖或恢复这些文件。未做Windows／Intel实机、完整七天流程、GPU画面、听音或实体输入验收。详见[本轮验证](../artifacts/qa/shortcut-release-2026-10-27/verification.json)及同目录`github-release.json`。

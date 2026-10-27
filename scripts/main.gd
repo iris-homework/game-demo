@@ -187,7 +187,12 @@ func _input(event: InputEvent) -> void:
 			close_current_deck()
 		return
 	if is_instance_valid(card_console): return
-	if Game.page == "menu" and is_instance_valid(view) and is_instance_valid(view.settings_dialog):
+	# Game.page changes before the outgoing battle view is replaced by the tween.
+	# Block input before reading any page-specific properties during that interval.
+	if Game.transition_locked:
+		get_viewport().set_input_as_handled()
+		return
+	if Game.page == "menu" and shown_page == "menu" and is_instance_valid(view) and is_instance_valid(view.settings_dialog):
 		var settings: Control = view.settings_dialog
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
 			get_viewport().set_input_as_handled()
@@ -203,9 +208,6 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		if Game.config.developmentMode and not Game.battle_busy and not Game.transition_locked and not Game.is_run_over():
 			open_card_console()
-		return
-	if Game.transition_locked:
-		get_viewport().set_input_as_handled()
 		return
 	if not event is InputEventKey or not event.is_pressed() or event.is_echo(): return
 	if Game.battle_busy:

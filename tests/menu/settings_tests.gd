@@ -407,8 +407,36 @@ func test_hand_input() -> void:
 	ready = await wait_ready(func(): return battle.initialized and battle.model.turn > turn_before)
 	check(ready and battle.model.turn == turn_before + 1,"E executes exactly one real enemy turn and starts next player turn")
 	Game.menu()
+	check(Game.transition_locked and Game.page == "menu" and app.shown_page == "battle" and app.view == battle,"menu destination keeps battle view during transition cover")
+	var snapshot: Dictionary = battle.model.snapshot()
+	test_transition_input("battle cover")
+	check(battle.model.snapshot() == snapshot,"transition input does not mutate outgoing battle")
+	var deadline := Time.get_ticks_msec() + 5000
+	while app.shown_page != "menu" and Time.get_ticks_msec() < deadline:
+		await get_tree().process_frame
+	check(app.shown_page == "menu" and Game.transition_locked,"menu view is installed while transition reveal remains locked")
+	test_transition_input("menu reveal")
 	await wait_ready(func(): return Game.page == "menu")
+	check(app.shown_page == "menu" and not Game.transition_locked,"menu transition completes after blocked input")
+	app.view.open_settings()
+	check(is_instance_valid(app.view.settings_dialog),"settings still opens after battle return")
+	await key(KEY_ESCAPE)
+	check(not is_instance_valid(app.view.settings_dialog),"Escape closes settings after transition unlocks")
 	PlayerSettings.reset_defaults()
+
+func test_transition_input(phase: String) -> void:
+	var motion := InputEventMouseMotion.new()
+	motion.position = Vector2(700, 400)
+	var right := InputEventMouseButton.new()
+	right.button_index = MOUSE_BUTTON_RIGHT
+	right.pressed = true
+	var console_key := key_event(KEY_A, true, true)
+	console_key.shift_pressed = true
+	for event in [motion, right, key_event(KEY_ESCAPE), key_event(KEY_E), key_event(KEY_1), console_key]:
+		get_viewport().push_input(event, true)
+		check(get_viewport().is_input_handled(),phase + " consumes " + event.as_text())
+	check(Game.page == "menu" and Game.transition_locked,phase + " preserves transition destination and lock")
+	check(not is_instance_valid(app.card_console) and not is_instance_valid(app.exit_dialog),phase + " does not open global dialogs")
 
 func _ready() -> void:
 	if not OS.get_user_data_dir().to_lower().contains("settings-qa"):
