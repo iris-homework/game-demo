@@ -419,6 +419,18 @@ func retire_actor(actor: Node2D) -> void:
 		await fx.finished
 	else:
 		await create_tween().tween_property(actor,"modulate:a",0.0,0.16).finished
+	face_duet_survivor()
+
+func face_duet_survivor() -> void:
+	# Only the split-side Boss formation needs a new idle target after a death.
+	if not dancer_duet or not player.alive: return
+	var survivors: Array[Node2D] = []
+	for enemy in enemies:
+		if enemy.alive: survivors.append(enemy)
+	if survivors.size() != 1: return
+	var survivor := survivors[0]
+	player.face_toward(survivor.position)
+	survivor.face_toward(player.position)
 
 func spawn_pollution_spit(attacker: Node2D, defender: Node2D, instant: bool = false) -> Node2D:
 	if not attacker.alive or attacker.kind != "fish": return null
@@ -566,6 +578,8 @@ func return_home() -> void:
 			actor.position = actor.home
 			actor.facing = 1.0 if actor == player or (dancer_duet and actor.home.x < player.home.x) else -1.0
 			actor.set_pose("idle")
+		face_duet_survivor()
+		for actor in returning:
 			var ghost := ReturnGhost.new()
 			ghost.position = actor.home
 			ghost.scale = Vector2.ONE*depth_scale(actor.home)

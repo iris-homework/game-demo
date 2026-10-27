@@ -834,6 +834,7 @@ func setup_dancer_duet() -> void:
 	for i in stage.enemies.size():
 		stage.enemies[i].alive = model.enemies[i].hp > 0
 		stage.enemies[i].visible = stage.enemies[i].alive
+	stage.face_duet_survivor()
 	enemy_portraits.assign(stage.enemies)
 
 func present_encounter_phase() -> void:
@@ -1077,6 +1078,7 @@ func resume_console_combat() -> void:
 	for i in stage.enemies.size():
 		stage.enemies[i].alive = model.enemies[i].hp > 0
 		stage.enemies[i].visible = stage.enemies[i].alive
+	stage.face_duet_survivor()
 	refresh_enemy_hud()
 	refresh_resources()
 	refresh_card_previews()
