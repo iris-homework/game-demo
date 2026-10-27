@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-10-27修正[通用归位专项](combat/presentation/return_glitch_visual.tscn)的旧100HP开局假设：按实际开局HP检查准确扣6血，并分别验证回合、手牌、污染及显示同步；当前实测70→64，79项全通过。退出前释放场景，旧资源残留提示消除。[鱼规则专项](combat/enemies/fish/fish_rules_tests.tscn)同步机器人演练45HP预期，199项通过；合计278项，无窗口、独立QA用户目录、正式存档不变，见[验证](../artifacts/qa/return-assertion-2026-10-27/verification.json)。
+
 2026-10-27新增[舞者存活目标朝向专项](combat/presentation/dancer_survivor_facing_tests.tscn)：真实近战／远程击杀黑舞者、回合归位、快照恢复、共用死亡入口、白舞者先死及末敌死亡，并以普通单敌／双敌／三敌检查朝向隔离。复制工程与独立QA用户目录、禁用保存，支持`-- --output=<绝对证据目录>`；无窗口运行，不移动指针或截图。修复前91项中9项失败，修复后91项全通过；配套回归及边界见[本轮记录](../docs/修改记录.md#2026-10-27-双舞者存活目标朝向修复)。
 
 2026-10-27新增[战斗快捷键输入专项](combat/interaction/battle_shortcut_input_tests.tscn)：真实主场景与战斗、合成按下／释放，覆盖默认数字与小键盘、Space选牌／结束回合、缺失手牌槽、重复键、带Shift释放、弹层确认与打开后的释放、视图暂停漏释放、未绑定Space／Enter原生确认。须复制工程，设置含`battle-shortcut-qa`的独立用户目录；`QA_OUT_DIR`指定证据与设置路径，冒险／meta保存关闭且路径独立。修复前120项中11项失败，修复后120项通过；配套设置／文字选择／消耗选择／事件刷新／战败共6套1045项0失败。后两套同步当前诊所100价及机器人45HP预期，首轮旧断言失败保留。无实体输入或像素验收，见[验证](../artifacts/qa/battle-shortcut-fix-2026-10-27/verification.json)。

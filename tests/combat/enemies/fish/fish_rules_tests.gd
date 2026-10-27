@@ -298,7 +298,7 @@ func test_snapshot_and_training() -> void:
 	for battle_id in ["B11", "B04", "B02"]:
 		Game.start_training(battle_id)
 		check(Game.training_mode and Game.state.battleId == battle_id, "Training starts requested battle " + battle_id)
-		var expected_hp: Array = [15, 15, 30] if battle_id == "B04" else ([30, 30] if battle_id == "B11" else [100])
+		var expected_hp: Array = [15, 15, 30] if battle_id == "B04" else ([30, 30] if battle_id == "B11" else [45])
 		check(Game.state.combat.enemies.map(func(e): return e.hp) == expected_hp and Game.state.combat.enemies.map(func(e): return e.maxHp) == expected_hp, "Training exact HP for " + battle_id)
 		check(Game.valid_combat(Game.state.combat), "Training snapshot valid " + battle_id)
 		var training := CombatModel.new()

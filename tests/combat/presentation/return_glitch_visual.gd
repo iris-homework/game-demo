@@ -64,12 +64,22 @@ func _ready() -> void:
 	await idle()
 	var view = app.view
 	view.stage.phase_changed.connect(on_phase)
+	var initial_hp: int = view.model.player_hp
+	var initial_turn: int = view.model.turn
+	check(initial_hp == view.model.max_hp and view.model.block == 0 and view.model.buffs.count(view.model,"pollution") == 0,"Training starts at full configured HP without block or pollution")
+	check(view.model.enemies.size() == 2,"Fish fixture contains both enemies")
+	var first_intent: Dictionary = view.model.enemies[0].intent
+	var second_intent: Dictionary = view.model.enemies[1].intent
+	check(first_intent.type == "attack" and int(first_intent.amount) == 6 and int(first_intent.get("hits",1)) == 1 and second_intent.type == "pollution" and int(second_intent.amount) == 3,"Fish fixture starts with one six-damage attack and three-stack pollution intent")
 	# No cards played: defender stays home while fish attack / apply pollution.
 	cycle = "melee-turn"
 	stationary_player = true
 	await view.end_turn_pressed()
 	await verify_return()
-	check(view.model.player_hp == 94 and view.model.turn == 2 and view.model.hand.size() == 5,"Actual enemy turn damages and draws exactly once")
+	check(view.model.player_hp == initial_hp-6 and view.shown_player_hp == view.model.player_hp,"Enemy turn deals exactly six damage from configured starting HP (%d -> %d), display agrees" % [initial_hp,view.model.player_hp])
+	check(view.model.turn == initial_turn+1,"Enemy turn advances the round exactly once")
+	check(view.model.hand.size() == 5,"Next player round deals exactly five cards")
+	check(view.model.buffs.count(view.model,"pollution") == 5 and view.shown_player_pollution == 5,"Two contact stacks plus three intent stacks wait until the next player turn end")
 	check(not Game.battle_busy and view.cards.size() == 5,"Next hand opens after return")
 	await capture(cycle+"-complete")
 	# All actors stay at home, but face the wrong way after a hit / turn.
@@ -105,5 +115,10 @@ func _ready() -> void:
 	view.set_busy(false)
 	await capture(cycle+"-complete")
 	FileAccess.open(output+"result.json",FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures,"physicalInput":false},"\t"))
+	Game.finish_training("lose")
+	await idle()
+	app.queue_free()
+	await get_tree().process_frame
+	await get_tree().create_timer(0.3).timeout
 	print("RETURN GLITCH: %d checks, %d failures; %s" % [checks,failures,output])
 	get_tree().quit(0 if failures == 0 else 1)
