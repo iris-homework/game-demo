@@ -9,6 +9,7 @@ var battle: Dictionary
 var expected_revision: int
 var selected_uid := ""
 var held_card_uid := ""
+var held_shortcut_keys: Dictionary = {}
 var cards: Dictionary = {}
 var enemy_hud: Control
 var targets: Array[Button] = []
@@ -1194,28 +1195,42 @@ func show_debug_results() -> void:
 	add_child(popup)
 	popup.popup_centered(Vector2i(610,185))
 
-func _unhandled_key_input(event: InputEvent) -> void:
-	if not event is InputEventKey or not event.pressed or event.echo: return
-	if event.ctrl_pressed or event.alt_pressed or event.meta_pressed or event.shift_pressed: return
-	if not initialized or Game.battle_busy or Game.transition_locked or is_instance_valid(pile_overlay): return
-	if not model.outcome.is_empty(): return
+func handle_battle_shortcut(event: InputEventKey) -> bool:
+	# Own the whole key gesture before focused Buttons see ui_accept. The action
+	# may open a modal or start an animation before the matching release arrives.
+	if held_shortcut_keys.has(event.keycode):
+		held_shortcut_keys.erase(event.keycode)
+		if not event.pressed or event.echo:
+			if event.pressed: held_shortcut_keys[event.keycode] = true
+			get_viewport().set_input_as_handled()
+			return true
+		# A fresh press can follow a release consumed while this view was paused.
+	if not event.pressed or event.echo: return false
+	if event.ctrl_pressed or event.alt_pressed or event.meta_pressed or event.shift_pressed: return false
+	if not initialized or Game.battle_busy or Game.transition_locked or is_instance_valid(pile_overlay): return false
+	if not model.outcome.is_empty(): return false
 	for action in ["end_turn", "technology", "draw_pile", "discard_pile"]:
 		if not PlayerSettings.matches(event, action): continue
+		held_shortcut_keys[event.keycode] = true
 		get_viewport().set_input_as_handled()
 		match action:
 			"end_turn": end_turn_pressed()
 			"technology": show_cyberware()
 			"draw_pile": show_pile("抽牌堆", model.draw_pile)
 			"discard_pile": show_pile("弃牌堆", model.discard_pile)
-		return
+		return true
 	# Resolve bindings against the current hand order, including default keypad aliases.
-	for index in mini(10, model.hand.size()):
+	# An empty hand slot still owns its binding instead of confirming a GUI button.
+	for index in 10:
 		if PlayerSettings.matches(event, "hand_%d" % (index + 1)):
-			select_card(model.hand[index], false)
+			held_shortcut_keys[event.keycode] = true
 			get_viewport().set_input_as_handled()
-			return
+			if index < model.hand.size(): select_card(model.hand[index], false)
+			return true
+	return false
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventKey and handle_battle_shortcut(event): return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_F5,KEY_F6,KEY_F7]:
 		if Game.training_mode and Game.config.developmentMode:
 			if event.keycode == KEY_F5:

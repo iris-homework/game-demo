@@ -202,7 +202,7 @@ func test_days_and_failures() -> void:
 	Game.visit("clinic")
 	Game.state.currentHp = 50
 	Game.state.credits = 150
-	check(Game.heal_at("clinic") and Game.state.credits == 0, "paid clinic healing succeeds")
+	check(Game.heal_at("clinic") and Game.state.credits == 50, "paid clinic healing deducts the current 100-credit price")
 	check(Game.state.currentDay == before + 1, "movement and healing consume no time")
 	check(Game.apply_actions([{"op":"advanceDay", "days":20}]), "explicit day advancement succeeds")
 	check(Game.state.currentDay == 7 and Game.state.currentWeek == 1, "explicit advancement caps at seven without switching weeks")

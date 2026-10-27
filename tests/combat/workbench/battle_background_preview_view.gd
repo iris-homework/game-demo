@@ -78,12 +78,6 @@ func _input(event: InputEvent) -> void:
 	super._input(event)
 
 
-func _unhandled_key_input(event: InputEvent) -> void:
-	if _parent_modal_open() or _parent_tools_locked(): return
-	if _preview_keyboard_blocked(): return
-	super._unhandled_key_input(event)
-
-
 func get_actor(index: int) -> Node2D:
 	if not is_instance_valid(stage): return null
 	if index == 0: return stage.player as Node2D
@@ -470,8 +464,8 @@ func _preview_keyboard_blocked() -> bool:
 	var viewport := get_viewport()
 	if not is_instance_valid(viewport): return true
 	if _parent_tool_contains(viewport.get_mouse_position()): return true
-	# Digit selection is an unhandled-key shortcut, so a focused tool button must
-	# also suppress it even when the pointer is elsewhere.
+	# Tool fields and buttons keep their own keyboard input even when the pointer
+	# is elsewhere; battle shortcuts must not preempt their GUI handling.
 	var focus := viewport.gui_get_focus_owner()
 	return is_instance_valid(focus) and focus != self and not is_ancestor_of(focus)
 

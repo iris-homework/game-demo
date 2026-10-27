@@ -219,7 +219,7 @@ func finish_story() -> void:
 
 func test_victory_training_new_game() -> void:
 	var model := begin_battle("victory", "B02", 63)
-	check(model.enemies[0].maxHp == 40, "Victory fixture uses the current authored robot")
+	check(model.enemies[0].maxHp == 45, "Victory fixture uses the current authored 45-HP robot")
 	model.draw_cards()
 	var rounds := 0
 	while model.outcome.is_empty() and rounds < 20:
