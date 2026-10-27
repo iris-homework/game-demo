@@ -2,7 +2,7 @@
 
 2026-10-27修复自定义Space战斗快捷键与焦点按钮确认冲突，按下／重复／释放由对应操作接管，弹窗确认保留；同步诊所100信用点及机器人45HP两项旧断言。6套1045项隔离无窗口检查通过；原代码复现与范围见[修改记录](修改记录.md)及[验证](../artifacts/qa/battle-shortcut-fix-2026-10-27/verification.json)。
 
-2026-10-27按用户要求直接替换现有[GitHub试玩发行版](https://github.com/iris-homework/game-demo/releases/tag/v0.4.0-demo.1)，原下载链接保持不变。Windows x86_64与macOS Universal包从main提交`2af38ad6dd52485eddb03368f6e3ecb599d83f32`的隔离副本构建，版本标签同步指向该提交；未改变游戏代码或存档格式。两个最终PCK共1990项检查通过，ZIP完整性、架构、Mac临时签名及解压应用无窗口启动检查通过，GitHub附件SHA256与本地一致。正式存档及设置哈希未变；Windows／Intel实机、完整七天流程、GPU画面、实际听音和实体输入未验收。详见[本轮验证](../artifacts/qa/main-release-2026-10-27/verification.json)及同目录`github-release.json`。
+2026-10-27空格修复版已替换现有[GitHub试玩发行版](https://github.com/iris-homework/game-demo/releases/tag/v0.4.0-demo.1)，原下载链接保持不变。Windows x86_64与macOS Universal包基于main提交`0a4ddeec61116ceb53d589a82ef306b1b64762bd`隔离构建，发行标签同步指向该提交。两个最终PCK共2240项检查通过（资源／运行逻辑1990项、空格输入专项250项），ZIP完整性、架构、Mac临时签名与解压应用无窗口启动通过；三个线上附件SHA256与本地一致。构建及测试结束时正式用户目录10个文件集合与哈希未变；上传期间设置及日志出现后续变化，未覆盖或恢复这些文件。未做Windows／Intel实机、完整七天流程、GPU画面、听音或实体输入验收。详见[本轮验证](../artifacts/qa/shortcut-release-2026-10-27/verification.json)及同目录`github-release.json`。
 
 2026-10-27商场对白接入专属无人中庭背景：`mall`绑定`woss_mall_dialogue_v1.png`，沿用标准左右立绘与现有交易入口。浅色建筑、淡粉灯光、扶梯和科技橱窗的原图、提示词及接入记录见[素材记录](../assets/market/WOSS-MALL.md)，本轮验证见[验证记录](../artifacts/qa/mall-dialogue-background-2026-10-27/verification.json)。
 
