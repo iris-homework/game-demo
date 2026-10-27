@@ -139,6 +139,33 @@ func layout_check(picker: Control, context: String) -> void:
 		entry.cards.append({"id":picker.cards[i].uid,"card":rect_data(picker.cards[i].get_global_rect()),"button":rect_data(picker.option_buttons[i].get_global_rect())})
 	layouts.append(entry)
 
+func slot_labels(node: Node) -> Array[Label]:
+	# Card faces intentionally use their own serif font and authored texture-space text.
+	var result: Array[Label] = []
+	for child in node.get_children():
+		if child is CombatCard: continue
+		if child is Label: result.append(child)
+		result.append_array(slot_labels(child))
+	return result
+
+func font_check(picker: Control, context: String) -> void:
+	for index in picker.option_slots.size():
+		var labels := slot_labels(picker.option_slots[index])
+		var wrong_fonts: Array[String] = []
+		var missing := ""
+		var has_grade := false
+		var has_category := false
+		for label in labels:
+			var font := label.get_theme_font("font")
+			if font != picker.base_font: wrong_fonts.append(label.text)
+			has_grade = has_grade or label.text.ends_with(" 级") or label.text == "卡牌"
+			has_category = has_category or label.text.contains("  /  ")
+			for character in label.text:
+				if character.strip_edges().is_empty(): continue
+				if not font.has_char(character.unicode_at(0)) and not missing.contains(character): missing += character
+		var covered := labels.size() >= 6 and has_grade and has_category and labels.has(picker.owned_labels[index]) and labels.has(picker.action_labels[index])
+		check(covered and wrong_fonts.is_empty() and missing.is_empty(), context + " slot %d grade/type/ownership/action and other labels retain bundled font and complete glyphs; wrong_fonts=%s missing=%s" % [index, str(wrong_fonts), missing])
+
 func rect_data(value: Rect2) -> Array:
 	return [value.position.x,value.position.y,value.size.x,value.size.y]
 
@@ -149,6 +176,7 @@ func test_modal(source: String) -> void:
 	var revision: int = Game.revision
 	var picker := opened_picker()
 	picker.entrance_tween.pause()
+	font_check(picker, source + " initial SubViewport reveal")
 	var center: Vector2 = picker.SLOT_ORIGIN + Vector2(picker.SLOT_STEP,0)
 	check(picker.entrance_running and picker.entrance_materials.size() == 3 and picker.entrance_materials.all(func(ink): return float(ink.get_shader_parameter("progress")) == 0.0), source + " all three offers start hidden in independent neon reveal surfaces")
 	check(picker.option_buttons.all(func(button): return button.disabled and button.focus_mode == Control.FOCUS_NONE and button.mouse_filter == Control.MOUSE_FILTER_IGNORE), source + " entrance disables all mouse and focus targets")
@@ -159,6 +187,7 @@ func test_modal(source: String) -> void:
 	for button in picker.option_buttons: button.pressed.emit()
 	check(Game.state == before and Game.revision == revision and picker.active_index == -1, source + " revealing offers reject pointer, keyboard and direct button callbacks without queued claims")
 	picker.entrance_tween.custom_step(0.30)
+	font_check(picker, source + " midway SubViewport reveal")
 	check(picker.entrance_materials.all(func(ink): return float(ink.get_shader_parameter("progress")) > 0.0 and float(ink.get_shader_parameter("progress")) < 1.0), source + " all three neon reveals advance through intermediate shader progress")
 	for i in 3:
 		check(picker.entrance_images[i].position.is_equal_approx(picker.SLOT_ORIGIN+Vector2(i*picker.SLOT_STEP,0)-picker.REVEAL_MARGIN) and picker.entrance_surfaces[i].gui_disable_input, source + " reveal %d stays in its final column and cannot receive input" % i)
@@ -167,6 +196,7 @@ func test_modal(source: String) -> void:
 	await motion(Vector2(40,40))
 	picker.entrance_tween.play()
 	await get_tree().create_timer(0.6).timeout
+	font_check(picker, source + " completed reveal")
 	check(not picker.entrance_running and picker.option_buttons.all(func(button): return not button.disabled and button.focus_mode == Control.FOCUS_ALL), source + " completed reveal unlocks selection")
 	check(picker.entrance_surfaces.is_empty() and picker.entrance_materials.is_empty() and picker.option_slots.all(func(slot): return slot.get_parent() == picker), source + " completion restores live slots and releases temporary effects")
 	for i in 3:
@@ -210,6 +240,7 @@ func test_modal(source: String) -> void:
 	check(not reward.exit_button.disabled and reward.card_reward_button.has_focus(), source + " close restores the reward button and focus")
 	picker = opened_picker()
 	check(picker.entrance_running and picker.entrance_surfaces.size() == 3, source + " reopening restarts the neon reveal")
+	font_check(picker, source + " reopened SubViewport reveal")
 	await settle()
 	await click_with_motion(picker.back_button.get_global_rect().get_center())
 	await settle()

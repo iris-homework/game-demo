@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-10-27[奖励选择专项](combat/cards/reward_picker_tests.tscn)增加24项入场字体回归：分别在初始／中段SubViewport、完成及重开时检查三个槽位的等级、类别、拥有数和操作文字字体及字形，跳过卡面独立字体。旧代码129项中18项失败，修复后129项全通过，配套刷新90项通过；GPU截图及隔离范围见[验证](../artifacts/qa/reward-font-2026-10-27/verification.json)。
+
 2026-10-27新增[悬停说明字体专项](rendering/card_hover_font_tests.tscn)：通过正式鼠标进入／离开信号与0.45秒延时，核对伤口追猎及拉开距离的原始／动态说明、关闭重开、实际解析的字体及全部可见字符字形。须复制工程并设置名称含QA的独立用户目录；关闭保存、无系统鼠标操作，结果写入`QA_OUT_DIR`。此专项检查字体和节点，不代替GPU像素验收；本轮实际结果见修改记录。
 
 2026-10-27修正[通用归位专项](combat/presentation/return_glitch_visual.tscn)的旧100HP开局假设：按实际开局HP检查准确扣6血，并分别验证回合、手牌、污染及显示同步；当前实测70→64，79项全通过。退出前释放场景，旧资源残留提示消除。[鱼规则专项](combat/enemies/fish/fish_rules_tests.tscn)同步机器人演练45HP预期，199项通过；合计278项，无窗口、独立QA用户目录、正式存档不变，见[验证](../artifacts/qa/return-assertion-2026-10-27/verification.json)。

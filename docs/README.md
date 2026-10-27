@@ -1,5 +1,7 @@
 # 午夜委托文档索引
 
+2026-10-27 game-demo奖励三选一入场字体修复：选项槽显式保留中文主题，避免动画期间退回Open Sans。旧代码新增回归18项失败，修复后选择／刷新共219项通过，另核对1280×800与1600×1000 GPU截图。仅当前game-demo源码更新，未打包、提交或推送；详见[修改记录](修改记录.md)与[验证](../artifacts/qa/reward-font-2026-10-27/verification.json)。
+
 2026-10-27将桌面工程的悬停说明字体修复同步到game-demo：为独立CanvasLayer下的holder显式传递中文主题，修复说明文字退回默认字体导致“远”字方框。隔离专项36项通过；仅本地源码同步，未打包、更新线上发行版或提交／推送。见[修改记录](修改记录.md)与[验证](../artifacts/qa/hover-font-sync-2026-10-27/verification.json)。
 
 2026-10-27已按最新main提交`508913459adacd913b856ff05df501c29928af0e`重新构建并替换现有[GitHub试玩发行版](https://github.com/iris-homework/game-demo/releases/tag/v0.4.0-demo.1)，Windows x86_64与macOS Universal附件及校验文件已更新，原下载链接不变；发行标题与正文按用户要求逐字保留。相较上一发行仅`battle.gd`与`test_stage.gd`运行文件变化，包含调试按钮移除与双舞者存活目标朝向修复。两个最终PCK共2388项检查通过，ZIP、961项源文件哈希、架构、Mac临时签名与解压应用无窗口启动通过；三个线上附件SHA256一致、下载返回200。同期有正式源工程游戏运行，正式存档与设置哈希出现变化，全目录保护审计未通过；未覆盖或恢复这些文件，不声明本轮正式目录哈希未变。未做Windows／Intel实机、完整七天、GPU画面、听音或实体输入验收。详见[本轮验证](../artifacts/qa/main-refresh-5089134-2026-10-27/verification.json)。

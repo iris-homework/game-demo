@@ -95,6 +95,8 @@ func build_option(index: int) -> void:
 	var color: Color = CombatCard.RARITY_COLORS.get(rarity, CYAN)
 	rarity_colors.append(color)
 	var slot := Control.new()
+	# Keep UI fonts when the entrance effect reparents this slot into a SubViewport.
+	slot.theme = theme
 	slot.name = "RewardSlot%d" % (index+1)
 	slot.position = SLOT_ORIGIN + Vector2(index*SLOT_STEP,0)
 	slot.size = SLOT_SIZE
