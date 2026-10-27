@@ -1,5 +1,7 @@
 # 午夜委托文档索引
 
+2026-10-27 game-demo启用导出中文断行数据：`project.godot`设置`internationalization/locale/include_text_server_data=true`，供后续独立发行包携带ICU断词／断行规则。已静态核对配置、隔离构建复制路径及本机ICU模板文件；本轮未运行、打包或更新线上发行版，旧包仍须重新导出后生效。见[发行说明](发行版制作.md)、[修改记录](修改记录.md)与[验证](../artifacts/qa/chinese-line-break-export-2026-10-27/verification.json)。
+
 2026-10-27 game-demo奖励三选一入场字体修复：选项槽显式保留中文主题，避免动画期间退回Open Sans。旧代码新增回归18项失败，修复后选择／刷新共219项通过，另核对1280×800与1600×1000 GPU截图。仅当前game-demo源码更新，未打包、提交或推送；详见[修改记录](修改记录.md)与[验证](../artifacts/qa/reward-font-2026-10-27/verification.json)。
 
 2026-10-27将桌面工程的悬停说明字体修复同步到game-demo：为独立CanvasLayer下的holder显式传递中文主题，修复说明文字退回默认字体导致“远”字方框。隔离专项36项通过；仅本地源码同步，未打包、更新线上发行版或提交／推送。见[修改记录](修改记录.md)与[验证](../artifacts/qa/hover-font-sync-2026-10-27/verification.json)。
