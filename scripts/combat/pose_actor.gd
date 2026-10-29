@@ -6,7 +6,12 @@ var facing := -1.0
 var kind := "noren"
 var is_player := false
 var pose := "idle"
-var alive := true
+var alive := true:
+	set(value):
+		alive = value
+		if not alive:
+			_idle_weight = 0.0
+			_apply_idle_motion()
 var combat_stance := "melee"
 var tint := Color("ff4c9b")
 var poses: Dictionary = {}
@@ -45,6 +50,15 @@ var pipeline_pose_elapsed := 0.0
 var _runtime_animation_frames_cache: Dictionary = {}
 var use_mipmapped_textures := true
 var _mipmapped_textures: Dictionary = {}
+# Presentation only: compose from the authored frame, never accumulate transforms.
+var _pose_sprite_transform := Transform2D.IDENTITY
+var _idle_motion_transform := Transform2D.IDENTITY
+var _idle_elapsed := 0.0
+var _idle_weight := 0.0
+var _idle_phase := 0.0
+var _idle_requested := false
+var _jellyfish_idle_material: ShaderMaterial
+const JELLYFISH_IDLE_TEXTURE := "res://enemy_asset_pipeline/published/assets/9c8f72c46125f5e0a4c894c11be1ca02f4a8cc5ed1b701bdf845e4d5649007ae.png"
 const WeaponShift := preload("res://scripts/combat/weapon_shift_fx.gd")
 const PipelineCatalogScript := preload("res://enemy_asset_pipeline/runtime/pipeline_catalog.gd")
 const PipelineRuntimeProfileScript := preload("res://enemy_asset_pipeline/runtime/pipeline_runtime_profile.gd")
@@ -107,6 +121,8 @@ func _place(origin: Vector2, direction: float) -> void:
 	home = origin
 	position = origin
 	facing = direction
+	# Stable per formation slot; deliberately does not consume combat's RNG.
+	_idle_phase = fposmod(origin.x*0.017+origin.y*0.0137+float(kind.hash()%997)*0.01,TAU)
 	tint = Color("ff4c9b") if is_player else Color("6ae4f2")
 	add_child(sprite)
 	sprite.centered = false
@@ -143,6 +159,10 @@ func _apply_player_pipeline() -> void:
 	if runtime.source_facing != 0.0: source_facing = runtime.source_facing
 
 func set_pose(value: String) -> void:
+	var wants_idle := value == "idle" and not is_player
+	if wants_idle != _idle_requested:
+		_idle_weight = 0.0
+	_idle_requested = wants_idle
 	value = pose_aliases.get(value, value)
 	if is_player and combat_stance == "ranged" and value in ["idle","block","damaged"]:
 		value = "gun_"+value
@@ -155,12 +175,14 @@ func set_pose(value: String) -> void:
 	pipeline_pose_elapsed = 0.0
 	_current_frame = 0
 	_show_current_pose()
+	_apply_idle_motion()
 
 func face_toward(point: Vector2) -> void:
 	var next_facing := 1.0 if point.x >= position.x else -1.0
 	if is_equal_approx(next_facing,facing): return
 	facing = next_facing
 	_refresh_pose_transform()
+	_apply_idle_motion()
 
 func _show_current_pose() -> void:
 	var frames: Array = pipeline_frames.get(pose, [])
@@ -180,6 +202,7 @@ func _show_legacy_pose() -> void:
 	var mirror := facing*source_facing
 	# Legacy calibration remains unchanged when no pipeline frame exists.
 	sprite.transform = Transform2D(Vector2(mirror*factor,0),Vector2(0,factor),Vector2(-anchor.x*mirror*factor,-anchor.y*factor))
+	_pose_sprite_transform = sprite.transform
 	_sync_trails(false)
 
 func _show_pipeline_frame(frames: Array, index: int) -> void:
@@ -198,6 +221,7 @@ func _apply_pipeline_transform(local_transform: Transform2D) -> void:
 	# transform[6] already includes the source anchor and all visual scales.
 	var mirror := facing*source_facing
 	sprite.transform = Transform2D(Vector2(mirror,0),Vector2(0,1),Vector2.ZERO)*local_transform
+	_pose_sprite_transform = sprite.transform
 
 func _refresh_pose_transform() -> void:
 	var frames: Array = pipeline_frames.get(pose, [])
@@ -210,6 +234,80 @@ func _refresh_pose_transform() -> void:
 	_sync_trails(pipeline_playing)
 
 func _process(delta: float) -> void:
+	_advance_pipeline(delta)
+	_idle_elapsed += delta
+	if _can_idle():
+		_idle_weight = minf(1.0,_idle_weight+delta/0.4)
+	else:
+		_idle_weight = 0.0
+	_apply_idle_motion()
+
+func _can_idle() -> bool:
+	# Authored multi-frame idle animations already supply their own motion.
+	return _idle_requested and not is_player and alive and sprite.texture != null \
+		and is_visible_in_tree() and modulate.a >= 0.98 \
+		and pipeline_frames.get(pose,[]).size() <= 1
+
+func _apply_idle_motion() -> void:
+	_idle_motion_transform = Transform2D.IDENTITY
+	if _can_idle() and _idle_weight > 0.0:
+		var speed := 1.8
+		var breath_size := 0.009
+		var sway_size := 0.010
+		var hover_size := 0.0
+		match kind:
+			"robot", "rogue_drone":
+				speed = 1.35
+				breath_size = 0.0
+				sway_size = 0.005
+				if kind == "rogue_drone": hover_size = 1.5
+			"fish", "pruning_hound", "mutant_mouse":
+				speed = 2.4
+				breath_size = 0.012
+				sway_size = 0.007
+			"beacon_jellyfish":
+				speed = 1.65
+				breath_size = 0.018
+				sway_size = 0.014
+				hover_size = 2.4
+			"dancer_black", "dancer_white":
+				speed = 1.65
+				sway_size = 0.014
+		var weight := smoothstep(0.0,1.0,_idle_weight)
+		var phase := _idle_elapsed*speed+_idle_phase
+		var breath := sin(phase)*breath_size*weight
+		var sway := (sin(phase*0.61+_idle_phase)*0.8+sin(phase*1.13)*0.2)*sway_size*weight
+		# Shear and vertical breathing leave the ground line fixed. No whole-body
+		# rotation or horizontal scaling, so planted feet do not skate or rock.
+		_idle_motion_transform = Transform2D(Vector2(1,0),Vector2(sway*facing,1.0+breath),Vector2(0,sin(phase)*hover_size*weight))
+	sprite.transform = _idle_motion_transform*_pose_sprite_transform
+	for container in [attachment_below,attachment_above]:
+		if is_instance_valid(container): container.transform = _idle_motion_transform
+	_update_jellyfish_tentacles()
+
+func _update_jellyfish_tentacles() -> void:
+	if is_player or kind != "beacon_jellyfish": return
+	var source: Texture2D = poses.get("idle")
+	var frames: Array = pipeline_frames.get(pose,[])
+	if not frames.is_empty():
+		source = frames[clampi(pipeline_frame_index,0,frames.size()-1)].texture
+	# The local mask follows this exact painting. New artwork and authored
+	# multi-frame idles must not inherit its calibrated deformation by accident.
+	var use_tentacles: bool = alive and _idle_requested and pose == "idle" \
+		and source != null and source.resource_path == JELLYFISH_IDLE_TEXTURE \
+		and pipeline_frames.get(pose,[]).size() <= 1 and not white_key_poses.get(pose,false)
+	if not use_tentacles:
+		if _jellyfish_idle_material != null and sprite.material == _jellyfish_idle_material:
+			sprite.material = white_key_material if white_key_poses.get(pose,false) else null
+		return
+	if _jellyfish_idle_material == null:
+		_jellyfish_idle_material = ShaderMaterial.new()
+		_jellyfish_idle_material.shader = preload("res://shaders/jellyfish_idle.gdshader")
+	_jellyfish_idle_material.set_shader_parameter("motion_time",_idle_elapsed+_idle_phase)
+	_jellyfish_idle_material.set_shader_parameter("strength",smoothstep(0.0,1.0,_idle_weight) if _can_idle() else 0.0)
+	sprite.material = _jellyfish_idle_material
+
+func _advance_pipeline(delta: float) -> void:
 	if not pipeline_playing or pipeline_frames.is_empty(): return
 	var frames: Array = pipeline_frames.get(pose, [])
 	if frames.is_empty():
@@ -258,7 +356,10 @@ func _show_attachments(attachments: Array, _frame_transform: Transform2D = Trans
 	_ensure_attachment_nodes()
 	var sorted: Array = attachments.duplicate()
 	sorted.sort_custom(func(a, b): return a.layer_order < b.layer_order)
-	var owner := pipeline_owner_transform()
+	# The container receives idle motion; its children retain the authored frame.
+	# Using the animated sprite here would apply motion twice after a texture refresh.
+	var half := Vector2(sprite.texture.get_width(),sprite.texture.get_height())*0.5
+	var owner := Transform2D(_pose_sprite_transform.x,_pose_sprite_transform.y,_pose_sprite_transform*half)
 	for attachment in sorted:
 		var node := Sprite2D.new()
 		node.texture = _display_texture(attachment.texture)

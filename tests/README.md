@@ -1,5 +1,9 @@
 # 测试目录索引
 
+2026-10-29新增[水母触须待机专项](combat/presentation/jellyfish_idle_motion_tests.tscn)：检查专属材质与原图绑定、渐入／时间推进、独立实例、朝向与采样刷新、攻击／受伤／死亡／隐藏停用，以及多帧或替换立绘避让；同时核对玩家、其他敌人与游戏状态不变。须使用名称含`qa`的独立用户目录，绝对`QA_OUT_DIR`可保存结果。仅验证材质与生命周期，触须形变和画面观感另做GPU检查。
+
+2026-10-29新增[敌人待机动效专项](combat/presentation/enemy_idle_motion_tests.tscn)：覆盖正式外观及已发布外观的持续运动、脚底固定／悬浮范围、朝向、目标与站位不变、攻击／受伤／死亡停用、同类错相、玩家隔离、随机流不变、单帧挂件跟随和采样刷新、多帧待机避让。要求复制工程及名称含`qa`的独立用户目录，可用绝对`QA_OUT_DIR`输出结果；无系统鼠标操作。GPU观感须另行核对，不能由此专项替代。
+
 2026-10-29新增[启动开屏专项](menu/startup_splash_tests.tscn)：验证启动自动播放、菜单处理与焦点隔离、高清字体渲染目标、斩击音只播放一次、自动结束与资源释放、跳过按下／重复／释放不穿透、返回菜单不重播及禁止保存。须在复制工程中将自定义用户目录设为包含`startup-settings-qa`的独立名称，并设置绝对`QA_OUT_DIR`。无窗口检查逻辑，GPU模式额外保存关键帧；`QA_CAPTURE_SEQUENCE=1`记录定位动画序列，`QA_REALTIME=1`单独核对实时完成时长。仅视口合成输入，无系统光标移动。本轮结果见[验证](../artifacts/qa/startup-splash-2026-10-29/verification.json)。
 
 2026-10-27[演练专项](combat/enemies/published_training_tests.tscn)改查第一周七组正式对手、完整阵容及Boss两阶段、菜单焦点／布局、旧测试敌人拒绝、胜负恢复和禁写存档；[原B04选景专项](combat/presentation/b04_scenery_choice_visual.tscn)现在验证七组固定正式背景及演员站位，不再选景。两者均要求绝对`QA_OUT_DIR`与名称含QA的隔离用户目录，支持无窗口运行；本轮结果见[验证](../artifacts/qa/week1-training-2026-10-27/verification.json)。
