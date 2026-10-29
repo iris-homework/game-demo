@@ -45,6 +45,11 @@ var quitting := false
 var previous_auto_accept_quit := true
 var audio_player: Node
 var audio_hooks: Node
+var startup_splash: Control
+var startup_requested := false
+var startup_view_process_mode := Node.PROCESS_MODE_INHERIT
+var startup_swallowed_keys: Dictionary = {}
+var startup_swallowed_mouse: Dictionary = {}
 
 func _ready() -> void:
 	audio_player = preload("res://scripts/audio/game_audio.gd").new()
@@ -64,8 +69,64 @@ func _ready() -> void:
 	Game.technology_loadout_requested.connect(open_technology_loadout)
 	Game.menu_requested.connect(open_exit_confirmation.bind("menu"))
 	Game.quit_requested.connect(open_exit_confirmation.bind("quit"))
+	# Only the actual application entry plays the intro, never embedded QA scenes
+	# or a later return to the menu. This session flag never reaches a save file.
+	startup_requested = get_parent() == get_tree().root and Game.page == "menu" and Game.pending_save_kind.is_empty() and not get_tree().root.get_meta("startup_splash_played", false)
 	show_page()
+	if startup_requested: _start_startup_splash()
 	if not Game.pending_save_kind.is_empty(): open_save_failure()
+
+func _start_startup_splash() -> void:
+	if is_instance_valid(startup_splash) or not is_instance_valid(view) or shown_page != "menu": return
+	get_tree().root.set_meta("startup_splash_played", true)
+	startup_requested = false
+	get_viewport().gui_release_focus()
+	startup_view_process_mode = view.process_mode
+	view.process_mode = Node.PROCESS_MODE_DISABLED
+	startup_splash = preload("res://scripts/menu/startup_splash.gd").new()
+	startup_splash.theme = view.theme
+	startup_splash.z_index = 200
+	startup_splash.finished.connect(_finish_startup_splash)
+	startup_splash.slash_started.connect(_play_startup_slash)
+	add_child(startup_splash)
+
+func _play_startup_slash() -> void:
+	if is_instance_valid(audio_player): audio_player.play_cue("parry", 1.1)
+
+func _finish_startup_splash() -> void:
+	if not is_instance_valid(startup_splash): return
+	startup_splash.queue_free()
+	startup_splash = null
+	if is_instance_valid(view):
+		view.process_mode = startup_view_process_mode
+		if shown_page == "menu": view.reveal_after_startup()
+
+func _consume_startup_input(event: InputEvent) -> bool:
+	var showing := is_instance_valid(startup_splash)
+	var consumed := showing
+	if event is InputEventKey:
+		var code: int = event.physical_keycode if event.physical_keycode != 0 else event.keycode
+		# A fresh physical press ends any stale hold (for example after focus loss).
+		if not showing and event.pressed and not event.echo: startup_swallowed_keys.erase(code)
+		consumed = consumed or startup_swallowed_keys.has(code)
+		if consumed:
+			if event.pressed: startup_swallowed_keys[code] = true
+			else: startup_swallowed_keys.erase(code)
+	elif event is InputEventMouseButton:
+		if not showing and event.pressed: startup_swallowed_mouse.erase(event.button_index)
+		consumed = consumed or startup_swallowed_mouse.has(event.button_index)
+		if consumed:
+			if event.pressed: startup_swallowed_mouse[event.button_index] = true
+			else: startup_swallowed_mouse.erase(event.button_index)
+	if not consumed: return false
+	get_viewport().set_input_as_handled()
+	if showing:
+		var skip_key: bool = event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_ESCAPE, KEY_SPACE, KEY_ENTER, KEY_KP_ENTER]
+		var skip_click: bool = event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
+		# Defer teardown until this input dispatch ends. Held/released skip inputs
+		# stay consumed after teardown so they cannot activate a newly focused button.
+		if skip_key or skip_click: startup_splash.call_deferred("skip")
+	return true
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
@@ -108,6 +169,7 @@ func swap_view() -> void:
 	else:
 		view = VIEWS.get(Game.page,VIEWS.menu).instantiate()
 	shown_page = Game.page
+	if shown_page == "menu": view.startup_intro_pending = startup_requested
 	add_child(view)
 	# Game.choose can swap the view before select() emits its success signal.
 	# Keep this connection on that view until it is freed, independently of hooks.
@@ -158,6 +220,7 @@ func show_notice(message: String) -> void:
 		if is_instance_valid(notice_ui): notice_ui.queue_free())
 
 func _input(event: InputEvent) -> void:
+	if _consume_startup_input(event): return
 	if is_instance_valid(save_dialog):
 		if event is InputEventKey:
 			if event.is_action("ui_accept"): return

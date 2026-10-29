@@ -33,6 +33,7 @@ var confirm_cancel: Button
 var modal_button_states: Dictionary = {}
 ## 统一演练面板的打开状态。
 var training_open := false
+var startup_intro_pending := false
 
 func _ready() -> void:
 	_add_environment()
@@ -44,6 +45,13 @@ func _ready() -> void:
 	_add_readability_mask()
 	_build_right_column()
 	_build_bottom_right()
+	if startup_intro_pending:
+		ui_layer.modulate.a = 0.0
+	else:
+		reveal_after_startup()
+
+func reveal_after_startup() -> void:
+	startup_intro_pending = false
 	_fade_in_ui()
 	new_button.grab_focus() if continue_button.disabled else continue_button.grab_focus()
 

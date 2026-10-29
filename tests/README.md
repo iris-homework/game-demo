@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-10-29新增[启动开屏专项](menu/startup_splash_tests.tscn)：验证启动自动播放、菜单处理与焦点隔离、高清字体渲染目标、斩击音只播放一次、自动结束与资源释放、跳过按下／重复／释放不穿透、返回菜单不重播及禁止保存。须在复制工程中将自定义用户目录设为包含`startup-settings-qa`的独立名称，并设置绝对`QA_OUT_DIR`。无窗口检查逻辑，GPU模式额外保存关键帧；`QA_CAPTURE_SEQUENCE=1`记录定位动画序列，`QA_REALTIME=1`单独核对实时完成时长。仅视口合成输入，无系统光标移动。本轮结果见[验证](../artifacts/qa/startup-splash-2026-10-29/verification.json)。
+
 2026-10-27[演练专项](combat/enemies/published_training_tests.tscn)改查第一周七组正式对手、完整阵容及Boss两阶段、菜单焦点／布局、旧测试敌人拒绝、胜负恢复和禁写存档；[原B04选景专项](combat/presentation/b04_scenery_choice_visual.tscn)现在验证七组固定正式背景及演员站位，不再选景。两者均要求绝对`QA_OUT_DIR`与名称含QA的隔离用户目录，支持无窗口运行；本轮结果见[验证](../artifacts/qa/week1-training-2026-10-27/verification.json)。
 
 2026-10-27[奖励选择专项](combat/cards/reward_picker_tests.tscn)增加24项入场字体回归：分别在初始／中段SubViewport、完成及重开时检查三个槽位的等级、类别、拥有数和操作文字字体及字形，跳过卡面独立字体。旧代码129项中18项失败，修复后129项全通过，配套刷新90项通过；GPU截图及隔离范围见[验证](../artifacts/qa/reward-font-2026-10-27/verification.json)。
