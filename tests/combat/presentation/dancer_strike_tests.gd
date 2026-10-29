@@ -37,11 +37,13 @@ func record_effect(node: Node) -> void:
 		"frame":Engine.get_process_frames(),"ref":weakref(node)})
 
 func record_hit(hit: Dictionary, index: int) -> void:
-	contacts.append({"hit":hit.duplicate(true),"index":index})
+	contacts.append({"hit":hit.duplicate(true),"index":index,"pose":stage.active_attacker.pose})
 	check(effects.size() == index+1,"Each real segment produces exactly one strike before its callback")
 	if effects.size() <= index: return
 	var fx: Dictionary = effects[index]
 	var expected_mode := "pierce" if stage.active_attacker.kind == "dancer_black" else "slash"
+	var expected_pose := "slash_alt" if expected_mode == "slash" and index % 2 == 1 else expected_mode
+	check(stage.active_attacker.pose == expected_pose,"Contact uses the correct pose: white slash / return slash / slash; black retains pierce")
 	var expected_direction := 1.0 if stage.active_defender.position.x > stage.active_attacker.position.x else -1.0
 	var depth: float = stage.depth_scale(stage.active_defender.position)
 	var point: Vector2 = stage.active_defender.position + Vector2(-expected_direction*13,-62)*depth
@@ -49,7 +51,8 @@ func record_hit(hit: Dictionary, index: int) -> void:
 	check(fx.script == Strike and fx.mode == expected_mode,"Dancer action dispatches to its dedicated black thrust or white slash")
 	check(fx.frame == Engine.get_process_frames(),"Dedicated strike and existing hit callback share the contact frame")
 	check(fx.direction == expected_direction and fx.position.is_equal_approx(point),"Strike follows attack direction and target contact")
-	check(fx.scale.is_equal_approx(Vector2.ONE*depth*stage._effect_scale(stage.active_attacker)),"Strike respects target depth and authored effect scale")
+	var vertical_direction := -1.0 if expected_pose == "slash_alt" else 1.0
+	check(fx.scale.is_equal_approx(Vector2(1.0,vertical_direction)*depth*stage._effect_scale(stage.active_attacker)),"Strike follows the upward return cut while preserving target depth and authored effect scale")
 	check(fx.blocked == (int(hit.get("blocked",0)) > 0),"Strike receives full and partial block state")
 	var live = fx.ref.get_ref()
 	check(live != null and live.material is ShaderMaterial and live.material.shader == Palette,"Dancer hit uses its independent black and white palette material")
@@ -69,6 +72,10 @@ func destroy_stage() -> void:
 func test_real_attacks(duet: bool) -> void:
 	fixture(duet)
 	var attacker: Node2D = stage.enemies[1 if duet else 0]
+	if duet:
+		check(attacker.poses.has("slash_alt"),"White dancer resolves its additional slash from the actual visual catalog")
+		if attacker.poses.has("slash_alt"):
+			check(attacker.poses.slash_alt != attacker.poses.slash,"Alternate slash uses a distinct texture")
 	var hits := [{"damage":6,"blocked":0,"hpAfter":64,"killed":false},
 		{"damage":0,"blocked":6,"hpAfter":64,"killed":false},
 		{"damage":3,"blocked":3,"hpAfter":61,"killed":false}]
@@ -79,6 +86,12 @@ func test_real_attacks(duet: bool) -> void:
 	check(hits == before,"Attack effects never alter supplied combat results")
 	for i in contacts.size():
 		check(contacts[i].hit == before[i] and contacts[i].index == i,"Callbacks retain the supplied hit data and order")
+	check(attacker.pose == "idle","Attack completion restores the idle pose")
+	if duet:
+		effects.clear()
+		contacts.clear()
+		await stage.attack(attacker,stage.player,"hit",hits,record_hit)
+		check(contacts.size() == 3 and contacts[0].pose == "slash" and contacts[1].pose == "slash_alt" and contacts[2].pose == "slash","A repeated triple attack restarts the slash / return slash / slash sequence")
 	await stage.return_home()
 	check(attacker.position.is_equal_approx(attacker.home),"Dancer returns to its original home after dedicated attack effects")
 	await get_tree().create_timer(0.45).timeout
@@ -103,6 +116,16 @@ func test_dispatch_and_anchors() -> void:
 			check(fx.position.is_equal_approx(point+Vector2(3,-4)*depth),"Effect offset is applied once at either target depth")
 			check(fx.scale.is_equal_approx(Vector2.ONE*depth*1.2),"Both colored effects follow authored scale at either target depth")
 			refs.append(fx.ref)
+	stage.active_attacker = stage.enemies[1]
+	stage.active_attacker.set_pose("slash_alt")
+	for direction in [-1.0,1.0]:
+		var point := Vector2(720,210)
+		var depth: float = stage.depth_scale(stage.player.position)
+		stage.show_strike(point,direction,"slash",false)
+		var fx: Dictionary = effects[-1]
+		check(fx.direction == direction and fx.scale.is_equal_approx(Vector2(1,-1)*depth*1.2),"Return slash flips vertically with either horizontal facing")
+		check(fx.position.is_equal_approx(point+Vector2(3,-4)*depth),"Return slash reflection keeps the same target contact and authored offset")
+		refs.append(fx.ref)
 	stage.active_attacker = stage.player
 	stage.active_defender = stage.enemies[0]
 	stage.show_strike(Vector2(720,210),1.0,"slash",false)

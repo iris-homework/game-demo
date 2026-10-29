@@ -317,6 +317,15 @@
         ],
         "scale": 0.109,
         "whiteKey": false
+      },
+      "slash_alt": {
+        "texture": "res://assets/combat_test/dancer_white/dancer_white_slash_alt.png",
+        "anchor": [
+          1030,
+          1015
+        ],
+        "scale": 0.098,
+        "whiteKey": false
       }
     }
   }

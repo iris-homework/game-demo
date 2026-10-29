@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-10-29白舞者交替挥砍：现有`combat/presentation/dancer_strike_tests`新增真实备用纹理、逐段`slash / slash_alt / slash`、重复三连击重置与归位检查。本轮148项通过，配套敌人视觉资源348项通过；1440×900 GPU三段截图及运行边界见`artifacts/qa/dancer-alternate-slash-2026-10-29/verification.json`。
+
 2026-10-29新增[水母触须待机专项](combat/presentation/jellyfish_idle_motion_tests.tscn)：检查专属材质与原图绑定、渐入／时间推进、独立实例、朝向与采样刷新、攻击／受伤／死亡／隐藏停用，以及多帧或替换立绘避让；同时核对玩家、其他敌人与游戏状态不变。须使用名称含`qa`的独立用户目录，绝对`QA_OUT_DIR`可保存结果。仅验证材质与生命周期，触须形变和画面观感另做GPU检查。
 
 2026-10-29新增[敌人待机动效专项](combat/presentation/enemy_idle_motion_tests.tscn)：覆盖正式外观及已发布外观的持续运动、脚底固定／悬浮范围、朝向、目标与站位不变、攻击／受伤／死亡停用、同类错相、玩家隔离、随机流不变、单帧挂件跟随和采样刷新、多帧待机避让。要求复制工程及名称含`qa`的独立用户目录，可用绝对`QA_OUT_DIR`输出结果；无系统鼠标操作。GPU观感须另行核对，不能由此专项替代。

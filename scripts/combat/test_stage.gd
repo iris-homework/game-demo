@@ -369,7 +369,12 @@ func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_h
 		await move_actor(attacker,destination-Vector2(direction*10,0),0.10 if enemy_attack else 0.075)
 		var default_windup := 0.12 if style == "bite" else (0.045 if enemy_attack else 0.025)
 		await get_tree().create_timer(_motion_value(attacker,"windup",default_windup)).timeout
-		attacker.set_pose("bite_close" if style == "bite" else style)
+		var strike_pose := "bite_close" if style == "bite" else style
+		# Alternate the white dancer's sword pose within this attack only. Keep
+		# the slash style for contact effects, audio and supplied combat results.
+		if attacker.kind == "dancer_white" and style == "slash" and i % 2 == 1 and attacker.poses.has("slash_alt"):
+			strike_pose = "slash_alt"
+		attacker.set_pose(strike_pose)
 		if style == "slash" or style == "pierce": combat_audio.play_cue("slash")
 		await move_actor(attacker,destination+Vector2(direction*10,0),0.035)
 		var contact_point: Vector2 = defender.position+Vector2(-direction*13,-62)*depth_scale(defender.position)
@@ -495,6 +500,9 @@ func show_strike(point: Vector2, direction: float, style: String, blocked: bool,
 		strike.direction = direction
 		strike.blocked = blocked
 		strike.scale = Vector2.ONE * depth_scale(active_defender.position) * effect_scale
+		# Reflect both slash layers around their contact point for the upward return cut.
+		if active_attacker.kind == "dancer_white" and active_attacker.pose == "slash_alt":
+			strike.scale.y *= -1.0
 		world.add_child(strike)
 		return
 	if style in ["slash", "pierce"] and active_attacker == player and player.kind == "noren":
