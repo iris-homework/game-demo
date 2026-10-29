@@ -362,7 +362,7 @@ func open_exit_confirmation(action: String) -> void:
 	var message := "确定要退出游戏吗？" if action == "quit" else "确定要返回主菜单吗？"
 	if action == "menu":
 		if Game.training_mode:
-			message += "\n本次演练将结束，不影响冒险进度。"
+			message += "\n本次%s将结束，不影响冒险进度。" % ("教程" if Game.tutorial_mode else "演练")
 		elif Game.state.get("currentScene") == "battle" and not Game.state.get("battleStart", {}).is_empty() and Game.state.get("combat", {}).get("outcome", "").is_empty():
 			message += "\n再次继续委托时，将从本场战斗开局重来。"
 	ui.label(ui, title, Vector2(432, 326), Vector2(576, 44), 29)

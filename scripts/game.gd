@@ -53,6 +53,11 @@ var transition_locked := false
 var battle_busy := false
 # Victory routing may checkpoint internally; publish only after its one disk write.
 var _defer_checkpoint := false
+# Tutorial uses the same disposable session lifecycle as training.
+const TUTORIAL_BATTLE_ID := "tutorial_fish"
+# Draw order; CombatModel draws from the back of its pile.
+const TUTORIAL_DECK := ["noren_01", "noren_02", "noren_04", "noren_03", "noren_40", "noren_01", "noren_02", "noren_01", "noren_02", "noren_04"]
+var tutorial_mode := false
 var training_mode := false
 var training_backup: Dictionary = {}
 var training_enemies: Array = []
@@ -1112,6 +1117,10 @@ func initialize_combat() -> void:
 	rules.playerCyberwareIds = equipped_cyberware_ids()
 	rules.cyberware = player_cyberware()
 	rules.deck = full_deck_ids()
+	if tutorial_mode:
+		rules.deck = TUTORIAL_DECK.duplicate()
+		rules.deck.reverse()
+		rules.shuffleInitialDeck = false
 	rules.cards.merge(reward_rules.cards, false)
 	model.initialize(state.battleId, int(state.currentHp), int(state.maxHp), rules, definitions, card_catalog)
 	state.combat = model.snapshot()
@@ -1188,6 +1197,21 @@ func training_enemy_choices() -> Array[Dictionary]:
 		choices.append(choice)
 	return choices
 
+func start_tutorial() -> void:
+	if page != "menu" or not pending_save_kind.is_empty() or transition_locked or battle_busy or training_mode: return
+	if battles.has(TUTORIAL_BATTLE_ID) or not battles.has("B11") or not enemy_catalog.has("fish"): return
+	var practice: Dictionary = battles.B11.duplicate(true)
+	practice.id = TUTORIAL_BATTLE_ID
+	practice.eventId = ""
+	practice.name = "新手教程"
+	practice.enemyIds = ["fish"]
+	practice.trainingOnly = true
+	practice.tutorialOnly = true
+	battles[TUTORIAL_BATTLE_ID] = practice
+	training_battle_id = TUTORIAL_BATTLE_ID
+	start_training(TUTORIAL_BATTLE_ID)
+	if not training_mode: _clear_training_encounter()
+
 func start_enemy_training(id: String) -> void:
 	if page != "menu" or transition_locked or battle_busy or training_mode: return
 	for definition in training_enemy_choices():
@@ -1218,11 +1242,13 @@ func start_training(battle_id: String = "B04") -> void:
 	if not battles[battle_id].get("trainingOnly", false):
 		var event: Dictionary = events.get(battles[battle_id].eventId, {})
 		if event.is_empty() or not event.get("nodes", {}).has("battle") or event.nodes.battle.get("battleId") != battle_id: return
-	var source := state if not state.is_empty() else saved_adventure_preview()
-	if source.is_empty() and has_save():
+	var is_tutorial: bool = battles[battle_id].get("tutorialOnly", false)
+	# A tutorial never reads a checkpoint or inherits upgraded decks/technology.
+	var source: Dictionary = {} if is_tutorial else (state if not state.is_empty() else saved_adventure_preview())
+	if not is_tutorial and source.is_empty() and has_save():
 		notice.emit("存档无法读取，不能使用当前冒险配置演练。请先恢复有效存档。")
 		return
-	var fresh := initial_state(source.get("playerCharacterId", config.defaultPlayerCharacterId))
+	var fresh := initial_state("noren" if is_tutorial else source.get("playerCharacterId", config.defaultPlayerCharacterId))
 	if fresh.is_empty(): return
 	fresh.deck = source.get("deck", []).duplicate()
 	fresh.removedStartingCards = source.get("removedStartingCards", []).duplicate()
@@ -1232,6 +1258,7 @@ func start_training(battle_id: String = "B04") -> void:
 	training_backup = state.duplicate(true)
 	training_scenery_place_id = ""
 	training_mode = true
+	tutorial_mode = is_tutorial
 	state = fresh
 	state.targetId = "richard"
 	state.activeEventId = battles[battle_id].eventId
@@ -1249,15 +1276,20 @@ func restore_training() -> void:
 	training_backup.clear()
 	_clear_training_encounter()
 	training_mode = false
+	tutorial_mode = false
 	training_scenery_place_id = ""
 
 func finish_training(result: String) -> void:
 	if not training_mode or result not in ["win", "lose"]: return
+	var was_tutorial := tutorial_mode
 	restore_training()
 	page = "menu"
 	revision += 1
 	changed.emit()
-	notice.emit("演练结束：%s。冒险进度和血量未改变。" % {"win":"胜利","lose":"失败"}.get(result,result))
+	if was_tutorial:
+		notice.emit("教学战胜利！可从主菜单再次练习。" if result == "win" else "教学战结束，可从主菜单重新练习。冒险进度未改变。")
+	else:
+		notice.emit("演练结束：%s。冒险进度和血量未改变。" % {"win":"胜利","lose":"失败"}.get(result,result))
 
 func open_cyberware() -> void:
 	if not pending_save_kind.is_empty() or transition_locked or battle_busy: return

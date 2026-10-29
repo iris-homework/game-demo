@@ -4,6 +4,8 @@ signal card_aim_started(uid: String)
 signal card_aim_cancelled
 signal card_played(uid: String)
 signal resource_denied
+signal pile_inspected(title: String)
+var tutorial_guide: Control
 var model: CombatModel
 var battle: Dictionary
 var expected_revision: int
@@ -138,7 +140,7 @@ func enter(params: Dictionary) -> void:
 		shade_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(shade_view)
 	# Battle has no footer; changing the section title must retain that layout.
-	status_bar(Game.battle_type_label(Game.battle_type()),false,Callable(),false)
+	status_bar("新手教程" if Game.tutorial_mode else Game.battle_type_label(Game.battle_type()),false,Callable(),false)
 	if not Game.training_mode and not model.is_noren():
 		tag("旧版测试规则",Vector2(760,117),CYAN,310)
 	if Game.texture(place_asset) == null:
@@ -200,6 +202,10 @@ func enter(params: Dictionary) -> void:
 	add_child(aim)
 	refresh_counts()
 	set_busy(true)
+	if Game.tutorial_mode:
+		tutorial_guide = preload("res://scripts/combat/tutorial_guide.gd").new()
+		add_child(tutorial_guide)
+		tutorial_guide.configure(self)
 	start_hand.call_deferred()
 
 func battle_background() -> bool:
@@ -1168,6 +1174,7 @@ func show_pile(title: String, contents: Array) -> void:
 	pile_overlay.setup(model, title, contents)
 	pile_overlay.closed.connect(close_pile)
 	add_child(pile_overlay)
+	pile_inspected.emit(title)
 
 func close_pile() -> void:
 	if not is_instance_valid(pile_overlay): return
@@ -1229,6 +1236,11 @@ func handle_battle_shortcut(event: InputEventKey) -> bool:
 	return false
 
 func _input(event: InputEvent) -> void:
+	# Guide controls must reach GUI before a selected self/all card claims the click.
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and is_instance_valid(tutorial_guide) and tutorial_guide.blocks_pointer(event.position):
+		if event.pressed: cancel_selection()
+		else: clear_card_drag()
+		return
 	if event is InputEventKey and handle_battle_shortcut(event): return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_F5,KEY_F6,KEY_F7]:
 		if Game.training_mode and Game.config.developmentMode:

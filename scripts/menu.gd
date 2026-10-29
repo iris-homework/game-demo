@@ -17,6 +17,7 @@ var continue_button: Button
 var new_button: Button
 var cyberware_button: Button
 var library_button: Button
+var tutorial_button: Button
 var training_toggle: Button
 var training_container: Control
 var training_cancel: Button
@@ -183,7 +184,9 @@ func close_settings() -> void:
 	settings_button.grab_focus()
 
 func _build_bottom_right() -> void:
-	settings_button = _menu_button("settings", "设置", Vector2(COLUMN_X, 680), Vector2(COLUMN_WIDTH, 48), open_settings, false, 18)
+	tutorial_button = _menu_button("tutorial", "新手教程", Vector2(COLUMN_X, 680), Vector2(COLUMN_WIDTH, 48), Game.start_tutorial, true, 18)
+	tutorial_button.tooltip_text = "与变异的鱼练习战斗基础；不影响冒险进度。"
+	settings_button = _menu_button("settings", "设置", Vector2(COLUMN_X, 750), Vector2(COLUMN_WIDTH, 48), open_settings, false, 18)
 	motion_button = _menu_button("motion_toggle", _motion_label(), Vector2(COLUMN_X, 828), Vector2(165, 44), _toggle_motion, false, 16)
 	quit_button = _menu_button("quit_game", "退出游戏", Vector2(COLUMN_X + 185, 828), Vector2(165, 44), Game.request_quit, false, 16)
 	var version := str(ProjectSettings.get_setting("application/config/version", "0.2.6-r1"))

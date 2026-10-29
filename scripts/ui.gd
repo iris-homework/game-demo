@@ -213,7 +213,7 @@ func status_bar(section: String, show_days: bool = true, weeks_action: Callable 
 	deck_button.name = "current_deck_button"
 	deck_button.tooltip_text = "查看当前完整卡组及每种牌的数量"
 	deck_button.disabled = Game.state.is_empty()
-	var menu_button := button(self, "退出演练" if Game.training_mode else "菜单", Vector2(1248.0, 16.0), Vector2(140.0, 44.0), Game.request_menu)
+	var menu_button := button(self, "退出教程" if Game.tutorial_mode else ("退出演练" if Game.training_mode else "菜单"), Vector2(1248.0, 16.0), Vector2(140.0, 44.0), Game.request_menu)
 	menu_button.name = "menu_button"
 	if not reserve_action_slot and not weeks_action.is_valid():
 		deck_button.position.x = menu_button.position.x - deck_button.size.x - 8.0
