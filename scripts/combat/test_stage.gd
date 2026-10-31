@@ -2,6 +2,7 @@ extends Control
 ## Clipped presentation world. No model, saves, card data or HUD are mutated here.
 signal phase_changed(phase: String)
 const Actor = preload("res://scripts/combat/pose_actor.gd")
+const Atmosphere = preload("res://scripts/combat/battle_atmosphere.gd")
 const ReturnGhost = preload("res://scripts/combat/return_ghost_fx.gd")
 const NeonSlash = preload("res://scripts/combat/prismatic_slash_fx.gd")
 const NorenSlash = preload("res://scripts/combat/noren_slash_fx.gd")
@@ -79,7 +80,7 @@ func set_dancer_duet(enemy_visuals: Array[EnemyVisualResolver.Visual]) -> void:
 	update_depth()
 	_update_camera()
 
-func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual], scenery_texture: Texture2D = null, ground_start: float = 0.5) -> void:
+func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual], scenery_texture: Texture2D = null, ground_start: float = 0.5, scenery_place_id: String = "") -> void:
 	# This is the new-battle boundary. Refresh before the player is created so
 	# Noren and any lazily resolved actors use the just-applied catalog. Existing
 	# Visual instances already owned by a running battle are not touched.
@@ -95,7 +96,7 @@ func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual], scen
 	add_child(world)
 	focus_y = floor_y-35
 	if scenery_texture != null:
-		setup_scenery(scenery_texture,ground_start)
+		setup_scenery(scenery_texture,ground_start,scenery_place_id)
 	else:
 		var ground := preload("res://scripts/combat/depth_floor.gd").new()
 		ground.z_index = -2
@@ -125,7 +126,7 @@ func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual], scen
 	add_child(combat_audio)
 	_update_camera()
 
-func setup_scenery(texture: Texture2D, ground_start: float) -> void:
+func setup_scenery(texture: Texture2D, ground_start: float, place_id: String = "") -> void:
 	# Place the artwork horizon behind the furthest depth lane, preserving aspect ratio.
 	var ground_line := position.y+floor_y-155.0
 	var ground_uv := clampf(ground_start,0.1,0.9)
@@ -141,6 +142,7 @@ func setup_scenery(texture: Texture2D, ground_start: float) -> void:
 	scenery.z_index = -2
 	# Full canvas sibling avoids seams at the actor stage's clipping boundaries.
 	get_parent().add_child(scenery)
+	Atmosphere.apply_to(scenery,place_id,ground_start)
 
 func _exit_tree() -> void:
 	if is_instance_valid(scenery): scenery.queue_free()
@@ -167,6 +169,7 @@ func update_depth() -> void:
 		actor.scale = Vector2.ONE*depth_scale(actor.position)
 
 func _process(delta: float) -> void:
+	if is_visible_in_tree(): Atmosphere.advance(scenery,delta)
 	update_depth()
 	if shake_time < shake_duration:
 		shake_time = minf(shake_duration,shake_time+delta)

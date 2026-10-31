@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-10-30新增[战斗背景动态专项](combat/presentation/battle_atmosphere_tests.tscn)：13地点材质、镜头覆盖、战斗快照、暂停与释放；GPU输出九组背景前后帧及实战截图，新增七类代表灯光至少15%明暗差的像素检查，并记录动态／静态CPU帧间隔（非GPU耗时）。须复制工程并使用独立custom_user_dir_name，支持QA_OUT_DIR及QA_CAPTURE_MOTION=1。
+
 新手教程专项：[`menu/tutorial_tests.tscn`](menu/tutorial_tests.tscn)覆盖固定首抽、正式敌人定义复用、无存档／已有进度／损坏磁盘存档隔离、退出与胜负恢复、菜单模态、七步实操、牌堆与悬停、教学按钮与出牌输入隔离。必须使用复制工程与名称含`tutorial-settings-qa`的独立用户目录；`QA_OUT_DIR`指定证据目录，GPU运行额外生成逐步截图。不移动系统鼠标，未代替实体输入验收。
 
 

@@ -121,7 +121,7 @@ func enter(params: Dictionary) -> void:
 		enemy_visuals.append(Game.enemy_combat_visual(enemy))
 	var stage_definition: Dictionary = Game.assets.get(stage_asset,{})
 	var stage_texture: Texture2D = Game.texture(stage_asset) if stage_definition.get("battleEnabled",true) else null
-	stage.setup(533+actor_offset.y,enemy_visuals,stage_texture,float(stage_definition.get("groundStart",0.5)))
+	stage.setup(533+actor_offset.y,enemy_visuals,stage_texture,float(stage_definition.get("groundStart",0.5)),scenery_place_id)
 	shown_encounter_phase = model.encounter_phase
 	if model.profile.get("encounterId", "") == "dancer_duet" and shown_encounter_phase == 2:
 		setup_dancer_duet()
