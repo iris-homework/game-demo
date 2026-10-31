@@ -1,0 +1,17 @@
+{
+  "title": "Team Energy",
+  "game": "Limbus Company",
+  "context": "LCB Regular Check-up",
+  "credited_artist": "ProjectMoon",
+  "download_date": "2026-11-01",
+  "source_page": "https://downloads.khinsider.com/game-soundtracks/album/limbus-company-ios-mobile-online-gamerip-2023/7-52.%2520Team%2520Energy.mp3",
+  "download_url": "https://vgmtreasurechest.com/soundtracks/limbus-company-ios-mobile-online-gamerip-2023/feylaedxmr/7-52.%20Team%20Energy.mp3",
+  "file": "team_energy.mp3",
+  "bytes": 4788919,
+  "sha256": "3c1c6b6460fcfd224617d20abce6fbc43c54fd3163113e43b685da6bafbec39e",
+  "processing": "Original downloaded MP3 bytes; no transcoding, trimming or normalization. Godot loops the full stream.",
+  "rights": "Third-party game soundtrack. Community download is not evidence of permission to redistribute in another game; no open-source or cross-game reuse license verified.",
+  "duration_seconds": 203.328,
+  "sample_rate_hz": 48000,
+  "channels": 2
+}

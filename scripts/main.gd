@@ -45,6 +45,7 @@ var quitting := false
 var previous_auto_accept_quit := true
 var audio_player: Node
 var audio_hooks: Node
+var music_player: AudioStreamPlayer
 var startup_splash: Control
 var startup_requested := false
 var startup_view_process_mode := Node.PROCESS_MODE_INHERIT
@@ -52,6 +53,8 @@ var startup_swallowed_keys: Dictionary = {}
 var startup_swallowed_mouse: Dictionary = {}
 
 func _ready() -> void:
+	music_player = preload("res://scripts/audio/background_music.gd").new()
+	add_child(music_player)
 	audio_player = preload("res://scripts/audio/game_audio.gd").new()
 	add_child(audio_player)
 	audio_hooks = preload("res://scripts/audio/sfx_hooks.gd").new()
@@ -145,6 +148,8 @@ func quit_after_audio_cleanup() -> void:
 
 func show_page() -> void:
 	if Game.transition_locked: return
+	# Stop at the battle request, before its transition or presentation starts.
+	if Game.page == "battle" and is_instance_valid(music_player): music_player.stop()
 	# A committed reward updates its existing controls; rebuilding it replays the
 	# full-screen fade and discards the balance counter animation.
 	if shown_page == "result" and Game.page == "result" and is_instance_valid(view) and view.refresh_reward(): return
@@ -169,6 +174,7 @@ func swap_view() -> void:
 	else:
 		view = VIEWS.get(Game.page,VIEWS.menu).instantiate()
 	shown_page = Game.page
+	if is_instance_valid(music_player): music_player.set_page(shown_page)
 	if shown_page == "menu": view.startup_intro_pending = startup_requested
 	add_child(view)
 	# Game.choose can swap the view before select() emits its success signal.

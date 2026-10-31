@@ -25,6 +25,8 @@ var settings_path := "user://settings.cfg"
 var master_volume := 1.0
 var sfx_volume := 1.0
 var sfx_enabled := true
+var music_volume := 1.0
+var music_enabled := true
 var display_mode := "windowed"
 var _windowed_size := Vector2i(1280, 800)
 var _windowed_position := Vector2i.ZERO
@@ -43,11 +45,12 @@ func _process(delta: float) -> void:
 	if retry_seconds >= 2.0: _save()
 
 func _ensure_audio_bus() -> void:
-	if AudioServer.get_bus_index("SFX") < 0:
-		AudioServer.add_bus()
-		var index := AudioServer.bus_count - 1
-		AudioServer.set_bus_name(index, "SFX")
-		AudioServer.set_bus_send(index, "Master")
+	for bus_name in ["SFX", "Music"]:
+		if AudioServer.get_bus_index(bus_name) < 0:
+			AudioServer.add_bus()
+			var index := AudioServer.bus_count - 1
+			AudioServer.set_bus_name(index, bus_name)
+			AudioServer.set_bus_send(index, "Master")
 
 func _volume_value(value: Variant) -> float:
 	if typeof(value) not in [TYPE_FLOAT, TYPE_INT] or not is_finite(float(value)): return 1.0
@@ -58,6 +61,8 @@ func reload_settings() -> void:
 	master_volume = 1.0
 	sfx_volume = 1.0
 	sfx_enabled = true
+	music_volume = 1.0
+	music_enabled = true
 	display_mode = "windowed"
 	bindings = DEFAULT_BINDINGS.duplicate()
 	pending_save = false
@@ -66,6 +71,9 @@ func reload_settings() -> void:
 		sfx_volume = _volume_value(config.get_value("audio", "sfx_volume", 1.0))
 		var enabled: Variant = config.get_value("audio", "sfx_enabled", true)
 		sfx_enabled = enabled if typeof(enabled) == TYPE_BOOL else true
+		music_volume = _volume_value(config.get_value("audio", "music_volume", 1.0))
+		var music_on: Variant = config.get_value("audio", "music_enabled", true)
+		music_enabled = music_on if typeof(music_on) == TYPE_BOOL else true
 		var mode: Variant = config.get_value("display", "mode", "windowed")
 		if typeof(mode) == TYPE_STRING and DISPLAY_MODES.has(mode): display_mode = mode
 		# Validate the complete candidate map before accepting it (supports key swaps).
@@ -88,12 +96,17 @@ func _apply_audio() -> void:
 	var index := AudioServer.get_bus_index("SFX")
 	AudioServer.set_bus_volume_db(index, linear_to_db(maxf(sfx_volume, 0.0001)))
 	AudioServer.set_bus_mute(index, not sfx_enabled or sfx_volume <= 0.0)
+	var music_index := AudioServer.get_bus_index("Music")
+	AudioServer.set_bus_volume_db(music_index, linear_to_db(maxf(music_volume, 0.0001)))
+	AudioServer.set_bus_mute(music_index, not music_enabled or music_volume <= 0.0)
 
 func _save() -> bool:
 	var config := ConfigFile.new()
 	config.set_value("audio", "master_volume", master_volume)
 	config.set_value("audio", "sfx_volume", sfx_volume)
 	config.set_value("audio", "sfx_enabled", sfx_enabled)
+	config.set_value("audio", "music_volume", music_volume)
+	config.set_value("audio", "music_enabled", music_enabled)
 	config.set_value("display", "mode", display_mode)
 	for action in bindings: config.set_value("keys", action, bindings[action])
 	var temporary := settings_path + ".tmp"
@@ -159,6 +172,16 @@ func set_sfx_enabled(value: bool) -> bool:
 	_apply_audio()
 	return _save()
 
+func set_music_volume(value: float) -> bool:
+	music_volume = _volume_value(value)
+	_apply_audio()
+	return _save()
+
+func set_music_enabled(value: bool) -> bool:
+	music_enabled = value
+	_apply_audio()
+	return _save()
+
 func action_label(action: String) -> String:
 	return ACTION_LABELS.get(action, "选择第%s张手牌" % action.trim_prefix("hand_"))
 
@@ -201,6 +224,8 @@ func reset_defaults() -> bool:
 	master_volume = 1.0
 	sfx_volume = 1.0
 	sfx_enabled = true
+	music_volume = 1.0
+	music_enabled = true
 	display_mode = "windowed"
 	bindings = DEFAULT_BINDINGS.duplicate()
 	_apply_audio()

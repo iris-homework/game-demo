@@ -5,6 +5,8 @@ var display_mode_picker: OptionButton
 var master_slider: HSlider
 var sfx_slider: HSlider
 var sfx_toggle: CheckButton
+var music_slider: HSlider
+var music_toggle: CheckButton
 var binding_buttons: Dictionary = {}
 var listening_action := ""
 var status_label: Label
@@ -12,6 +14,7 @@ var close_button: Button
 var reset_button: Button
 var master_value: Label
 var sfx_value: Label
+var music_value: Label
 var focus_controls: Array[Control] = []
 
 func _ready() -> void:
@@ -28,21 +31,30 @@ func _ready() -> void:
 	label(self, "总音量", Vector2(278, 239), Vector2(180, 30), 19)
 	master_value = label(self, "", Vector2(555, 239), Vector2(80, 30), 18, MUTED)
 	master_slider = _slider(Vector2(280, 285))
-	label(self, "音效音量", Vector2(278, 343), Vector2(180, 30), 19)
-	sfx_value = label(self, "", Vector2(555, 343), Vector2(80, 30), 18, MUTED)
-	sfx_slider = _slider(Vector2(280, 389))
+	label(self, "音乐音量", Vector2(278, 327), Vector2(180, 30), 19)
+	music_value = label(self, "", Vector2(555, 327), Vector2(80, 30), 18, MUTED)
+	music_slider = _slider(Vector2(280, 365))
+	music_toggle = CheckButton.new()
+	music_toggle.text = "开启音乐"
+	music_toggle.position = Vector2(278, 405)
+	music_toggle.size = Vector2(350, 40)
+	add_child(music_toggle)
+	focus_controls.append(music_toggle)
+	label(self, "音效音量", Vector2(278, 459), Vector2(180, 30), 19)
+	sfx_value = label(self, "", Vector2(555, 459), Vector2(80, 30), 18, MUTED)
+	sfx_slider = _slider(Vector2(280, 497))
 	sfx_toggle = CheckButton.new()
 	sfx_toggle.text = "开启音效"
-	sfx_toggle.position = Vector2(278, 445)
-	sfx_toggle.size = Vector2(350, 48)
+	sfx_toggle.position = Vector2(278, 537)
+	sfx_toggle.size = Vector2(350, 40)
+	sfx_toggle.tooltip_text = "控制界面、对白与战斗音效"
 	add_child(sfx_toggle)
 	focus_controls.append(sfx_toggle)
-	label(self, "涵盖界面、对白与战斗声音", Vector2(278, 506), Vector2(350, 30), 16, MUTED)
-	label(self, "显示", Vector2(278, 553), Vector2(300, 32), 23, CYAN)
-	label(self, "显示模式", Vector2(278, 597), Vector2(110, 32), 18)
+	label(self, "显示", Vector2(278, 593), Vector2(300, 32), 23, CYAN)
+	label(self, "显示模式", Vector2(278, 641), Vector2(110, 32), 18)
 	display_mode_picker = OptionButton.new()
 	display_mode_picker.name = "display_mode"
-	display_mode_picker.position = Vector2(395, 591)
+	display_mode_picker.position = Vector2(395, 635)
 	display_mode_picker.size = Vector2(244, 44)
 	display_mode_picker.add_theme_font_size_override("font_size", 17)
 	for mode in PlayerSettings.DISPLAY_MODES:
@@ -50,9 +62,8 @@ func _ready() -> void:
 		display_mode_picker.set_item_metadata(display_mode_picker.item_count - 1, mode)
 	add_child(display_mode_picker)
 	focus_controls.append(display_mode_picker)
-	var display_hint := label(self, "真全屏使用独占全屏模式", Vector2(278, 651), Vector2(360, 27), 16, MUTED)
-	display_hint.tooltip_text = "切换立即生效并自动保存；返回窗口会恢复窗口尺寸。"
-	var help := label(self, "Esc / 右键返回 · Tab / 方向键导航\nEnter / Space 确认 · 数字键选择对白选项", Vector2(278, 690), Vector2(370, 48), 14, MUTED)
+	display_mode_picker.tooltip_text = "真全屏使用独占全屏模式。切换立即生效并自动保存；返回窗口会恢复窗口尺寸。"
+	var help := label(self, "Esc / 右键返回 · Tab / 方向键导航\nEnter / Space 确认 · 数字键选择对白选项", Vector2(278, 699), Vector2(370, 48), 14, MUTED)
 	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label(self, "快捷键", Vector2(700, 185), Vector2(400, 32), 23, CYAN)
 	label(self, "点击键位后按下新键 · Esc 取消改键", Vector2(700, 224), Vector2(440, 28), 16, MUTED)
@@ -94,6 +105,8 @@ func _ready() -> void:
 	master_slider.value_changed.connect(func(value: float): PlayerSettings.set_master_volume(value / 100.0); _update_values())
 	sfx_slider.value_changed.connect(func(value: float): PlayerSettings.set_sfx_volume(value / 100.0); _update_values())
 	sfx_toggle.toggled.connect(func(value: bool): PlayerSettings.set_sfx_enabled(value))
+	music_slider.value_changed.connect(func(value: float): PlayerSettings.set_music_volume(value / 100.0); _update_values())
+	music_toggle.toggled.connect(func(value: bool): PlayerSettings.set_music_enabled(value))
 	display_mode_picker.item_selected.connect(func(index: int):
 		PlayerSettings.set_display_mode(str(display_mode_picker.get_item_metadata(index))))
 	PlayerSettings.status_changed.connect(_status_changed)
@@ -122,11 +135,14 @@ func _slider(pos: Vector2) -> HSlider:
 func _update_values() -> void:
 	master_value.text = "%d%%" % roundi(PlayerSettings.master_volume * 100)
 	sfx_value.text = "%d%%" % roundi(PlayerSettings.sfx_volume * 100)
+	music_value.text = "%d%%" % roundi(PlayerSettings.music_volume * 100)
 
 func _refresh() -> void:
 	master_slider.set_value_no_signal(PlayerSettings.master_volume * 100)
 	sfx_slider.set_value_no_signal(PlayerSettings.sfx_volume * 100)
 	sfx_toggle.set_pressed_no_signal(PlayerSettings.sfx_enabled)
+	music_slider.set_value_no_signal(PlayerSettings.music_volume * 100)
+	music_toggle.set_pressed_no_signal(PlayerSettings.music_enabled)
 	for index in display_mode_picker.item_count:
 		if display_mode_picker.get_item_metadata(index) == PlayerSettings.display_mode:
 			display_mode_picker.select(index)

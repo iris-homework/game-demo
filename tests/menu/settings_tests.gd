@@ -191,6 +191,52 @@ func test_display_storage() -> void:
 	PlayerSettings.reload_settings()
 	check(PlayerSettings.display_mode == "windowed","Restore Defaults automatically persists windowed display mode")
 
+func test_music_storage() -> void:
+	PlayerSettings.reset_defaults()
+	var music := AudioServer.get_bus_index("Music")
+	var sfx := AudioServer.get_bus_index("SFX")
+	check(music >= 0 and AudioServer.get_bus_send(music) == &"Master", "music has an independent bus feeding master")
+	check(PlayerSettings.music_enabled and is_equal_approx(PlayerSettings.music_volume, 1.0), "music defaults preserve the previous playback level")
+	check(PlayerSettings.set_music_volume(0.34) and PlayerSettings.set_music_enabled(false), "music volume and switch save immediately")
+	PlayerSettings.music_volume = 1.0
+	PlayerSettings.music_enabled = true
+	PlayerSettings.reload_settings()
+	check(is_equal_approx(PlayerSettings.music_volume, 0.34) and not PlayerSettings.music_enabled, "reloading restores both music preferences")
+	check(AudioServer.is_bus_mute(music) and is_equal_approx(AudioServer.get_bus_volume_linear(music), 0.34), "saved music settings apply to the real audio bus")
+	check(not AudioServer.is_bus_mute(sfx) and is_equal_approx(AudioServer.get_bus_volume_linear(sfx), 1.0), "music controls leave effects unchanged")
+	PlayerSettings.set_music_enabled(true)
+	PlayerSettings.set_music_volume(0.0)
+	check(AudioServer.is_bus_mute(music) and PlayerSettings.music_enabled, "zero music volume is silent without replacing the switch preference")
+	PlayerSettings.set_music_volume(0.34)
+	check(not AudioServer.is_bus_mute(music), "raising music volume restores the enabled bus")
+	PlayerSettings.set_sfx_enabled(false)
+	check(not AudioServer.is_bus_mute(music), "effects switch cannot mute music")
+	PlayerSettings.set_master_volume(0.0)
+	check(AudioServer.is_bus_mute(0), "master mute still covers music")
+	var saved_path: String = PlayerSettings.settings_path
+	PlayerSettings.settings_path = output.path_join("absent-music-parent/settings.cfg")
+	check(not PlayerSettings.set_music_enabled(false) and AudioServer.is_bus_mute(music) and PlayerSettings.pending_save, "failed music save retains the live mute setting and retry")
+	PlayerSettings.settings_path = saved_path
+	PlayerSettings._process(2.1)
+	PlayerSettings.reload_settings()
+	check(not PlayerSettings.music_enabled and not PlayerSettings.pending_save, "retry persists the retained music switch")
+	var legacy := ConfigFile.new()
+	legacy.set_value("audio", "master_volume", 0.61)
+	legacy.set_value("audio", "sfx_enabled", false)
+	legacy.save(PlayerSettings.settings_path)
+	PlayerSettings.reload_settings()
+	check(PlayerSettings.music_enabled and is_equal_approx(PlayerSettings.music_volume, 1.0) and is_equal_approx(PlayerSettings.master_volume, 0.61) and not PlayerSettings.sfx_enabled, "older settings gain music defaults without losing existing preferences")
+	for value in [-2.0, 3.0, "loud", false]:
+		legacy.set_value("audio", "music_volume", value)
+		legacy.set_value("audio", "music_enabled", "false")
+		legacy.save(PlayerSettings.settings_path)
+		PlayerSettings.reload_settings()
+		var expected := 0.0 if value is float and value < 0.0 else 1.0
+		check(is_equal_approx(PlayerSettings.music_volume, expected) and PlayerSettings.music_enabled, "invalid music preferences clamp or fall back safely: " + str(value))
+	PlayerSettings.reset_defaults()
+	PlayerSettings.reload_settings()
+	check(PlayerSettings.music_enabled and is_equal_approx(PlayerSettings.music_volume, 1.0) and not AudioServer.is_bus_mute(music), "Restore Defaults persists enabled music at full user volume")
+
 func test_bindings() -> void:
 	for i in 10:
 		var action := "hand_%d" % (i + 1)
@@ -229,18 +275,25 @@ func test_panel() -> bool:
 	for control in settings.find_children("*","Button",true,false):
 		if "保存" in control.text: save_buttons += 1
 	check(save_buttons == 0,"settings has no separate Save button")
-	for i in settings.binding_buttons.size() + 8:
+	for i in settings.focus_controls.size() + 1:
 		await key(KEY_TAB)
 		check(settings.is_ancestor_of(get_viewport().gui_get_focus_owner()),"Tab stays in settings modal at step %d" % i)
 	await key(KEY_TAB,true)
 	check(settings.is_ancestor_of(get_viewport().gui_get_focus_owner()),"Shift Tab stays in settings modal")
 	settings.master_slider.value = 28
 	settings.sfx_slider.value = 46
+	settings.music_slider.value = 34
 	await settle()
 	# Sliders expose percentages; persistence exposes normalized volume.
 	check(is_equal_approx(PlayerSettings.master_volume,0.28) and is_equal_approx(PlayerSettings.sfx_volume,0.46),"slider changes apply normalized sound volumes immediately")
+	check(is_equal_approx(PlayerSettings.music_volume,0.34) and settings.music_value.text == "34%" and app.music_player.bus == "Music", "music slider updates percentage and the active music bus immediately")
 	PlayerSettings.reload_settings()
 	check(is_equal_approx(PlayerSettings.master_volume,0.28) and is_equal_approx(PlayerSettings.sfx_volume,0.46),"slider changes survive reload without closing panel")
+	check(is_equal_approx(PlayerSettings.music_volume,0.34), "music slider survives reloading preferences")
+	var music_before: bool = PlayerSettings.music_enabled
+	await click(settings.music_toggle)
+	check(PlayerSettings.music_enabled != music_before and AudioServer.is_bus_mute(AudioServer.get_bus_index("Music")), "music switch mutes live background music through GUI")
+	check(not AudioServer.is_bus_mute(AudioServer.get_bus_index("SFX")), "music switch leaves effects audible")
 	var enabled_before: bool = PlayerSettings.sfx_enabled
 	await click(settings.sfx_toggle)
 	check(PlayerSettings.sfx_enabled != enabled_before,"effects switch toggles live setting through GUI")
@@ -269,7 +322,9 @@ func test_panel() -> bool:
 	menu.open_settings()
 	await settle()
 	settings = menu.settings_dialog
+	check(is_equal_approx(settings.music_slider.value,34.0) and not settings.music_toggle.button_pressed, "reopening settings restores music controls")
 	await click(settings.reset_button)
+	check(settings.music_toggle.button_pressed and is_equal_approx(settings.music_slider.value,100.0) and PlayerSettings.music_enabled, "Restore Defaults refreshes and saves both music controls")
 	check(PlayerSettings.bindings == PlayerSettings.DEFAULT_BINDINGS and is_equal_approx(PlayerSettings.master_volume,1.0) and is_equal_approx(PlayerSettings.sfx_volume,1.0) and PlayerSettings.sfx_enabled,"Restore Defaults applies and automatically saves all settings")
 	await click(settings.close_button)
 	check(not is_instance_valid(menu.settings_dialog),"close button returns to main menu")
@@ -379,7 +434,10 @@ func test_hand_input() -> void:
 	var voices := app.find_children("*","AudioStreamPlayer",true,false)
 	check(voices.size() >= 12,"real scene includes shared, stage, frame and attack audio voices")
 	for voice in voices:
-		check(voice.bus == &"SFX","live sound voice uses settings SFX bus: " + str(voice.get_path()))
+		if voice == app.music_player:
+			check(voice.bus == &"Music" and not voice.playing, "battle music player uses its independent bus and remains stopped")
+		else:
+			check(voice.bus == &"SFX","live sound effect uses settings SFX bus: " + str(voice.get_path()))
 	for action_data in [[KEY_Q,"cyberware_view.gd"],[KEY_D,"pile_view.gd"],[KEY_F,"pile_view.gd"]]:
 		get_viewport().gui_release_focus()
 		await key(action_data[0])
@@ -459,6 +517,7 @@ func _ready() -> void:
 	test_storage()
 	test_invalid_file()
 	test_display_storage()
+	test_music_storage()
 	test_bindings()
 	app = preload("res://scenes/main.tscn").instantiate()
 	add_child(app)
