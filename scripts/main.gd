@@ -103,6 +103,7 @@ func _finish_startup_splash() -> void:
 	if is_instance_valid(view):
 		view.process_mode = startup_view_process_mode
 		if shown_page == "menu": view.reveal_after_startup()
+		if Game.page == shown_page: music_player.set_page(shown_page)
 
 func _consume_startup_input(event: InputEvent) -> bool:
 	var showing := is_instance_valid(startup_splash)
@@ -174,7 +175,8 @@ func swap_view() -> void:
 	else:
 		view = VIEWS.get(Game.page,VIEWS.menu).instantiate()
 	shown_page = Game.page
-	if is_instance_valid(music_player): music_player.set_page(shown_page)
+	if is_instance_valid(music_player) and not startup_requested and not is_instance_valid(startup_splash):
+		music_player.set_page(shown_page)
 	if shown_page == "menu": view.startup_intro_pending = startup_requested
 	add_child(view)
 	# Game.choose can swap the view before select() emits its success signal.

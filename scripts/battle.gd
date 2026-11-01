@@ -67,6 +67,9 @@ var pending_battle_result := ""
 var stage: Control
 var shown_enemies: Array = []
 var shown_encounter_phase := 1
+const DANCER_MUSIC_ENTRY_DELAY := 0.35
+var dancer_music: AudioStreamPlayer
+var normal_battle_music: AudioStreamPlayer
 var dancer_darkness: ColorRect
 var dancer_blackout: ColorRect
 var dancer_reveal_flash: ColorRect
@@ -123,8 +126,19 @@ func enter(params: Dictionary) -> void:
 	var stage_texture: Texture2D = Game.texture(stage_asset) if stage_definition.get("battleEnabled",true) else null
 	stage.setup(533+actor_offset.y,enemy_visuals,stage_texture,float(stage_definition.get("groundStart",0.5)),scenery_place_id)
 	shown_encounter_phase = model.encounter_phase
-	if model.profile.get("encounterId", "") == "dancer_duet" and shown_encounter_phase == 2:
-		setup_dancer_duet()
+	if model.profile.get("encounterId", "") == "dancer_duet":
+		dancer_music = AudioStreamPlayer.new()
+		dancer_music.name = "DancerMusic"
+		dancer_music.bus = &"Music"
+		dancer_music.volume_db = -8.0
+		dancer_music.stream = preload("res://assets/audio/music/dancer_rain_loop.ogg")
+		add_child(dancer_music)
+		if shown_encounter_phase == 2:
+			setup_dancer_duet()
+			play_dancer_music()
+	elif not Game.tutorial_mode and Game.battle_type() == "normal":
+		normal_battle_music = preload("res://scripts/audio/normal_battle_music.gd").new()
+		add_child(normal_battle_music)
 	if stage.scenery != null:
 		var shade := Gradient.new()
 		shade.offsets = PackedFloat32Array([0.0,0.25,0.38,0.66,0.88,1.0])
@@ -409,6 +423,10 @@ func start_hand() -> void:
 		set_busy(false)
 		finish(model.outcome)
 		return
+	if is_instance_valid(dancer_music) and shown_encounter_phase == 1:
+		create_tween().tween_callback(play_dancer_music).set_delay(DANCER_MUSIC_ENTRY_DELAY)
+	if is_instance_valid(normal_battle_music):
+		normal_battle_music.start_if_available()
 	var first_draw: bool = not model.opening_draw_done
 	if first_draw:
 		await announce_turn("第%d回合" % model.turn)
@@ -827,6 +845,14 @@ func present_attack_impact(attack: Dictionary, index: int) -> void:
 	enemy.intent.amount = int(enemy.intent.get("amount",0)) + int(attack.electricChargeUsed)
 	apply_shown_status({"target":index,"buffId":"electric_charge","stacksAfter":int(attack.electricChargeAfter)})
 
+func play_dancer_music() -> void:
+	# The same loop spans both formations; the blackout only pauses its playhead.
+	if is_instance_valid(dancer_blackout): return
+	if dancer_music.stream_paused:
+		dancer_music.stream_paused = false
+	elif not dancer_music.playing:
+		dancer_music.play()
+
 func setup_dancer_duet() -> void:
 	var visuals: Array[EnemyVisualResolver.Visual] = []
 	for enemy in model.enemies:
@@ -850,6 +876,7 @@ func present_encounter_phase() -> void:
 	dancer_blackout.name = "DancerBlackout"
 	dancer_blackout.z_index = 100
 	dancer_blackout.mouse_filter = Control.MOUSE_FILTER_STOP
+	dancer_music.stream_paused = true
 	await get_tree().create_timer(1.0).timeout
 	setup_dancer_duet()
 	shown_encounter_phase = model.encounter_phase
@@ -881,6 +908,7 @@ func present_encounter_phase() -> void:
 	exposure.tween_property(dancer_reveal_flash,"color:a",0.0,0.18).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	exposure.tween_callback(dancer_reveal_flash.queue_free)
 	dancer_blackout.hide()
+	light_pulse.parallel().tween_callback(play_dancer_music).set_delay(DANCER_MUSIC_ENTRY_DELAY)
 	dancer_blackout.queue_free()
 	dancer_blackout = null
 	# Hold the tableau and input lock while the opening brightness settles.

@@ -1,0 +1,44 @@
+{
+  "checked_date": "2026-11-01",
+  "requested_game": "超时空方舟 / Chrono Ark (Al Fine)",
+  "requested_track": "Battle2-1 / Battle 2-1",
+  "status": "installed_for_user_requested_private_use",
+  "target_resource": "res://assets/audio/music/chrono_ark_battle2_1.ogg",
+  "audio_file_present": true,
+  "download_performed": true,
+  "license_verified_for_this_project": false,
+  "sources": [
+    {
+      "url": "https://www.bilibili.com/video/BV1TZ421p7U8/",
+      "kind": "community listening catalog",
+      "observation": "Lists Battle 2-1 at 02:37; uploader states audio was taken from game files. Not evidence of permission to reuse in another game."
+    },
+    {
+      "url": "https://steamcommunity.com/app/1188930/discussions/0/2266943550300652684/",
+      "kind": "developer reply",
+      "observation": "Hyung_12 developer reply dated 2024-06-10 says OST cannot be released and situation with musicians is more complicated. This is a historical statement, not proof of current ownership or a definitive reuse-license ruling."
+    },
+    {
+      "url": "https://downloads.khinsider.com/game-soundtracks/album/chrono-ark-windows-gamerip-2019/CA%2520Battle02.mp3",
+      "kind": "community gamerip single-track public download",
+      "observation": "CA Battle02 OGG, 156.303 seconds, matches the Battle 2-1 community listing duration; original OGG bytes installed after explicit user private-use instruction. Exact title mapping is inferred from track name and catalog duration, not independently confirmed by an official track list."
+    }
+  ],
+  "unresolved": [
+    "Exact composer and rights holder for this specific track not independently confirmed.",
+    "No cross-game incorporation, redistribution or commercial-use license verified."
+  ],
+  "implementation": "Installed original OGG; only existing normal battle type, excluding tutorial and dancer encounter, plays a private looping stream on Music bus.",
+  "verification_fixture": "Earlier missing-resource and synthesized-tone checks are retained separately from the new actual-source validation.",
+  "user_instruction": "User explicitly requested direct installation into the production source project for personal private use; this instruction does not establish permission from the rights holder.",
+  "source_track_name": "CA Battle02",
+  "source_page": "https://downloads.khinsider.com/game-soundtracks/album/chrono-ark-windows-gamerip-2019/CA%2520Battle02.mp3",
+  "download_url": "https://lambda.vgmtreasurechest.com/soundtracks/chrono-ark-windows-gamerip-2019/hubzrlgz/CA%20Battle02.ogg",
+  "file": "chrono_ark_battle2_1.ogg",
+  "bytes": 10706019,
+  "sha256": "9dfe60313f948ee89007479105fcda897d8445e8fde36657c5405142622faf3c",
+  "duration_seconds": 156.30266666666665,
+  "sample_rate_hz": 48000,
+  "channels": 2,
+  "processing": "Original OGG bytes, no transcoding or edits; playback enables native looping on a private stream copy."
+}

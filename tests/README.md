@@ -1,5 +1,9 @@
 # 测试目录索引
 
+[普通战斗可选配乐专项](audio/normal_battle_music_tests.tscn)：用`QA_EXPECT_NORMAL_MUSIC=0`检查缺资源静默，或用`1`检查已导入的OGG；`QA_TRACK_KIND=actual-source`额外核对实际曲目解码长度。独立用户目录须含`normal-battle-music-qa`，`QA_OUT_DIR`可指定证据。覆盖正式B02入口、入场转场、冻结类型优先、重复循环、Music／SFX／Master设置、普通演练、精英／其他Boss／教程／舞者排除与离场释放；合成音和实际音频分别记录，Dummy播放状态检查不代替人工试听。
+
+[双人舞者配乐专项](audio/dancer_music_tests.tscn)检查正式战、演练、新旧快照、单曲连续两次循环边界、黑屏暂停与位置冻结、亮灯后0.35秒接续原进度。使用复制工程及目录名包含 `dancer-music-settings-qa` 的独立用户目录。
+
 2026-11-01新增[冒险难度专项](menu/difficulty_tests.tscn)：七组正式战斗普通／进阶、Boss逐阶段血量、快照恢复与重开防重复、保存读取和旧档迁移／非法值、菜单选择取消确认，以及演练／教程隔离。须使用复制工程、名称含`difficulty-settings-qa`的独立用户目录及绝对`QA_OUT_DIR`，补充真实Tab／Esc／鼠标事件及单敌、三敌、Boss实战血条和结束回合；GPU运行额外输出模式面板与进阶实战截图。使用视口合成输入，不代表实体输入。
 
 
