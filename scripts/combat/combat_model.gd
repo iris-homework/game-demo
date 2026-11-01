@@ -130,6 +130,13 @@ func initialize(id: String, hp: int, maximum: int, rules: Dictionary, enemy_defs
 	player_hp = hp
 	max_hp = maximum
 	profile = rules.duplicate(true)
+	# Freeze adjusted definitions once, before spawning. restore() uses snapshots
+	# directly, so loading or restarting a battle cannot stack the HP bonus.
+	var starting_enemies := difficulty_enemies(enemy_defs)
+	if profile.has("phaseOneEnemies"):
+		profile.phaseOneEnemies = starting_enemies.duplicate(true)
+	if profile.has("phaseTwoEnemies"):
+		profile.phaseTwoEnemies = difficulty_enemies(profile.phaseTwoEnemies)
 	card_catalog = cards.duplicate(true)
 	card_catalog.merge(profile.get("cards", {}), false)
 	card_catalog.merge(profile.get("phaseTwoCards", {}), false)
@@ -142,7 +149,7 @@ func initialize(id: String, hp: int, maximum: int, rules: Dictionary, enemy_defs
 		stance = profile.get("initialStance", "melee")
 		ammo = int(profile.get("initialAmmo", 2))
 		if profile.get("shuffleInitialDeck", true): draw_pile.shuffle()
-	for definition in enemy_defs:
+	for definition in starting_enemies:
 		var enemy: Dictionary = definition.duplicate(true)
 		if enemy.has("buffs"): enemy.buffs = buffs.restore_extra_state(enemy.buffs)
 		enemy.maxHp = int(profile.enemyMaxHp) if enemy.get("maxHp") == null else int(enemy.maxHp)
@@ -157,6 +164,15 @@ func initialize(id: String, hp: int, maximum: int, rules: Dictionary, enemy_defs
 		enemy.intent = intent_for(enemy, 0)
 	if player_hp <= 0: outcome = "lose"
 	log_lines.append("战斗连接已建立。")
+
+func difficulty_enemies(definitions: Array) -> Array:
+	var adjusted := definitions.duplicate(true)
+	if profile.get("difficulty", "normal") != "advanced": return adjusted
+	var bonus := 10 if adjusted.size() == 1 else 5
+	for definition in adjusted:
+		var base_hp: int = int(profile.get("enemyMaxHp", 1)) if definition.get("maxHp") == null else int(definition.maxHp)
+		definition.maxHp = base_hp + bonus
+	return adjusted
 
 func intent_for(enemy: Dictionary, index: int) -> Dictionary:
 	var sequence: Array = enemy.get("intentSequence", [])

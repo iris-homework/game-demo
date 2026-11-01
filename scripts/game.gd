@@ -20,6 +20,7 @@ const LEGACY_PLAYER_CHARACTER_ID := "noren"
 const PLAYER_REFERENCE := "@player"
 const TRAINING_ENEMY_HP := 100
 const BATTLE_TYPES := {"normal":"普通战斗", "elite":"精英战斗", "boss":"Boss战"}
+const DIFFICULTIES := {"normal":"普通模式", "advanced":"进阶模式"}
 const EVENT_REFRESH_LIMIT := 3
 var event_refresh_rng := RandomNumberGenerator.new()
 var places: Array
@@ -214,18 +215,20 @@ func valid_player_character(id) -> bool:
 		seen.append(skill.id)
 	return true
 
-func initial_state(player_id: String = "") -> Dictionary:
+func initial_state(player_id: String = "", difficulty: String = "normal") -> Dictionary:
+	if not DIFFICULTIES.has(difficulty): return {}
 	if player_id.is_empty(): player_id = config.defaultPlayerCharacterId
 	if not valid_player_character(player_id): return {}
 	var hp := int(player_characters[player_id].attributes.maxHp)
 	var fresh := {"schemaVersion":2, "playerCharacterId":player_id, "ownedCyberwareIds":player_characters[player_id].get("cyberwareIds", []).duplicate(), "equippedCyberwareIds":player_characters[player_id].get("cyberwareIds", []).duplicate(), "currentWeek":1, "currentDay":int(config.initialDay), "currentHp":hp, "maxHp":hp, "combat":{}, "battleStart":{}, "inventory":{}, "currentScene":"dialogue", "currentPlaceId":"bar", "activeEventId":"E01", "activeNodeId":"intro_01", "targetId":"", "credits":int(config.initialCredits), "completedEventIds":[], "flags":{}, "claimedRewardIds":[], "choiceHistory":{}, "dialogueHistory":[], "battleId":"", "result":"", "battleHistory":[], "deck":[], "removedStartingCards":[], "battleReward":{}, "battlePassiveReward":{}, "portraits":{"left":PLAYER_REFERENCE, "right":"bartender"}, "refreshedEventIds":[]}
+	fresh.difficulty = difficulty
 	refresh_event_pool(fresh)
 	black_market_model.refresh(fresh, card_catalog, black_market_rules)
 	return fresh
 
-func new_game(player_id: String = "") -> void:
+func new_game(player_id: String = "", difficulty: String = "normal") -> void:
 	if not pending_save_kind.is_empty() or transition_locked or battle_busy: return
-	var fresh := initial_state(player_id)
+	var fresh := initial_state(player_id, difficulty)
 	if fresh.is_empty():
 		notice.emit("主角配置无效，无法开始委托。")
 		return
@@ -918,6 +921,7 @@ func checkpoint_file_is_valid(path: String) -> bool:
 
 func valid_save(s) -> bool:
 	if not s is Dictionary or s.get("schemaVersion", 0) != 2: return false
+	if not s.get("difficulty") is String or not DIFFICULTIES.has(s.difficulty): return false
 	if s.has("faction"): return false # Legacy fields must pass through migration first.
 	if not valid_player_character(s.get("playerCharacterId")): return false
 	if not valid_equipped_technologies(s.get("equippedCyberwareIds"), s.get("ownedCyberwareIds")): return false
@@ -1111,6 +1115,7 @@ func initialize_combat() -> void:
 		for id in battle.phaseTwoEnemyIds:
 			rules.phaseTwoEnemies.append(enemy_catalog[id].duplicate(true))
 	rules.battleType = configured_battle_type(state.battleId)
+	rules.difficulty = "normal" if training_mode else state.get("difficulty", "normal")
 	rules.playerCharacterId = player_character_id()
 	rules.playerAttributes = player.attributes.duplicate(true)
 	rules.playerSkills = player.skills.duplicate(true)
@@ -1343,6 +1348,8 @@ func save_meta() -> bool:
 func migrate_save(data):
 	if not data is Dictionary: return data
 	data = data.duplicate(true)
+	# Existing adventures keep the original difficulty and frozen combat values.
+	if not data.has("difficulty"): data.difficulty = "normal"
 	# Continue older checkpoints past removed shop dialogue lines.
 	var place_context = data.get("placeDialogue")
 	if place_context is Dictionary and place_context.get("placeId") == "market" and place_context.get("nodeId") in ["intro_04", "intro_05"]:

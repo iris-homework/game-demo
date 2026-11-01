@@ -98,7 +98,7 @@ func button_style(state_name: String, accent: bool) -> StyleBoxFlat:
 	s.border_color = PINK if accent else Color("586373")
 	match state_name:
 		"hover":
-			s.bg_color = CREAM if accent else Color("234039")
+			s.bg_color = Color("df294d") if accent else Color("234039")
 			s.border_color = CREAM if accent else CYAN
 			s.shadow_color = Color(0.95,0.2,0.5,0.18) if accent else Color(0.2,0.8,0.95,0.15)
 			s.shadow_size = 5
@@ -125,9 +125,12 @@ func button(parent: Node, text: String, pos: Vector2, dimensions: Vector2, actio
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	b.add_theme_font_override("font", button_font)
 	b.add_theme_font_size_override("font_size", 19)
-	b.add_theme_color_override("font_color", INK if accent else CREAM)
-	b.add_theme_color_override("font_hover_color", INK if accent else Color("ffffff"))
-	b.add_theme_color_override("font_pressed_color", CREAM)
+	b.add_theme_color_override("font_color", Color.WHITE if accent else CREAM)
+	b.add_theme_color_override("font_hover_color", Color.WHITE)
+	b.add_theme_color_override("font_pressed_color", Color.WHITE if accent else CREAM)
+	if accent:
+		b.add_theme_color_override("font_hover_pressed_color", Color.WHITE)
+		b.add_theme_color_override("font_focus_color", Color.WHITE)
 	b.add_theme_color_override("font_disabled_color", Color("667384"))
 	for state_name in ["normal", "hover", "pressed", "disabled", "focus"]:
 		b.add_theme_stylebox_override(state_name, button_style(state_name, accent))

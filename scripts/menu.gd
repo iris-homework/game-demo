@@ -31,6 +31,10 @@ var progress_summary: Label
 var confirm_dialog: Control
 var confirm_ok: Button
 var confirm_cancel: Button
+var normal_mode: Button
+var advanced_mode: Button
+var difficulty_hint: Label
+var pending_difficulty := "normal"
 var modal_button_states: Dictionary = {}
 ## 统一演练面板的打开状态。
 var training_open := false
@@ -206,7 +210,8 @@ func _summary_text() -> String:
 		return "本次冒险已结束 · 请开始新的委托"
 	if not Game.state.is_empty():
 		var place_name := str(Game.place_data(Game.state.get("currentPlaceId", "")).get("name", ""))
-		return place_name if not place_name.is_empty() else "进行中的委托"
+		var mode_name: String = Game.DIFFICULTIES.get(Game.state.get("difficulty", "normal"), "普通模式")
+		return "%s · %s" % [mode_name, place_name if not place_name.is_empty() else "进行中的委托"]
 	if Game.has_save():
 		# 仅磁盘存档时只提示存在检查点，不触发读取、恢复或保存。
 		return "已有检查点"
@@ -214,11 +219,9 @@ func _summary_text() -> String:
 
 func request_new() -> void:
 	if is_instance_valid(settings_dialog): return
-	if training_open: return
-	if Game.has_save() or not Game.state.is_empty():
-		_open_confirm()
-	else:
-		Game.new_game()
+	if training_open or Game.transition_locked or Game.battle_busy: return
+	if is_instance_valid(confirm_dialog) and confirm_dialog.visible: return
+	_open_confirm()
 
 func _open_confirm() -> void:
 	if training_open: return
@@ -231,15 +234,41 @@ func _open_confirm() -> void:
 	add_child(confirm_dialog)
 	var shade := rect(confirm_dialog, Vector2.ZERO, Vector2(1440, 900), Color(0, 0, 0, 0.64))
 	shade.mouse_filter = Control.MOUSE_FILTER_STOP
-	panel(confirm_dialog, Vector2(414, 325), Vector2(612, 250), PANEL, CYAN)
-	label(confirm_dialog, "开始新的委托", Vector2(446, 350), Vector2(548, 44), 29)
-	label(confirm_dialog, "这会覆盖当前进度。是否开始新的委托？", Vector2(446, 411), Vector2(548, 45), 19, MUTED)
-	confirm_cancel = _menu_button("confirm_cancel", "返回", Vector2(446, 497), Vector2(176, 48), _close_confirm, false, 19, confirm_dialog)
-	confirm_ok = _menu_button("confirm_ok", "开始新的委托", Vector2(644, 497), Vector2(344, 48), _on_new_confirmed, true, 19, confirm_dialog)
-	confirm_ok.focus_next = confirm_ok.get_path_to(confirm_cancel)
-	confirm_ok.focus_previous = confirm_ok.focus_next
-	confirm_cancel.focus_next = confirm_cancel.get_path_to(confirm_ok)
-	confirm_cancel.focus_previous = confirm_cancel.focus_next
+	panel(confirm_dialog, Vector2(340, 242), Vector2(760, 416), PANEL, CYAN)
+	label(confirm_dialog, "选择游戏模式", Vector2(378, 268), Vector2(684, 44), 29)
+	var warning := "开始后将覆盖当前进度。" if Game.has_save() or not Game.state.is_empty() else "选择本次委托的难度，开始你的冒险。"
+	label(confirm_dialog, warning, Vector2(378, 323), Vector2(684, 28), 18, MUTED)
+	normal_mode = _menu_button("normal_mode", "普通模式\n保持当前难度", Vector2(378, 370), Vector2(328, 128), _select_difficulty.bind("normal"), false, 20, confirm_dialog)
+	advanced_mode = _menu_button("advanced_mode", "进阶模式\n敌人更加困难", Vector2(734, 370), Vector2(328, 128), _select_difficulty.bind("advanced"), false, 20, confirm_dialog)
+	for choice in [normal_mode, advanced_mode]:
+		choice.toggle_mode = true
+		var selected_style := button_style("pressed", false)
+		selected_style.bg_color = Color("17332f")
+		selected_style.border_color = CYAN
+		selected_style.set_border_width_all(2)
+		choice.add_theme_stylebox_override("pressed", selected_style)
+		choice.add_theme_color_override("font_pressed_color", CYAN)
+	difficulty_hint = label(confirm_dialog, "", Vector2(378, 518), Vector2(684, 30), 17, CYAN)
+	_select_difficulty("normal")
+	confirm_cancel = _menu_button("confirm_cancel", "返回", Vector2(378, 582), Vector2(176, 48), _close_confirm, false, 19, confirm_dialog)
+	confirm_ok = _menu_button("confirm_ok", "开始新的委托", Vector2(734, 582), Vector2(328, 48), _on_new_confirmed, true, 19, confirm_dialog)
+	var focus_buttons: Array[Button] = [confirm_cancel, confirm_ok, normal_mode, advanced_mode]
+	for index in focus_buttons.size():
+		var current := focus_buttons[index]
+		current.focus_next = current.get_path_to(focus_buttons[(index + 1) % focus_buttons.size()])
+		current.focus_previous = current.get_path_to(focus_buttons[posmod(index - 1, focus_buttons.size())])
+	normal_mode.focus_neighbor_right = normal_mode.get_path_to(advanced_mode)
+	advanced_mode.focus_neighbor_left = advanced_mode.get_path_to(normal_mode)
+	normal_mode.focus_neighbor_bottom = normal_mode.get_path_to(confirm_cancel)
+	advanced_mode.focus_neighbor_bottom = advanced_mode.get_path_to(confirm_ok)
+	confirm_cancel.focus_neighbor_top = confirm_cancel.get_path_to(normal_mode)
+	confirm_ok.focus_neighbor_top = confirm_ok.get_path_to(advanced_mode)
+	confirm_cancel.focus_neighbor_right = confirm_cancel.get_path_to(confirm_ok)
+	confirm_ok.focus_neighbor_left = confirm_ok.get_path_to(confirm_cancel)
+	normal_mode.focus_neighbor_top = normal_mode.get_path_to(confirm_cancel)
+	advanced_mode.focus_neighbor_top = advanced_mode.get_path_to(confirm_ok)
+	confirm_cancel.focus_neighbor_bottom = confirm_cancel.get_path_to(normal_mode)
+	confirm_ok.focus_neighbor_bottom = confirm_ok.get_path_to(advanced_mode)
 	modal_button_states.clear()
 	for node in ui_layer.find_children("*", "Button", true, false):
 		modal_button_states[node] = {"disabled": node.disabled, "focus": node.focus_mode}
@@ -248,7 +277,15 @@ func _open_confirm() -> void:
 	confirm_cancel.grab_focus()
 
 func _on_new_confirmed() -> void:
-	Game.new_game()
+	if not is_instance_valid(confirm_dialog) or not confirm_dialog.visible: return
+	Game.new_game("", pending_difficulty)
+
+func _select_difficulty(value: String) -> void:
+	if not Game.DIFFICULTIES.has(value): return
+	pending_difficulty = value
+	normal_mode.set_pressed_no_signal(value == "normal")
+	advanced_mode.set_pressed_no_signal(value == "advanced")
+	difficulty_hint.text = "已选择：%s · 本次冒险中保持不变" % Game.DIFFICULTIES[value]
 
 func _close_confirm() -> void:
 	get_viewport().gui_release_focus()
@@ -263,6 +300,17 @@ func _close_confirm() -> void:
 
 func _input(event: InputEvent) -> void:
 	if is_instance_valid(settings_dialog): return
+	if is_instance_valid(confirm_dialog) and confirm_dialog.visible:
+		if event.is_action_pressed("ui_cancel"):
+			get_viewport().set_input_as_handled()
+			_close_confirm()
+		elif event.is_action_pressed("ui_focus_next") or event.is_action_pressed("ui_focus_prev"):
+			if get_viewport().gui_get_focus_owner() == null:
+				confirm_cancel.grab_focus()
+				get_viewport().set_input_as_handled()
+		elif event is InputEventKey and not (event.is_action("ui_accept") or event.is_action("ui_left") or event.is_action("ui_right") or event.is_action("ui_up") or event.is_action("ui_down")):
+			get_viewport().set_input_as_handled()
+		return
 	if training_open:
 		if event.is_action_pressed("ui_cancel"):
 			get_viewport().set_input_as_handled()

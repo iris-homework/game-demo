@@ -145,7 +145,7 @@ func _build_detail(accent: Color, name_text: String, state_text: String, desc_te
 	if has_enter:
 		var market := str(_content.get("id", "")) == "market"
 		var enter_button := _add_button("进入黑市    →" if market else "进入商场    →" if str(_content.get("id", "")) == "mall" else "进入地点    →", "enter_place", Rect2(PAD, footer_y, inner_w, BUTTON_HEIGHT), true, func(): _emit("enter", ""))
-		enter_button.add_theme_color_override("font_hover_color", DemoUI.INK)
+		enter_button.add_theme_color_override("font_hover_color", Color.WHITE)
 	_add_button("关闭", "close_place", Rect2(card_width - PAD - 56.0, 12.0, 56.0, 24.0), false, func(): _emit("close", "")).add_theme_font_size_override("font_size", 12)
 
 func _build_preview(accent: Color, name_text: String, state_text: String, desc_text: String, lock_text: String, open: bool, events: Array, inner_w: float, max_h: float, name_h: float, state_h: float) -> void:
@@ -308,9 +308,12 @@ func _make_button(text: String, node_name: String, accent: bool, action: Callabl
 	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	button.add_theme_font_size_override("font_size", 18)
-	button.add_theme_color_override("font_color", CREAM)
+	button.add_theme_color_override("font_color", Color.WHITE if accent else CREAM)
 	button.add_theme_color_override("font_hover_color", Color.WHITE)
-	button.add_theme_color_override("font_pressed_color", CREAM)
+	button.add_theme_color_override("font_pressed_color", Color.WHITE if accent else CREAM)
+	if accent:
+		button.add_theme_color_override("font_hover_pressed_color", Color.WHITE)
+		button.add_theme_color_override("font_focus_color", Color.WHITE)
 	button.mouse_filter = Control.MOUSE_FILTER_STOP
 	if _provider != null and _provider.has_method("button_style"):
 		for state_name in ["normal", "hover", "pressed", "disabled", "focus"]:

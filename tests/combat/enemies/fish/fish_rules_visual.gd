@@ -22,18 +22,20 @@ func _ready() -> void:
 	check(view.stage.enemies.all(func(e): return e.kind == "fish"),"Both actors use fish art")
 	check(view.model.enemies.all(func(e): return e.hp == 30),"Both start at 30 HP in enemy test")
 	check(view.model.enemy_intent_text(view.model.enemies[0]) == "攻击 6","First opening intent")
-	check(view.model.enemy_intent_text(view.model.enemies[1]) == "污染 3","Second opening intent")
+	check(view.model.enemy_intent_text(view.model.enemies[1]) == "污染 2","Second opening intent")
 	check(view.targets[0].tooltip_text.contains("追加 2 层污染"),"Fish passive tooltip")
-	check(view.targets[0].tooltip_text.contains("死亡时，向角色施加 3 层污染"),"Fish death tooltip uses three stacks independently of two-stack contact")
+	check(view.targets[0].tooltip_text.contains("死亡时，对你施加 3 层污染"),"Fish death tooltip uses three stacks independently of two-stack contact")
 	view.stage.phase_changed.connect(on_phase)
 	await shot("opening-two-fish")
-	var expected_hp := [94,79,65,43]
-	var expected_pollution := [5,10,16,20]
+	var opening_hp: int = view.model.player_hp
+	var hp_offset := opening_hp - 100
+	var expected_hp := [94 + hp_offset,80 + hp_offset,67 + hp_offset,47 + hp_offset]
+	var expected_pollution := [4,9,14,17]
 	var expected_hits := [
-		[[0,94,2]],
-		[[0,87,6],[0,85,8],[1,79,10]],
-		[[1,67,14],[1,65,16]],
-		[[0,43,17]]
+		[[0,94 + hp_offset,2]],
+		[[0,88 + hp_offset,5],[0,86 + hp_offset,7],[1,80 + hp_offset,9]],
+		[[1,69 + hp_offset,12],[1,67 + hp_offset,14]],
+		[[0,47 + hp_offset,15]]
 	]
 	for round_index in 4:
 		hit_states.clear()
@@ -56,13 +58,13 @@ func _ready() -> void:
 	await idle()
 	check(hit_states.is_empty(),"Fatal pollution causes no fish attack animation")
 	check(not Game.training_mode,"Fatal pollution finishes training")
-	check(Game.state.currentHp == 100,"Training restores adventure HP")
+	check(Game.state.currentHp == opening_hp,"Training restores adventure HP")
 	# Enemy turn-end deaths must retire the correct actor before later actions.
 	Game.start_training("B11")
 	await idle()
 	view = app.view
 	view.model.enemies[0].hp = 1
-	view.model.enemies[0].intent = {"type":"pollution","amount":3}
+	view.model.enemies[0].intent = {"type":"pollution","amount":2}
 	view.model.buffs.apply(view.model,"pollution",1,0)
 	view.shown_enemies = view.model.enemies.duplicate(true)
 	view.refresh_enemy_hud()
@@ -72,7 +74,7 @@ func _ready() -> void:
 	check(view.model.enemies[0].hp == 0 and not view.stage.enemies[0].alive,"Enemy pollution death retires first fish")
 	check(view.stage.enemies[0].modulate.a == 0 and view.shown_enemies[0].hp == 0,"Dead fish and HUD fade together")
 	check(view.model.enemies[1].hp == 30 and view.stage.enemies[1].alive,"Second fish survives independently")
-	check(view.shown_player_pollution == 9 and view.model.buffs.count(view.model,"pollution") == 9,"Two active three-stack intents plus one three-stack death total nine")
+	check(view.shown_player_pollution == 7 and view.model.buffs.count(view.model,"pollution") == 7,"Two active two-stack intents plus one three-stack death total seven")
 	await shot("first-fish-pollution-death")
 	view.model.buffs.apply(view.model,"pollution",999,1)
 	view.shown_enemies = view.model.enemies.duplicate(true)
@@ -81,7 +83,8 @@ func _ready() -> void:
 	await shot("pollution-999-enemy")
 	await view.end_turn_pressed()
 	await idle()
-	check(not Game.training_mode and Game.state.currentHp == 100,"Last fish pollution death wins and restores training")
+	check(not Game.training_mode and Game.state.currentHp == opening_hp,"Last fish pollution death wins and restores training")
+	await preload("res://scripts/combat/audio_cleanup.gd").release(app, get_tree())
 	app.queue_free()
 	await get_tree().process_frame
 	await get_tree().process_frame
