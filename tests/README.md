@@ -1,5 +1,7 @@
 # 测试目录索引
 
+[敌人强化箭头专项](combat/presentation/enemy_buff_fx_tests.tscn)：真实强化事件、自身／同伴目标、负面／玩家／零值排除、快照不变、复用与清理。须复制工程并使用路径含`qa`的独立用户目录，`QA_OUT_DIR`可输出结果；不移动系统鼠标，像素观感另验。
+
 [普通战斗可选配乐专项](audio/normal_battle_music_tests.tscn)：用`QA_EXPECT_NORMAL_MUSIC=0`检查缺资源静默，或用`1`检查已导入的OGG；`QA_TRACK_KIND=actual-source`额外核对实际曲目解码长度。独立用户目录须含`normal-battle-music-qa`，`QA_OUT_DIR`可指定证据。覆盖正式B02入口、入场转场、冻结类型优先、重复循环、Music／SFX／Master设置、普通演练、精英／其他Boss／教程／舞者排除与离场释放；合成音和实际音频分别记录，Dummy播放状态检查不代替人工试听。
 
 [双人舞者配乐专项](audio/dancer_music_tests.tscn)检查正式战、演练、新旧快照、单曲连续两次循环边界、黑屏暂停与位置冻结、亮灯后0.35秒接续原进度。使用复制工程及目录名包含 `dancer-music-settings-qa` 的独立用户目录。

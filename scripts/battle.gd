@@ -959,6 +959,8 @@ func present_status_event(event: Dictionary) -> void:
 		else:
 			apply_shown_status(event)
 			var definition := model.buffs.definition(event.buffId)
+			if target_index >= 0 and int(event.get("amount",0)) > 0 and definition.get("category", "") == "positive":
+				stage.present_enemy_buff(actor)
 			impact(stage.contact(actor)-Vector2(0,70),"%s+%d" % [definition.name,int(event.get("amount",0))],Color(definition.color),0.75)
 			await get_tree().create_timer(0.30).timeout
 		return

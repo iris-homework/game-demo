@@ -13,6 +13,7 @@ const BiteHit = preload("res://scripts/combat/bite_hit_fx.gd")
 const PollutionSpit = preload("res://scripts/combat/pollution_spit_fx.gd")
 const FishDeathBurst = preload("res://scripts/combat/fish_death_burst_fx.gd")
 const CardGainFX = preload("res://scripts/combat/card_gain_fx.gd")
+const EnemyBuffFX = preload("res://scripts/combat/enemy_buff_fx.gd")
 const AuthoredAttack := preload("res://scripts/combat/authored_attack.gd")
 const PipelineCatalogScript := preload("res://enemy_asset_pipeline/runtime/pipeline_catalog.gd")
 const ACTOR_SCALE := 1.2544
@@ -237,6 +238,18 @@ func present_card_gain(kind: String, amount: int) -> Node2D:
 func target_rect(index: int) -> Rect2:
 	var actor := enemies[index]
 	return Rect2(actor.to_global(actor.target_bounds.position),actor.target_bounds.size*actor.global_scale).intersection(get_global_rect())
+
+func present_enemy_buff(actor: Node2D) -> Node2D:
+	if not is_instance_valid(actor) or actor not in enemies or not actor.alive: return null
+	var fx := actor.get_node_or_null("EnemyBuffFX")
+	if is_instance_valid(fx) and not fx.is_queued_for_deletion():
+		fx.restart(actor.target_bounds)
+		return fx
+	fx = EnemyBuffFX.new()
+	fx.name = "EnemyBuffFX"
+	fx.body_bounds = actor.target_bounds
+	actor.add_child(fx)
+	return fx
 
 func move_actor(actor: Node2D, destination: Vector2, duration: float) -> void:
 	var tween := create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
