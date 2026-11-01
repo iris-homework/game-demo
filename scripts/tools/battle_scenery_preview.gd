@@ -1,6 +1,6 @@
 extends Node
 ## Isolated, playable preview of the real battle view. No adventure files are written.
-const PLACE_IDS := ["garden", "hive", "port", "pump", "junkyard", "hotel", "tower", "block5", "church", "alley", "bar"]
+const PLACE_IDS := ["garden", "hive", "port", "pump", "junkyard", "hotel", "tower", "block5", "church", "alley", "bar", "camp"]
 const PREVIEW_BATTLE := "B04"
 var app: Control
 var controls: DemoUI

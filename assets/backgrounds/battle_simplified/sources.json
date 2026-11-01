@@ -116,7 +116,22 @@
       "date": "2026-10-25",
       "version": "v1",
       "groundStart": 0.533
+    },
+    {
+      "placeAssetId": "camp",
+      "battleAssetId": "camp_battle_simplified",
+      "name": "归零运动营地",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/归零运动营地背景_2026-11-01/归零运动营地_战斗背景_v1.png",
+      "sha256": "6d8ead053fec660710e23dab8a5b7fc752e789e8faf759213424d696ad96edf4",
+      "size": [
+        1586,
+        992
+      ],
+      "date": "2026-11-01",
+      "version": "v1",
+      "groundStart": 0.52,
+      "generatedWith": "built-in image_gen"
     }
   ],
-  "updated": "2026-10-25"
+  "updated": "2026-11-01"
 }

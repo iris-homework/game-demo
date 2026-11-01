@@ -136,7 +136,19 @@
       "generatedWith": "built-in image_gen",
       "date": "2026-10-27",
       "prompt": "res://assets/backgrounds/woss_mall_dialogue_v1.prompt.txt"
+    },
+    {
+      "assetId": "camp",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/场景/归零运动营地背景_2026-11-01/归零运动营地_对话背景_v1.png",
+      "path": "res://assets/backgrounds/camp_dialogue_v1.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "27522127e6b6cc633e4a9ee31fb949449628a4e45d231cd2f986f4b64b1548ba",
+      "generatedWith": "built-in image_gen",
+      "date": "2026-11-01"
     }
   ],
-  "updated": "2026-10-27"
+  "updated": "2026-11-01"
 }

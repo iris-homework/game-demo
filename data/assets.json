@@ -49,8 +49,9 @@
     "battleAssetId": "hive_battle_simplified"
   },
   "camp": {
-    "path": "",
-    "kind": "pending"
+    "path": "res://assets/backgrounds/camp_dialogue_v1.png",
+    "kind": "background",
+    "battleAssetId": "camp_battle_simplified"
   },
   "block5": {
     "path": "res://assets/backgrounds/block5.png",
@@ -356,5 +357,15 @@
     "path": "res://assets/characters/dancer_black_dialogue_v1.png",
     "kind": "portrait",
     "whiteKey": false
+  },
+  "camp_battle_simplified": {
+    "path": "res://assets/backgrounds/battle_simplified/camp_v1.png",
+    "kind": "battle_background",
+    "groundStart": 0.52,
+    "actorOffset": [
+      0,
+      0
+    ],
+    "trainingSelectable": true
   }
 }
