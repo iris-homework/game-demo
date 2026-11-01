@@ -122,8 +122,7 @@ static func build(data: Dictionary, font: Font) -> PanelContainer:
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color("101722fa")
 	style.border_color = Color(accent,0.55)
-	style.set_border_width_all(1)
-	style.border_width_top = 3
+	style.set_border_width_all(2)
 	style.set_corner_radius_all(8)
 	style.content_margin_left = 18
 	style.content_margin_right = 18
