@@ -7,8 +7,8 @@ var hp_label: Label
 var status_label: Label
 const DIMENSIONS := Vector2(328,68)
 const BOSS_DIMENSIONS := Vector2(600,68)
-const MINION_DIMENSIONS := Vector2(210,52)
-const MINION_TRACK := Rect2(0,28,210,8)
+const MINION_DIMENSIONS := Vector2(258,52)
+const MINION_TRACK := Rect2(0,28,170,8)
 const TRACK := Rect2(18,44,170,12)
 const BOSS_TRACK := Rect2(18,44,442,12)
 const BOSS_SHIELD := Rect2(4,34,32,32)
@@ -68,16 +68,16 @@ func setup(enemy: Dictionary, number: int, font: Font, boss: bool = false, compa
 		track = MINION_TRACK
 		show_background = false
 		name_label.position = Vector2.ZERO
-		name_label.size = Vector2(130,24)
-		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		name_label.size = Vector2(track.size.x,24)
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		name_label.add_theme_font_size_override("font_size",14)
-		hp_label.position = Vector2(132,0)
+		hp_label.position = Vector2(track.end.x+10,20)
 		hp_label.size = Vector2(78,24)
-		hp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		hp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		hp_label.add_theme_font_size_override("font_size",13)
 		status_label.text = state
 		status_label.position = Vector2(0,36)
-		status_label.size = Vector2(210,16)
+		status_label.size = Vector2(track.size.x,16)
 		status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		status_label.add_theme_font_size_override("font_size",11)
 		if hp <= 0: name_label.add_theme_color_override("font_color",Color("a7b0be"))

@@ -16,6 +16,26 @@ void fragment() {
 	float floor_mix = wall_mode ? smoothstep(floor_horizon-20.0,floor_horizon+50.0,p.y) : 0.0;
 	float alpha = mix(1.0,0.30,floor_mix);
 	vec3 color = mix(vec3(0.0),vec3(0.008,0.009,0.022),floor_mix);
+	// Inlaid gold follows the floor's vanishing point; never appears in dialogue.
+	if (wall_mode) {
+		float depth = max(p.y-floor_horizon+38.0,1.0);
+		float projected_x = (p.x-720.0)*240.0/depth;
+		float ray_distance = abs(mod(projected_x+80.0,160.0)-80.0)*depth/240.0;
+		float accent_distance = abs(mod(projected_x+68.0,160.0)-80.0)*depth/240.0;
+		float line_width = mix(0.7,2.0,clamp(depth/480.0,0.0,1.0));
+		float rays = 1.0-smoothstep(line_width,line_width+1.1,ray_distance);
+		float accents = (1.0-smoothstep(0.5,1.5,accent_distance))*0.42;
+		float bands = 0.0;
+		for (int i=0;i<4;i++) {
+			float band_depth = 64.0*pow(1.85,float(i));
+			float band_width = 0.7+float(i)*0.3;
+			bands = max(bands,1.0-smoothstep(band_width,band_width+1.0,abs(p.y-floor_horizon-band_depth)));
+		}
+		float floor_mask = smoothstep(floor_horizon+20.0,floor_horizon+90.0,p.y);
+		float gold = max(max(rays,accents),bands*0.66)*floor_mask;
+		color = mix(color,vec3(0.86,0.56,0.16),gold*0.86);
+		alpha = mix(alpha,0.78,gold);
+	}
 	float wall_mask = 1.0-smoothstep(floor_horizon-50.0,floor_horizon+15.0,p.y);
 	if (!wall_mode) wall_mask = 1.0-smoothstep(640.0,880.0,p.y);
 	float cycle = floor(ambient_time/5.2);

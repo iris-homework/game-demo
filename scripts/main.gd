@@ -185,13 +185,13 @@ func swap_view() -> void:
 		view.choice_confirmed.connect(audio_player.play_cue.bind("ui_click"))
 	if is_instance_valid(audio_hooks): audio_hooks.attach(view)
 
-func play_transition() -> void:
+func play_transition(covered_action: Callable = Callable(), overlay_z_index: int = 100) -> void:
 	Game.transition_locked = true
 	transition_count += 1
 	transition = ColorRect.new()
 	transition.size = Vector2(1440,900)
 	transition.mouse_filter = Control.MOUSE_FILTER_STOP
-	transition.z_index = 100
+	transition.z_index = overlay_z_index
 	var mat := ShaderMaterial.new()
 	mat.shader = preload("res://shaders/glitch.gdshader")
 	transition.material = mat
@@ -199,7 +199,9 @@ func play_transition() -> void:
 	var cover := create_tween()
 	cover.tween_method(func(value): mat.set_shader_parameter("coverage",value),0.0,1.0,0.58)
 	await cover.finished
-	swap_view()
+	# Phase interludes reuse this wipe without rebuilding the active battle.
+	if covered_action.is_valid(): covered_action.call()
+	else: swap_view()
 	await get_tree().process_frame
 	var reveal := create_tween()
 	reveal.tween_method(func(value): mat.set_shader_parameter("fade",value),1.0,0.0,0.32)

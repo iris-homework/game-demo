@@ -306,7 +306,13 @@ func refresh_enemy_hud() -> void:
 		summary_plate.setup(enemy,i+1,base_font,boss,hand_bar)
 		if noss_first:
 			# Keep array/target indices intact; only reorder the visible hierarchy.
-			summary_plate.position = Vector2.ZERO if enemy.id == "noss" else Vector2(18 if enemy.id == "noss_hand_left" else 250,68)
+			if enemy.id == "noss":
+				summary_plate.position = Vector2.ZERO
+			else:
+				# Align the two visible tracks to the main bar's outside edges.
+				# HP labels occupy their own space and never affect centering.
+				var hand_x: float = EnemyHPSummary.BOSS_TRACK.position.x if enemy.id == "noss_hand_left" else EnemyHPSummary.BOSS_TRACK.end.x-EnemyHPSummary.MINION_TRACK.size.x
+				summary_plate.position = Vector2(hand_x,68)
 		enemy_summary_plates.append(summary_plate)
 		var intent_text := displayed_enemy_intent(enemy)
 		var plate := ActorHUD.new()
@@ -973,14 +979,13 @@ func present_noss_phase() -> void:
 	interlude.queue_free()
 	# Keep the same layout and animation phase while revealing the battle actors.
 	stage.noss_eye_wall.ambient_time = eyes.ambient_time
-	var reveal := create_tween().set_parallel(true)
-	reveal.tween_property(eyes,"modulate:a",0.0,0.65)
-	reveal.tween_property(shade,"modulate:a",0.0,0.65)
-	await reveal.finished
-	remove_child(eyes)
-	eyes.queue_free()
-	remove_child(shade)
-	shade.queue_free()
+	# Reuse the normal page/battle wipe; reveal this existing view at full cover.
+	await get_parent().play_transition(func():
+		remove_child(eyes)
+		eyes.queue_free()
+		remove_child(shade)
+		shade.queue_free()
+	,120)
 	turn_hud.set_state(model.turn)
 
 func present_enemy_death_effect(hit: Dictionary) -> void:

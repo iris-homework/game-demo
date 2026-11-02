@@ -57,7 +57,25 @@ func _ready() -> void:
 	var dialogue: Control = battle.get_node_or_null("NossPhaseDialogue")
 	check(dialogue != null and dialogue.eye_wall_background,"phase dialogue retains the opened eye wall")
 	await shot("eyes_dialogue")
+	check(not is_instance_valid(app.transition),"normal wipe waits for the final dialogue line")
+	var transitions_before: int = app.transition_count
+	for i in 6:
+		advance_phase_dialogue()
+		await get_tree().process_frame
+	var transition: ColorRect = app.transition
+	check(is_instance_valid(transition) and app.transition_count == transitions_before+1,"last dialogue line starts exactly one shared battle transition")
+	if is_instance_valid(transition):
+		check(transition.material.shader.resource_path == "res://shaders/glitch.gdshader","interlude uses the existing game transition shader")
+		check(Game.battle_busy and Game.transition_locked and transition.mouse_filter == Control.MOUSE_FILTER_STOP,"shared transition retains both combat and page input locks")
+		check(JSON.stringify(battle.model.snapshot()) == committed,"shared transition leaves committed combat data unchanged")
+		while is_instance_valid(transition) and float(transition.material.get_shader_parameter("coverage")) < 0.45:
+			await get_tree().process_frame
+		await shot("phase2_existing_transition")
+		while is_instance_valid(eyes) and is_instance_valid(transition):
+			await get_tree().process_frame
+		check(not is_instance_valid(eyes) and is_instance_valid(transition),"foreground is removed under full cover before the shared wipe fades")
 	await settle()
+	check(not is_instance_valid(app.transition) and not Game.transition_locked and app.view == battle,"shared transition cleans up without rebuilding the active battle")
 	check(not is_instance_valid(eyes) and battle.get_node_or_null("NossPhaseBlackout") == null,"reveal and input blocker clean up after dialogue")
 	check(phase_lines_advanced == 6,"all six authored dialogue lines are preserved")
 	var wall: Node2D = battle.stage.noss_eye_wall
@@ -100,7 +118,7 @@ func _ready() -> void:
 	battle = app.view
 	check(is_instance_valid(battle.stage.noss_eye_wall) and battle.stage.noss_eye_wall.visible,"restoring phase two directly restores the eye wall")
 	check(battle.stage.scenery.visible and battle.stage.noss_eye_wall.floor_horizon == saved_horizon,"restoring phase two also restores its calibrated floor boundary")
-	check(battle.get_node_or_null("NossPhaseEyes") == null and battle.get_node_or_null("NossPhaseDialogue") == null,"restored phase two does not replay the interlude")
+	check(battle.get_node_or_null("NossPhaseEyes") == null and battle.get_node_or_null("NossPhaseDialogue") == null and battle.get_node_or_null("NossPhaseNeonTransition") == null,"restored phase two does not replay the interlude or neon reveal")
 	check(JSON.stringify(battle.model.snapshot()) == JSON.stringify(saved),"phase-two restore preserves all combat data")
 	await shot("phase2_restored")
 	await turn(battle,"first eye-wall battle turn")
@@ -109,6 +127,12 @@ func _ready() -> void:
 	check(not is_instance_valid(app.view.stage.noss_eye_wall),"ordinary robot battle does not inherit Noss eyes")
 	Game.restore_training()
 	await settle()
+	var outgoing: Control = app.view
+	var page_transitions_before: int = app.transition_count
+	Game.menu()
+	check(Game.transition_locked and app.view == outgoing,"default shared transition keeps the outgoing battle during cover")
+	await settle()
+	check(app.shown_page == "menu" and app.view != outgoing and app.transition_count == page_transitions_before+1 and not Game.transition_locked,"default shared transition still swaps pages and unlocks normally")
 	Engine.time_scale = 1.0
 	await preload("res://scripts/combat/audio_cleanup.gd").release(app,get_tree())
 	app.queue_free()
@@ -118,3 +142,15 @@ func _ready() -> void:
 	report()
 	print("NOSS EYE WALL: %d checks, %d failures" % [checks,failures.size()])
 	get_tree().quit(0 if failures.is_empty() else 1)
+
+func shot(name: String) -> void:
+	if not capture or DisplayServer.get_name() == "headless": return
+	for resolution in [Vector2i(1280,800),Vector2i(1600,1000)]:
+		get_window().size = resolution
+		await get_tree().process_frame
+		await get_tree().process_frame
+		RenderingServer.force_draw(false)
+		var filename := name+"_%dx%d.png" % [resolution.x,resolution.y]
+		var error := get_viewport().get_texture().get_image().save_png(output.path_join(filename))
+		check(error == OK,"GPU screenshot saved: "+filename)
+		if error == OK: screenshots.append(filename)
