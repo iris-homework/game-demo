@@ -1,0 +1,52 @@
+{
+  "clips": [
+    {
+      "file": "monster_bite_lucasduff_467701.mp3",
+      "source_url": "https://freesound.org/people/LucasDuff/sounds/467701/",
+      "download_url": "https://cdn.freesound.org/previews/467/467701_8272463-lq.mp3",
+      "title": "monster bite",
+      "author": "LucasDuff",
+      "license": "CC0 1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "downloaded_date": "2026-11-02",
+      "source_format": "Public MP3 preview used in prior audition; not original WAV",
+      "modified": false,
+      "sha256": "8d1a4f13bc51042219a7f4d5623ccd620b90d2d21bca9618f953290fa68152bd",
+      "bytes": 13512,
+      "duration_seconds": 2.025167,
+      "sample_rate_hz": 24000,
+      "channels": 2,
+      "playback_start_seconds": 0.38,
+      "volume_db": -12.0,
+      "enemy_ids": [
+        "fish",
+        "fish_second",
+        "luggage_lurker",
+        "luggage_lurker_second"
+      ]
+    },
+    {
+      "file": "impact_strong_punch_mixkit_2155.mp3",
+      "source_url": "https://mixkit.co/free-sound-effects/fight/",
+      "download_url": "https://assets.mixkit.co/active_storage/sfx/2155/2155-preview.mp3",
+      "title": "Impact of a strong punch",
+      "author": "Mixkit (individual creator not listed on category page)",
+      "license": "Mixkit Sound Effects Free License",
+      "license_url": "https://mixkit.co/license/#sfxFree",
+      "downloaded_date": "2026-11-02",
+      "source_format": "Public MP3 preview used in prior audition; not original WAV",
+      "modified": false,
+      "sha256": "21ba82c90564b070489deb207d8048abac65a2dd040602dc788fbf9957b78ad6",
+      "bytes": 36132,
+      "duration_seconds": 1.625,
+      "sample_rate_hz": 44100,
+      "channels": 2,
+      "playback_start_seconds": 0.04,
+      "volume_db": -12.0,
+      "enemy_ids": [
+        "noss_hand_left",
+        "noss_hand_right"
+      ]
+    }
+  ]
+}

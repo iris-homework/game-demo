@@ -2,6 +2,11 @@ extends Node
 ## Exercise the real presentation stage with supplied hit results; no model or RNG calls.
 const Stage = preload("res://scripts/combat/test_stage.gd")
 const GunBurst = preload("res://scripts/combat/gun_burst_fx.gd")
+const AttackConfig = preload("res://enemy_asset_pipeline/runtime/pipeline_attack_config.gd")
+const CONTACT_CLIPS := {
+	"bite":"res://assets/audio/combat/enemy_reference/monster_bite_lucasduff_467701.mp3",
+	"hit":"res://assets/audio/combat/enemy_reference/impact_strong_punch_mixkit_2155.mp3",
+}
 var checks := 0
 var failures: Array[String] = []
 var stage: Control
@@ -15,13 +20,14 @@ func check(ok: bool, message: String) -> void:
 		failures.append(message)
 		push_error(message)
 
-func fixture(profile: String = "gang_henchman", count: int = 1) -> void:
+func fixture(profile: String = "gang_henchman", count: int = 1, preview_profile: bool = false) -> void:
 	stage = Stage.new()
 	add_child(stage)
 	var resolver := EnemyVisualResolver.new()
 	var visuals: Array[EnemyVisualResolver.Visual] = []
 	for i in count:
-		visuals.append(resolver.resolve({"id":"audio_%d" % i,"combatVisualId":profile}, {}))
+		var enemy_id := "preview_"+profile if preview_profile else "audio_%d" % i
+		visuals.append(resolver.resolve({"id":enemy_id,"combatVisualId":profile}, {}))
 	stage.setup(577.0, visuals)
 	cues.clear()
 	contacts.clear()
@@ -40,7 +46,9 @@ func record_effect(node: Node) -> void:
 		muzzle_frames.append(Engine.get_process_frames())
 
 func record_hit(hit: Dictionary, index: int) -> void:
-	contacts.append({"hit":hit.duplicate(true),"index":index,"frame":Engine.get_process_frames(),"cue_count":cues.size()})
+	contacts.append({"hit":hit.duplicate(true),"index":index,"frame":Engine.get_process_frames(),
+		"cue_count":cues.size(),"phase":stage.phase,"pose":stage.active_attacker.pose,
+		"has_impact_stream":stage.sound.stream != null,"impact_playing":stage.sound.playing})
 
 func hit(damage: int = 5, blocked: int = 0, killed: bool = false) -> Dictionary:
 	return {"damage":damage,"blocked":blocked,"hpAfter":0 if killed else 95,"killed":killed}
@@ -94,8 +102,8 @@ func test_bite_and_invalid_attacks() -> void:
 	fixture("fish")
 	await stage.attack(stage.enemies[0],stage.player,"pierce",[hit(),hit()],record_hit)
 	check(contacts.size() == 2,"Fish override executes both bite contacts")
-	check(cues.is_empty(),"Fish bite override never plays blade or gunshot cues")
-	check(stage.sound.stream != null,"Bite keeps its existing impact sound")
+	check(cues.size() == 2 and cues[0].cue == "bite" and cues[1].cue == "bite", "Fish bite override replaces pierce with one bite sample per contact")
+	check(stage.sound.stream == null,"Unblocked bite sample replaces the procedural impact")
 	await destroy_stage()
 	fixture()
 	stage.enemies[0].alive = false
@@ -107,6 +115,145 @@ func test_bite_and_invalid_attacks() -> void:
 	await stage.attack(stage.player,stage.enemies[0],"slash",[hit()],record_hit)
 	await stage.ranged_attack(stage.player,stage.enemies[0],[hit()],record_hit)
 	check(cues.is_empty() and contacts.is_empty(),"Dead attacker produces no attack sounds or contacts")
+	await destroy_stage()
+
+# Parse the same contract as published actions; never write a catalog or fixture file.
+func install_authored_hit(actor: Node2D, style: String = "hit", strike_pose: String = "hit") -> void:
+	var problems: Array[String] = []
+	var parsed := AttackConfig.parse({style:{"type":"hit", "movement":"approach",
+		"windupPose":"idle", "strikePose":strike_pose, "recoveryPose":"idle",
+		"windup":0.04, "impactDelay":0.02, "recovery":0.04, "flightTime":0.0,
+		"muzzle":[0,0], "contact":[0,-62],
+		"muzzleTexture":"", "projectileTexture":"", "impactTexture":""}}, actor.poses, actor.pose_aliases, problems)
+	check(problems.is_empty() and parsed.has(style),"In-memory authored hit uses a legal parsed action")
+	actor.pipeline_attacks = parsed
+
+func test_contact_route(profile: String, cue: String, authored: bool, blocked: int = 0, lethal: bool = false, pose_name: String = "", segments: int = 2) -> void:
+	# preview_luggage_lurker selects the real published profile, independent of encounter bindings.
+	fixture(profile,1,true)
+	var actor: Node2D = stage.enemies[0]
+	if authored and cue == "hit": install_authored_hit(actor)
+	check(actor.kind == profile,profile+" resolves its actual visual profile")
+	check(actor.pipeline_attacks.has(cue) == authored,profile+" exercises the intended ordinary/authored branch")
+	var hits := [hit(0 if blocked else 5,blocked,lethal)]
+	if segments > 1: hits.append(hit(0 if blocked else 5,blocked))
+	var before := hits.duplicate(true)
+	# The intent still says pierce; profile overrides select bite/hit presentation.
+	await stage.attack(actor,stage.player,"pierce",hits,record_hit)
+	var expected := 1 if lethal else segments
+	var expected_pose := pose_name if not pose_name.is_empty() else ("bite_close" if cue == "bite" else "hit")
+	expected_pose = actor.pose_aliases.get(expected_pose,expected_pose)
+	var label := "%s authored=%s blocked=%d lethal=%s" % [profile,authored,blocked,lethal]
+	check(cues.size() == expected,label+" emits exactly one corresponding sample per executed segment")
+	check(contacts.size() == expected,label+" preserves contact count and lethal truncation")
+	check(hits == before,label+" leaves supplied hit results untouched")
+	for i in contacts.size():
+		check(contacts[i].hit == hits[i] and contacts[i].index == i,label+" reveals each supplied result once in order")
+		check(contacts[i].has_impact_stream == (blocked > 0),
+			label+" keeps a separate metallic block transient and avoids doubled ordinary impacts")
+		if blocked: check(contacts[i].impact_playing,label+" metallic block feedback is playing at contact")
+	for i in cues.size():
+		check(cues[i].cue == cue,label+" routes the resolved attack rather than requested pierce")
+		check(cues[i].pose == expected_pose,label+" sample occurs in the contact pose")
+		check(i < contacts.size() and cues[i].frame == contacts[i].frame and contacts[i].cue_count == i+1,
+			label+" sample precedes its callback in the same frame")
+		if authored:
+			check(cues[i].phase == "impact" and i < contacts.size() and contacts[i].phase == "impact",
+				label+" authored sample and callback occur in impact phase")
+	check(stage.sound.bus == "SFX",label+" metallic feedback stays on SFX")
+	if lethal: check(not stage.player.alive,label+" retires the defender before a second segment")
+	await destroy_stage()
+
+func test_authored_type_routing() -> void:
+	fixture("luggage_lurker",1,true)
+	var actor: Node2D = stage.enemies[0]
+	check(actor.pipeline_attacks.has("bite"),"Published luggage lurker supplies its authored bite")
+	if actor.pipeline_attacks.has("bite"):
+		# An explicitly selected action can retain a legacy pierce key and still be a bite.
+		actor.pipeline_attacks["pierce"] = actor.pipeline_attacks.bite.duplicate(true)
+		await stage.attack(actor,stage.player,"pierce",[hit()],record_hit)
+		check(cues.size() == 1 and cues[0].cue == "bite","Authored bite type wins over a pierce action key without a slash layer")
+		check(contacts.size() == 1 and stage.sound.stream == null,"Authored bite type replaces the procedural ordinary impact")
+	await destroy_stage()
+	for style in ["slash","pierce"]:
+		fixture("noss_hand",1,true)
+		install_authored_hit(stage.enemies[0],style)
+		await stage.attack(stage.enemies[0],stage.player,style,[hit()],record_hit)
+		check(cues.size() == 1 and cues[0].cue == "slash","Authored hit template preserves %s blade start cue" % style)
+		if cues.size() == 1:
+			check(cues[0].phase == "strike","Authored %s slash cue still begins at strike" % style)
+		check(contacts.size() == 1 and contacts[0].cue_count == 1 and stage.sound.stream != null,
+			"Authored %s blade contact preserves its procedural impact without a blunt sample" % style)
+		await destroy_stage()
+
+func test_mouse_routes() -> void:
+	var enemies: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/enemies/enemies.json"))
+	var resolver := EnemyVisualResolver.new()
+	for id in ["mutant_mouse","mutant_mouse_second"]:
+		check(enemies.has(id),id+" is present in the formal enemy catalog")
+		if not enemies.has(id): continue
+		var visual := resolver.resolve(enemies[id],enemies)
+		check(visual.id == "mutant_mouse",id+" uses the mouse profile in actual encounter resolution")
+		fixture("mutant_mouse",1,true)
+		var hits := [hit(),hit(0,10)]
+		var before := hits.duplicate(true)
+		await stage.attack(stage.enemies[0],stage.player,"pierce",hits,record_hit)
+		check(cues.size() == 2 and contacts.size() == 2,id+" executes two slash cues and contacts")
+		check(hits == before,id+" preserves supplied damage and block results")
+		for i in cues.size():
+			check(cues[i].cue == "slash" and cues[i].pose == "pierce",id+" uses slash audio with the existing lunge pose")
+			check(i < contacts.size() and cues[i].frame <= contacts[i].frame and contacts[i].cue_count == i+1,
+				id+" plays one slash per segment before its normal or blocked contact")
+		check(stage.sound.stream != null,id+" retains separate contact and block feedback")
+		await destroy_stage()
+	fixture("mutant_mouse",1,true)
+	install_authored_hit(stage.enemies[0],"pierce","pierce")
+	await stage.attack(stage.enemies[0],stage.player,"pierce",[hit()],record_hit)
+	check(cues.size() == 1 and cues[0].cue == "slash" and cues[0].pose == "pierce",
+		"Authored mouse hit template keeps pierce motion and uses the slash cue")
+	check(contacts.size() == 1 and stage.sound.stream != null,"Authored mouse retains its ordinary impact transient")
+	if cues.size() == 1 and contacts.size() == 1:
+		check(cues[0].phase == "strike" and cues[0].frame <= contacts[0].frame,"Authored mouse slash starts at strike before contact")
+	await destroy_stage()
+
+func test_contact_dead_and_death_silence(profile: String, authored_hit: bool = false) -> void:
+	fixture(profile,1,true)
+	var actor: Node2D = stage.enemies[0]
+	if authored_hit: install_authored_hit(actor)
+	actor.alive = false
+	await stage.attack(actor,stage.player,"pierce",[hit()],record_hit)
+	check(cues.is_empty() and contacts.is_empty(),profile+" dead attacker produces no sample or contact")
+	actor.alive = true
+	stage.player.alive = false
+	await stage.attack(actor,stage.player,"pierce",[hit()],record_hit)
+	check(cues.is_empty() and contacts.is_empty(),profile+" dead defender produces no sample or contact")
+	stage.player.alive = true
+	await stage.retire_actor(actor)
+	check(cues.is_empty() and contacts.is_empty(),profile+" retirement adds no bite/hit/death cue")
+	await destroy_stage()
+
+func test_contact_resources() -> void:
+	fixture()
+	check(AudioServer.get_bus_index("SFX") >= 0,"Contact samples have a real SFX bus")
+	for cue in CONTACT_CLIPS:
+		var stream: AudioStream = stage.combat_audio.CLIPS.get(cue)
+		check(stream != null and stream.resource_path == CONTACT_CLIPS[cue],cue+" binds the exact accepted MP3")
+		if stream == null: continue
+		check(stream is AudioStreamMP3 and stream.get_length() > 0.0,cue+" loads as a nonempty MP3 stream")
+		var start_offset: float = stage.combat_audio.START_OFFSETS.get(cue,0.0)
+		check(is_equal_approx(start_offset,0.38 if cue == "bite" else 0.04) and start_offset < stream.get_length(),
+			cue+" starts after its leading silence within the original source")
+		var playback := stream.instantiate_playback()
+		check(playback != null,cue+" creates a real decoder")
+		if playback == null: continue
+		playback.start()
+		var peak := 0.0
+		# Decode the source instead of trusting metadata or the presence of imported bytes.
+		for _chunk in ceili(stream.get_length()*AudioServer.get_mix_rate()/4096.0)+1:
+			var samples := playback.mix_audio(1.0,4096)
+			for sample in samples: peak = maxf(peak,maxf(absf(sample.x),absf(sample.y)))
+		playback.stop()
+		check(peak > 0.0001,cue+" decodes into non-silent PCM samples")
 	await destroy_stage()
 
 func test_return() -> void:
@@ -163,16 +310,25 @@ func test_playback_lifecycle() -> void:
 	controller.play_cue("shoot")
 	controller.play_cue("snap")
 	controller.play_cue("slash")
+	controller.play_cue("bite")
+	controller.play_cue("hit")
+	controller.play_cue("bite")
 	var players := audio_players(controller)
-	check(players.size() == 4,"Overlapping and repeated cues own independent players")
+	check(players.size() == 7,"Overlapping and repeated slash/shoot/snap/bite/hit cues own independent players")
 	check(first.size() == 1 and is_instance_valid(first[0]) and first[0].playing,"Later sounds do not stop the first slash")
 	var longest := 0.0
 	for player in players:
 		check(player.playing and player.stream != null and player.stream.get_length() > 0.0,"Each concurrent player has nonempty playing audio")
+		check(player.bus == "SFX","Each independent action voice uses SFX")
 		longest = maxf(longest,player.stream.get_length()/player.pitch_scale)
 	stage.play_hit_sound(true)
-	check(stage.sound.playing and audio_players(controller).size() == 4,"Existing impact can play alongside all action sounds")
-	await get_tree().create_timer(longest+0.40).timeout
+	check(stage.sound.playing and audio_players(controller).size() == 7,"Existing impact can play alongside all action sounds")
+	# MP3 completion follows the real audio thread, even when --fixed-fps makes
+	# scene timers advance much faster. Observe natural completion, never stop it.
+	var completion_deadline := Time.get_ticks_msec()+int((longest+1.0)*1000.0)
+	while not audio_players(controller).is_empty() and Time.get_ticks_msec() < completion_deadline:
+		OS.delay_msec(1)
+		await get_tree().process_frame
 	check(audio_players(controller).is_empty(),"All transient players free themselves after natural completion")
 	if recording:
 		recorder.set_recording_active(false)
@@ -205,7 +361,7 @@ func _ready() -> void:
 	var original_state: Dictionary = Game.state.duplicate(true)
 	var original_revision: int = Game.revision
 	print("AUDIO DRIVER: "+AudioServer.get_driver_name())
-	get_tree().create_timer(60.0).timeout.connect(func():
+	get_tree().create_timer(120.0).timeout.connect(func():
 		push_error("Combat audio tests timed out")
 		get_tree().quit(2))
 	await test_melee("slash")
@@ -216,6 +372,19 @@ func _ready() -> void:
 	await test_ranged(0,true)
 	await test_ranged(0,false,true)
 	await test_bite_and_invalid_attacks()
+	for route in [{"profile":"fish","cue":"bite","authored":false},
+		{"profile":"luggage_lurker","cue":"bite","authored":true},
+		{"profile":"noss_hand","cue":"hit","authored":false},
+		{"profile":"noss_hand","cue":"hit","authored":true}]:
+		await test_contact_route(route.profile,route.cue,route.authored)
+		await test_contact_route(route.profile,route.cue,route.authored,10)
+		await test_contact_route(route.profile,route.cue,route.authored,0,true)
+	await test_authored_type_routing()
+	await test_mouse_routes()
+	for profile in ["fish","luggage_lurker","noss_hand","mutant_mouse"]:
+		await test_contact_dead_and_death_silence(profile)
+	await test_contact_dead_and_death_silence("noss_hand",true)
+	await test_contact_resources()
 	await test_return()
 	await test_playback_lifecycle()
 	# Allow the audio thread to release the just-stopped voice before engine shutdown.

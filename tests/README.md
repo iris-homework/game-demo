@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-11-02新增[近战绕行专项](combat/presentation/approach_motion_tests.tscn)：真实三敌舞台覆盖左右镜像后排绕路、直线接近及途中目标换边，检查圆角避让、实际逐帧位置／透明度／朝向、连续推进和精确接触；GPU可录制运动关键帧。须复制工程并使用含qa的独立用户目录，关闭保存，以绝对`QA_OUT_DIR`输出，`QA_CAPTURE=1`启用GPU录制；不移动系统鼠标。本轮结果、旧实现负对照及既有归位测试的污染预期边界见修改记录与`artifacts/qa/approach-motion-2026-11-02/verification.json`。
+
 2026-11-02演练目录扩为第一、第二周14组：`combat/enemies/published_training_tests.tscn`按两周正式事件战斗集合核对目录，覆盖14项冷启动／冒险／动态引用、15按钮布局／焦点、逐只阵容及胜败／退出／存档sentinel隔离。新增[真实菜单专项](combat/presentation/week2_training_menu_tests.tscn)，实际通过main菜单进入第二周六组、核对普通难度完整阵容及退出恢复，GPU输出两尺寸菜单和六场截图。使用复制工程、独立含QA的用户目录与绝对`QA_OUT_DIR`，不移动系统鼠标或写正式存档。实际结果见修改记录。
 
 2026-11-02诺斯新版意图：新增[规则专项](combat/enemies/noss_intents_rules_tests.tscn)和[真实战场专项](combat/presentation/noss_intents_presentation_tests.tscn)，覆盖本体100HP独杀转阶段、护主整轮末、异罪逐段削层及30／26／22／18伤害、重击消费显示时序、敕令回退、新旧冻结规则与非法字段。规则专项使用`fixtures/noss_legacy_enemies.json`保留旧90HP整组击败夹具；现有诺斯正式流程与Buff目录精确计数同步新版。须复制工程、隔离含QA用户目录和绝对`QA_OUT_DIR`，关闭正式保存。`QA_CAPTURE=1`可输出两尺寸GPU战场／说明截图，使用内存夹具、无系统鼠标。实际检查及边界见修改记录。

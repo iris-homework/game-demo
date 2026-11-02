@@ -13,6 +13,7 @@ static func play(stage, attacker, defender, style: String, config: Dictionary, h
 	var direction: float = 1.0 if defender.position.x >= attacker.position.x else -1.0
 	var destination: Vector2 = attacker.position
 	var ranged: bool = config.type in ["shoot", "laser"]
+	var contact_style: String = "bite" if config.type == "bite" else ("" if ranged else style)
 	if config.movement == "approach":
 		destination = stage.attack_destination(attacker, defender, stage._motion_value(attacker, "reach", 92.0))
 		if config.muzzle != Vector2.ZERO:
@@ -43,7 +44,7 @@ static func play(stage, attacker, defender, style: String, config: Dictionary, h
 		await _wait(stage, config.windup)
 		attacker.set_pose(config.strikePose)
 		stage.set_phase("bite_close" if config.type == "bite" else ("fire" if ranged else "strike"))
-		if style in ["slash", "pierce"]:
+		if config.type == "hit" and style in ["slash", "pierce"]:
 			stage.combat_audio.play_cue("slash")
 		await _wait(stage, config.impactDelay)
 		var point: Vector2 = contact_point(stage, defender, config)
@@ -78,7 +79,7 @@ static func play(stage, attacker, defender, style: String, config: Dictionary, h
 		else:
 			var effect = _spawn(stage, point, "hit", null, 0.24, defender, attacker)
 			effect.blocked = blocked
-		stage.play_hit_sound(blocked)
+		stage.play_attack_contact_sound(contact_style, blocked)
 		defender.set_pose("block" if blocked else "damaged")
 		defender.sprite.modulate = Color(1.6, 1.2, 1.4)
 		stage.last_hit_stop = stage._hit_stop(attacker, 0.095)

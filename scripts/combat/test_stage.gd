@@ -337,12 +337,56 @@ func approach_path(attacker: Node2D, defender: Node2D, destination: Vector2) -> 
 	return best
 
 func approach(attacker: Node2D, defender: Node2D, destination: Vector2) -> void:
-	var points := approach_path(attacker,defender,destination)
+	var points := approach_motion_points(attacker,defender,destination)
+	var distances := PackedFloat32Array([0.0])
 	var total := 0.0
-	for i in points.size()-1: total += points[i].distance_to(points[i+1])
-	var duration := travel_duration(attacker,total)
 	for i in points.size()-1:
-		await move_actor(attacker,points[i+1],maxf(0.01,duration*points[i].distance_to(points[i+1])/maxf(total,1)))
+		total += points[i].distance_to(points[i+1])
+		distances.append(total)
+	if total < 0.001: return
+	# One distance-based tween preserves momentum through turns. Restarting an
+	# ease-out tween at each waypoint made the short first leg look like a jump.
+	var tween := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_method(func(distance: float):
+		for i in points.size()-1:
+			if distance > distances[i+1] and i < points.size()-2: continue
+			attacker.position = points[i].lerp(points[i+1],clampf((distance-distances[i])/maxf(0.001,distances[i+1]-distances[i]),0.0,1.0))
+			break
+		# Track a side change during the approach, before the attack pose begins.
+		attacker.face_toward(defender.position)
+		defender.face_toward(attacker.position)
+	,0.0,total,approach_duration(attacker,points))
+	await tween.finished
+	attacker.position = destination
+
+func approach_motion_points(attacker: Node2D, defender: Node2D, destination: Vector2) -> Array[Vector2]:
+	var route := approach_path(attacker,defender,destination)
+	if route.size() <= 2: return route
+	# Round inside the existing route's envelope so camera framing stays valid.
+	# Validate every sampled segment; tight gaps retain a smaller or sharp turn.
+	for radius in [64.0,32.0,16.0]:
+		var rounded: Array[Vector2] = [route[0]]
+		for i in range(1,route.size()-1):
+			var corner := route[i]
+			var inset := minf(radius,minf(corner.distance_to(route[i-1]),corner.distance_to(route[i+1]))*0.3)
+			var entry := corner.move_toward(route[i-1],inset)
+			var exit := corner.move_toward(route[i+1],inset)
+			rounded.append(entry)
+			for step in range(1,9):
+				var t := float(step)/8.0
+				rounded.append(entry.lerp(corner,t).lerp(corner.lerp(exit,t),t))
+		rounded.append(route[-1])
+		if path_clear(rounded,attacker,defender): return rounded
+	return route
+
+func approach_duration(actor: Node2D, points: Array[Vector2]) -> float:
+	var distance := 0.0
+	for i in points.size()-1: distance += points[i].distance_to(points[i+1])
+	var duration := travel_duration(actor,distance)
+	# Detours need time to read as travel behind a companion. Honor authored
+	# slower motion, while preventing a long route being squeezed into 0.34s.
+	if points.size() > 2: duration = maxf(duration,maxf(0.42,distance/1350.0))
+	return duration
 
 func frame_attack(attacker: Node2D, defender: Node2D, destination: Vector2) -> void:
 	var magnification := 1.65*ATTACK_ZOOM_FACTOR
@@ -438,11 +482,11 @@ func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_h
 		if attacker.kind == "dancer_white" and style == "slash" and i % 2 == 1 and attacker.poses.has("slash_alt"):
 			strike_pose = "slash_alt"
 		attacker.set_pose(strike_pose)
-		if style == "slash" or style == "pierce": combat_audio.play_cue("slash")
+		if style in ["slash", "pierce"]: combat_audio.play_cue("slash")
 		await move_actor(attacker,destination+Vector2(direction*10,0),0.035)
 		var contact_point: Vector2 = defender.position+Vector2(-direction*13,-62)*depth_scale(defender.position)
 		show_strike(contact_point,direction,style,blocked)
-		play_hit_sound(blocked)
+		play_attack_contact_sound(style,blocked)
 		if not blocked and damage > 0: defender.set_pose("damaged")
 		on_hit.call(hit,i)
 		last_hit_stop = _hit_stop(attacker,0.095 if enemy_attack else (0.075 if style == "pierce" else 0.085))
@@ -591,6 +635,14 @@ func show_strike(point: Vector2, direction: float, style: String, blocked: bool,
 		fx.scale *= effect_scale
 	fx.blocked = blocked
 	if blocked: fx.duration = 0.24
+
+func play_attack_contact_sound(style: String, blocked: bool) -> void:
+	# Bite and blunt samples own the contact transient; keep the metallic block
+	# feedback as a separate layer, without doubling ordinary flesh impacts.
+	if style in ["bite", "hit"]:
+		combat_audio.play_cue(style)
+		if not blocked: return
+	play_hit_sound(blocked)
 
 func play_hit_sound(blocked: bool) -> void:
 	# Small procedural transient; no new external audio asset dependency.

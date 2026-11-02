@@ -138,7 +138,7 @@ func enter(params: Dictionary) -> void:
 		if shown_encounter_phase == 2:
 			setup_dancer_duet()
 			play_dancer_music()
-	elif not Game.tutorial_mode and Game.battle_type() == "normal":
+	elif Game.tutorial_mode or Game.battle_type() == "normal" or model.profile.get("encounterId", "") == "noss_sovereign":
 		normal_battle_music = preload("res://scripts/audio/normal_battle_music.gd").new()
 		add_child(normal_battle_music)
 	if stage.scenery != null:

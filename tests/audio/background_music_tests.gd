@@ -120,7 +120,7 @@ func _ready() -> void:
 	Game.start_tutorial()
 	check(not music.playing, "tutorial battle stops the background music immediately")
 	await settle()
-	check(Game.tutorial_mode and app.shown_page == "battle" and not music.playing, "tutorial stays silent")
+	check(Game.tutorial_mode and app.shown_page == "battle" and not music.playing, "tutorial keeps non-battle music stopped")
 	Game.finish_training("win")
 	await settle()
 	check(app.shown_page == "menu" and music.playing, "tutorial completion restores music")
