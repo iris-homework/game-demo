@@ -30,6 +30,9 @@ func _ready() -> void:
 	if mode == "write":
 		Game.state = Game.initial_state()
 		Game.state.currentHp = 63
+		# Explicitly carry the technology exercised below; new runs start empty.
+		Game.state.ownedCyberwareIds = ["dimensional_pocket"]
+		Game.state.equippedCyberwareIds = ["dimensional_pocket"]
 		Game.state.activeEventId = "E04"
 		Game.state.currentPlaceId = "alley"
 		Game.enter_node("battle")
@@ -79,6 +82,7 @@ func _ready() -> void:
 		check(JSON.parse_string(JSON.stringify(app.view.model.snapshot())) == expected.combat, "Continue button restarts exact opening without duplicate draw")
 	# Let presentation-only timers settle before tearing down the test harness.
 	await get_tree().create_timer(0.5).timeout
+	check(await preload("res://scripts/combat/audio_cleanup.gd").release(app, get_tree()), "Main audio playback references drain before test disposal")
 	app.queue_free()
 	await get_tree().process_frame
 	await get_tree().process_frame

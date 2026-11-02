@@ -75,7 +75,7 @@ func assert_ended(label: String) -> void:
 	check(Game.is_run_over() and not Game.can_continue(), label + ": run over and continue unavailable")
 
 func test_all_battles() -> void:
-	check(Game.battles.size() == 7 and Game.battles.has("B16"), "Fixture covers six normal battles and the day-seven Boss")
+	check(Game.battles.size() == 14 and Game.battles.has("B16") and Game.battles.has("B23") and Game.battles.values().filter(func(b): return b.get("battleType") == "normal").size() == 12, "Fixture covers twelve normal battles and both day-seven Bosses")
 	for battle_id in Game.battles:
 		var label := "loss-" + str(battle_id)
 		var model := begin_battle(label, battle_id)
@@ -329,6 +329,7 @@ func test_ui() -> void:
 		Game.changed.emit()
 		await get_tree().process_frame
 		check(app.view.continue_button.disabled, "Disk-only terminal save disables menu continue")
+	check(await preload("res://scripts/combat/audio_cleanup.gd").release(app, get_tree()), "Main audio playback references drain before test disposal")
 	app.queue_free()
 	await get_tree().process_frame
 	await get_tree().process_frame

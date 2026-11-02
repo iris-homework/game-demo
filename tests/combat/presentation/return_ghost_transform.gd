@@ -89,6 +89,7 @@ func _ready() -> void:
 		verify(bench.view.stage.world.get_children().filter(func(node): return node.get_script() == Ghost).is_empty(),cycle+": temporary ghosts cleaned")
 		if DisplayServer.get_name() != "headless": verify(capture_done,cycle+": captured reveal")
 	verify(reveals == 2,"both stance return sequences observed")
+	verify(await preload("res://scripts/combat/audio_cleanup.gd").release(bench, get_tree()), "Workbench audio references drain before disposal")
 	bench.queue_free()
 	await get_tree().process_frame
 	await get_tree().process_frame

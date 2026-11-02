@@ -150,7 +150,7 @@ func _ready() -> void:
 	Game.meta_path = OUTPUT + "meta.json"
 	var original: Dictionary = Game.battles.duplicate(true)
 	for id in Game.battles:
-		var expected := "boss" if id == "B16" else "normal"
+		var expected := "boss" if id in ["B16", "B23"] else "normal"
 		check(Game.battles[id].get("battleType") == expected, id + " explicitly declares its type")
 		begin_battle(id)
 		check(Game.battle_type() == expected and Game.valid_save(Game.state), id + " initializes a valid typed battle")

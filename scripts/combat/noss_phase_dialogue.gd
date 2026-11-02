@@ -1,10 +1,10 @@
 extends DemoUI
 ## Read-only interlude: the combat model has already committed phase two.
 signal finished
+const Presentation := preload("res://scripts/dialogue_presentation.gd")
 var lines: Array = []
 var cursor := 0
 var content: Control
-var next_button: Button
 
 func _ready() -> void:
 	name = "NossPhaseDialogue"
@@ -22,22 +22,29 @@ func show_line() -> void:
 		return
 	var line: Dictionary = lines[cursor]
 	Game.record_encounter_line(cursor, line)
-	content = Control.new()
-	content.size = Vector2(1440, 900)
+	content = Presentation.new()
 	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(content)
-	rect(content, Vector2.ZERO, Vector2(1440, 900), Color("080913ed"))
-	var portrait_root := DemoUI.new()
-	content.add_child(portrait_root)
-	portrait_root.portrait(Game.PLAYER_REFERENCE, "left", line.get("speakerId") == Game.PLAYER_REFERENCE, 82, 650)
-	portrait_root.portrait(line.get("portrait", "noss_phase2"), "right", line.get("speakerId") != Game.PLAYER_REFERENCE, 82, 650)
-	label(content, "太阳之下  /  第二阶段", Vector2(60, 48), Vector2(1100, 50), 26, Color("ffe6a0"))
-	panel(content, Vector2(60, 648), Vector2(1320, 214), Color("0b101af5"), Color("bb984e"))
+	content.background(Game.place_data(Game.events.E23.placeId).backgroundAssetId, 0.19)
 	var speaker: String = line.get("speakerId", "")
-	label(content, Game.display_name(speaker) if not speaker.is_empty() else "场景", Vector2(92, 669), Vector2(1180, 42), 25, Color("ffe6a0"))
-	label(content, Game.render_text(line.get("text", "")), Vector2(94, 718), Vector2(1178, 85), 25, CREAM)
-	next_button = button(content, "进入第二阶段  →" if cursor == lines.size() - 1 else "继续  →", Vector2(1116, 805), Vector2(230, 42), advance_line, true)
-	next_button.grab_focus()
+	var side := "" if speaker.is_empty() else ("left" if speaker == Game.PLAYER_REFERENCE else "right")
+	content.dialogue_portraits({"left":Game.PLAYER_REFERENCE, "right":line.get("portrait", "noss_phase2")}, speaker, side)
+	var advance_area := Control.new()
+	advance_area.name = "DialogueAdvanceArea"
+	advance_area.position = Vector2(0,180)
+	advance_area.size = Vector2(1440,720)
+	advance_area.mouse_filter = Control.MOUSE_FILTER_STOP
+	advance_area.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	advance_area.gui_input.connect(_on_advance_area_input)
+	content.add_child(advance_area)
+	content.dialogue_panel(speaker)
+	content.dialogue_text(Game.render_text(line.get("text", "")))
+	content.dialogue_hint(("点击进入第二阶段" if cursor == lines.size() - 1 else "点击继续") + "    ·    " + PlayerSettings.key_label("advance"))
+
+func _on_advance_area_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		get_viewport().set_input_as_handled()
+		advance_line()
 
 func advance_line() -> void:
 	cursor += 1

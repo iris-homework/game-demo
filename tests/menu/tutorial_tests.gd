@@ -148,7 +148,15 @@ func pointer(point: Vector2, pressed: int = -1) -> void:
 		event = button
 	event.position = point
 	event.global_position = point
-	get_viewport().push_input(event, true)
+	if DisplayServer.get_name() == "headless":
+		get_viewport().push_input(event, true)
+	else:
+		# A visible window refreshes hover from the native pointer between frames.
+		# Move it to the same transformed point used by the injected window event.
+		event.position = get_viewport().get_final_transform() * point
+		event.global_position = event.position
+		Input.warp_mouse(event.position)
+		Input.parse_input_event(event)
 	await get_tree().process_frame
 	await get_tree().process_frame
 
@@ -243,7 +251,7 @@ func exercise_guide() -> void:
 	view.select_card(ranged, false)
 	view.play_selected(-1)
 	await idle()
-	check(view.model.stance == "ranged" and guide.completed.get(3, false), "Changing stance through a real card completes protagonist practice")
+	check(view.model.stance == "ranged" and not guide.completed.get(3, false), "Entering ranged through a real card does not complete the required return to melee")
 	check(view.model.energy == 0 and view.model.stance_discount, "Stance card uses last energy and grants ranged attack discount")
 	await capture_frame("ranged")
 	guide.set_step(4)
@@ -278,6 +286,15 @@ func exercise_guide() -> void:
 	check(view.model.snapshot() == cooling_snapshot and not guide.visible, "Technology number key cannot reactivate a cooling technology or reveal the guide")
 	await click_control(technology.close_button)
 	check(guide.visible and view.model.snapshot() == cooling_snapshot, "Closing the technology panel restores the guide without changing combat")
+	check(not guide.completed.get(3, false), "Reading other lessons and activating energy technology cannot finish stance practice")
+	var melee := ""
+	for uid in view.model.hand:
+		if view.model.card(uid).id == "noren_03": melee = uid
+	view.select_card(melee, false)
+	view.play_selected(-1)
+	await idle()
+	check(view.model.stance == "melee" and guide.completed.get(3, false), "Returning to melee through a real card completes stance practice even while another lesson is selected")
+	check(view.model.energy == 0 and melee in view.model.discard_pile, "The return to melee spends the restored energy and resolves the actual stance card")
 	guide.set_step(7)
 	await click_control(view.end_button)
 	await idle()

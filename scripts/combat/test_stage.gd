@@ -663,7 +663,8 @@ func return_home() -> void:
 		set_phase("home_glitch")
 		await get_tree().create_timer(0.22).timeout
 		set_phase("home_reveal")
-		await reveal.finished
+		# The reveal can finish before the earlier phase timer resumes.
+		if reveal.is_running(): await reveal.finished
 		for ghost in ghosts: ghost.queue_free()
 
 	if camera_tween.is_running(): await camera_tween.finished

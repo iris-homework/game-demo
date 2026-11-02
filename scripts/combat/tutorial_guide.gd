@@ -70,7 +70,7 @@ var collapse_button: Button
 var expand_button: Button
 var hovered_inspection: Control
 var hover_elapsed := 0.0
-var initial_stance := "melee"
+var practiced_ranged := false
 var highlights: Array[Rect2] = []
 var guidance_targets: Array[Dictionary] = []
 var leader_paths: Array[PackedVector2Array] = []
@@ -85,7 +85,6 @@ func configure(view: Control) -> void:
 	battle_view = view
 	name = "TutorialGuide"
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	initial_stance = str(battle_view.model.stance)
 	target_label_style = _target_label_style()
 	panel_view = panel(self, GUIDE_POSITION, GUIDE_SIZE, Color("0d1523f7"), Color("407a86"))
 	panel_view.name = "TutorialPanel"
@@ -189,6 +188,12 @@ func _on_card_played(uid: String) -> void:
 	var definition: Dictionary = battle_view.model.card(uid)
 	if definition.get("id", "") == "noren_02": _mark_complete(0)
 	if definition.get("id", "") == "noren_40": _mark_complete(1)
+	_track_stance_practice()
+
+func _track_stance_practice() -> void:
+	# Remember actual practice even before this lesson is selected or while hidden.
+	if battle_view.model.stance == "ranged": practiced_ranged = true
+	elif practiced_ranged and battle_view.model.stance == "melee": _mark_complete(3)
 
 func _on_pile_inspected(title: String) -> void:
 	if title in ["抽牌堆", "弃牌堆"]:
@@ -200,7 +205,7 @@ func _process(delta: float) -> void:
 	if not is_instance_valid(battle_view): return
 	# Keep modal overlays, animations and their input entirely with the battle.
 	visible = battle_view.initialized and not Game.battle_busy and not Game.transition_locked and not is_instance_valid(battle_view.pile_overlay) and battle_view.model.outcome.is_empty()
-	if str(battle_view.model.stance) != initial_stance: _mark_complete(3)
+	_track_stance_practice()
 	if battle_view.model.cyberware_cooldown("backup_energy") > 0: _mark_complete(4)
 	if int(battle_view.model.turn) > 1: _mark_complete(7)
 	if not visible:

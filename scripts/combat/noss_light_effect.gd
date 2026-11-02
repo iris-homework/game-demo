@@ -10,6 +10,8 @@ var tail_offset := Vector2.ZERO
 var samples: Array[Vector2] = []
 var sparkles: Array[Dictionary] = []
 var sparkle_serial := 0
+var shatter := false
+var fragments: Array[Dictionary] = []
 const MAX_SPARKLES := 64
 const GOLD := Color("ffe66a")
 const IVORY := Color("fffeed")
@@ -22,6 +24,14 @@ func _ready() -> void:
 		for i in (14 if mode == "impact" else 9):
 			var ray := Vector2.from_angle(axis.angle()+float(i)*TAU/(14.0 if mode == "impact" else 9.0))
 			_emit_sparkle(ray*5.0*visual_scale,ray*(95.0 if mode == "impact" else 65.0)*visual_scale)
+	if mode == "impact" and shatter:
+		# Deterministic glasslike light shards; no combat RNG or model writes.
+		for i in 14:
+			var ray := Vector2.from_angle(float(i)*2.39996)
+			var variation := 0.5+0.5*sin(float(i)*7.137)
+			fragments.append({"velocity":ray*(240.0+variation*320.0)*visual_scale+Vector2.UP*80.0*visual_scale,
+				"length":18.0+variation*18.0,"width":2.8+variation*2.6,
+				"rotation":ray.angle(),"spin":(-1.0 if i%2 == 0 else 1.0)*(3.0+variation*5.0)})
 	_sample_tail()
 	queue_redraw()
 
@@ -81,6 +91,8 @@ func _draw() -> void:
 	var t := clampf(elapsed/maxf(0.001,duration),0.0,1.0)
 	var fade := pow(1.0-t,1.25)
 	var strength := visual_scale
+	if mode == "impact" and shatter:
+		_draw_shatter(t,fade)
 	if mode == "trail":
 		for i in range(1,samples.size()):
 			var weight := float(i)/float(samples.size()-1)
@@ -107,3 +119,25 @@ func _draw() -> void:
 		# A small directional cross at contact remains readable through guard flash.
 		var normal := axis.orthogonal()
 		draw_line(-normal*radius*0.55,normal*radius*0.55,Color(IVORY,fade),1.2*strength,true)
+
+func _draw_shatter(t: float, fade: float) -> void:
+	var flash := pow(1.0-clampf(t*3.0,0.0,1.0),2.0)
+	draw_circle(Vector2.ZERO,(40.0+100.0*t)*visual_scale,Color(GOLD,flash*0.30))
+	draw_circle(Vector2.ZERO,(17.0+20.0*t)*visual_scale,Color(IVORY,flash))
+	draw_arc(Vector2.ZERO,(18.0+145.0*t)*visual_scale,0,TAU,48,Color(GOLD,fade*0.8),3.2*visual_scale,true)
+	draw_arc(Vector2.ZERO,(10.0+110.0*t)*visual_scale,0,TAU,48,Color(IVORY,fade*0.5),1.2*visual_scale,true)
+	for ray in [Vector2.DOWN,Vector2.RIGHT]:
+		var reach: float = (95.0 if ray == Vector2.DOWN else 70.0)*visual_scale*(1.0+t)
+		draw_line(-ray*reach,ray*reach,Color(GOLD,flash*0.5),9.0*visual_scale,true)
+		draw_line(-ray*reach,ray*reach,Color(IVORY,flash),2.5*visual_scale,true)
+	for fragment in fragments:
+		var point: Vector2 = fragment.velocity*elapsed+Vector2.DOWN*180.0*visual_scale*elapsed*elapsed
+		var ray := Vector2.from_angle(float(fragment.rotation)+float(fragment.spin)*elapsed)
+		var side := ray.orthogonal()
+		var length: float = fragment.length*visual_scale*(1.0-t*0.65)
+		var width: float = fragment.width*visual_scale
+		var shard := PackedVector2Array([point-ray*length*0.55,point+side*width,
+			point+ray*length*0.65,point-side*width*0.55])
+		draw_circle(point,width*2.0,Color(GOLD,fade*0.13))
+		draw_colored_polygon(shard,Color(GOLD,fade*0.9))
+		draw_line(point-ray*length*0.40,point+ray*length*0.52,Color(IVORY,fade),1.3*visual_scale,true)

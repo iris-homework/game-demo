@@ -3,7 +3,7 @@ extends Node
 const CASES := [
 	["E13", "B13", "pruning_hound", "garden", 35, 8],
 	["E14", "B14", "powerline_repairman", "power", 60, 0],
-	["E15", "B15", "beacon_jellyfish", "port", 36, 6],
+	["E15", "B15", "beacon_jellyfish", "port", 36, 10],
 ]
 var checks := 0
 var failures: Array[String] = []

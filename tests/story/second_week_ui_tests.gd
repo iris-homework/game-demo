@@ -5,6 +5,8 @@ var app: Control
 var output := ""
 var checks := 0
 var failures: Array[String] = []
+var ordinary_panel: Array = []
+var ordinary_background: Texture2D
 
 func check(ok: bool, message: String) -> void:
 	checks += 1
@@ -44,7 +46,90 @@ func key(code: Key) -> void:
 func shot(name: String, viewport: Viewport) -> void:
 	if DisplayServer.get_name() == "headless" or OS.get_environment("QA_CAPTURE") != "1": return
 	await RenderingServer.frame_post_draw
-	viewport.get_texture().get_image().save_png(output.path_join(name + ".png"))
+	var image := viewport.get_texture().get_image()
+	check(image.save_png(output.path_join(name + ".png")) == OK, "GPU capture saved: " + name)
+
+func captures(name: String) -> void:
+	if DisplayServer.get_name() == "headless" or OS.get_environment("QA_CAPTURE") != "1": return
+	var original := DisplayServer.window_get_size()
+	for dimensions in [Vector2i(1280,800), Vector2i(1600,1000)]:
+		DisplayServer.window_set_size(dimensions)
+		await get_tree().create_timer(0.25).timeout
+		await shot(name + "_%dx%d" % [dimensions.x, dimensions.y], get_viewport())
+	DisplayServer.window_set_size(original)
+	await settle()
+
+func click(point: Vector2, which: MouseButton = MOUSE_BUTTON_LEFT) -> void:
+	for pressed in [true, false]:
+		var event := InputEventMouseButton.new()
+		event.position = point
+		event.button_index = which
+		event.pressed = pressed
+		get_viewport().push_input(event, true)
+		await settle()
+
+func panel_signature(root: Control) -> Array:
+	var result := []
+	for child in root.get_children():
+		if child is Polygon2D and child.polygon.size() > 0:
+			var lower_panel := true
+			for point in child.polygon:
+				if point.y < 650: lower_panel = false
+			if lower_panel: result.append([child.polygon, child.color])
+		elif child is ColorRect and child.position == Vector2(0,650):
+			result.append([child.position, child.size, child.color])
+	return result
+
+func scene_background(root: Control) -> Texture2D:
+	for child in root.get_children():
+		if child is TextureRect and child.position == Vector2.ZERO and child.size == Vector2(1440,900):
+			return child.texture
+	return null
+
+func check_layout(root: Control, tag: String) -> void:
+	var body := root.get_node_or_null("DialogueText") as Label
+	var speaker := root.get_node_or_null("SpeakerName") as Label
+	var hint := root.get_node_or_null("DialogueHint") as Label
+	var area := root.get_node_or_null("DialogueAdvanceArea") as Control
+	check(body != null and speaker != null and hint != null and area != null, tag + ": ordinary dialogue nodes exist")
+	if body == null or speaker == null or hint == null or area == null: return
+	check(body.position == Vector2(330,706) and body.size == Vector2(1004,118), tag + ": ordinary body rectangle")
+	check(body.get_theme_font_size("font_size") == 25 and body.get_theme_constant("line_spacing") == 8, tag + ": ordinary body typography")
+	check(speaker.position == Vector2(20,708) and speaker.size == Vector2(222,49) and is_equal_approx(speaker.rotation, -0.20), tag + ": ordinary slanted speaker plaque")
+	check(hint.position == Vector2(330,842) and hint.size == Vector2(650,26), tag + ": ordinary hint rectangle")
+	check(area.position == Vector2(0,180) and area.size == Vector2(1440,720), tag + ": ordinary advance area")
+	check(panel_signature(root) == ordinary_panel and ordinary_panel.size() == 9, tag + ": same black panel and eight red/black rails")
+	check(scene_background(root) == ordinary_background and ordinary_background != null, tag + ": same E23 dialogue background")
+
+func check_phase_line(interlude: Control) -> void:
+	# Presentation must not mutate the committed combat snapshot or authored lines.
+	await get_tree().create_timer(0.23).timeout
+	var index: int = interlude.cursor
+	var line: Dictionary = interlude.lines[index]
+	var root: Control = interlude.content
+	var tag := "phase line %d" % index
+	check_layout(root, tag)
+	var body := root.get_node_or_null("DialogueText") as Label
+	var speaker_label := root.get_node_or_null("SpeakerName") as Label
+	var speaker: String = line.get("speakerId", "")
+	check(body != null and body.text == Game.render_text(line.get("text", "")) and body.visible_characters == -1, tag + ": complete authored line visible")
+	check(speaker_label != null and speaker_label.text == (Game.display_name(speaker) if not speaker.is_empty() else "场景"), tag + ": speaker name matches")
+	check(root.find_children("*", "Button", true, false).is_empty(), tag + ": no separate continuation button")
+	var portraits: Array[TextureRect] = []
+	for child in root.get_children():
+		if child is TextureRect and child.size.is_equal_approx(Vector2(390,642)): portraits.append(child)
+	check(portraits.size() == 2, tag + ": both ordinary-sized portraits exist")
+	if portraits.size() != 2: return
+	for side_index in 2:
+		var character: String = Game.PLAYER_REFERENCE if side_index == 0 else line.get("portrait", "noss_phase2")
+		var resolved: String = Game.resolve_character_id(character)
+		var portrait := portraits[side_index]
+		var top := 173.0 + float(Game.characters[resolved].get("portraitOffsetY", 0.0))
+		check(portrait.position.is_equal_approx(Vector2(120 if side_index == 0 else 900, top)), tag + ": portrait baseline " + str(side_index))
+		check(portrait.texture == Game.texture(Game.characters[resolved].portraitAssetId), tag + ": correct portrait texture " + str(side_index))
+		var active := not speaker.is_empty() and Game.resolve_character_id(speaker) == resolved
+		check(portrait.modulate == (Color.WHITE if active else Color(0.72,0.66,0.79,0.95)), tag + ": speaker highlight / narrator dim " + str(side_index))
+	await captures("phase_line_%d" % index)
 
 func test_week_archive() -> void:
 	var cases := [
@@ -97,6 +182,13 @@ func test_phase_shortcut() -> void:
 	if not await wait_for(idle):
 		check(false, "Boss introduction becomes idle")
 		return
+	await get_tree().create_timer(0.23).timeout
+	ordinary_panel = panel_signature(app.view)
+	ordinary_background = scene_background(app.view)
+	check(ordinary_background == Game.texture(Game.place_data(Game.events.E23.placeId).backgroundAssetId), "ordinary E23 scene uses its formal place background")
+	check_layout(app.view, "ordinary E23")
+	app.view.text_label.visible_characters = -1
+	await captures("ordinary_E23")
 	Game.skip_dialogue(Game.revision)
 	if not await wait_for(func(): return idle() and app.shown_page == "battle" and app.view.initialized):
 		check(false, "actual Boss battle becomes playable")
@@ -113,16 +205,24 @@ func test_phase_shortcut() -> void:
 	var interlude = view.get_node("NossPhaseDialogue")
 	var before: Dictionary = view.model.snapshot()
 	check(Game.battle_busy and interlude.cursor == 0, "transition begins under battle input lock")
+	check(interlude.lines.size() == 6 and interlude.lines == Game.events.E23.phaseTwoDialogue, "all six authored transition lines remain intact")
+	await check_phase_line(interlude)
+	await click(Vector2(720,120))
+	await click(Vector2(720,700), MOUSE_BUTTON_RIGHT)
+	check(interlude.cursor == 0, "above-area and right clicks cannot advance the interlude")
 	PlayerSettings.bindings.advance = KEY_SPACE
 	await key_event(KEY_SPACE, true)
 	check(interlude.cursor == 1, "default Space advances once")
+	await check_phase_line(interlude)
 	await key_event(KEY_SPACE, true, true)
 	await key_event(KEY_SPACE, false)
 	check(interlude.cursor == 1, "default key echo/release does not advance")
 	await key(KEY_ENTER)
 	check(interlude.cursor == 2, "default Enter alias advances once")
+	await check_phase_line(interlude)
 	await key(KEY_KP_ENTER)
 	check(interlude.cursor == 3, "default keypad Enter alias advances once")
+	await check_phase_line(interlude)
 	# Advance may share a battle binding; the modal must own the gesture.
 	PlayerSettings.bindings.advance = KEY_E
 	for old_default in [KEY_SPACE, KEY_ENTER, KEY_KP_ENTER]:
@@ -140,9 +240,11 @@ func test_phase_shortcut() -> void:
 	check(interlude.cursor == 3, "modified keys and echo cannot advance")
 	await key(KEY_E)
 	check(interlude.cursor == 4, "custom advance key works inside actual busy Battle/main")
+	await check_phase_line(interlude)
 	await shot("phase_custom_key", get_viewport())
-	await key(KEY_E)
-	check(interlude.cursor == 5, "custom key release cannot double-advance")
+	await click(Vector2(720,700))
+	check(interlude.cursor == 5, "ordinary lower-panel click advances exactly once across content replacement")
+	await check_phase_line(interlude)
 	await key(KEY_E)
 	check(await wait_for(idle), "last custom key completes presentation and releases input lock")
 	check(view.get_node_or_null("NossPhaseDialogue") == null, "finished interlude is removed")

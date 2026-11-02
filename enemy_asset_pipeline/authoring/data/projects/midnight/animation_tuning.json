@@ -133,7 +133,7 @@
       "y": 0
     },
     "profiles.mutant_mouse.groups.damaged.rotation": 0,
-    "profiles.luggage_lurker.character.visual_size": 0.6,
+    "profiles.luggage_lurker.character.visual_size": 1.2,
     "profiles.luggage_lurker.character.offset": {
       "x": 0,
       "y": 0

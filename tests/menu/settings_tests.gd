@@ -436,6 +436,8 @@ func test_hand_input() -> void:
 	for voice in voices:
 		if voice == app.music_player:
 			check(voice.bus == &"Music" and not voice.playing, "battle music player uses its independent bus and remains stopped")
+		elif voice == battle.normal_battle_music:
+			check(voice.bus == &"Music", "ordinary battle music uses the independent Music bus")
 		else:
 			check(voice.bus == &"SFX","live sound effect uses settings SFX bus: " + str(voice.get_path()))
 	for action_data in [[KEY_Q,"cyberware_view.gd"],[KEY_D,"pile_view.gd"],[KEY_F,"pile_view.gd"]]:

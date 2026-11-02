@@ -60,9 +60,9 @@ func _ready() -> void:
 	restored.restore(saved)
 	check(Game.valid_combat(saved) and restored.enemies[0].weak == 2, "Existing stored layers load without migration")
 	helper.play(restored)
-	check(restored.enemies[0].weak == 3, "Reapplying extends duration by one stack")
+	check(restored.enemies[0].weak == 4, "Current suppression shot reapplies exactly two weakness stacks")
 	restored.end_turn()
-	check(restored.enemies[0].weak == 2, "Restored/reapplied stacks decay once")
+	check(restored.enemies[0].weak == 3, "Restored/reapplied stacks decay once")
 	check(restored.buffs.enemy_badges(restored.enemies[0]).filter(func(b): return b.buffId == "weak")[0].description.contains("固定降低 25%"), "Tooltip describes fixed percentage")
 	m = helper.fixture([19])
 	m.enemies[0].weak = 998

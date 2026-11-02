@@ -25,7 +25,7 @@
 
 2026-10-30新增[战斗背景动态专项](combat/presentation/battle_atmosphere_tests.tscn)：13地点材质、镜头覆盖、战斗快照、暂停与释放；GPU输出九组背景前后帧及实战截图，新增七类代表灯光至少15%明暗差的像素检查，并记录动态／静态CPU帧间隔（非GPU耗时）。须复制工程并使用独立custom_user_dir_name，支持QA_OUT_DIR及QA_CAPTURE_MOTION=1。
 
-新手教程专项：[`menu/tutorial_tests.tscn`](menu/tutorial_tests.tscn)覆盖固定首抽、正式敌人定义复用、无存档／已有进度／损坏磁盘存档隔离、退出与胜负恢复、菜单模态、八步实操、临时教学科技隔离、实际激活与能量恢复／冷却递减、科技模态和禁用重用、牌堆与悬停、教学按钮与出牌输入隔离。必须使用复制工程与名称含`tutorial-settings-qa`的独立用户目录；`QA_OUT_DIR`指定证据目录，GPU运行额外生成逐步截图。不移动系统鼠标，未代替实体输入验收。
+新手教程专项：[`menu/tutorial_tests.tscn`](menu/tutorial_tests.tscn)覆盖固定首抽、正式敌人定义复用、无存档／已有进度／损坏磁盘存档隔离、退出与胜负恢复、菜单模态、八步实操、临时教学科技隔离、实际激活与能量恢复／冷却递减、科技模态和禁用重用、牌堆与悬停、教学按钮与出牌输入隔离。必须使用复制工程与名称含`tutorial-settings-qa`的独立用户目录；`QA_OUT_DIR`指定证据目录，GPU运行额外生成逐步截图，并同步系统鼠标与最终变换后的窗口事件坐标，须顺序运行；headless仍只注入视口事件。形态练习覆盖切远程时未完成、真实切回近战后完成及跨课程提前练习，未代替真人输入验收。
 
 
 2026-10-29白舞者交替挥砍：现有`combat/presentation/dancer_strike_tests`新增真实备用纹理、逐段`slash / slash_alt / slash`、重复三连击重置与归位检查。本轮148项通过，配套敌人视觉资源348项通过；1440×900 GPU三段截图及运行边界见`artifacts/qa/dancer-alternate-slash-2026-10-29/verification.json`。
@@ -205,6 +205,8 @@
 无人物版卡面专项：[card_face_style_tests](card_face_style_tests.tscn)。保留原入口名，当前以隔离用户目录及独立存档路径headless运行，覆盖40张无人物实图、主菜单无卡面按钮、旧偏好不影响显示、浏览与放大复用、40牌双形态动态排版及快照不变。不能代替实际像素和物理输入验收；本轮结果见修改记录。`artifacts/qa/card-face-style-2026-10-23/`及本页较早双卡面数量为移除切换前的历史证据。
 
 第一周七组正式对手的菜单演练专项：[published_training_tests](combat/enemies/published_training_tests.tscn)，在隔离复制工程中headless运行；覆盖七选择与第一周事件战斗集合一致、动态正式数据与Boss两阶段、旧测试敌人拒绝、胜负及退出恢复、临时战斗清理、存档哨兵与模态焦点／Esc／锁定。只验证逻辑和节点时序，不替代像素渲染或真实鼠标验收，不启动桌面窗口。
+
+归位异步完成专项：[`combat/presentation/late_completion_tests.tscn`](combat/presentation/late_completion_tests.tscn) 使用真实 `stage.return_home()` 检查正常完成，以及归位 Tween 在先前阶段 Timer 恢复前已完成的时序。确定性注入只提前推进该表现 Tween，不改卡牌、伤害或模型；检查返回、不再忙碌、进入 idle、残影清理、演员归位与透明度、模型和冒险状态守恒及音频释放。须使用复制工程、含 `qa` 的独立用户目录和绝对 `QA_OUT_DIR`。负对照保留于本轮证据，不能将该注入等同自然慢帧复现或 GPU 截图停滞根因。
 
 ## 2026-10-23 事件删减与无前置回归
 
@@ -443,6 +445,6 @@ Node扫描、参数、发布与回退测试为
 
 `tests/story/noss_boss_tests.tscn` 覆盖周次／日期入口、三敌转单敌阶段、AoE和弹反边界、难度冻结与开局重开、奖励和第二周结束、演练隔离。仅在复制工程及含QA的用户目录运行，设置绝对 `QA_OUT_DIR`；`QA_CAPTURE=1` 增加真实战场、命中显示、转阶段对白与结算截图，以及一阶段主血条／双手小血条的对齐、独立HP／格挡／死亡显示、目标索引及二阶段清理检查；GPU额外调整至1600×1000检查与截图。使用Dummy音频，不代表真人输入／听感验收。
 
-上述真实场景同时检查二阶段 `halo_charge → halo_burst`、蓄光期间不提前显示扣血和爆炸后一次性揭示16点模型伤害，并截取光环／爆炸画面。`tests/combat/presentation/noss_visual_tests.tscn` 另覆盖重击的目标中心、无光剑弹体、蓄光顺序、伤害／完全格挡对应姿势、站位／站姿恢复及节点清理；以专用QA用户目录运行，`NOSS_VISUAL_QA_OUT` 指定输出，`-- --capture` 启用GPU截图。
+上述真实场景同时检查二阶段 `halo_charge → halo_burst`、蓄光期间不提前显示扣血和爆炸后一次性揭示16点模型伤害，并截取光环／爆炸画面。`tests/combat/presentation/noss_visual_tests.tscn` 另覆盖二阶段光剑在目标头顶凝聚、完整剑柄位于裁切区域内、垂直加速砸落、14枚高速长光屑及命中一次性，并保留重击的目标中心、无光剑弹体、蓄光顺序、伤害／完全格挡对应姿势、站位／站姿恢复及节点清理；以专用QA用户目录运行，`NOSS_VISUAL_QA_OUT` 指定输出，`-- --capture` 启用GPU截图。
 
 重击视觉专项还检查爆炸光层存在、局部时钟实际推进和不拦截输入；真实场景保存爆光峰值及后续冲击波截图。`QA_CAPTURE=1 QA_SEQUENCE=1` 额外录制一次约1.65秒的真实GPU画面序列至 `heavy_sequence/`，`frames.json` 保留每帧测得时间、场景阶段及爆炸年龄，可用于动画预览编码；先在内存中收集实际图像，再写PNG，峰值静帧也从这些实际帧中挑选，避免压缩打断录制。无窗口运行不录制。

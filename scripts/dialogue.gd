@@ -1,8 +1,6 @@
-extends DemoUI
+extends "res://scripts/dialogue_presentation.gd"
 signal advance_requested
 signal choice_confirmed
-const STORY_RED := Color("ff393e")
-const STORY_WHITE := Color("f4f2ef")
 var text_label: Label
 var node: Dictionary
 var expected_revision: int
@@ -30,9 +28,7 @@ func _ready() -> void:
 			var id = overrides.get(portrait_side)
 			if id is String and (id.is_empty() or Game.characters.has(Game.resolve_character_id(id))):
 				shown[portrait_side] = id
-	var speaker := Game.resolve_character_id(node.get("speakerId", ""))
-	portrait(shown.left, "left", side == "left" and Game.resolve_character_id(shown.left) == speaker, 173, 642)
-	portrait(shown.right, "right", side == "right" and Game.resolve_character_id(shown.right) == speaker, 173, 642)
+	dialogue_portraits(shown, node.get("speakerId", ""), side)
 	map_chrome(e.title, Callable(), true) # Keep the skip-story slot between deck and menu.
 	history_button = button(self, "对话记录", Vector2(856,16), Vector2(108,44), open_history)
 	history_button.add_theme_font_size_override("font_size", 17)
@@ -58,12 +54,11 @@ func _ready() -> void:
 			b.disabled = not allowed
 			b.tooltip_text = "信用点不足，可选择拒绝支付或按 F1 测试支付分支。" if not allowed else ""
 			choice_buttons.append(b)
-	_build_dialogue_panel()
-	text_label = label(self, Game.render_text(node.get("text", "")), Vector2(330,706), Vector2(1004,118), 25, STORY_WHITE)
-	text_label.add_theme_constant_override("line_spacing", 8)
+	dialogue_panel(node.get("speakerId", ""))
+	text_label = dialogue_text(Game.render_text(node.get("text", "")))
 	text_label.visible_characters = 0
 	var hint := "点击继续    ·    %s" % PlayerSettings.key_label("advance") if node.has("next") and choice_buttons.is_empty() else "点击选项    ·    数字键选择"
-	label(self, hint, Vector2(330,842), Vector2(650,26), 13, MUTED)
+	dialogue_hint(hint)
 
 func _build_advance_area() -> void:
 	# Middle and lower scene, behind choices; keep the HUD and event tag outside.
@@ -80,48 +75,6 @@ func _on_advance_area_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		advance_area.accept_event()
 		advance()
-
-func _build_dialogue_panel() -> void:
-	# Solid reading panel and a shared horizontal cap for the rising left graphics.
-	rect(self, Vector2(0,650), Vector2(1440,250), Color.BLACK)
-	# Two rising red rails frame the lower-right corner; the center stays open.
-	_dialogue_polygon([Vector2(1025,900),Vector2(1440,786),Vector2(1440,839),Vector2(1214,900)], STORY_RED)
-	_dialogue_polygon([Vector2(1047,900),Vector2(1440,792),Vector2(1440,832),Vector2(1190,900)], Color.BLACK)
-	_dialogue_polygon([Vector2(1320,801),Vector2(1440,767),Vector2(1440,783),Vector2(1320,817)], STORY_RED)
-	# Left slopes are clipped at y=650; keep the long underline and short bottom stripe.
-	_dialogue_polygon([Vector2(0,708),Vector2(242.20,650),Vector2(275.60,650),Vector2(0,716)], STORY_RED)
-	_dialogue_polygon([Vector2(0,716),Vector2(275.60,650),Vector2(380,650),Vector2(380,676),Vector2(0,767)], Color.BLACK)
-	_dialogue_polygon([Vector2(0,767),Vector2(486.85,650),Vector2(511.81,650),Vector2(0,773)], STORY_RED)
-	_dialogue_polygon([Vector2(0,779),Vector2(260,717),Vector2(260,804),Vector2(0,866)], STORY_RED)
-	_dialogue_polygon([Vector2(0,877),Vector2(170,836),Vector2(170,844),Vector2(0,885)], STORY_RED)
-	var speaker: String = node.get("speakerId", "")
-	var speaker_name := Game.display_name(speaker) if not speaker.is_empty() else "场景"
-	var name_font := FontVariation.new()
-	name_font.base_font = base_font
-	name_font.variation_embolden = 0.65
-	name_font.spacing_glyph = 2
-	var speaker_label := label(self, speaker_name, Vector2(20,708), Vector2(222,49), 27, STORY_WHITE)
-	speaker_label.name = "SpeakerName"
-	speaker_label.add_theme_font_override("font", name_font)
-	speaker_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	speaker_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	speaker_label.autowrap_mode = TextServer.AUTOWRAP_OFF
-	speaker_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	speaker_label.rotation = -0.20
-	# Center both lines on the red plaque's local axis, using the original fonts.
-	var brand_center := Vector2(130,791.5)
-	var brand_angle := Vector2(260,-62).angle() # Match the plaque edge exactly.
-	var title := label(self, "午夜委托", brand_center + Vector2(-110,-30).rotated(brand_angle), Vector2(220,30), 21, Color.BLACK)
-	title.add_theme_font_override("font", name_font)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	title.autowrap_mode = TextServer.AUTOWRAP_OFF
-	title.rotation = brand_angle
-	var subtitle := label(self, "MIDNIGHT COMMISSION", brand_center + Vector2(-110,3).rotated(brand_angle), Vector2(220,22), 13, Color.BLACK)
-	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	subtitle.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	subtitle.autowrap_mode = TextServer.AUTOWRAP_OFF
-	subtitle.rotation = brand_angle
 
 func _story_button(text: String, pos: Vector2, dimensions: Vector2, action: Callable) -> Button:
 	# Native button states keep keyboard focus visible without the shared cyan corner marks.
@@ -166,11 +119,6 @@ func _story_button(text: String, pos: Vector2, dimensions: Vector2, action: Call
 	b.pressed.connect(action)
 	add_child(b)
 	return b
-
-func _dialogue_polygon(points: Array, color: Color) -> Polygon2D:
-	var shape := polygon(self, points, color)
-	shape.antialiased = true
-	return shape
 
 func _process(delta: float) -> void:
 	if is_instance_valid(history_overlay): return

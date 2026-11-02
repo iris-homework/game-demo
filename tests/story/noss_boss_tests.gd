@@ -173,6 +173,8 @@ func test_training() -> void:
 
 func shot(name: String) -> void:
 	if DisplayServer.get_name() == "headless": return
+	DisplayServer.window_move_to_foreground()
+	await get_tree().process_frame
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png(output.path_join(name + ".png"))
 
@@ -350,6 +352,7 @@ func test_views() -> void:
 	summary.free()
 
 func _ready() -> void:
+	if DisplayServer.get_name() != "headless": DisplayServer.window_move_to_foreground()
 	output = OS.get_environment("QA_OUT_DIR")
 	if not output.is_absolute_path() or not "qa" in output.to_lower() or not "qa" in OS.get_user_data_dir().to_lower():
 		push_error("NOSS BOSS: isolated QA project and absolute QA_OUT_DIR required")

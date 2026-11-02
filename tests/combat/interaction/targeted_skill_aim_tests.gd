@@ -63,12 +63,12 @@ func test_skill(number: int, form: String) -> void:
 	check(not view.model.hand.has("card_000") and view.model.energy == 3-int(Game.card_catalog["noren_%02d" % number].cost), "%s %d release commits exactly one card and cost" % [form,number])
 	match number:
 		11:
-			check(view.model.block == 8 and view.model.buffs.count(view.model,"weak",1) == 1, "Ranged steady footing blocks and weakens the chosen enemy")
+			check(view.model.block == 11 and view.model.buffs.count(view.model,"weak",1) == 1, "Ranged steady footing blocks and weakens the chosen enemy")
 		30,34:
 			check(view.model.buffs.count(view.model,"bleed",1) == (2 if form == "ranged" else 3) and view.model.buffs.count(view.model,"bleed",0) == 0 and view.model.buffs.count(view.model,"bleed",2) == 0, "%s %d bleed affects only chosen second enemy" % [form,number])
 			if number == 34: check("card_000" in view.model.exhaust_pile, "Mark follows its original exhaust rule")
 		39:
-			check(view.model.hand.size() == before.hand.size()-1+3 and view.model.buffs.count(view.model,"bleed",1) == 3, "%s blood trail draws three from chosen wounded enemy without changing bleed" % form)
+			check(view.model.hand.size() == before.hand.size()-1+4 and view.model.buffs.count(view.model,"bleed",1) == 3, "%s blood trail draws four from chosen enemy with three bleed without changing bleed" % form)
 	var paid: Dictionary = view.model.snapshot()
 	await pointer(target, 0)
 	check(view.model.snapshot() == paid, "%s %d duplicate release cannot resolve twice" % [form,number])
@@ -137,7 +137,7 @@ func test_invalid_and_forms() -> void:
 	await click_at(card_point())
 	await click_at(Vector2(60,420))
 	await idle()
-	check(view.model.block == 8 and view.model.ammo == int(before.norenState.ammo)+1 and not view.model.hand.has("card_000"), "Melee steady footing still casts in whole-view self release area")
+	check(view.model.block == 11 and view.model.ammo == int(before.norenState.ammo)+1 and not view.model.hand.has("card_000"), "Melee steady footing still casts in whole-view self release area")
 	for all_target in [false,true]:
 		await install_hand([2,1]);view=app.view
 		if all_target: view.model.card_catalog.noren_02.target = "all"

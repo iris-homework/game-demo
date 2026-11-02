@@ -289,6 +289,7 @@ func test_map_modal() -> void:
 	app.open_exit_confirmation("menu")
 	check(not is_instance_valid(app.exit_dialog), "Technology modal prevents stacking exit confirmation")
 	await escape()
+	check(await preload("res://scripts/combat/audio_cleanup.gd").release(app, get_tree()), "Main audio playback references drain before test disposal")
 	app.queue_free()
 	await settle()
 	Game.state = {}

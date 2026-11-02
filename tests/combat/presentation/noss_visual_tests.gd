@@ -16,7 +16,9 @@ func check(ok: bool, title: String) -> void:
 
 func screenshot(name: String) -> void:
 	if not capture or DisplayServer.get_name() == "headless": return
-	await RenderingServer.frame_post_draw
+	# Explicitly draw the current state: an occluded macOS window can stop
+	# automatic frame_post_draw signals while the simulation keeps advancing.
+	RenderingServer.force_draw(false)
 	get_viewport().get_texture().get_image().save_png(output.path_join(name+".png"))
 
 func showing_pose(actor, pose_name: String, filename: String) -> bool:
@@ -65,31 +67,60 @@ func _ready() -> void:
 	check(stage.enemies[0].home.y != stage.enemies[1].home.y,"hands occupy distinct target lanes")
 	check(not is_instance_valid(stage.dancer_lights),"no dancer lighting in Noss encounter")
 	await screenshot("phase1_idle")
-	var shot_checks := {"count":0,"flight":0,"impact":0,"pose":""}
+	var shot_checks := {"count":0,"flight":0,"impact":0,"form":0,"pose":""}
 	stage.phase_changed.connect(func(phase: String):
+		var overhead: bool = stage.active_attacker != null and stage.active_attacker.kind == "noss_phase2"
+		if phase == "sword_form":
+			shot_checks.form += 1
+			var forming := get_tree().get_nodes_in_group("noss_light_sword")
+			var head: Vector2 = stage.world.to_local(stage.player.to_global(Vector2(stage.player.target_bounds.get_center().x,stage.player.target_bounds.position.y)))
+			check(overhead and forming.size() == 1,"phase2 summons one sword before dropping")
+			if forming.size() == 1:
+				check(absf(forming[0].position.x-head.x) < 1.0,"summoned blade is directly over target head")
+				check(forming[0].position.y+90.0*stage.depth_scale(stage.player.position) < head.y,"entire summoned blade clears target head")
+				var hilt: Vector2 = stage.get_global_transform().affine_inverse()*forming[0].to_global(Vector2(float(forming[0].texture.get_width())*0.5,0))
+				check(hilt.y > 4.0,"full blade hilt remains inside the clipped combat stage")
+			check(shot_checks.impact == shot_checks.flight,"formation reveals no early contact")
+			await get_tree().create_timer(0.09).timeout
+			check(stage.phase == "sword_form" and shot_checks.impact == shot_checks.flight,"sword visibly hangs before accelerating down")
+			if capture: await screenshot("sword_form_%d" % shot_checks.form)
 		if phase == "impact" and stage.active_attacker != null and stage.active_attacker.kind in ["noss","noss_phase2"]:
 			var impacts := get_tree().get_nodes_in_group("noss_sword_impact")
 			check(impacts.size() == 1,"one bounded gold impact burst at each sword contact")
 			var tails := get_tree().get_nodes_in_group("noss_sword_trail")
 			if tails.size() == 1:
 				flight_seconds.append(tails[0].elapsed)
-				check(tails[0].elapsed >= 0.13 and tails[0].elapsed <= 0.23,"sword reaches target in accelerated flight window")
+				check(tails[0].elapsed >= (0.19 if overhead else 0.13) and tails[0].elapsed <= (0.30 if overhead else 0.23),"sword reaches target in its flight window")
 			check(impacts.size() == 1 and impacts[0].sparkles.size() >= 9,"contact emits its own sparkle burst")
+			if impacts.size() == 1:
+				check(impacts[0].shatter == overhead,"shattering impact is exclusive to phase2 swords")
+				check(impacts[0].fragments.size() == (14 if overhead else 0),"phase2 contact explodes into 14 large light shards")
+				if overhead:
+					check(impacts[0].duration <= 0.55 and impacts[0].fragments[0].length >= 18.0 and impacts[0].fragments[0].length <= 36.0 and impacts[0].fragments[0].width <= 5.4,"moderate shards have a bounded explosive lifetime")
+					var fastest := 0.0
+					for fragment in impacts[0].fragments:
+						fastest = maxf(fastest,fragment.velocity.length()/impacts[0].visual_scale)
+					check(fastest > 500.0,"light shards scatter with strong outward velocity")
+				var target: Vector2 = stage.world.to_local(stage.player.to_global(stage.player.target_bounds.get_center()))
+				check(impacts[0].position.distance_to(target) < 1.0,"explosion originates at target contact")
 			shot_checks.impact += 1
 			if capture:
 				var impact_number: int = shot_checks.impact
 				await get_tree().create_timer(0.045).timeout
 				await screenshot("sword_impact_%d" % impact_number)
+				if overhead:
+					await get_tree().create_timer(0.09).timeout
+					await screenshot("sword_shards_%d" % impact_number)
 		if phase != "projectile_flight": return
 		var swords := get_tree().get_nodes_in_group("noss_light_sword")
 		var muzzle := get_tree().get_nodes_in_group("noss_sword_muzzle")
 		var trails := get_tree().get_nodes_in_group("noss_sword_trail")
 		check(swords.size() == 1,"exactly one independently animated light sword")
-		check(muzzle.size() == 1 and muzzle[0].duration <= 0.30,"visible bounded palm emission at launch")
+		check(muzzle.is_empty() if overhead else (muzzle.size() == 1 and muzzle[0].duration <= 0.30),"phase2 summons overhead; phase1 emits at palm")
 		check(trails.size() == 1 and trails[0].projectile == swords[0],"one sampled trail follows this sword only")
-		check(muzzle.size() == 1 and muzzle[0].sparkles.size() >= 6,"palm flash emits sparkling particles")
+		if not overhead: check(muzzle.size() == 1 and muzzle[0].sparkles.size() >= 6,"palm flash emits sparkling particles")
 		if swords.size() == 1:
-			var axis: Vector2 = (stage.player.position-stage.active_attacker.position).normalized()
+			var axis: Vector2 = Vector2.DOWN if overhead else (stage.player.position-stage.active_attacker.position).normalized()
 			var tip_direction := Vector2.LEFT.rotated(swords[0].rotation)
 			check(tip_direction.dot(axis) > 0.90,"left-facing sword flies tip first")
 			check(swords[0].texture.resource_path.ends_with("noss_vfx_projectile.png"),"selected pure light sword texture")
@@ -100,15 +131,26 @@ func _ready() -> void:
 		if is_instance_valid(trails[0]) and trails[0].samples.size() >= 3:
 			check(trails[0].samples[0].distance_to(trails[0].samples[-1]) > 5,"trajectory has measurable travel, not a fixed palm line")
 			check(trails[0].sparkles.size() >= 6 and trails[0].sparkles.size() <= 64,"fast flight leaves a bounded field of sparkling particles")
+			if overhead:
+				var travel: Vector2 = trails[0].samples[-1]-trails[0].samples[0]
+				check(travel.length() > 5.0 and travel.normalized().dot(Vector2.DOWN) > 0.999,"phase2 sword falls vertically toward target")
 			var particle: Dictionary = trails[0].sparkles[-1].duplicate()
-			var brightness: float = trails[0].sparkle_brightness(particle,trails[0].elapsed)
 			var oldest: Vector2 = trails[0].sparkles[0].point
 			var newest: Vector2 = trails[0].sparkles[-1].point
-			check(oldest.distance_to(newest) > 30,"sparkles spread along actual flight instead of remaining at the palm")
+			check(oldest.distance_to(newest) > (15.0 if overhead else 30.0),"sparkles spread along actual flight including accelerating drop")
 			if capture:
 				await screenshot("sword_flight_%d" % flight_number)
-			await get_tree().create_timer(0.035).timeout
-			check(is_instance_valid(trails[0]) and absf(trails[0].sparkle_brightness(particle,trails[0].elapsed)-brightness) > 0.015,"particle brightness visibly changes across playback frames")
+			# Sample several adjacent frames; one endpoint pair can land at
+			# equal brightness in a periodic twinkle, especially during GPU capture.
+			var low: float = trails[0].sparkle_brightness(particle,trails[0].elapsed)
+			var high := low
+			for frame in 3:
+				await get_tree().create_timer(0.018).timeout
+				if is_instance_valid(trails[0]):
+					var value: float = trails[0].sparkle_brightness(particle,trails[0].elapsed)
+					low = minf(low,value)
+					high = maxf(high,value)
+			check(is_instance_valid(trails[0]) and high-low > 0.015,"particle brightness visibly changes across playback frames")
 			if capture:
 				await screenshot("sword_sparkles_%d" % flight_number))
 	await stage.attack(stage.enemies[2],stage.player,"shoot",[{"damage":7,"blocked":0,"killed":false}],func(_hit,_index):
@@ -137,6 +179,7 @@ func _ready() -> void:
 	var phase_two_hits := {"count":0}
 	await stage.attack(stage.enemies[0],stage.player,"shoot",[{"damage":8,"blocked":2,"killed":false},{"damage":8,"blocked":0,"killed":false}],func(_hit,_index): phase_two_hits.count += 1)
 	check(phase_two_hits.count == 2 and shot_checks.flight == 3 and shot_checks.impact == 3,"phase2 multi-hit launches two swords and callbacks once per model hit")
+	check(shot_checks.form == 2,"every phase2 hit forms its own overhead blade")
 	check(get_tree().get_nodes_in_group("noss_light_sword").is_empty(),"projectiles clean up after playback")
 	await get_tree().create_timer(0.35).timeout
 	check(get_tree().get_nodes_in_group("noss_sword_vfx").is_empty(),"muzzle, trail and impact all clean up within bounded lifetimes")

@@ -227,7 +227,14 @@ func test_save() -> void:
 	reset_authored()
 	check(Game.eligible_events().size() == 7 and Game.state.refreshedEventIds.size() == 3, "new adventure has seven ungated candidates and three refreshed events")
 	for event in Game.events.values():
-		check(not event.has("optional") and (Game.event_refresh_time_label(event) == "第7天" if event.id == "E16" else event.get("refreshTimeRange") == {"startDay":null,"endDay":null}), "authored event uses its declared window and no category " + event.id)
+		var valid_window: bool = event.get("refreshTimeRange") == {"startDay":null,"endDay":null}
+		if event.id in ["E16", "E23"]:
+			var expected_week := 2 if event.id == "E23" else 1
+			var expected_label := "第2周 · 第7天" if expected_week == 2 else "第7天"
+			var day_window: Dictionary = event.get("refreshTimeRange", {})
+			var week_window: Dictionary = event.get("refreshWeekRange", {})
+			valid_window = day_window.get("startDay") == 7 and day_window.get("endDay") == 7 and week_window.get("startWeek") == expected_week and week_window.get("endWeek") == expected_week and Game.event_refresh_time_label(event) == expected_label
+		check(not event.has("optional") and valid_window, "authored event uses its declared window and no category " + event.id)
 	Game.state.currentDay = 7
 	Game.state.completedEventIds = ["E01", "E02"]
 	Game.state.targetId = "richard"

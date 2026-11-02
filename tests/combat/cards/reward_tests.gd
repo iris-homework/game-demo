@@ -13,6 +13,12 @@ func start_battle(id: String) -> void:
 	Game.state.targetId = "richard"
 	Game.state.activeEventId = Game.battles[id].eventId
 	Game.state.currentPlaceId = Game.battles[id].placeId
+	var event: Dictionary = Game.events[Game.state.activeEventId]
+	var start_week = event.get("refreshWeekRange", {}).get("startWeek")
+	var start_day = event.get("refreshTimeRange", {}).get("startDay")
+	if start_week != null: Game.state.currentWeek = int(start_week)
+	if start_day != null: Game.state.currentDay = int(start_day)
+	check(Game.event_in_refresh_range(event), id + " reward fixture uses its authored week and date")
 	Game.enter_node("battle")
 
 func finish_dialogue() -> void:
@@ -35,17 +41,18 @@ func _ready() -> void:
 	Game.meta_path = "res://artifacts/qa/reward-2026-10-09/test_meta.json"
 	for id in Game.battles:
 		start_battle(id)
-		if id == "B16":
+		var two_phase_boss: bool = Game.battles[id].get("encounterId", "") in ["dancer_duet", "noss_sovereign"]
+		if two_phase_boss:
 			# Formal Boss victories require a valid defeated second-phase snapshot.
 			var boss := CombatModel.new()
 			boss.restore(Game.state.combat)
-			boss.enemy_damage(0, 999)
-			boss.resolve_outcome()
-			check(boss.advance_encounter_phase(), "Boss reward fixture reaches real second phase")
 			for index in boss.enemies.size(): boss.enemy_damage(index, 999)
 			boss.resolve_outcome()
-			check(boss.encounter_phase == 2 and boss.outcome == "win" and Game.valid_combat(boss.snapshot()), "Boss reward fixture defeats both second-phase dancers")
-			check(Game.commit_combat(boss), "Boss reward fixture commits actual victory")
+			check(boss.advance_encounter_phase() and boss.encounter_phase == 2 and boss.outcome.is_empty(), id + " reward fixture reaches its real living second phase")
+			for index in boss.enemies.size(): boss.enemy_damage(index, 999)
+			boss.resolve_outcome()
+			check(boss.encounter_phase == 2 and boss.outcome == "win" and Game.valid_combat(boss.snapshot()), id + " reward fixture defeats its entire second phase")
+			check(Game.commit_combat(boss), id + " reward fixture commits actual victory")
 		var rev := Game.revision
 		check(Game.battle_exit("win",rev),id + " accepts victory")
 		check(not Game.battle_exit("win",rev),"Duplicate result rejected")
@@ -70,9 +77,11 @@ func _ready() -> void:
 		check(not Game.choose_reward_card(options[0],rev) and not Game.choose_reward_card(options[2],Game.revision),"Duplicate and second choice rejected")
 		check(Game.state.deck == [options[1]] and Game.state.credits == int(Game.config.initialCredits) + credit_amount,"One card added with no repeated credits")
 		check(roundtrip() and Game.state.battleReward.status == "claimed" and Game.state.deck == [options[1]],"Claimed reward persists")
-		if id == "B16":
+		if two_phase_boss:
+			var expected_week := 2 if id == "B23" else 1
+			check(Game.state.currentWeek == expected_week and Game.state.currentDay == 7, id + " Boss reward retains the authored week and seventh day")
 			check(Game.page == "result" and not Game.is_week_complete() and Game.can_continue(), "New Boss receipt remains in rewards until explicit exit after reload")
-			check(Game.claim_rewards(Game.revision) and Game.is_week_complete(), "Explicit Boss reward exit completes first week")
+			check(Game.claim_rewards(Game.revision) and Game.is_week_complete() and Game.state.flags.get("week2Complete" if expected_week == 2 else "week1Complete", false), id + " explicit Boss reward exit completes the correct week")
 			check(not Game.claim_rewards(Game.revision), "Completed Boss reward cannot exit a second time")
 			check(not Game.choose_reward_card(options[0],Game.revision), "No claiming from week completion")
 		else:

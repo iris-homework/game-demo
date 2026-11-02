@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "revision": "c9cadb1c692ed2af",
+  "revision": "dd371685d43b07b9",
   "profiles": {
     "warden_shield": {
       "id": "warden_shield",
@@ -1633,7 +1633,7 @@
             779.5,
             893
           ],
-          "scale": 0.04398
+          "scale": 0.08796
         },
         "move": {
           "texture": "res://enemy_asset_pipeline/published/assets/527bae6a3c5d697e901d753d16f542910ef29d2737e25a68f2b34adf7dee721d.png",
@@ -1641,7 +1641,7 @@
             780,
             891
           ],
-          "scale": 0.04428
+          "scale": 0.08856
         },
         "pierce": {
           "texture": "res://enemy_asset_pipeline/published/assets/7454502bb94a8f316eff43059c7fdedaf62c973a8eea2c14ef8aa5b9b8c65982.png",
@@ -1649,7 +1649,7 @@
             780.5,
             968
           ],
-          "scale": 0.04398
+          "scale": 0.08796
         },
         "damaged": {
           "texture": "res://enemy_asset_pipeline/published/assets/30d95751462bf638b1dfb1c94471302880f69be025eabe6e4509d62dfda9229a.png",
@@ -1657,7 +1657,7 @@
             798,
             937
           ],
-          "scale": 0.04416
+          "scale": 0.08832
         },
         "bite": {
           "texture": "res://enemy_asset_pipeline/published/assets/7454502bb94a8f316eff43059c7fdedaf62c973a8eea2c14ef8aa5b9b8c65982.png",
@@ -1665,7 +1665,7 @@
             780.5,
             968
           ],
-          "scale": 0.04218
+          "scale": 0.08436
         },
         "bite_close": {
           "texture": "res://enemy_asset_pipeline/published/assets/a2141191d9f9e92287a379038b6174bda2fdc9407cdb025c23dbe90859c42a11.png",
@@ -1673,7 +1673,7 @@
             781,
             920
           ],
-          "scale": 0.045513000000000005
+          "scale": 0.09102600000000001
         }
       },
       "attackStyleOverride": "bite",
@@ -1687,12 +1687,12 @@
           {
             "texture": "res://enemy_asset_pipeline/published/assets/12ce150391e9afa6197332a1983dfbe5c1494c0f9a6800189815e0fe13059f63.png",
             "transform": [
-              0.04398,
+              0.08796,
               0,
               0,
-              0.04398,
-              -34.28241,
-              -32.67414
+              0.08796,
+              -68.56482,
+              -65.34828
             ],
             "duration": 0.125,
             "loop": true,
@@ -1700,7 +1700,7 @@
               779.5,
               893
             ],
-            "scale": 0.04398,
+            "scale": 0.08796,
             "audio": [],
             "attachments": [],
             "xsxb": {
@@ -1779,12 +1779,12 @@
           {
             "texture": "res://enemy_asset_pipeline/published/assets/527bae6a3c5d697e901d753d16f542910ef29d2737e25a68f2b34adf7dee721d.png",
             "transform": [
-              0.04428,
+              0.08856,
               0,
               0,
-              0.04428,
-              -34.5384,
-              -30.45348
+              0.08856,
+              -69.0768,
+              -60.90696
             ],
             "duration": 0.125,
             "loop": true,
@@ -1792,7 +1792,7 @@
               780,
               891
             ],
-            "scale": 0.04428,
+            "scale": 0.08856,
             "audio": [],
             "attachments": [],
             "xsxb": {
@@ -1871,12 +1871,12 @@
           {
             "texture": "res://enemy_asset_pipeline/published/assets/7454502bb94a8f316eff43059c7fdedaf62c973a8eea2c14ef8aa5b9b8c65982.png",
             "transform": [
-              0.04398,
+              0.08796,
               0,
               0,
-              0.04398,
-              -34.32639,
-              -35.97264
+              0.08796,
+              -68.65278,
+              -71.94528
             ],
             "duration": 0.125,
             "loop": false,
@@ -1884,7 +1884,7 @@
               780.5,
               968
             ],
-            "scale": 0.04398,
+            "scale": 0.08796,
             "audio": [],
             "attachments": [],
             "xsxb": {
@@ -1963,12 +1963,12 @@
           {
             "texture": "res://enemy_asset_pipeline/published/assets/30d95751462bf638b1dfb1c94471302880f69be025eabe6e4509d62dfda9229a.png",
             "transform": [
-              0.03824368183112081,
-              0.022079999999999995,
-              -0.022079999999999995,
-              0.03824368183112081,
-              -19.390987646300786,
-              -55.306205097533855
+              0.07648736366224163,
+              0.04415999999999999,
+              -0.04415999999999999,
+              0.07648736366224163,
+              -38.78197529260157,
+              -110.61241019506771
             ],
             "duration": 0.125,
             "loop": false,
@@ -1976,7 +1976,7 @@
               798,
               937
             ],
-            "scale": 0.04416,
+            "scale": 0.08832,
             "audio": [],
             "attachments": [],
             "xsxb": {
@@ -2055,12 +2055,12 @@
           {
             "texture": "res://enemy_asset_pipeline/published/assets/7454502bb94a8f316eff43059c7fdedaf62c973a8eea2c14ef8aa5b9b8c65982.png",
             "transform": [
-              0.04218,
+              0.08436,
               0,
               0,
-              0.04218,
-              -32.921490000000006,
-              -35.430240000000005
+              0.08436,
+              -65.84298000000001,
+              -70.86048000000001
             ],
             "duration": 0.125,
             "loop": false,
@@ -2068,7 +2068,7 @@
               780.5,
               968
             ],
-            "scale": 0.04218,
+            "scale": 0.08436,
             "audio": [],
             "attachments": [],
             "xsxb": {
@@ -2147,12 +2147,12 @@
           {
             "texture": "res://enemy_asset_pipeline/published/assets/a2141191d9f9e92287a379038b6174bda2fdc9407cdb025c23dbe90859c42a11.png",
             "transform": [
-              0.045513000000000005,
+              0.09102600000000001,
               0,
               0,
-              0.045513000000000005,
-              -35.54565300000001,
-              -41.87196
+              0.09102600000000001,
+              -71.09130600000002,
+              -83.74392
             ],
             "duration": 0.125,
             "loop": false,
@@ -2160,7 +2160,7 @@
               781,
               920
             ],
-            "scale": 0.045513000000000005,
+            "scale": 0.09102600000000001,
             "audio": [],
             "attachments": [],
             "xsxb": {
@@ -2272,10 +2272,10 @@
             "y": 0
           },
           "scale": {
-            "x": 0.6,
-            "y": 0.6
+            "x": 1.2,
+            "y": 1.2
           },
-          "uniformScale": 0.6,
+          "uniformScale": 1.2,
           "rotation": 0
         },
         "animations": [

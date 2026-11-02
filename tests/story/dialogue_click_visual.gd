@@ -48,7 +48,14 @@ func _ready() -> void:
 	add_child(app)
 	Game.new_game()
 	await capture("opening")
-	check(app.view.find_children("*", "Button", true, false).size() == 3, "Opening has menu, history and skip buttons")
+	var opening_buttons: Array[Node] = app.view.find_children("*", "Button", true, false)
+	check(opening_buttons.size() == 4, "Opening has four HUD buttons")
+	var opening_labels: Array[String] = []
+	for item in opening_buttons: opening_labels.append(item.text)
+	var expected_labels: Array[String] = ["对话记录", "牌库", "跳过剧情", "菜单"]
+	opening_labels.sort()
+	expected_labels.sort()
+	check(opening_labels == expected_labels, "Opening keeps history, deck, skip and menu actions")
 	var footer_absent := true
 	for item in app.view.find_children("*", "Label", true, false):
 		if item.position.y >= 850: footer_absent = false

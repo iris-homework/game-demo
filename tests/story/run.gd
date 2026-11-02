@@ -44,7 +44,7 @@ func _ready() -> void:
 	Game.meta_path = "user://automated_test_meta.json"
 	# Validate authored references, including legacy saved result nodes.
 	check(Game.places.size() == 17, "17 places including church")
-	check(Game.events.size() == 15 and Game.events.has("E01R") and Game.events.has("E16") and Game.events.has("E22"), "first-week catalog and six second-week commissions")
+	check(Game.events.size() == 16 and Game.events.has("E01R") and Game.events.has("E16") and Game.events.has("E22") and Game.events.has("E23"), "first-week catalog, six second-week commissions and E23 Boss")
 	for e in Game.events.values():
 		check(not Game.place_data(e.placeId).is_empty(), e.id + " place exists")
 		for n in e.nodes.values():
@@ -93,7 +93,14 @@ func _ready() -> void:
 			Game.state.targetId = "richard"
 			Game.state.activeEventId = b.eventId
 			Game.state.currentPlaceId = Game.events[b.eventId].placeId
+			var event: Dictionary = Game.events[b.eventId]
+			var start_week = event.get("refreshWeekRange", {}).get("startWeek")
+			var start_day = event.get("refreshTimeRange", {}).get("startDay")
+			if start_week != null: Game.state.currentWeek = int(start_week)
+			if start_day != null: Game.state.currentDay = int(start_day)
+			check(Game.event_in_refresh_range(event), b.id + " fixture uses its authored week and date")
 			Game.enter_node("battle")
+			var battle_flags: Dictionary = Game.state.flags.duplicate(true)
 			check(Game.save_game(), "Save battle")
 			Game.state = {}
 			check(Game.load_game(), "Restore battle")
@@ -101,22 +108,28 @@ func _ready() -> void:
 			var battle_rev := Game.revision
 			check(not Game.battle_exit("surrender", battle_rev), "Surrender rejected " + b.id)
 			check(Game.state == before_rejected and Game.revision == battle_rev and Game.page == "battle", "Rejected surrender preserves battle")
-			if b.id == "B16" and result == "win":
+			if b.get("encounterId", "") in ["dancer_duet", "noss_sovereign"] and result == "win":
+				var before_premature := Game.state.duplicate(true)
+				check(not Game.battle_exit("win", battle_rev) and Game.state == before_premature and Game.revision == battle_rev, b.id + " cannot claim victory before phase two")
 				var boss := CombatModel.new()
 				boss.restore(Game.state.combat)
-				boss.enemy_damage(0, 999)
-				boss.resolve_outcome()
-				boss.advance_encounter_phase()
 				for i in boss.enemies.size(): boss.enemy_damage(i, 999)
 				boss.resolve_outcome()
-				Game.commit_combat(boss)
+				check(boss.advance_encounter_phase() and boss.encounter_phase == 2 and boss.outcome.is_empty(), b.id + " advances through its real phase boundary")
+				check(Game.valid_combat(boss.snapshot()) and Game.commit_combat(boss), b.id + " live second phase validates and commits")
+				var second_phase := Game.state.duplicate(true)
+				var second_revision := Game.revision
+				check(not Game.battle_exit("win", second_revision) and Game.state == second_phase and Game.revision == second_revision, b.id + " cannot claim victory while phase two lives")
+				for i in boss.enemies.size(): boss.enemy_damage(i, 999)
+				boss.resolve_outcome()
+				check(boss.outcome == "win" and Game.valid_combat(boss.snapshot()) and Game.commit_combat(boss), b.id + " real second-phase victory validates and commits")
 				battle_rev = Game.revision
 			check(Game.battle_exit(result,battle_rev), b.id + " " + result)
 			check(not Game.battle_exit(result,battle_rev), "Duplicate battle result rejected")
 			check(Game.state.activeNodeId == b.returnNodeByResult.win if result == "win" else Game.page == "defeat" and Game.state.currentScene == "defeat", "Exact victory node or terminal defeat page")
 			if result != "win":
 				check(Game.state.completedEventIds.is_empty(), "Failure not completed")
-				check(Game.state.flags.is_empty(), "Failure grants no clues")
+				check(Game.state.flags == battle_flags, "Failure preserves appearance flags and grants no new flags or clues")
 				check(Game.is_run_over() and not Game.can_continue(), "Failure ends the adventure")
 				var failed := Game.state.duplicate(true)
 				Game.go_map()
