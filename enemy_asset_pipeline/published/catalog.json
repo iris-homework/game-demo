@@ -8488,6 +8488,807 @@
           "impactTexture": ""
         }
       }
+    },
+    "scavenger_hooker": {
+      "id": "scavenger_hooker",
+      "label": "拾荒钩客",
+      "sourceFacing": "left",
+      "targetRect": [
+        -65,
+        -145,
+        130,
+        155
+      ],
+      "poses": {
+        "idle": {
+          "texture": "res://enemy_asset_pipeline/published/assets/67562e7d7081f2443db1e2f2a830aabfffc96c29986b4fa9af19a658771220c2.png",
+          "anchor": [
+            770,
+            1100
+          ],
+          "scale": 0.123984
+        },
+        "move": {
+          "texture": "res://enemy_asset_pipeline/published/assets/04dfd4c0146832453d75bde64e0575fc5515a1bfc825fb3c0993c12710f37839.png",
+          "anchor": [
+            900,
+            1090
+          ],
+          "scale": 0.12457144799999999
+        },
+        "pierce": {
+          "texture": "res://enemy_asset_pipeline/published/assets/5ebaafbc8652cc89c5068011a1e9d1e712e9b205142feeacf7c7a41e82b3cc5b.png",
+          "anchor": [
+            900,
+            1090
+          ],
+          "scale": 0.123286344
+        },
+        "damaged": {
+          "texture": "res://enemy_asset_pipeline/published/assets/457185b630929648cd9218a8a2fe6bab44a2c23ac1f34e45f1555f9c4f62f30a.png",
+          "anchor": [
+            680.5,
+            1105
+          ],
+          "scale": 0.12960264
+        }
+      },
+      "hitEffectTexture": "res://enemy_asset_pipeline/published/assets/96b1297b19f150eb9052311c33b36f6d6c3a171428e2e04a801afd68c4fe0ecd.png",
+      "pipelineFrames": {
+        "idle": [
+          {
+            "texture": "res://enemy_asset_pipeline/published/assets/67562e7d7081f2443db1e2f2a830aabfffc96c29986b4fa9af19a658771220c2.png",
+            "transform": [
+              0.123984,
+              0,
+              0,
+              0.123984,
+              -95.46768,
+              -136.3824
+            ],
+            "duration": 0.125,
+            "loop": true,
+            "anchor": [
+              770,
+              1100
+            ],
+            "scale": 0.123984,
+            "audio": [],
+            "attachments": [],
+            "xsxb": {
+              "index": 0,
+              "id": "frame_0001",
+              "name": "scavenger_hooker_idle.png",
+              "assetPath": "res://enemy_asset_pipeline/published/assets/67562e7d7081f2443db1e2f2a830aabfffc96c29986b4fa9af19a658771220c2.png",
+              "sourceAssetPath": "res://enemy_asset_pipeline/published/assets/67562e7d7081f2443db1e2f2a830aabfffc96c29986b4fa9af19a658771220c2.png",
+              "bakedComposite": false,
+              "bakedOffset": null,
+              "bakedMainAnchor": null,
+              "bakedPixelScale": 1,
+              "width": 1346,
+              "height": 1168,
+              "durationMs": 125,
+              "disabled": false,
+              "transform": {
+                "position": {
+                  "x": 0,
+                  "y": 0
+                },
+                "scale": {
+                  "x": 0.126,
+                  "y": 0.126
+                },
+                "uniformScale": 0.126,
+                "rotation": 0
+              },
+              "boxes": [
+                {
+                  "kind": "hurtbox",
+                  "enabled": false,
+                  "position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "size": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "rotation": 0
+                },
+                {
+                  "kind": "hitbox",
+                  "enabled": false,
+                  "position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "size": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "rotation": 0
+                },
+                {
+                  "kind": "collisionbox",
+                  "enabled": true,
+                  "position": {
+                    "x": 19,
+                    "y": -486.5
+                  },
+                  "size": {
+                    "x": 365,
+                    "y": 973
+                  },
+                  "rotation": 0
+                }
+              ],
+              "audio": [],
+              "attachments": []
+            }
+          }
+        ],
+        "move": [
+          {
+            "texture": "res://enemy_asset_pipeline/published/assets/04dfd4c0146832453d75bde64e0575fc5515a1bfc825fb3c0993c12710f37839.png",
+            "transform": [
+              0.12457144799999999,
+              0,
+              0,
+              0.12457144799999999,
+              -112.11430319999998,
+              -135.78287831999998
+            ],
+            "duration": 0.125,
+            "loop": true,
+            "anchor": [
+              900,
+              1090
+            ],
+            "scale": 0.12457144799999999,
+            "audio": [],
+            "attachments": [],
+            "xsxb": {
+              "index": 0,
+              "id": "frame_0001",
+              "name": "scavenger_hooker_move.png",
+              "assetPath": "res://enemy_asset_pipeline/published/assets/04dfd4c0146832453d75bde64e0575fc5515a1bfc825fb3c0993c12710f37839.png",
+              "sourceAssetPath": "res://enemy_asset_pipeline/published/assets/04dfd4c0146832453d75bde64e0575fc5515a1bfc825fb3c0993c12710f37839.png",
+              "bakedComposite": false,
+              "bakedOffset": null,
+              "bakedMainAnchor": null,
+              "bakedPixelScale": 1,
+              "width": 1346,
+              "height": 1168,
+              "durationMs": 125,
+              "disabled": false,
+              "transform": {
+                "position": {
+                  "x": 0,
+                  "y": 0
+                },
+                "scale": {
+                  "x": 0.126597,
+                  "y": 0.126597
+                },
+                "uniformScale": 0.126597,
+                "rotation": 0
+              },
+              "boxes": [
+                {
+                  "kind": "hurtbox",
+                  "enabled": false,
+                  "position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "size": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "rotation": 0
+                },
+                {
+                  "kind": "hitbox",
+                  "enabled": false,
+                  "position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "size": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "rotation": 0
+                },
+                {
+                  "kind": "collisionbox",
+                  "enabled": true,
+                  "position": {
+                    "x": -25.5,
+                    "y": -483
+                  },
+                  "size": {
+                    "x": 495,
+                    "y": 966
+                  },
+                  "rotation": 0
+                }
+              ],
+              "audio": [],
+              "attachments": []
+            }
+          }
+        ],
+        "pierce": [
+          {
+            "texture": "res://enemy_asset_pipeline/published/assets/5ebaafbc8652cc89c5068011a1e9d1e712e9b205142feeacf7c7a41e82b3cc5b.png",
+            "transform": [
+              0.123286344,
+              0,
+              0,
+              0.123286344,
+              -110.9577096,
+              -134.38211496
+            ],
+            "duration": 0.125,
+            "loop": false,
+            "anchor": [
+              900,
+              1090
+            ],
+            "scale": 0.123286344,
+            "audio": [],
+            "attachments": [],
+            "xsxb": {
+              "index": 0,
+              "id": "frame_0001",
+              "name": "scavenger_hooker_attack.png",
+              "assetPath": "res://enemy_asset_pipeline/published/assets/5ebaafbc8652cc89c5068011a1e9d1e712e9b205142feeacf7c7a41e82b3cc5b.png",
+              "sourceAssetPath": "res://enemy_asset_pipeline/published/assets/5ebaafbc8652cc89c5068011a1e9d1e712e9b205142feeacf7c7a41e82b3cc5b.png",
+              "bakedComposite": false,
+              "bakedOffset": null,
+              "bakedMainAnchor": null,
+              "bakedPixelScale": 1,
+              "width": 1346,
+              "height": 1168,
+              "durationMs": 125,
+              "disabled": false,
+              "transform": {
+                "position": {
+                  "x": 0,
+                  "y": 0
+                },
+                "scale": {
+                  "x": 0.125291,
+                  "y": 0.125291
+                },
+                "uniformScale": 0.125291,
+                "rotation": 0
+              },
+              "boxes": [
+                {
+                  "kind": "hurtbox",
+                  "enabled": false,
+                  "position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "size": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "rotation": 0
+                },
+                {
+                  "kind": "hitbox",
+                  "enabled": false,
+                  "position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "size": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "rotation": 0
+                },
+                {
+                  "kind": "collisionbox",
+                  "enabled": true,
+                  "position": {
+                    "x": 10.5,
+                    "y": -486
+                  },
+                  "size": {
+                    "x": 552,
+                    "y": 972
+                  },
+                  "rotation": 0
+                }
+              ],
+              "audio": [],
+              "attachments": []
+            }
+          }
+        ],
+        "damaged": [
+          {
+            "texture": "res://enemy_asset_pipeline/published/assets/457185b630929648cd9218a8a2fe6bab44a2c23ac1f34e45f1555f9c4f62f30a.png",
+            "transform": [
+              0.12960264,
+              0,
+              0,
+              0.12960264,
+              -88.19459651999999,
+              -143.21091719999998
+            ],
+            "duration": 0.125,
+            "loop": false,
+            "anchor": [
+              680.5,
+              1105
+            ],
+            "scale": 0.12960264,
+            "audio": [],
+            "attachments": [],
+            "xsxb": {
+              "index": 0,
+              "id": "frame_0001",
+              "name": "scavenger_hooker_damaged.png",
+              "assetPath": "res://enemy_asset_pipeline/published/assets/457185b630929648cd9218a8a2fe6bab44a2c23ac1f34e45f1555f9c4f62f30a.png",
+              "sourceAssetPath": "res://enemy_asset_pipeline/published/assets/457185b630929648cd9218a8a2fe6bab44a2c23ac1f34e45f1555f9c4f62f30a.png",
+              "bakedComposite": false,
+              "bakedOffset": null,
+              "bakedMainAnchor": null,
+              "bakedPixelScale": 1,
+              "width": 1346,
+              "height": 1168,
+              "durationMs": 125,
+              "disabled": false,
+              "transform": {
+                "position": {
+                  "x": 0,
+                  "y": 0
+                },
+                "scale": {
+                  "x": 0.13171,
+                  "y": 0.13171
+                },
+                "uniformScale": 0.13171,
+                "rotation": 0
+              },
+              "boxes": [
+                {
+                  "kind": "hurtbox",
+                  "enabled": false,
+                  "position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "size": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "rotation": 0
+                },
+                {
+                  "kind": "hitbox",
+                  "enabled": false,
+                  "position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "size": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "rotation": 0
+                },
+                {
+                  "kind": "collisionbox",
+                  "enabled": true,
+                  "position": {
+                    "x": 9.5,
+                    "y": -473.5
+                  },
+                  "size": {
+                    "x": 550,
+                    "y": 947
+                  },
+                  "rotation": 0
+                }
+              ],
+              "audio": [],
+              "attachments": []
+            }
+          }
+        ]
+      },
+      "pipelineShadow": {
+        "enabled": true,
+        "size": [
+          32,
+          9
+        ],
+        "offset": [
+          0,
+          2
+        ],
+        "opacity": 0.7
+      },
+      "pipelineMotion": {
+        "speed": 2300,
+        "reach": 86,
+        "windup": 0.045,
+        "recovery": 0.12
+      },
+      "pipelineEffects": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "pipelineXsxb": {
+        "id": "scavenger_hooker",
+        "label": "拾荒钩客",
+        "kind": "actor",
+        "sourceFacesLeft": false,
+        "characterTransform": {
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "scale": {
+            "x": 0.984,
+            "y": 0.984
+          },
+          "uniformScale": 0.984,
+          "rotation": 0
+        },
+        "animations": [
+          {
+            "id": "idle",
+            "name": "idle",
+            "type": "actor",
+            "anchorMode": "canvas_bottom_center",
+            "sourceAnchor": {
+              "x": 696,
+              "y": 1127
+            },
+            "fps": 8,
+            "durationMs": 125,
+            "frames": [
+              {
+                "index": 0,
+                "id": "frame_0001",
+                "name": "scavenger_hooker_idle.png",
+                "assetPath": "res://enemy_asset_pipeline/published/assets/67562e7d7081f2443db1e2f2a830aabfffc96c29986b4fa9af19a658771220c2.png",
+                "sourceAssetPath": "res://enemy_asset_pipeline/published/assets/67562e7d7081f2443db1e2f2a830aabfffc96c29986b4fa9af19a658771220c2.png",
+                "bakedComposite": false,
+                "bakedOffset": null,
+                "bakedMainAnchor": null,
+                "bakedPixelScale": 1,
+                "width": 1346,
+                "height": 1168,
+                "durationMs": 125,
+                "disabled": false,
+                "transform": {
+                  "position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "scale": {
+                    "x": 0.126,
+                    "y": 0.126
+                  },
+                  "uniformScale": 0.126,
+                  "rotation": 0
+                },
+                "boxes": [
+                  {
+                    "kind": "hurtbox",
+                    "enabled": false,
+                    "position": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "size": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "rotation": 0
+                  },
+                  {
+                    "kind": "hitbox",
+                    "enabled": false,
+                    "position": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "size": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "rotation": 0
+                  },
+                  {
+                    "kind": "collisionbox",
+                    "enabled": true,
+                    "position": {
+                      "x": 19,
+                      "y": -486.5
+                    },
+                    "size": {
+                      "x": 365,
+                      "y": 973
+                    },
+                    "rotation": 0
+                  }
+                ],
+                "audio": [],
+                "attachments": []
+              }
+            ],
+            "attackTrails": []
+          },
+          {
+            "id": "move",
+            "name": "move",
+            "type": "actor",
+            "anchorMode": "canvas_bottom_center",
+            "sourceAnchor": {
+              "x": 650.5,
+              "y": 1111
+            },
+            "fps": 8,
+            "durationMs": 125,
+            "frames": [
+              {
+                "index": 0,
+                "id": "frame_0001",
+                "name": "scavenger_hooker_move.png",
+                "assetPath": "res://enemy_asset_pipeline/published/assets/04dfd4c0146832453d75bde64e0575fc5515a1bfc825fb3c0993c12710f37839.png",
+                "sourceAssetPath": "res://enemy_asset_pipeline/published/assets/04dfd4c0146832453d75bde64e0575fc5515a1bfc825fb3c0993c12710f37839.png",
+                "bakedComposite": false,
+                "bakedOffset": null,
+                "bakedMainAnchor": null,
+                "bakedPixelScale": 1,
+                "width": 1346,
+                "height": 1168,
+                "durationMs": 125,
+                "disabled": false,
+                "transform": {
+                  "position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "scale": {
+                    "x": 0.126597,
+                    "y": 0.126597
+                  },
+                  "uniformScale": 0.126597,
+                  "rotation": 0
+                },
+                "boxes": [
+                  {
+                    "kind": "hurtbox",
+                    "enabled": false,
+                    "position": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "size": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "rotation": 0
+                  },
+                  {
+                    "kind": "hitbox",
+                    "enabled": false,
+                    "position": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "size": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "rotation": 0
+                  },
+                  {
+                    "kind": "collisionbox",
+                    "enabled": true,
+                    "position": {
+                      "x": -25.5,
+                      "y": -483
+                    },
+                    "size": {
+                      "x": 495,
+                      "y": 966
+                    },
+                    "rotation": 0
+                  }
+                ],
+                "audio": [],
+                "attachments": []
+              }
+            ],
+            "attackTrails": []
+          },
+          {
+            "id": "pierce",
+            "name": "攻击",
+            "type": "actor",
+            "anchorMode": "canvas_bottom_center",
+            "sourceAnchor": {
+              "x": 674.5,
+              "y": 1114
+            },
+            "fps": 8,
+            "durationMs": 125,
+            "frames": [
+              {
+                "index": 0,
+                "id": "frame_0001",
+                "name": "scavenger_hooker_attack.png",
+                "assetPath": "res://enemy_asset_pipeline/published/assets/5ebaafbc8652cc89c5068011a1e9d1e712e9b205142feeacf7c7a41e82b3cc5b.png",
+                "sourceAssetPath": "res://enemy_asset_pipeline/published/assets/5ebaafbc8652cc89c5068011a1e9d1e712e9b205142feeacf7c7a41e82b3cc5b.png",
+                "bakedComposite": false,
+                "bakedOffset": null,
+                "bakedMainAnchor": null,
+                "bakedPixelScale": 1,
+                "width": 1346,
+                "height": 1168,
+                "durationMs": 125,
+                "disabled": false,
+                "transform": {
+                  "position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "scale": {
+                    "x": 0.125291,
+                    "y": 0.125291
+                  },
+                  "uniformScale": 0.125291,
+                  "rotation": 0
+                },
+                "boxes": [
+                  {
+                    "kind": "hurtbox",
+                    "enabled": false,
+                    "position": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "size": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "rotation": 0
+                  },
+                  {
+                    "kind": "hitbox",
+                    "enabled": false,
+                    "position": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "size": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "rotation": 0
+                  },
+                  {
+                    "kind": "collisionbox",
+                    "enabled": true,
+                    "position": {
+                      "x": 10.5,
+                      "y": -486
+                    },
+                    "size": {
+                      "x": 552,
+                      "y": 972
+                    },
+                    "rotation": 0
+                  }
+                ],
+                "audio": [],
+                "attachments": []
+              }
+            ],
+            "attackTrails": []
+          },
+          {
+            "id": "damaged",
+            "name": "damaged",
+            "type": "actor",
+            "anchorMode": "canvas_bottom_center",
+            "sourceAnchor": {
+              "x": 680.5,
+              "y": 1105
+            },
+            "fps": 8,
+            "durationMs": 125,
+            "frames": [
+              {
+                "index": 0,
+                "id": "frame_0001",
+                "name": "scavenger_hooker_damaged.png",
+                "assetPath": "res://enemy_asset_pipeline/published/assets/457185b630929648cd9218a8a2fe6bab44a2c23ac1f34e45f1555f9c4f62f30a.png",
+                "sourceAssetPath": "res://enemy_asset_pipeline/published/assets/457185b630929648cd9218a8a2fe6bab44a2c23ac1f34e45f1555f9c4f62f30a.png",
+                "bakedComposite": false,
+                "bakedOffset": null,
+                "bakedMainAnchor": null,
+                "bakedPixelScale": 1,
+                "width": 1346,
+                "height": 1168,
+                "durationMs": 125,
+                "disabled": false,
+                "transform": {
+                  "position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "scale": {
+                    "x": 0.13171,
+                    "y": 0.13171
+                  },
+                  "uniformScale": 0.13171,
+                  "rotation": 0
+                },
+                "boxes": [
+                  {
+                    "kind": "hurtbox",
+                    "enabled": false,
+                    "position": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "size": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "rotation": 0
+                  },
+                  {
+                    "kind": "hitbox",
+                    "enabled": false,
+                    "position": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "size": {
+                      "x": 0,
+                      "y": 0
+                    },
+                    "rotation": 0
+                  },
+                  {
+                    "kind": "collisionbox",
+                    "enabled": true,
+                    "position": {
+                      "x": 9.5,
+                      "y": -473.5
+                    },
+                    "size": {
+                      "x": 550,
+                      "y": 947
+                    },
+                    "rotation": 0
+                  }
+                ],
+                "audio": [],
+                "attachments": []
+              }
+            ],
+            "attackTrails": []
+          }
+        ]
+      }
     }
   },
   "bindings": {}

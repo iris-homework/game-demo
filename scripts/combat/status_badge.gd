@@ -32,6 +32,15 @@ func _draw() -> void:
 		"energy_suit":
 			poly([Vector2(8,1),Vector2(1,6),Vector2(6,14),Vector2(6,27),Vector2(23,27),Vector2(23,14),Vector2(28,6),Vector2(21,1),Vector2(18,8),Vector2(11,8)],tint)
 			draw_polyline(PackedVector2Array([Vector2(16,11),Vector2(11,18),Vector2(18,18),Vector2(13,25)]),Color("245e6d"),2,true)
+		"alien_sin":
+			for index in 8:
+				var angle := float(index)*TAU/8.0
+				draw_line(Vector2(14,14)+Vector2.from_angle(angle)*11,Vector2(14,14)+Vector2.from_angle(angle)*15,tint,2,true)
+			draw_circle(Vector2(14,14),10,tint)
+			draw_circle(Vector2(14,14),7,Color("342b47"))
+			draw_line(Vector2(14,7),Vector2(14,21),tint,2,true)
+			draw_line(Vector2(10,11),Vector2(18,17),tint,2,true)
+			draw_line(Vector2(18,11),Vector2(10,17),tint,2,true)
 		"electric_charge":
 			poly([Vector2(17,1),Vector2(3,17),Vector2(13,17),Vector2(9,29),Vector2(25,10),Vector2(16,10),Vector2(21,1)],tint)
 			draw_line(Vector2(15,6),Vector2(9,14),Color("e5fbff"),2,true)

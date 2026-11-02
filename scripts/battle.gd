@@ -126,6 +126,8 @@ func enter(params: Dictionary) -> void:
 	var stage_texture: Texture2D = Game.texture(stage_asset) if stage_definition.get("battleEnabled",true) else null
 	stage.setup(533+actor_offset.y,enemy_visuals,stage_texture,float(stage_definition.get("groundStart",0.5)),scenery_place_id)
 	shown_encounter_phase = model.encounter_phase
+	if model.profile.get("encounterId", "") == "noss_sovereign":
+		stage.set_noss_encounter(enemy_visuals)
 	if model.profile.get("encounterId", "") == "dancer_duet":
 		dancer_music = AudioStreamPlayer.new()
 		dancer_music.name = "DancerMusic"
@@ -277,8 +279,10 @@ func refresh_enemy_hud() -> void:
 	enemy_hud.add_child(summary)
 	# Use the frozen battle type, including training and restored encounters.
 	var boss: bool = model.profile.get("battleType","normal") == "boss"
+	var noss_first: bool = boss and model.profile.get("encounterId", "") == "noss_sovereign" and shown_encounter_phase == 1 and shown_enemies.size() == 3
 	var summary_width: float = EnemyHPSummary.BOSS_DIMENSIONS.x if boss else EnemyHPSummary.DIMENSIONS.x
 	summary.size = Vector2(summary_width+16,80*mini(3,shown_enemies.size())-12)
+	if noss_first: summary.size.y = 120
 	# Center the visible health track; the HP readout sits to its right.
 	summary.global_position = Vector2(720-EnemyHPSummary.BOSS_TRACK.get_center().x,96) if boss else Vector2(1072,96)
 	summary.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -290,6 +294,7 @@ func refresh_enemy_hud() -> void:
 	summary.add_child(summary_scroll)
 	var rows := Control.new()
 	rows.custom_minimum_size = Vector2(summary_width,80*shown_enemies.size()-12)
+	if noss_first: rows.custom_minimum_size.y = 120
 	rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	summary_scroll.add_child(rows)
 	for i in shown_enemies.size():
@@ -297,7 +302,11 @@ func refresh_enemy_hud() -> void:
 		var summary_plate := EnemyHPSummary.new()
 		rows.add_child(summary_plate)
 		summary_plate.position = Vector2(0,i*80)
-		summary_plate.setup(enemy,i+1,base_font,boss)
+		var hand_bar: bool = noss_first and enemy.id in ["noss_hand_left", "noss_hand_right"]
+		summary_plate.setup(enemy,i+1,base_font,boss,hand_bar)
+		if noss_first:
+			# Keep array/target indices intact; only reorder the visible hierarchy.
+			summary_plate.position = Vector2.ZERO if enemy.id == "noss" else Vector2(18 if enemy.id == "noss_hand_left" else 250,68)
 		enemy_summary_plates.append(summary_plate)
 		var intent_text := displayed_enemy_intent(enemy)
 		var plate := ActorHUD.new()
@@ -659,6 +668,8 @@ func play_selected(target: int, discard_uid: String = "", extra_ammo: int = -1) 
 			shown_enemies[index].bleed = hit.get("bleedAfter",0)
 			if hit.has("electricChargeAfter"):
 				apply_shown_status({"target":index,"buffId":"electric_charge","stacksAfter":hit.electricChargeAfter})
+			if hit.has("alienSinAfter"):
+				apply_shown_status({"target":index,"buffId":"alien_sin","stacksAfter":hit.alienSinAfter})
 			if hit.has("ammoAfter"):
 				shown_player_ammo = int(hit.ammoAfter)
 				refresh_ammo()
@@ -837,13 +848,17 @@ func present_attack_start(_attack: Dictionary, _index: int) -> void:
 
 func present_attack_impact(attack: Dictionary, index: int) -> void:
 	var enemy: Dictionary = shown_enemies[index]
-	if int(attack.get("electricChargeUsed",0)) <= 0: return
-	if model.buffs.enemy_count(enemy,model.buffs.definition("electric_charge")) <= 0: return
-	# Keep the badge through preparation; spend it on the first actual hit only.
-	# Fold its captured bonus into the shown intent to keep later-hit previews stable.
-	enemy.intent = enemy.intent.duplicate(true)
-	enemy.intent.amount = int(enemy.intent.get("amount",0)) + int(attack.electricChargeUsed)
-	apply_shown_status({"target":index,"buffId":"electric_charge","stacksAfter":int(attack.electricChargeAfter)})
+	# Keep consumable badges through preparation, then preserve the captured
+	# damage in the shown intent when the first actual impact consumes them.
+	if int(attack.get("electricChargeUsed",0)) > 0 and model.buffs.enemy_count(enemy,model.buffs.definition("electric_charge")) > 0:
+		enemy.intent = enemy.intent.duplicate(true)
+		enemy.intent.amount = int(enemy.intent.get("amount",0)) + int(attack.electricChargeUsed)
+		apply_shown_status({"target":index,"buffId":"electric_charge","stacksAfter":int(attack.electricChargeAfter)})
+	if int(attack.get("alienSinUsed",0)) > 0 and model.buffs.enemy_count(enemy,model.buffs.definition("alien_sin")) > 0:
+		enemy.intent = enemy.intent.duplicate(true)
+		enemy.intent.amount = int(enemy.intent.get("amount",0)) + int(attack.alienSinUsed)*int(enemy.intent.get("sinMultiplier",0))
+		enemy.intent.erase("sinMultiplier")
+		apply_shown_status({"target":index,"buffId":"alien_sin","stacksAfter":int(attack.get("alienSinAfter",0))})
 
 func play_dancer_music() -> void:
 	# The same loop spans both formations; the blackout only pauses its playhead.
@@ -870,6 +885,9 @@ func setup_dancer_duet() -> void:
 	enemy_portraits.assign(stage.enemies)
 
 func present_encounter_phase() -> void:
+	if model.profile.get("encounterId", "") == "noss_sovereign":
+		if model.encounter_phase != shown_encounter_phase: await present_noss_phase()
+		return
 	if model.profile.get("encounterId", "") != "dancer_duet" or model.encounter_phase == shown_encounter_phase: return
 	# No HP or deck mutations here. Input stays locked across the entire reveal.
 	dancer_blackout = rect(self, Vector2.ZERO, Vector2(1440,900), Color.BLACK)
@@ -916,6 +934,31 @@ func present_encounter_phase() -> void:
 	dancer_reveal_flash = null
 	turn_hud.set_state(model.turn)
 
+func present_noss_phase() -> void:
+	# No combat mutations here: the new enemies, turn and hand already exist.
+	var shade := rect(self, Vector2.ZERO, Vector2(1440,900), Color("090811f0"))
+	shade.z_index = 110
+	shade.mouse_filter = Control.MOUSE_FILTER_STOP
+	turn_hud.set_state(model.turn, "reveal")
+	await get_tree().create_timer(0.45).timeout
+	var visuals: Array[EnemyVisualResolver.Visual] = []
+	for enemy in model.enemies: visuals.append(Game.enemy_combat_visual(enemy))
+	stage.set_noss_encounter(visuals)
+	enemy_portraits.assign(stage.enemies)
+	shown_encounter_phase = model.encounter_phase
+	shown_enemies = model.enemies.duplicate(true)
+	refresh_enemy_hud()
+	refresh_resources()
+	prepare_phase_deal_counts()
+	var interlude := preload("res://scripts/combat/noss_phase_dialogue.gd").new()
+	interlude.lines = Game.events.E23.get("phaseTwoDialogue", []).duplicate(true)
+	add_child(interlude)
+	await interlude.finished
+	remove_child(interlude)
+	interlude.queue_free()
+	shade.queue_free()
+	turn_hud.set_state(model.turn)
+
 func present_enemy_death_effect(hit: Dictionary) -> void:
 	if not hit.has("playerPollutionAfter"): return
 	shown_player_pollution = int(hit.playerPollutionAfter)
@@ -936,6 +979,25 @@ func present_status_event(event: Dictionary) -> void:
 		enemy.intentIndex = event.intentIndex
 		enemy.intentPhase = event.intentPhase
 		refresh_enemy_hud()
+		return
+	if event.type == "block_steal":
+		shown_player_block = int(event.playerBlockAfter)
+		shown_enemies[target_index].block = int(event.blockAfter)
+		refresh_player_plate()
+		refresh_enemy_hud()
+		impact(stage.contact(actor)-Vector2(0,70),"夺取格挡 %d" % int(event.amount),Color("73cafa"),0.75)
+		await get_tree().create_timer(0.30).timeout
+		return
+	if event.type == "self_hp_loss":
+		shown_enemies[target_index].hp = int(event.hpAfter)
+		shown_enemies[target_index].block = int(event.blockAfter)
+		present_enemy_death_effect(event)
+		refresh_enemy_hud()
+		actor.set_pose("damaged")
+		impact(stage.contact(actor),"苦修 −%d HP" % int(event.damage),PINK)
+		await get_tree().create_timer(0.25).timeout
+		if event.killed: await stage.retire_actor(actor)
+		else: actor.set_pose("idle")
 		return
 	if event.type == "status_decay":
 		apply_shown_status(event)
@@ -1370,7 +1432,13 @@ func update_enemy_plates() -> void:
 		intent.visible = actor.visible and actor.alive and actor.modulate.a > 0.01
 		intent.modulate.a = actor.modulate.a
 		var head := actor.to_global(Vector2(0,-130))
-		intent.global_position = Vector2(clampf(head.x-ENEMY_INTENT_SIZE.x*0.5,16,1424-ENEMY_INTENT_SIZE.x),clampf(head.y-ENEMY_INTENT_SIZE.y-8,206,674))
+		var intent_min_y := 206.0
+		if actor.kind in ["noss", "noss_hand", "noss_phase2"] and actor.sprite.texture != null:
+			# These paintings have tall head/halo silhouettes and detached hands.
+			# Keep intent above the actual canvas instead of on the eclipse face.
+			head.y = minf(head.y, actor.sprite.to_global(Vector2.ZERO).y + 8.0)
+			intent_min_y = 222.0 if model.profile.get("encounterId", "") == "noss_sovereign" and shown_encounter_phase == 1 else 166.0
+		intent.global_position = Vector2(clampf(head.x-ENEMY_INTENT_SIZE.x*0.5,16,1424-ENEMY_INTENT_SIZE.x),clampf(head.y-ENEMY_INTENT_SIZE.y-8,intent_min_y,674))
 	# At melee distance, separate intersecting strips while retaining their foot anchors.
 	var plates: Array = [player_plate]+enemy_plates
 	for pass_index in 3:

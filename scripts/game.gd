@@ -22,6 +22,7 @@ const TRAINING_ENEMY_HP := 100
 const BATTLE_TYPES := {"normal":"普通战斗", "elite":"精英战斗", "boss":"Boss战"}
 const DIFFICULTIES := {"normal":"普通模式", "advanced":"进阶模式"}
 const EVENT_REFRESH_LIMIT := 3
+const WEEK_BOSS_EVENTS := {1:"E16", 2:"E23"}
 var event_refresh_rng := RandomNumberGenerator.new()
 var places: Array
 var events: Dictionary
@@ -58,6 +59,7 @@ var _defer_checkpoint := false
 const TUTORIAL_BATTLE_ID := "tutorial_fish"
 # Draw order; CombatModel draws from the back of its pile.
 const TUTORIAL_DECK := ["noren_01", "noren_02", "noren_04", "noren_03", "noren_40", "noren_01", "noren_02", "noren_01", "noren_02", "noren_04"]
+const TUTORIAL_CYBERWARE := ["backup_energy"]
 var tutorial_mode := false
 var training_mode := false
 var training_backup: Dictionary = {}
@@ -76,6 +78,7 @@ func _ready() -> void:
 	characters = read_data("characters.json")
 	places = read_data("places.json")
 	events = read_data("weeks/week1/events.json")
+	events.merge(read_data("weeks/week2/events.json"))
 	place_dialogues = read_data("place_dialogues.json")
 	battles = read_data("battles.json")
 	rewards = read_data("rewards.json")
@@ -156,6 +159,17 @@ func valid_equipped_technologies(ids, owned) -> bool:
 
 func valid_technology_loadout(ids, player_id: String) -> bool:
 	return valid_player_character(player_id) and valid_equipped_technologies(ids, player_characters[player_id].get("cyberwareIds", []))
+
+func _acquire_technology(draft: Dictionary, id: String) -> bool:
+	# Acquisition fills an empty slot once; duplicate grants respect manual removal.
+	var definition := cyberware_definition(id)
+	if id.begins_with("test_") or definition.is_empty() or not CombatModel.valid_cyberware_definition(definition): return false
+	if not valid_equipped_technologies(draft.get("equippedCyberwareIds"), draft.get("ownedCyberwareIds")): return false
+	if id in draft.ownedCyberwareIds: return true
+	draft.ownedCyberwareIds.append(id)
+	if draft.equippedCyberwareIds.size() < CombatModel.CYBERWARE_LIMIT:
+		draft.equippedCyberwareIds.append(id)
+	return true
 
 func open_technology_loadout() -> void:
 	if state.is_empty() or page != "map" or state.get("currentScene") != "map" or training_mode or transition_locked or battle_busy: return
@@ -279,6 +293,7 @@ func place_data(id: String) -> Dictionary:
 
 func event_in_refresh_range(event: Dictionary, subject: Dictionary = {}) -> bool:
 	var s: Dictionary = state if subject.is_empty() else subject
+	if not event_in_week_range(event, s): return false
 	var window = event.get("refreshTimeRange", {"startDay":null, "endDay":null})
 	if not window is Dictionary: return false
 	var start = window.get("startDay")
@@ -291,7 +306,38 @@ func event_in_refresh_range(event: Dictionary, subject: Dictionary = {}) -> bool
 	var day := int(s.get("currentDay", config.initialDay))
 	return (start == null or day >= start) and (end == null or day <= end)
 
+func event_in_week_range(event: Dictionary, subject: Dictionary = {}) -> bool:
+	var s: Dictionary = state if subject.is_empty() else subject
+	var window = event.get("refreshWeekRange", {"startWeek":null, "endWeek":null})
+	if not window is Dictionary: return false
+	var start = window.get("startWeek")
+	var end = window.get("endWeek")
+	for bound in [start, end]:
+		if bound == null: continue
+		if not (bound is int or bound is float): return false
+		if not is_finite(float(bound)) or bound < 1 or bound != floor(float(bound)): return false
+	if start != null and end != null and start > end: return false
+	var week = s.get("currentWeek", 1)
+	if not (week is int or week is float): return false
+	if not is_finite(float(week)) or week < 1 or week != floor(float(week)): return false
+	return (start == null or week >= start) and (end == null or week <= end)
+
 func event_refresh_time_label(event: Dictionary) -> String:
+	var day_label := event_refresh_day_label(event)
+	var window = event.get("refreshWeekRange", {})
+	if not window is Dictionary: return "配置无效"
+	var start = window.get("startWeek")
+	var end = window.get("endWeek")
+	if start == null and end == null: return day_label
+	if start == 1 and end == 1: return day_label
+	var week_label := ""
+	if start == null: week_label = "第%d周及以前" % int(end)
+	elif end == null: week_label = "第%d周起" % int(start)
+	elif start == end: week_label = "第%d周" % int(start)
+	else: week_label = "第%d—%d周" % [int(start), int(end)]
+	return week_label if day_label == "随时" else week_label + " · " + day_label
+
+func event_refresh_day_label(event: Dictionary) -> String:
 	var window = event.get("refreshTimeRange", {})
 	if not window is Dictionary: return "配置无效"
 	var start = window.get("startDay")
@@ -302,13 +348,19 @@ func event_refresh_time_label(event: Dictionary) -> String:
 	if start == end: return "第%d天" % int(start)
 	return "第%d—%d天" % [int(start), int(end)]
 
+func week_boss_event(subject: Dictionary = {}) -> String:
+	var current: Dictionary = state if subject.is_empty() else subject
+	return WEEK_BOSS_EVENTS.get(int(current.get("currentWeek", 1)), "")
+
 func boss_has_appeared(subject: Dictionary) -> bool:
+	var event_id := week_boss_event(subject)
+	if event_id.is_empty(): return false
 	var flags = subject.get("flags", {})
 	if not flags is Dictionary: return false
-	if flags.get("dancerBossAppeared", false) == true: return true
-	# Also guard old day-seven pools before migration/checkpoint refreshes them.
+	var flag := "nossBossAppeared" if int(subject.get("currentWeek", 1)) == 2 else "dancerBossAppeared"
+	if flags.get(flag, false) == true: return true
 	var day = subject.get("currentDay", 1)
-	return events.has("E16") and (day is int or day is float) and day == 7
+	return events.has(event_id) and (day is int or day is float) and day == 7
 
 func eligible_events(subject: Dictionary = {}) -> Array:
 	var s: Dictionary = state if subject.is_empty() else subject
@@ -319,7 +371,7 @@ func eligible_events(subject: Dictionary = {}) -> Array:
 	if not is_finite(float(s.currentDay)) or s.currentDay < 1 or s.currentDay != floor(float(s.currentDay)): return []
 	var found: Array = []
 	for e in events.values():
-		if boss_has_appeared(s) and e.id != "E16" and not e.get("permanent", false): continue
+		if boss_has_appeared(s) and e.id != week_boss_event(s) and not e.get("permanent", false): continue
 		if not e.id in s.get("completedEventIds", []) and meets(e.get("unlockCondition", {}), s) and event_in_refresh_range(e, s) and not place_data(e.placeId).is_empty():
 			found.append(e)
 	found.sort_custom(func(a, b): return str(a.id) < str(b.id))
@@ -328,12 +380,14 @@ func eligible_events(subject: Dictionary = {}) -> Array:
 func refresh_event_pool(subject: Dictionary = {}) -> void:
 	var s: Dictionary = state if subject.is_empty() else subject
 	if s.is_empty(): return
-	if boss_has_appeared(s) and s.get("flags") is Dictionary: s.flags.dancerBossAppeared = true
+	if boss_has_appeared(s) and s.get("flags") is Dictionary:
+		s.flags["nossBossAppeared" if int(s.get("currentWeek", 1)) == 2 else "dancerBossAppeared"] = true
 	var candidates: Array = eligible_events(s).map(func(e): return e.id)
 	var kept: Array = []
-	if "E16" in candidates:
-		kept.append("E16")
-		candidates.erase("E16")
+	var boss_event := week_boss_event(s)
+	if boss_event in candidates:
+		kept.append(boss_event)
+		candidates.erase(boss_event)
 	# The promised three-commission return must not wait for another random draw.
 	# Reserve one of the existing slots, including when loading an already full pool.
 	if "E01R" in candidates:
@@ -384,12 +438,16 @@ func map_place_state(id: String) -> Dictionary:
 		"completed":completed and available.is_empty(), "services":p.get("services", [])}
 
 func objective() -> String:
-	if is_week_complete(): return "第一周结束 · 后续内容开发中"
-	if "E16" in state.get("completedEventIds", []): return "双人舞者已击败 · 领取奖励后结束第一周"
-	if state.get("flags", {}).get("week1Complete", false): return "第一周已完成 · 可继续探索剩余事件"
+	if is_week_complete(): return "第二周结束 · 封锁已解除" if int(state.get("currentWeek", 1)) == 2 else "第一周结束 · 可进入第2周"
+	if state.get("currentWeek", 1) == 1:
+		if "E16" in state.get("completedEventIds", []): return "双人舞者已击败 · 领取奖励后结束第一周"
+		if state.get("flags", {}).get("week1Complete", false): return "第一周已完成 · 可继续探索剩余事件"
 	var targets := map_target_events()
 	if targets.size() == 1: return targets[0].title + "  /  " + place_data(targets[0].placeId).name
 	if targets.size() > 1: return "%d 个可进行的事件" % targets.size()
+	if state.get("currentWeek", 1) == 2:
+		if "E23" in state.get("completedEventIds", []): return "诺斯已击败 · 领取奖励后结束第二周"
+		if eligible_events().is_empty(): return "完成委托，等待第七天的封锁令"
 	return "探索城市，寻找新的委托"
 
 func in_place_dialogue() -> bool:
@@ -480,7 +538,7 @@ func start_event(id: String) -> bool:
 	if not pending_save_kind.is_empty() or transition_locked or battle_busy or is_run_over(): return false
 	if not events.has(id): return false
 	var e: Dictionary = events[id]
-	if boss_has_appeared(state) and id != "E16" and not e.get("permanent", false): return false
+	if boss_has_appeared(state) and id != week_boss_event() and not e.get("permanent", false): return false
 	if not id in state.get("refreshedEventIds", []) or id in state.completedEventIds or not meets(e.unlockCondition) or not event_in_refresh_range(e): return false
 	if place_data(e.placeId).is_empty(): return false
 	state.erase("placeDialogue")
@@ -517,12 +575,8 @@ func apply_actions(actions: Array) -> bool:
 				draft.targetId = a.value
 			"grantTechnology":
 				if not a.get("id") is String or not a.get("equip", false) is bool: return false
-				var id: String = a.get("id", "")
-				var definition := cyberware_definition(id)
-				if id.begins_with("test_") or definition.is_empty() or not CombatModel.valid_cyberware_definition(definition): return false
-				if not id in draft.ownedCyberwareIds: draft.ownedCyberwareIds.append(id)
-				if a.get("equip", false) and not id in draft.equippedCyberwareIds and draft.equippedCyberwareIds.size() < CombatModel.CYBERWARE_LIMIT:
-					draft.equippedCyberwareIds.append(id)
+				# Retain the legacy boolean field's validation; new grants always fill vacancies.
+				if not _acquire_technology(draft, a.id): return false
 			"completeEvent":
 				if not events.has(a.get("id", "")): return false
 				if not a.id in draft.completedEventIds:
@@ -537,7 +591,7 @@ func apply_actions(actions: Array) -> bool:
 				if days < 0: return false
 				draft.currentDay = mini(7, int(draft.currentDay) + days)
 			"finishWeek":
-				draft.flags.week1Complete = true
+				draft.flags["week2Complete" if int(draft.get("currentWeek", 1)) == 2 else "week1Complete"] = true
 			"grantReward":
 				var id: String = a.get("id", "")
 				if not rewards.has(id): return false
@@ -623,6 +677,13 @@ func record_dialogue(choice_text: String = "") -> void:
 		"kind": "choice" if not choice_text.is_empty() else "dialogue"
 	})
 
+func record_encounter_line(index: int, line: Dictionary) -> void:
+	if state.get("combat", {}).get("profile", {}).get("encounterId") != "noss_sovereign" or state.combat.get("encounterPhase") != 2: return
+	var key := "B23:phase2:%d" % index
+	if state.dialogueHistory.any(func(entry): return entry.get("phaseKey", "") == key): return
+	var speaker: String = line.get("speakerId", "")
+	state.dialogueHistory.append({"eventId":"E23", "title":"太阳之下 · 至高敕令", "speaker":display_name(speaker) if not speaker.is_empty() else "场景", "text":render_text(line.get("text", "")), "kind":"dialogue", "phaseKey":key})
+
 func advance(expected_revision: int) -> void:
 	if not pending_save_kind.is_empty() or transition_locked or battle_busy or expected_revision != revision or state.currentScene != "dialogue": return
 	var n := node_data()
@@ -683,7 +744,7 @@ func battle_exit(result: String, expected_revision: int) -> bool:
 	if training_mode:
 		finish_training(result)
 		return true
-	if result == "win" and b.get("encounterId", "") == "dancer_duet":
+	if result == "win" and b.get("encounterId", "") in ["dancer_duet", "noss_sovereign"]:
 		var combat: Dictionary = state.get("combat", {})
 		if combat.get("encounterPhase") != 2 or combat.get("outcome") != "win" or not valid_combat(combat): return false
 	if result == "win" and not b.get("returnNodeByResult", {}).has(result): return false
@@ -755,7 +816,30 @@ func is_run_failed(subject: Dictionary = {}) -> bool:
 
 func is_week_complete(subject: Dictionary = {}) -> bool:
 	var s: Dictionary = state if subject.is_empty() else subject
-	return s.get("flags", {}).get("week1Complete", false) == true and "E16" in s.get("completedEventIds", []) and not is_run_failed(s)
+	var week := int(s.get("currentWeek", 1))
+	var complete_flag := "week2Complete" if week == 2 else "week1Complete"
+	return week in [1, 2] and s.get("flags", {}).get(complete_flag, false) == true and week_boss_event(s) in s.get("completedEventIds", []) and not is_run_failed(s)
+
+func start_second_week(expected_revision: int) -> bool:
+	if not pending_save_kind.is_empty() or transition_locked or battle_busy or training_mode or tutorial_mode: return false
+	if expected_revision != revision or page != "result" or state.get("currentScene") != "result" or int(state.get("currentWeek", 1)) != 1 or not is_week_complete(): return false
+	# Carry all earned progression forward; clear only the settled encounter context.
+	state.currentWeek = 2
+	state.currentDay = 1
+	state.currentScene = "map"
+	state.currentPlaceId = "bar"
+	state.activeEventId = "E16"
+	state.activeNodeId = "finish"
+	state.battleId = ""
+	state.result = ""
+	state.combat = {}
+	state.battleStart = {}
+	state.battleReward = {}
+	state.battlePassiveReward = {}
+	state.refreshedEventIds = []
+	state.portraits = {"left":PLAYER_REFERENCE, "right":""}
+	state.erase("placeDialogue")
+	return checkpoint()
 
 func is_run_over(subject: Dictionary = {}) -> bool:
 	return is_run_failed(subject) or is_week_complete(subject)
@@ -780,8 +864,8 @@ func claim_rewards(expected_revision: int) -> bool:
 		state.battleReward.creditsStatus = "skipped"
 		if int(state.battleReward.get("bonusCredits", 0)) > 0:
 			state.battlePassiveReward.creditsStatus = "skipped"
-	if state.activeEventId == "E16" and "E16" in state.completedEventIds and state.result == "win":
-		state.flags.week1Complete = true
+	if state.activeEventId == week_boss_event() and state.activeEventId in state.completedEventIds and state.result == "win":
+		state.flags["week2Complete" if int(state.get("currentWeek", 1)) == 2 else "week1Complete"] = true
 		return checkpoint()
 	go_map()
 	return pending_save_kind.is_empty()
@@ -934,6 +1018,8 @@ func valid_save(s) -> bool:
 	if s.maxHp <= 0 or s.currentHp < 0 or s.currentHp > s.maxHp: return false
 	if not is_finite(float(s.currentDay)) or s.currentDay < 1 or s.currentDay > 7 or s.currentDay != floor(float(s.currentDay)): return false
 	if not s.refreshedEventIds is Array or s.refreshedEventIds.size() > EVENT_REFRESH_LIMIT: return false
+	if not (s.currentWeek is int or s.currentWeek is float): return false
+	if not is_finite(float(s.currentWeek)) or s.currentWeek < 1 or s.currentWeek > 2 or s.currentWeek != floor(float(s.currentWeek)): return false
 	var seen_events := []
 	for id in s.refreshedEventIds:
 		if not id is String or not events.has(id) or id in seen_events: return false
@@ -945,6 +1031,8 @@ func valid_save(s) -> bool:
 	if not s.completedEventIds is Array or not s.flags is Dictionary or not s.choiceHistory is Dictionary or not s.portraits is Dictionary: return false
 	if s.flags.has("dancerBossAppeared") and not s.flags.dancerBossAppeared is bool: return false
 	if s.flags.has("week1Complete") and not s.flags.week1Complete is bool: return false
+	for flag in ["nossBossAppeared", "week2Complete"]:
+		if s.flags.has(flag) and not s.flags[flag] is bool: return false
 	if not s.claimedRewardIds is Array or not s.battleHistory is Array: return false
 	if not s.deck is Array or not s.battleReward is Dictionary: return false
 	if not valid_removed_starting_cards(s): return false
@@ -1002,14 +1090,14 @@ func has_save() -> bool:
 	return FileAccess.file_exists(save_path) or FileAccess.file_exists(save_path + ".bak")
 
 func can_continue() -> bool:
-	if not state.is_empty(): return not is_run_over()
+	if not state.is_empty(): return not is_run_failed()
 	# Read only; follow the same main/backup precedence as load_game().
 	for path in [save_path, save_path + ".bak"]:
 		if not FileAccess.file_exists(path): continue
 		var parser := JSON.new()
 		if parser.parse(FileAccess.get_file_as_string(path)) != OK: continue
 		var data = migrate_save(parser.data)
-		if valid_save(data): return not is_run_over(data)
+		if valid_save(data): return not is_run_failed(data)
 	# Keep the existing damaged-save error available when neither file validates.
 	return has_save()
 
@@ -1107,10 +1195,11 @@ func initialize_combat() -> void:
 	var rules := prototype_rules.duplicate(true)
 	var player := player_definition()
 	if player.get("combatRules", "") == "noren_v1": rules.merge(noren_rules, true)
-	if battle.get("encounterId", "") == "dancer_duet":
-		rules.encounterId = "dancer_duet"
+	if battle.get("encounterId", "") in ["dancer_duet", "noss_sovereign"]:
+		rules.encounterId = battle.encounterId
+		if battle.has("phaseOneEndEnemyId"): rules.phaseOneEndEnemyId = battle.phaseOneEndEnemyId
 		rules.phaseOneEnemies = definitions.duplicate(true)
-		rules.phaseTwoCards = read_data("cards/dancer_encounter_cards.json")
+		if battle.encounterId == "dancer_duet": rules.phaseTwoCards = read_data("cards/dancer_encounter_cards.json")
 		rules.phaseTwoEnemies = []
 		for id in battle.phaseTwoEnemyIds:
 			rules.phaseTwoEnemies.append(enemy_catalog[id].duplicate(true))
@@ -1260,6 +1349,9 @@ func start_training(battle_id: String = "B04") -> void:
 	if valid_equipped_technologies(source.get("equippedCyberwareIds"), source.get("ownedCyberwareIds")):
 		fresh.ownedCyberwareIds = source.ownedCyberwareIds.duplicate()
 		fresh.equippedCyberwareIds = source.equippedCyberwareIds.duplicate()
+	if is_tutorial:
+		fresh.ownedCyberwareIds = TUTORIAL_CYBERWARE.duplicate()
+		fresh.equippedCyberwareIds = TUTORIAL_CYBERWARE.duplicate()
 	training_backup = state.duplicate(true)
 	training_scenery_place_id = ""
 	training_mode = true
@@ -1413,6 +1505,7 @@ func migrate_save(data):
 	return data
 
 func normalize_week_completion(data: Dictionary) -> void:
+	if data.get("currentWeek", 1) != 1: return
 	# Older completed Boss saves may already be back on the map. Do not replay
 	# completion, reissue rewards or skip a still-pending card selection.
 	if not data.get("flags") is Dictionary or not data.get("completedEventIds") is Array or not "E16" in data.completedEventIds or is_run_failed(data): return
@@ -1495,7 +1588,7 @@ func valid_battle_start(s: Dictionary) -> bool:
 	for field in ["profile", "cardCatalog", "maxHp"]:
 		if opening[field] != s.combat[field]: return false
 	var expected_instances: Dictionary = opening.instances.duplicate(true)
-	if opening.profile.get("encounterId", "") == "dancer_duet":
+	if opening.profile.get("encounterId", "") in ["dancer_duet", "noss_sovereign"]:
 		if s.combat.get("encounterPhase") == 2:
 			for card_id in opening.profile.get("phaseTwoCards", {}): expected_instances["encounter_" + card_id] = card_id
 		return opening.get("encounterPhase") == 1 and expected_instances == s.combat.instances
@@ -1615,12 +1708,23 @@ func valid_combat(c: Dictionary) -> bool:
 		var actions: Array = [enemy.intent]
 		if enemy.get("intentSequence") is Array: actions.append_array(enemy.intentSequence)
 		for action in actions:
+			if not valid_enemy_action_extensions(action): return false
 			if action is Dictionary and action.get("type") == "fortify":
 				if not buffs._valid_count(action.get("amount")) or not buffs._valid_count(action.get("strength"), 999): return false
 		if enemy.has("intentLoopStart"):
 			var sequence = enemy.get("intentSequence")
 			if not sequence is Array or sequence.is_empty(): return false
 			if not buffs._valid_count(enemy.intentLoopStart, sequence.size() - 1): return false
+	return true
+
+func valid_enemy_action_extensions(action) -> bool:
+	if not action is Dictionary: return false
+	for key in ["postBlock", "stealBlock", "onHitWeak", "postSin", "sinMultiplier", "charge", "selfHpLoss"]:
+		if not action.has(key): continue
+		var required_type := "attack" if key in ["postBlock", "stealBlock", "onHitWeak", "postSin", "sinMultiplier"] else "fortify"
+		if action.get("type") != required_type or not buffs._valid_count(action[key], 999): return false
+	if action.has("postSin") and not buffs._valid_count(action.postSin, 3): return false
+	if action.has("fallbackSelf") and (action.get("type") != "strength_allies" or not action.fallbackSelf is bool): return false
 	return true
 
 func valid_dancer_intent(intent, expected_ids: Array) -> bool:
@@ -1638,6 +1742,8 @@ func valid_dancer_encounter(c: Dictionary) -> bool:
 	# Only the currently active, session-only Boss copy may use a temporary ID.
 	var practice: Dictionary = battles.get(c.battleId, {})
 	var training_boss: bool = training_mode and c.battleId == training_battle_id and practice.get("trainingOnly", false) and practice.get("encounterId", "") == "dancer_duet"
+	if c.profile.get("encounterId", "") == "noss_sovereign" or c.battleId == "B23" or practice.get("encounterId", "") == "noss_sovereign":
+		return valid_noss_encounter(c)
 	var dancer_battle: bool = c.battleId == "B16" or training_boss
 	if c.profile.get("encounterId", "") != "dancer_duet":
 		return not dancer_battle and not c.has("encounterPhase") and not c.profile.has("phaseTwoEnemies") and not c.profile.has("phaseTwoCards") and not c.profile.has("phaseOneEnemies")
@@ -1679,6 +1785,47 @@ func valid_dancer_encounter(c: Dictionary) -> bool:
 				if c.instances.has(uid) or id in c.instances.values(): return false
 			elif c.instances.get(uid) != id or c.instances.values().count(id) != 1: return false
 	if c.outcome == "win" and (c.encounterPhase != 2 or c.enemies.any(func(e): return e.get("hp", 0) > 0)): return false
+	return true
+
+func valid_noss_encounter(c: Dictionary) -> bool:
+	var battle: Dictionary = battles.get(c.battleId, {})
+	var practice: bool = training_mode and c.battleId == training_battle_id and battle.get("trainingOnly", false)
+	if c.battleId != "B23" and not practice: return false
+	if battle.get("encounterId") != "noss_sovereign" or c.profile.get("encounterId") != "noss_sovereign" or c.profile.get("battleType") != "boss": return false
+	if not buffs._valid_count(c.get("encounterPhase"), 2) or int(c.get("encounterPhase")) not in [1, 2]: return false
+	if c.profile.has("phaseTwoCards"): return false
+	if c.profile.has("phaseOneEndEnemyId") and c.profile.phaseOneEndEnemyId != "noss": return false
+	var first = c.profile.get("phaseOneEnemies")
+	var second = c.profile.get("phaseTwoEnemies")
+	if not first is Array or first.size() != 3 or not second is Array or second.size() != 1: return false
+	var ids := [["noss_hand_left", "noss_hand_right", "noss"], ["noss_phase2"]]
+	for phase_index in 2:
+		var definitions: Array = first if phase_index == 0 else second
+		for i in definitions.size():
+			var definition = definitions[i]
+			if not definition is Dictionary or definition.get("id") != ids[phase_index][i]: return false
+			for key in ["displayName", "battlePortraitAssetId", "combatVisualId"]:
+				if not definition.get(key) is String: return false
+			if not buffs._valid_count(definition.get("maxHp")) or definition.maxHp < 1: return false
+			if not buffs.valid_extra_state(definition.get("buffs", {}), "enemy"): return false
+			if not definition.get("intentSequence") is Array or definition.intentSequence.is_empty(): return false
+			for intent in definition.intentSequence:
+				if not intent is Dictionary or intent.get("type") not in ["attack", "fortify", "strength_allies", "weak", "block_ally_deferred"]: return false
+				if not buffs._valid_count(intent.get("amount"), 999) or not buffs._valid_count(intent.get("hits", 1), 999) or intent.get("hits", 1) < 1: return false
+				if not valid_enemy_action_extensions(intent): return false
+				if intent.type == "fortify" and not buffs._valid_count(intent.get("strength"), 999): return false
+				if intent.type in ["strength_allies", "block_ally_deferred"]:
+					if not intent.get("targetIds") is Array or intent.targetIds.is_empty(): return false
+					for target in intent.targetIds:
+						if target not in ids[phase_index]: return false
+	var current: Array = first if int(c.encounterPhase) == 1 else second
+	if c.enemies.size() != current.size(): return false
+	for i in current.size():
+		var enemy = c.enemies[i]
+		if not enemy is Dictionary or enemy.get("id") != current[i].id or enemy.get("maxHp") != current[i].maxHp or enemy.get("intentSequence") != current[i].intentSequence: return false
+		if not buffs._valid_count(enemy.get("hp")) or enemy.hp > enemy.maxHp or not buffs._valid_count(enemy.get("intentIndex")): return false
+		if enemy.get("intent") != current[i].intentSequence[int(enemy.intentIndex) % current[i].intentSequence.size()]: return false
+	if c.outcome == "win" and (int(c.encounterPhase) != 2 or c.enemies.any(func(e): return e.hp > 0)): return false
 	return true
 
 func valid_conditional_intent(enemy: Dictionary, encounter: Array) -> bool:
@@ -1797,8 +1944,7 @@ func buy_shop_technology(index: int, expected_revision: int) -> bool:
 	if state.credits < offer.price: return _market_reject("信用点不足。")
 	var draft := state.duplicate(true)
 	draft.credits -= int(offer.price)
-	owned.append(offer.id)
-	draft.ownedCyberwareIds = owned
+	if not _acquire_technology(draft, offer.id): return _market_reject("科技携带配置无效。")
 	return _commit_market(draft)
 
 func market_buy_price(card_id: String) -> int:

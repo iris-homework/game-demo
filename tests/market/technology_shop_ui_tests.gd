@@ -45,6 +45,12 @@ func export_layout(node: Node, items: Array) -> void:
 		if item.has("text") or item.has("fill") or item.has("image"): items.append(item)
 	for child in node.get_children(): export_layout(child,items)
 
+func texts(node: Node) -> String:
+	var value := ""
+	if node is Label or node is Button or node is RichTextLabel: value += str(node.text) + "\n"
+	for child in node.get_children(): value += texts(child)
+	return value
+
 func _ready() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT))
 	Game.save_enabled = false
@@ -82,6 +88,7 @@ func _ready() -> void:
 		check(not view.stock.get_node("buy_slot_%d" % i).disabled,"Unowned passive technology can be purchased")
 		view.open_purchase(i)
 		check(is_instance_valid(view.modal),"Passive technology opens purchase confirmation")
+		check("自动装配" in texts(view.modal),"Available fourth slot confirmation explains automatic equipment")
 		view.close_modal()
 		check(Game.state.credits == 1000,"Cancel passive purchase preserves money")
 	for i in 3:
@@ -95,6 +102,7 @@ func _ready() -> void:
 	view.open_purchase(0)
 	await settle()
 	check(is_instance_valid(view.modal),"Purchase opens modal for unowned technology")
+	check("自动装配" in texts(view.modal),"Empty loadout confirmation explains automatic equipment")
 	check(Game.state.credits == 1000,"Opening modal does not spend")
 	check(view.modal.get_node("cancel_trade").has_focus(),"Cancel has initial focus")
 	for b in view.stock.find_children("*","Button",true,false):
@@ -112,7 +120,7 @@ func _ready() -> void:
 	await settle()
 	check(Game.state.credits == 875,"Confirm charges configured price once")
 	check(Game.owned_cyberware_ids().has("dimensional_pocket"),"Purchased technology owned")
-	check(not Game.equipped_cyberware_ids().has("dimensional_pocket"),"Purchase does not silently equip")
+	check(Game.equipped_cyberware_ids() == ["dimensional_pocket"],"Confirmed purchase automatically equips the acquired technology")
 	check(view.stock.get_node("buy_slot_0").disabled,"Owned purchase disabled")
 	check(view.credits_label.text == "875","HUD balance refreshed")
 	view.open_purchase(0)
@@ -128,6 +136,19 @@ func _ready() -> void:
 	view.modal.get_node("confirm_trade").pressed.emit()
 	await settle()
 	check(Game.state.credits == 1000 and not Game.owned_cyberware_ids().has("accelerated_clock"),"Stale confirmation cannot transact")
+	# Explicit full-slot fixture; purchasing stores ownership without replacing equipment.
+	var full_loadout := ["dimensional_pocket", "accelerated_clock", "backup_energy", "money_chip"]
+	Game.state.ownedCyberwareIds = full_loadout.duplicate()
+	Game.state.equippedCyberwareIds = full_loadout.duplicate()
+	view.refresh_stock()
+	view.open_purchase(4)
+	await settle()
+	check(is_instance_valid(view.modal) and "槽位已满" in texts(view.modal),"Full loadout confirmation explains that no automatic replacement occurs")
+	check(Game.owned_cyberware_ids() == full_loadout and Game.equipped_cyberware_ids() == full_loadout,"Opening a full-slot purchase leaves ownership and equipment unchanged")
+	view.modal.get_node("confirm_trade").pressed.emit()
+	await settle()
+	check(Game.owned_cyberware_ids() == full_loadout + ["healing_chip"] and Game.equipped_cyberware_ids() == full_loadout,"Full-slot purchase acquires the technology and preserves the four equipped items")
+	check(view.stock.get_node("buy_slot_4").disabled,"Full-slot acquired offer becomes disabled")
 	await key(KEY_ESCAPE)
 	check(Game.page == "map","Escape exits shop to map")
 	Game.visit("mall")

@@ -4,6 +4,8 @@ const DIMENSIONS := Vector2(96,66)
 const ICON_PATHS := {
 	"attack":"res://assets/icons/intents/attack.svg",
 	"fortify":"res://assets/icons/intents/fortify.svg",
+	"block_ally_deferred":"res://assets/icons/intents/fortify.svg",
+	"alien_sin":"res://assets/icons/intents/alien_sin.svg",
 	"energy_suit":"res://assets/icons/intents/energy_suit.svg",
 	"charge":"res://assets/icons/intents/charge.svg",
 	"strength_allies":"res://assets/icons/intents/strength_allies.svg",
@@ -35,8 +37,33 @@ func setup(intent: Dictionary, description: String, font: Font) -> void:
 	icon_views.clear()
 	kind = str(intent.get("type",""))
 	weak_amount = maxi(0,int(intent.get("onHitWeak",0))) if kind == "attack" else 0
-	add_icon(kind,Vector2(4 if weak_amount > 0 else 28,0))
-	if weak_amount > 0: add_icon("weak",Vector2(52,0))
+	var secondary := "weak" if weak_amount > 0 else ""
+	var secondary_text := str(weak_amount)
+	var secondary_name := "IntentWeakAmount"
+	if kind == "attack" and weak_amount == 0:
+		if int(intent.get("postBlock",0)) > 0:
+			secondary = "fortify"
+			secondary_text = "+%d" % int(intent.postBlock)
+			secondary_name = "IntentBlockAmount"
+		elif int(intent.get("stealBlock",0)) > 0:
+			secondary = "fortify"
+			secondary_text = "≤%d" % int(intent.stealBlock)
+			secondary_name = "IntentStealAmount"
+		elif int(intent.get("postSin",0)) > 0:
+			secondary = "alien_sin"
+			secondary_text = "+%d" % int(intent.postSin)
+			secondary_name = "IntentSinAmount"
+	elif kind == "fortify":
+		if int(intent.get("charge",0)) > 0:
+			secondary = "charge"
+			secondary_text = "+%d" % int(intent.charge)
+			secondary_name = "IntentChargeAmount"
+		elif int(intent.get("selfHpLoss",0)) > 0:
+			secondary = "attack"
+			secondary_text = "−%d" % int(intent.selfHpLoss)
+			secondary_name = "IntentHpLossAmount"
+	add_icon(kind,Vector2(4 if not secondary.is_empty() else 28,0))
+	if not secondary.is_empty(): add_icon(secondary,Vector2(52,0))
 	value_label = Label.new()
 	value_label.position = Vector2(0,36)
 	value_label.size = Vector2(DIMENSIONS.x,30)
@@ -52,14 +79,17 @@ func setup(intent: Dictionary, description: String, font: Font) -> void:
 		"attack": value_label.text = description.trim_prefix("攻击 ").replace(" ","")
 		"strength_allies", "charge": value_label.text = "+%d" % int(intent.get("amount",0))
 		"energy_suit", "fortify": value_label.text = "强化"
+		"block_ally_deferred": value_label.text = "+%d" % int(intent.get("amount",0))
 		"pollution", "vulnerable", "weak": value_label.text = str(int(intent.get("amount",0)))
 		"heal_ally": value_label.text = "+%d" % int(intent.get("amount",0))
 		_:
 			value_label.text = description
 			value_label.add_theme_font_size_override("font_size",14)
 	add_child(value_label)
-	if weak_amount > 0:
-		# The attack and its debuff are separate visible intentions. Preserve the
+	if not secondary.is_empty():
+		if kind == "fortify":
+			value_label.text = str(int(intent.get("amount",0))) if secondary == "charge" else "+%d" % int(intent.get("strength",0))
+		# The action and its secondary effect are separate visible intentions. Preserve the
 		# existing 96x66 HUD footprint and the numeric damage preview.
 		value_label.size.x = DIMENSIONS.x / 2
 		var number_size := 22
@@ -67,10 +97,10 @@ func setup(intent: Dictionary, description: String, font: Font) -> void:
 			number_size -= 1
 		value_label.add_theme_font_size_override("font_size",number_size)
 		var weak_label := value_label.duplicate() as Label
-		weak_label.name = "IntentWeakAmount"
+		weak_label.name = secondary_name
 		weak_label.position.x = DIMENSIONS.x / 2
-		weak_label.text = str(weak_amount)
-		weak_label.add_theme_color_override("font_color",Color("f4c79f"))
+		weak_label.text = secondary_text
+		weak_label.add_theme_color_override("font_color",Color("f4c79f") if secondary == "weak" else Color("f5cf76") if secondary == "alien_sin" else Color("9edbea"))
 		add_child(weak_label)
 
 func add_icon(symbol: String, origin: Vector2) -> void:

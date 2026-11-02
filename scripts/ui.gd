@@ -201,7 +201,9 @@ func status_bar(section: String, show_days: bool = true, weeks_action: Callable 
 		var day := clampi(int(Game.state.get("currentDay", 1)), 1, 7)
 		var date_width := 238.0
 		var date_x := (1440.0 - date_width) * 0.5
-		var date_label := label(self, "第 %d 天" % day, Vector2(date_x, 8.0), Vector2(date_width, 26.0), 19, CYAN)
+		var week := int(Game.state.get("currentWeek", 1))
+		var date_text := "第 %d 天" % day if week == 1 else "第 %d 周 · 第 %d 天" % [week, day]
+		var date_label := label(self, date_text, Vector2(date_x, 8.0), Vector2(date_width, 26.0), 19, CYAN)
 		date_label.name = "current_day_label"
 		date_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		rect(self, Vector2(date_x, 39.0), Vector2(date_width, 22.0), Color("456576"))
@@ -233,7 +235,7 @@ func map_chrome(section: String, weeks_action: Callable = Callable(), reserve_ac
 func chrome(section: String, show_days: bool = true) -> void:
 	status_bar(section, show_days)
 	if section != "战斗":
-		label(self,"MIDNIGHT / W01",Vector2(36,864),Vector2(600,24),12,MUTED)
+		label(self,"MIDNIGHT / W%02d" % int(Game.state.get("currentWeek", 1)),Vector2(36,864),Vector2(600,24),12,MUTED)
 		label(self,"● 自动保存    /    F1 开发面板",Vector2(1100,859),Vector2(310,27),12,MUTED)
 
 func refresh_hp() -> void:

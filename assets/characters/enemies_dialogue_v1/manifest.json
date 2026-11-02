@@ -10,8 +10,9 @@
     "generated": 10,
     "creatorVisualReview": "已逐张检查，修枝猎犬因比例与裁切返修后选用横构图版本",
     "userApproval": "pending",
-    "runtimeBinding": "2026-10-25：pruning_hound、powerline_repairman、beacon_jellyfish保留在工程并绑定E13/E14/E15；其余7种未绑定立绘已移出工程归档。",
-    "runtimeValidation": "2026-10-24三敌：独立复制工程无窗口对白场景检查及跳过回归共503项通过；原PNG逐张查看，未改图。未进行游戏实际像素／物理输入验收。"
+    "runtimeBinding": "2026-11-01：pruning_hound、powerline_repairman、beacon_jellyfish继续绑定E13/E14/E15；warden_shield、chip_broker、mutant_mouse、luggage_lurker、penitent_ascetic从归档原字节恢复并绑定第二周E17—E21；rogue_drone、mirror_inspector仍仅在归档，未绑定。",
+    "runtimeValidation": "2026-10-24三敌：独立复制工程无窗口对白场景检查及跳过回归共503项通过；原PNG逐张查看，未改图。未进行游戏实际像素／物理输入验收。",
+    "week2IntegrationManifest": "week2-integration-20261101.manifest.json"
   },
   "notes": [
     "保留各敌人现有形象；人形采用对白角色比例，非人形保持机械或动物结构。",

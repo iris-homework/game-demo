@@ -1,0 +1,105 @@
+{
+  "noss": {
+    "id": "noss",
+    "characterId": "noss",
+    "displayName": "理事长 诺斯",
+    "battlePortraitAssetId": "",
+    "maxHp": 90,
+    "combatVisualId": "noss",
+    "prototype": false,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 10,
+        "hits": 1,
+        "animation": "shoot"
+      },
+      {
+        "type": "strength_allies",
+        "amount": 1,
+        "targetIds": [
+          "noss_hand_left",
+          "noss_hand_right"
+        ]
+      },
+      {
+        "type": "attack",
+        "amount": 8,
+        "hits": 2,
+        "animation": "shoot"
+      }
+    ]
+  },
+  "noss_hand_left": {
+    "id": "noss_hand_left",
+    "characterId": "noss",
+    "displayName": "敕令之手 · 左",
+    "battlePortraitAssetId": "",
+    "maxHp": 40,
+    "combatVisualId": "noss_hand",
+    "prototype": false,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1,
+        "animation": "hit"
+      },
+      {
+        "type": "fortify",
+        "amount": 8,
+        "strength": 0
+      }
+    ]
+  },
+  "noss_hand_right": {
+    "id": "noss_hand_right",
+    "characterId": "noss",
+    "displayName": "敕令之手 · 右",
+    "battlePortraitAssetId": "",
+    "maxHp": 40,
+    "combatVisualId": "noss_hand",
+    "prototype": false,
+    "intentSequence": [
+      {
+        "type": "fortify",
+        "amount": 8,
+        "strength": 0
+      },
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1,
+        "animation": "hit"
+      }
+    ]
+  },
+  "noss_phase2": {
+    "id": "noss_phase2",
+    "characterId": "noss_phase2",
+    "displayName": "诺斯 · 至高敕令",
+    "battlePortraitAssetId": "",
+    "maxHp": 160,
+    "combatVisualId": "noss_phase2",
+    "prototype": false,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 16,
+        "hits": 1,
+        "animation": "halo_burst"
+      },
+      {
+        "type": "attack",
+        "amount": 10,
+        "hits": 2,
+        "animation": "shoot"
+      },
+      {
+        "type": "fortify",
+        "amount": 12,
+        "strength": 1
+      }
+    ]
+  }
+}

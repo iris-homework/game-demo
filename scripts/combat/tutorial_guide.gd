@@ -30,6 +30,12 @@ const LESSONS := [
 		"done":"已切换过形态；同形态重复使用不会触发切入奖励。"
 	},
 	{
+		"title":"使用科技",
+		"body":"有空位时自动装配，最多 4 项；地图可调整。\n点「激活科技」再点科技卡；主动科技不耗能量。\n本场借用后备能源：恢复 1 能量，冷却 3 回合。\n冷却含当回合，每新玩家回合 -1；被动自动生效。",
+		"task":"试一试：打开「激活科技」，点击「后备能源」。",
+		"done":"已恢复 1 能量；再打开科技面板，可查看剩余冷却。"
+	},
+	{
 		"title":"查看敌人机制",
 		"body":"悬停敌人或头顶意图，查看下次行动与机制。\n鱼每段攻击实际扣血时，追加 2 层污染；\n完全格挡可避免追加污染。鱼死亡时施加 3 层。",
 		"task":"试一试：鼠标停在鱼或意图图标上，等说明展开。",
@@ -94,7 +100,8 @@ func configure(view: Control) -> void:
 	step_label = label(panel_view, "", Vector2(358, 12), Vector2(83, 22), 14, CYAN)
 	title_label = label(panel_view, "", Vector2(22, 35), Vector2(510, 35), 26, CREAM)
 	for index in LESSONS.size():
-		progress_segments.append(rect(panel_view, Vector2(22 + index * 74, 79), Vector2(66, 3), Color("29414e")))
+		var segment_pitch := 516.0 / LESSONS.size()
+		progress_segments.append(rect(panel_view, Vector2(22 + index * segment_pitch, 79), Vector2(segment_pitch - 8, 3), Color("29414e")))
 	body_label = label(panel_view, "", Vector2(22, 94), Vector2(516, 112), 17, Color("ccd8df"))
 	task_panel = panel(panel_view, Vector2(16, 215), Vector2(528, 59), Color("152b35"), Color("2d5962"))
 	var task_style := style(Color("152b35"), Color("2d5962"))
@@ -194,7 +201,8 @@ func _process(delta: float) -> void:
 	# Keep modal overlays, animations and their input entirely with the battle.
 	visible = battle_view.initialized and not Game.battle_busy and not Game.transition_locked and not is_instance_valid(battle_view.pile_overlay) and battle_view.model.outcome.is_empty()
 	if str(battle_view.model.stance) != initial_stance: _mark_complete(3)
-	if int(battle_view.model.turn) > 1: _mark_complete(6)
+	if battle_view.model.cyberware_cooldown("backup_energy") > 0: _mark_complete(4)
+	if int(battle_view.model.turn) > 1: _mark_complete(7)
 	if not visible:
 		_clear_guidance()
 		queue_redraw()
@@ -214,9 +222,9 @@ func _track_inspection(delta: float) -> void:
 	var lesson := -1
 	if is_instance_valid(hovered):
 		if (hovered is Button and hovered in battle_view.targets) or hovered in battle_view.enemy_intents:
-			lesson = 4
-		elif hovered.get_script() == preload("res://scripts/combat/status_badge.gd"):
 			lesson = 5
+		elif hovered.get_script() == preload("res://scripts/combat/status_badge.gd"):
+			lesson = 6
 	if lesson < 0:
 		hovered_inspection = null
 		hover_elapsed = 0.0
@@ -286,11 +294,13 @@ func _update_highlights() -> void:
 				_target_card(["noren_04"] if battle_view.model.stance == "melee" else ["noren_03"], "使用形态切换牌")
 			else: _target_control(battle_view.ammo_panel, "查看当前弹药", "resource")
 		4:
+			_target_control(battle_view.cyberware_button, "再打开，查看科技冷却" if completed.get(4, false) else "点击后激活「后备能源」", "technology")
+		5:
 			for intent in battle_view.enemy_intents:
 				if intent.is_visible_in_tree():
 					_target_control(intent, "悬停意图，查看敌人机制", "intent")
 					break
-		5:
+		6:
 			for plate in [battle_view.player_plate] + battle_view.enemy_plates:
 				for badge in plate.badges:
 					if badge.is_visible_in_tree():
@@ -298,7 +308,7 @@ func _update_highlights() -> void:
 						break
 				if not guidance_targets.is_empty(): break
 			if guidance_targets.is_empty(): _target_card(["noren_40", "noren_03"], "先打出此牌，产生状态图标")
-		6:
+		7:
 			_target_control(battle_view.end_button, "点击结束回合", "end_turn")
 	for index in guidance_targets.size():
 		leader_paths.append(_leader_path(guidance_targets[index], index))
@@ -371,7 +381,7 @@ func _target_label_rect(target: Dictionary) -> Rect2:
 	var label_pos := Vector2(area.get_center().x - label_size.x / 2, area.position.y - 45)
 	if target.kind == "pile":
 		label_pos = Vector2(area.end.x + 12 if area.get_center().x < 720 else area.position.x - label_size.x - 12, area.get_center().y - 12)
-	elif target.kind == "resource" and area.position.y > 680:
+	elif target.kind == "technology" or (target.kind == "resource" and area.position.y > 680):
 		label_pos = Vector2(area.end.x + 12, area.get_center().y - 12)
 	elif target.kind == "actor":
 		label_pos = Vector2(area.end.x + 14, area.get_center().y - 43)

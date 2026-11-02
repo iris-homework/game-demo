@@ -1,0 +1,114 @@
+{
+  "date": "2026-11-01",
+  "note": "Byte-identical selected Noss art; phase2 long-leg regal v2. Runtime calibration is in combat_visuals.json.",
+  "files": [
+    {
+      "file": "noss_idle.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/独裁者诺斯/noss_idle_v2.png",
+      "sha256": "01cc67730d76e47a3747120364ee376a81198e51ee23b21dc3a58972ca949261",
+      "size": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "file": "noss_attack_shoot.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/独裁者诺斯/noss_attack_laser.png",
+      "sha256": "97d26ce33fd52692067f09d686133d720ccdb269e88edd8f435ef28de7aebf95",
+      "size": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "file": "noss_damaged.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/独裁者诺斯/noss_damaged.png",
+      "sha256": "ad9b111dfa0d70b2c8030333c247e3ebb5901096307d0b2a933e9fca1a9ceaa1",
+      "size": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "file": "noss_phase2_idle.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/独裁者诺斯/noss_phase2_idle_v2.png",
+      "sha256": "cb87da2483e6344661cc908d26f020a0e1ce42d747b9c0b27841be0fe003fd68",
+      "size": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "file": "noss_phase2_attack_shoot.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/独裁者诺斯/noss_phase2_attack_shoot_v2.png",
+      "sha256": "1805c39f4389b4b770db4bf0a38f5993a8c41ce14cf665dfd0c983c53ec9570b",
+      "size": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "file": "noss_phase2_damaged.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/独裁者诺斯/noss_phase2_damaged_v2.png",
+      "sha256": "c1bf7d1180416a7d4d549183c0d26ac683a6a7d529e74d34f015937807b7e708",
+      "size": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "file": "noss_vfx_projectile.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/独裁者诺斯/noss_vfx_projectile.png",
+      "sha256": "642dd696b375f00c0a90c59b2ca2ff3aca914854a39f63b936b267b47e93aff1",
+      "size": [
+        2172,
+        724
+      ]
+    },
+    {
+      "file": "noss_hand_idle.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/金色金属大手/golden_metal_hand_idle_v2.png",
+      "sha256": "efaa0f01389130c89a9700650386185dbc5fd4348163f232d9750a09fa22d785",
+      "size": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "file": "noss_hand_attack_hit.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/金色金属大手/golden_metal_hand_attack_hit.png",
+      "sha256": "71b22d715c5caf4e00a1a3a5953404d14150f144e079a3b563c9ab4805074faf",
+      "size": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "file": "noss_hand_damaged.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/动作参考/金色金属大手/golden_metal_hand_damaged.png",
+      "sha256": "3d8ac780b3cde668a147e68a153f047fa5574b0fa0b2ce7afa54cc095c4cd4a4",
+      "size": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "file": "../../characters/noss.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/角色/独裁者诺斯_对话立绘_v1.png",
+      "sha256": "4ebe5f30e82cc9b1ba8662f03e1b45cd9d391bf44b66d07698994cf87df09250",
+      "size": [
+        1024,
+        1536
+      ]
+    },
+    {
+      "file": "../../characters/noss_phase2.png",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/角色/独裁者诺斯_二阶段_对话立绘_v1.png",
+      "sha256": "22ec6c768c15515d55a2c640bf99c0d83e597da1bb25ed61c43c40e8316faebf",
+      "size": [
+        1024,
+        1536
+      ]
+    }
+  ]
+}

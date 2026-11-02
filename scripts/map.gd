@@ -782,7 +782,17 @@ func show_weeks() -> void:
 	var dialog := AcceptDialog.new()
 	dialog.name = "week_dialog"
 	dialog.title = "周次档案"
-	dialog.dialog_text = "第一周：%s / 第 %d 天\n\n第二周：内容待设计\n第三周：内容待设计\n\n每完成一个事件推进1天；移动、对话与治疗不计时。\n地图同时最多刷新3个事件。" % ["已完成" if Game.state.flags.get("week1Complete", false) else "进行中", int(Game.state.get("currentDay", 1))]
+	var week := int(Game.state.get("currentWeek", 1))
+	var day := int(Game.state.get("currentDay", 1))
+	var first := "已完成" if week > 1 or Game.state.flags.get("week1Complete", false) else "进行中 / 第 %d 天" % day
+	var second := "完成第一周后开放"
+	if Game.state.flags.get("week2Complete", false):
+		second = "已完成"
+	elif week == 2:
+		second = "进行中 / 第 %d 天" % day
+	elif Game.state.flags.get("week1Complete", false):
+		second = "可进入"
+	dialog.dialog_text = "第一周：%s\n\n第二周：%s\n第三周：暂未开放\n\n每完成一个事件推进1天；移动、对话与治疗不计时。\n地图同时最多刷新3个事件。" % [first, second]
 	dialog.ok_button_text = "返回城市"
 	dialog.exclusive = true
 	add_child(dialog)

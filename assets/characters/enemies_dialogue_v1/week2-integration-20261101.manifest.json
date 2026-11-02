@@ -1,0 +1,98 @@
+{
+  "date": "2026-11-01",
+  "purpose": "第二周六敌人对话立绘接入",
+  "bindingStatus": "E17—E22",
+  "userApproval": "用户要求导入；未单独记录最终视觉认可",
+  "images": [
+    {
+      "id": "warden_shield",
+      "name": "巡界盾手",
+      "eventId": "E17",
+      "source": "/Users/anyone/Documents/游戏资源归档/game-demo/20261025-222709/assets/characters/enemies_dialogue_v1/warden_shield_dialogue_v1.png",
+      "file": "assets/characters/enemies_dialogue_v1/warden_shield_dialogue_v1.png",
+      "sha256": "9fe55d1a98bb090ef1cf70ca90ccba30e98556fd38ff1c2e96419bfb04b9f375",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "sourceByteCopy": true,
+      "whiteKey": false
+    },
+    {
+      "id": "chip_broker",
+      "name": "筹码掮客",
+      "eventId": "E18",
+      "source": "/Users/anyone/Documents/游戏资源归档/game-demo/20261025-222709/assets/characters/enemies_dialogue_v1/chip_broker_dialogue_v1.png",
+      "file": "assets/characters/enemies_dialogue_v1/chip_broker_dialogue_v1.png",
+      "sha256": "83164529d642f183f4bfd6126472afe6b125829ce8374a9a1ba1e616e3e2598a",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "sourceByteCopy": true,
+      "whiteKey": false
+    },
+    {
+      "id": "mutant_mouse",
+      "name": "爬墙线鼠",
+      "eventId": "E19",
+      "source": "/Users/anyone/Documents/游戏资源归档/game-demo/20261025-222709/assets/characters/enemies_dialogue_v1/mutant_mouse_dialogue_v1.png",
+      "file": "assets/characters/enemies_dialogue_v1/mutant_mouse_dialogue_v1.png",
+      "sha256": "bd60cfaa0f43187dbbe0b0f01154f8fe2728f5c3c8a1fdd16b549c0d063bcf80",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "sourceByteCopy": true,
+      "whiteKey": false
+    },
+    {
+      "id": "luggage_lurker",
+      "name": "行李潜伏客",
+      "eventId": "E20",
+      "source": "/Users/anyone/Documents/游戏资源归档/game-demo/20261025-222709/assets/characters/enemies_dialogue_v1/luggage_lurker_dialogue_v1.png",
+      "file": "assets/characters/enemies_dialogue_v1/luggage_lurker_dialogue_v1.png",
+      "sha256": "1d028871e5f84d78ba3dad25a27c1fe57cb63585ec961404ac492aff0f7b7beb",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "sourceByteCopy": true,
+      "whiteKey": false
+    },
+    {
+      "id": "penitent_ascetic",
+      "name": "赎罪苦修者",
+      "eventId": "E21",
+      "source": "/Users/anyone/Documents/游戏资源归档/game-demo/20261025-222709/assets/characters/enemies_dialogue_v1/penitent_ascetic_dialogue_v1.png",
+      "file": "assets/characters/enemies_dialogue_v1/penitent_ascetic_dialogue_v1.png",
+      "sha256": "70c789b1b5b6e51cbf3471146aeb7d2f8805cf56beb3d12386441ea95cd39802",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "sourceByteCopy": true,
+      "whiteKey": false
+    },
+    {
+      "id": "scavenger_hooker",
+      "name": "拾荒钩客",
+      "eventId": "E22",
+      "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/角色/拾荒钩客_对话立绘_v1.png",
+      "file": "assets/characters/scavenger_hooker_dialogue_v1.png",
+      "sha256": "7b24a3d4f31c3882e06d19ad38af4299d59b479f9e6f1a35e4f2f1a0c5843710",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "sourceByteCopy": true,
+      "whiteKey": false
+    }
+  ]
+}

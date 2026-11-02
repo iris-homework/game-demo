@@ -40,9 +40,9 @@ func catalog_errors(rows) -> PackedStringArray:
 		if entry.target not in ["player", "enemy", "both"]: errors.append(entry.id + ": invalid target")
 		if entry.stacking not in ["add", "guarded_add", "flag", "unique"]: errors.append(entry.id + ": invalid stacking")
 		if entry.duration not in ["battle", "player_turn_end", "own_turn_start", "own_turn_end_decay"]: errors.append(entry.id + ": invalid duration")
-		if entry.handler not in ["block", "bleed", "weak", "pollution", "vulnerable", "strength", "parry", "soft", "energy_suit", "electric_charge", "attack_bonus", "attack_discount", "high_pressure", "dissection", "none"]: errors.append(entry.id + ": implement handler first")
-		if entry.handler in ["block", "bleed", "weak", "pollution", "vulnerable", "strength", "parry", "soft", "energy_suit", "electric_charge", "high_pressure", "dissection"] and entry.id != entry.handler: errors.append(entry.id + ": specialized handler requires its canonical ID")
-		if entry.handler in ["soft", "energy_suit", "electric_charge"] and entry.target != "enemy": errors.append(entry.id + ": currently requires enemy target")
+		if entry.handler not in ["block", "bleed", "weak", "pollution", "vulnerable", "strength", "parry", "soft", "energy_suit", "electric_charge", "alien_sin", "attack_bonus", "attack_discount", "high_pressure", "dissection", "none"]: errors.append(entry.id + ": implement handler first")
+		if entry.handler in ["block", "bleed", "weak", "pollution", "vulnerable", "strength", "parry", "soft", "energy_suit", "electric_charge", "alien_sin", "high_pressure", "dissection"] and entry.id != entry.handler: errors.append(entry.id + ": specialized handler requires its canonical ID")
+		if entry.handler in ["soft", "energy_suit", "electric_charge", "alien_sin"] and entry.target != "enemy": errors.append(entry.id + ": currently requires enemy target")
 		if entry.handler in ["attack_bonus", "attack_discount"] and entry.target != "player": errors.append(entry.id + ": attack modifier currently requires player target")
 		if not entry.get("showBadge") is bool or not Color.html_is_valid(entry.color): errors.append(entry.id + ": invalid display")
 		if entry.has("maxStacks") and not _valid_count(entry.maxStacks): errors.append(entry.id + ": invalid maximum")
@@ -214,16 +214,19 @@ func after_attack_hit(model, index: int, form: String, hit: Dictionary, triggers
 		hit.playerPollutionAfter = bleeding.playerPollutionAfter
 	hit.bleedAfter = count(model, "bleed", index)
 
-func enemy_attack_damage(enemy: Dictionary, amount: int) -> int:
+func enemy_attack_damage(enemy: Dictionary, amount: int, sin_multiplier: int = 0) -> int:
 	var strength := definition("strength")
 	var charge := enemy_count(enemy, definition("electric_charge"))
-	var base := maxi(0, amount + (enemy_count(enemy, strength) if not strength.is_empty() else 0) + charge)
+	var sin_bonus := enemy_count(enemy, definition("alien_sin")) * sin_multiplier
+	var base := maxi(0, amount + (enemy_count(enemy, strength) if not strength.is_empty() else 0) + charge + sin_bonus)
 	return roundi(base * (0.75 if int(enemy.get("weak", 0)) > 0 else 1.0))
 
 func after_incoming_attack(model, enemy_index: int, hp_loss: int) -> void:
 	# Damage has consumed the old block; this new block protects later hits.
 	if count(model, "soft", enemy_index) > 0:
 		apply(model, "block", 3, enemy_index)
+	var sin_layers := count(model, "alien_sin", enemy_index)
+	if sin_layers > 0: _write_count(model, "alien_sin", sin_layers - 1, enemy_index)
 	if count(model, "energy_suit", enemy_index) > 0:
 		if hp_loss > 0: apply(model, "electric_charge", 1, enemy_index)
 		return

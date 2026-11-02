@@ -1,0 +1,17 @@
+{
+  "id": "scavenger_hooker",
+  "name": "拾荒钩客",
+  "eventId": "E22",
+  "source": "/Users/anyone/Desktop/卡牌游戏正式制作/卡牌游戏美术资源/角色/拾荒钩客_对话立绘_v1.png",
+  "file": "assets/characters/scavenger_hooker_dialogue_v1.png",
+  "sha256": "7b24a3d4f31c3882e06d19ad38af4299d59b479f9e6f1a35e4f2f1a0c5843710",
+  "dimensions": [
+    1024,
+    1536
+  ],
+  "mode": "RGBA",
+  "sourceByteCopy": true,
+  "whiteKey": false,
+  "note": "对白用图；保留2026-11-01内置image_gen原始PNG，不更改透明度或像素。",
+  "promptSource": "卡牌游戏美术资源/角色/拾荒钩客_对话立绘_v1.prompt.txt"
+}

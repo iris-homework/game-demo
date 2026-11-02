@@ -15,6 +15,8 @@ const FishDeathBurst = preload("res://scripts/combat/fish_death_burst_fx.gd")
 const CardGainFX = preload("res://scripts/combat/card_gain_fx.gd")
 const EnemyBuffFX = preload("res://scripts/combat/enemy_buff_fx.gd")
 const AuthoredAttack := preload("res://scripts/combat/authored_attack.gd")
+const NossSwordAttack := preload("res://scripts/combat/noss_sword_attack.gd")
+const NossHaloStrike := preload("res://scripts/combat/noss_halo_strike.gd")
 const PipelineCatalogScript := preload("res://enemy_asset_pipeline/runtime/pipeline_catalog.gd")
 const ACTOR_SCALE := 1.2544
 const ATTACK_ZOOM_FACTOR := 0.9
@@ -48,11 +50,50 @@ var combat_audio := preload("res://scripts/combat/combat_audio.gd").new()
 var scenery: TextureRect
 var scenery_base_rect := Rect2()
 var dancer_duet := false
+var noss_encounter := false
 var dancer_lights: Node2D
+
+func set_noss_encounter(enemy_visuals: Array[EnemyVisualResolver.Visual]) -> void:
+	# Both initial entry and phase change use this isolated formation boundary.
+	# Preserve the player's pose/state and all scenery; only replace enemy actors.
+	noss_encounter = true
+	dancer_duet = false
+	if is_instance_valid(dancer_lights):
+		dancer_lights.queue_free()
+		dancer_lights = null
+	for actor in enemies:
+		actors_root.remove_child(actor)
+		actor.queue_free()
+	enemies.clear()
+	active_attacker = null
+	active_defender = null
+	active_attack_config = {}
+	player.position = player.home
+	player.facing = 1.0
+	player.set_pose("idle")
+	var hand_index := 0
+	for visual in enemy_visuals:
+		var origin := Vector2(1190,floor_y-55)
+		if visual.id == "noss_hand":
+			origin = Vector2(950,floor_y-85) if hand_index == 0 else Vector2(970,floor_y+65)
+			hand_index += 1
+		elif visual.id == "noss_phase2":
+			origin = Vector2(1055,floor_y-30)
+		var actor := Actor.new()
+		actors_root.add_child(actor)
+		actor.setup_enemy(visual,origin,-1.0)
+		enemies.append(actor)
+	if camera_tween != null and camera_tween.is_running(): camera_tween.kill()
+	zoom = 1.0
+	focus_x = 720.0
+	focus_y = floor_y-35
+	update_depth()
+	_update_camera()
 
 func set_dancer_duet(enemy_visuals: Array[EnemyVisualResolver.Visual]) -> void:
 	# Called behind the blackout after the model has committed its second phase.
 	dancer_duet = true
+	noss_encounter = false
 	for actor in enemies:
 		actors_root.remove_child(actor)
 		actor.queue_free()
@@ -307,7 +348,7 @@ func frame_attack(attacker: Node2D, defender: Node2D, destination: Vector2) -> v
 	var magnification := 1.65*ATTACK_ZOOM_FACTOR
 	var target_x := (destination.x+defender.position.x)*0.5
 	var target_y := (destination.y+defender.position.y)*0.5
-	if enemies.size() > 1:
+	if enemies.size() > 1 or noss_encounter:
 		# Keep all living opponents available for the next card while closing in.
 		var left := INF
 		var right := -INF
@@ -334,6 +375,12 @@ func frame_attack(attacker: Node2D, defender: Node2D, destination: Vector2) -> v
 	camera_to(target_x,magnification,0.25,target_y)
 
 func attack(attacker: Node2D, defender: Node2D, style: String, hits: Array, on_hit: Callable) -> void:
+	if not attacker.is_player and attacker.kind == "noss_phase2" and style == "halo_burst":
+		await NossHaloStrike.play(self,attacker,defender,hits,on_hit)
+		return
+	if not attacker.is_player and attacker.kind in ["noss", "noss_phase2"]:
+		await NossSwordAttack.play(self,attacker,defender,hits,on_hit)
+		return
 	# Visual profiles select presentation only; supplied model hits remain authoritative.
 	# An explicitly selected authored action wins. The profile override is the
 	# default for intents without their own animation, not a lock on all attacks.

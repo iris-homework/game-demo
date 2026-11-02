@@ -78,8 +78,36 @@ func test_grant_atomicity_and_full_slots() -> void:
 	var granted := Game.state.duplicate(true)
 	check(Game.apply_actions([{"op":"grantTechnology", "id":"swift_chip", "equip":true}]) and Game.state == granted, "duplicate grant neither duplicates ownership nor equipment")
 	fresh()
-	check(Game.apply_actions([{"op":"grantTechnology", "id":"healing_chip", "equip":false}]), "owned-only grant accepted")
-	check("healing_chip" in Game.state.ownedCyberwareIds and not "healing_chip" in Game.state.equippedCyberwareIds, "owned-only action respects equip false")
+	check(Game.apply_actions([{"op":"grantTechnology", "id":"healing_chip", "equip":false}]), "grant with legacy equip false is accepted")
+	check(Game.state.ownedCyberwareIds == ["healing_chip"] and Game.state.equippedCyberwareIds == ["healing_chip"], "new technology automatically equips even when legacy equip is false")
+	fresh()
+	check(Game.apply_actions([{"op":"grantTechnology", "id":"backup_energy"}]), "grant with omitted equip is accepted")
+	check(Game.state.ownedCyberwareIds == ["backup_energy"] and Game.state.equippedCyberwareIds == ["backup_energy"], "new technology automatically equips when equip is omitted")
+	fresh()
+	var original := ["dimensional_pocket", "accelerated_clock", "backup_energy"]
+	Game.state.ownedCyberwareIds = original.duplicate()
+	Game.state.equippedCyberwareIds = original.duplicate()
+	check(Game.apply_actions([
+		{"op":"grantTechnology", "id":"money_chip", "equip":false},
+		{"op":"grantTechnology", "id":"healing_chip"},
+		{"op":"grantTechnology", "id":"swift_chip", "equip":true}
+	]), "continuous mixed-flag grants cross the four-slot boundary")
+	check(Game.state.ownedCyberwareIds == original + CHIPS, "continuous grants preserve acquisition order and acquire all new technologies")
+	check(Game.state.equippedCyberwareIds == original + ["money_chip"], "only the first grant fills the final slot; later grants never replace equipment")
+	check(Game.save_game(), "mixed grant batch saves")
+	var ordered := Game.state.duplicate(true)
+	Game.state = {}
+	check(Game.load_game() and same(Game.state, ordered) and Game.equipped_cyberware_ids() == original + ["money_chip"], "grant batch roundtrip retains the exact automatic equipment order")
+	fresh()
+	check(Game.apply_actions([{"op":"grantTechnology", "id":"swift_chip", "equip":true}]), "fixture acquires a technology before manual removal")
+	Game.page = "map"
+	Game.state.currentScene = "map"
+	check(Game.set_technology_loadout([], Game.revision), "map can manually unequip a granted technology")
+	var unequipped := Game.state.duplicate(true)
+	for action in [{"op":"grantTechnology", "id":"swift_chip"}, {"op":"grantTechnology", "id":"swift_chip", "equip":false}, {"op":"grantTechnology", "id":"swift_chip", "equip":true}]:
+		check(Game.apply_actions([action]) and Game.state == unequipped, "duplicate grant preserves manual unequip for all legacy equip variants")
+	check(Game.apply_actions([{"op":"grantTechnology", "id":"money_chip"}]), "new grant succeeds after manually freeing a slot")
+	check(Game.state.ownedCyberwareIds == ["swift_chip", "money_chip"] and Game.state.equippedCyberwareIds == ["money_chip"], "new grant equips without restoring the previously removed technology")
 	for invalid in ["missing_chip", "test_cyberware_01", "", null, 7]:
 		fresh()
 		var before := Game.state.duplicate(true)

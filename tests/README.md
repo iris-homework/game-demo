@@ -1,5 +1,15 @@
 # 测试目录索引
 
+2026-11-02演练目录扩为第一、第二周14组：`combat/enemies/published_training_tests.tscn`按两周正式事件战斗集合核对目录，覆盖14项冷启动／冒险／动态引用、15按钮布局／焦点、逐只阵容及胜败／退出／存档sentinel隔离。新增[真实菜单专项](combat/presentation/week2_training_menu_tests.tscn)，实际通过main菜单进入第二周六组、核对普通难度完整阵容及退出恢复，GPU输出两尺寸菜单和六场截图。使用复制工程、独立含QA的用户目录与绝对`QA_OUT_DIR`，不移动系统鼠标或写正式存档。实际结果见修改记录。
+
+2026-11-02诺斯新版意图：新增[规则专项](combat/enemies/noss_intents_rules_tests.tscn)和[真实战场专项](combat/presentation/noss_intents_presentation_tests.tscn)，覆盖本体100HP独杀转阶段、护主整轮末、异罪逐段削层及30／26／22／18伤害、重击消费显示时序、敕令回退、新旧冻结规则与非法字段。规则专项使用`fixtures/noss_legacy_enemies.json`保留旧90HP整组击败夹具；现有诺斯正式流程与Buff目录精确计数同步新版。须复制工程、隔离含QA用户目录和绝对`QA_OUT_DIR`，关闭正式保存。`QA_CAPTURE=1`可输出两尺寸GPU战场／说明截图，使用内存夹具、无系统鼠标。实际检查及边界见修改记录。
+
+2026-11-02第二周普通敌人：新增[意图规则专项](combat/enemies/week2_intents_tests.tscn)，覆盖六场多轮伤害、两组错峰双敌、复合行动先后顺序、电能削层、格挡夺取、自损致死、进阶冻结、可选字段校验及原60HP单敌正式开局旧档；新增[真实战场专项](combat/presentation/week2_intents_presentation_tests.tscn)，覆盖六组角色资源／双敌目标可达、复合图标和说明、回合播放显示同步及自损致死胜利。必须使用复制工程、独立含QA的用户目录及绝对`QA_OUT_DIR`，关闭正式保存。真实战场专项支持`QA_CAPTURE=1`保存1280×800／1600×1000 GPU截图，单次播放及总时长有超时保护，不使用系统鼠标。实际结果与旧R1综合脚本边界见修改记录。
+
+2026-11-02新增`tests/story/second_week_ui_tests.tscn`：真实main／Battle下验证诺斯转阶段对白的默认／自定义按键、改键后旧别名失效、修饰键／重复／释放过滤及与结束回合键共用；检查周次档案在两周各阶段的文案与状态不变。须复制工程，设置含QA的独立用户目录及绝对`QA_OUT_DIR`；禁写冒险／meta。`QA_CAPTURE=1`可保存GPU弹窗／对白截图，无系统鼠标或实体输入。
+
+2026-11-01新增`tests/story/week2_commissions_tests.tscn`：第二周入口／周次过滤、三项普通池、六场当前生命／单双敌阵容及前三回合伤害、全对白立绘／胜败／奖励／存读及切周保存重试。使用复制工程、名称含QA的独立用户目录与绝对`QA_OUT_DIR`。配套第一周结算／事件刷新／剧情及动作库回归；实测见修改记录。
+
 [敌人强化箭头专项](combat/presentation/enemy_buff_fx_tests.tscn)：真实强化事件、自身／同伴目标、负面／玩家／零值排除、快照不变、复用与清理。须复制工程并使用路径含`qa`的独立用户目录，`QA_OUT_DIR`可输出结果；不移动系统鼠标，像素观感另验。
 
 [普通战斗可选配乐专项](audio/normal_battle_music_tests.tscn)：用`QA_EXPECT_NORMAL_MUSIC=0`检查缺资源静默，或用`1`检查已导入的OGG；`QA_TRACK_KIND=actual-source`额外核对实际曲目解码长度。独立用户目录须含`normal-battle-music-qa`，`QA_OUT_DIR`可指定证据。覆盖正式B02入口、入场转场、冻结类型优先、重复循环、Music／SFX／Master设置、普通演练、精英／其他Boss／教程／舞者排除与离场释放；合成音和实际音频分别记录，Dummy播放状态检查不代替人工试听。
@@ -15,7 +25,7 @@
 
 2026-10-30新增[战斗背景动态专项](combat/presentation/battle_atmosphere_tests.tscn)：13地点材质、镜头覆盖、战斗快照、暂停与释放；GPU输出九组背景前后帧及实战截图，新增七类代表灯光至少15%明暗差的像素检查，并记录动态／静态CPU帧间隔（非GPU耗时）。须复制工程并使用独立custom_user_dir_name，支持QA_OUT_DIR及QA_CAPTURE_MOTION=1。
 
-新手教程专项：[`menu/tutorial_tests.tscn`](menu/tutorial_tests.tscn)覆盖固定首抽、正式敌人定义复用、无存档／已有进度／损坏磁盘存档隔离、退出与胜负恢复、菜单模态、七步实操、牌堆与悬停、教学按钮与出牌输入隔离。必须使用复制工程与名称含`tutorial-settings-qa`的独立用户目录；`QA_OUT_DIR`指定证据目录，GPU运行额外生成逐步截图。不移动系统鼠标，未代替实体输入验收。
+新手教程专项：[`menu/tutorial_tests.tscn`](menu/tutorial_tests.tscn)覆盖固定首抽、正式敌人定义复用、无存档／已有进度／损坏磁盘存档隔离、退出与胜负恢复、菜单模态、八步实操、临时教学科技隔离、实际激活与能量恢复／冷却递减、科技模态和禁用重用、牌堆与悬停、教学按钮与出牌输入隔离。必须使用复制工程与名称含`tutorial-settings-qa`的独立用户目录；`QA_OUT_DIR`指定证据目录，GPU运行额外生成逐步截图。不移动系统鼠标，未代替实体输入验收。
 
 
 2026-10-29白舞者交替挥砍：现有`combat/presentation/dancer_strike_tests`新增真实备用纹理、逐段`slash / slash_alt / slash`、重复三连击重置与归位检查。本轮148项通过，配套敌人视觉资源348项通过；1440×900 GPU三段截图及运行边界见`artifacts/qa/dancer-alternate-slash-2026-10-29/verification.json`。
@@ -240,6 +250,8 @@
 
 `story/removed_events_tests`补充E03／B03四种上下文与全部历史节点迁移；`story/commission_return_tests`验证三项现存委托解锁，以及原艾克完成记录曾参与回礼资格时，待选／已领取／已跳过的历史回礼仍可读且不可重复领取。支付条件、跳过和点击回归改用[通用支付夹具](fixtures/payment_choice.gd)的`QA_PAYMENT`内存事件，不恢复正式艾克内容。剧情、事件刷新、地图和被动科技回归已适配目录删减。本段为覆盖说明，实际运行结果由本轮记录给出。
 
+2026-11-02科技自动装配回归扩展商场逻辑／界面与开幕支援专项：新获得科技在0／3／4槽时的自动追加或满槽只获得、连续赠送顺序、重复赠送不重装手动卸下项、购后直接进入新战斗、保存往返及失败回滚。
+
 ## 2026-10-24 开幕芯片支援
 
 [opening_support_tests](story/opening_support_tests.tscn)覆盖金钱／治疗／迅捷芯片三选一的实际拥有与自动携带、满槽不替换、存读及防重、非法科技与动作批次回滚、选择保存失败回滚、旧目标选择档不追发，以及真实对白三选项和结算节点结构。支持`QA_OUT_DIR`，仅写专项检查点；按headless运行，不调用系统鼠标，不代表像素或物理输入验收。配套更新事件刷新三分支、完整剧情、对话记录、跳过及点击断言；E01R回访奖励另由其专项覆盖。本条为新增覆盖说明，实际运行结果由本轮验证记录给出。
@@ -426,3 +438,11 @@ Node扫描、参数、发布与回退测试为
 
 
 2026-10-25商店首次对白本轮验收：新增专项153项，配套黑市／黑市UI／科技交易／商场UI／剧情／跳过／地图／mipmap共9套1866项0失败，使用复制工程和独立用户目录、headless+Dummy。新专项显式等待音频释放后退出，无清理提示；三套既有界面回归有音频清理提示，未做像素或物理输入验收。见[验证汇总](../artifacts/qa/shop-intros-2026-10-25/verification.json)。
+
+## 第二周诺斯专项
+
+`tests/story/noss_boss_tests.tscn` 覆盖周次／日期入口、三敌转单敌阶段、AoE和弹反边界、难度冻结与开局重开、奖励和第二周结束、演练隔离。仅在复制工程及含QA的用户目录运行，设置绝对 `QA_OUT_DIR`；`QA_CAPTURE=1` 增加真实战场、命中显示、转阶段对白与结算截图，以及一阶段主血条／双手小血条的对齐、独立HP／格挡／死亡显示、目标索引及二阶段清理检查；GPU额外调整至1600×1000检查与截图。使用Dummy音频，不代表真人输入／听感验收。
+
+上述真实场景同时检查二阶段 `halo_charge → halo_burst`、蓄光期间不提前显示扣血和爆炸后一次性揭示16点模型伤害，并截取光环／爆炸画面。`tests/combat/presentation/noss_visual_tests.tscn` 另覆盖重击的目标中心、无光剑弹体、蓄光顺序、伤害／完全格挡对应姿势、站位／站姿恢复及节点清理；以专用QA用户目录运行，`NOSS_VISUAL_QA_OUT` 指定输出，`-- --capture` 启用GPU截图。
+
+重击视觉专项还检查爆炸光层存在、局部时钟实际推进和不拦截输入；真实场景保存爆光峰值及后续冲击波截图。`QA_CAPTURE=1 QA_SEQUENCE=1` 额外录制一次约1.65秒的真实GPU画面序列至 `heavy_sequence/`，`frames.json` 保留每帧测得时间、场景阶段及爆炸年龄，可用于动画预览编码；先在内存中收集实际图像，再写PNG，峰值静帧也从这些实际帧中挑选，避免压缩打断录制。无窗口运行不录制。

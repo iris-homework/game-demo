@@ -1,5 +1,7 @@
 # 市场与地点服务素材
 
+2026-11-02用户认可按沃斯前台画风重绘的新版黑市老板并授权替换。对白 `black_market_keeper` 与交易页 `black_market_shopkeeper` 现共用 `assets/characters/black_market_keeper.png`（1024×1536 RGBA），逐字节复制自工作区 `卡牌游戏美术资源/角色/黑市老板_前台画风重绘_v1.png`，保留透明度、无损导入及mipmap。来源和SHA256见角色同名manifest。交易页人物在原540×720框内等比居中显示，背景和柜台遮挡沿用原层；旧 `black-market-shopkeeper-layer-v2.png` 与合层回退图保留，正常路径不再读取旧人物层。下方10月记录为历史状态。
+
 2026-10-25首次到访对白改为标准左右独立立绘：`market`背景绑定本目录无人底图`black-market-background-v2.png`，店主立绘为原参考`卡牌游戏美术资源/角色/黑市老板.png`逐字节复制到`assets/characters/black_market_keeper.png`，保留原透明度，来源与哈希见同目录manifest。首次对白不再使用整套`black_market_art`，交易页继续沿用下方分层版本。没有生成或重绘角色。
 
 

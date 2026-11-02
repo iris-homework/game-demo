@@ -207,7 +207,7 @@ func enemy_intent_damage(enemy: Dictionary, after_player_turn_end: bool = true, 
 			if source.id == "dancer_white" and source.hp > 0 and buffs.enemy_count(source, buffs.definition("soul_link")) > 0:
 				base += 2
 				break
-	var amount := buffs.enemy_attack_damage(enemy, base)
+	var amount := buffs.enemy_attack_damage(enemy, base, int(enemy.get("intent", {}).get("sinMultiplier", 0)))
 	# During the player's turn, show the amount that will actually be used after
 	# their own turn-end decay, without changing any live status or intent state.
 	# Playback supplies the displayed status because the live model has already
@@ -227,11 +227,16 @@ func enemy_intent_text(enemy: Dictionary, after_player_turn_end: bool = true, vu
 	if intent.get("type", "") == "pollution": return "污染 %d" % int(intent.get("amount", 0))
 	if intent.get("type", "") == "vulnerable": return "易伤 %d" % int(intent.get("amount", 0))
 	if intent.get("type", "") == "weak": return "虚弱 %d" % int(intent.get("amount", 0))
+	if intent.get("type", "") == "block_ally_deferred": return "护主 格挡 +%d" % int(intent.get("amount", 0))
 	if intent.get("type", "") == "heal_ally": return "治疗 %d" % int(intent.get("amount", 0))
 	if intent.get("type", "") == "strength_allies": return "强化 +%d" % int(intent.get("amount", 0))
 	if intent.get("type", "") == "charge": return "充能 +%d 电能" % int(intent.get("amount", 0))
 	if intent.get("type", "") == "energy_suit": return "强化：能量防护服"
-	if intent.get("type", "") == "fortify": return "强化：格挡 +%d／力量 +%d" % [int(intent.get("amount",0)),int(intent.get("strength",0))]
+	if intent.get("type", "") == "fortify":
+		var summary := "强化：格挡 +%d／力量 +%d" % [int(intent.get("amount",0)),int(intent.get("strength",0))]
+		if int(intent.get("charge",0)) > 0: summary += "／电能 +%d" % int(intent.charge)
+		if int(intent.get("selfHpLoss",0)) > 0: summary += "／失去 %d 生命" % int(intent.selfHpLoss)
+		return summary
 	if intent.get("type", "") != "attack": return str(intent.get("description", "非攻击行动"))
 	var amount := int(intent.get("amount", 0))
 	if is_noren(): amount = enemy_intent_damage(enemy, after_player_turn_end, vulnerable_layers)
@@ -373,7 +378,7 @@ func use_item(_item_id: String, _target_index: int, _inventory: Dictionary, _cat
 
 func snapshot() -> Dictionary:
 	var saved := {"battleId":battle_id,"turn":turn,"playerHp":player_hp,"maxHp":max_hp,"drawPile":draw_pile.duplicate(),"hand":hand.duplicate(),"discardPile":discard_pile.duplicate(),"instances":instances.duplicate(true),"enemies":enemies.duplicate(true),"outcome":outcome,"log":log_lines.slice(-30),"profile":profile.duplicate(true),"cardCatalog":card_catalog.duplicate(true),"usedCyberware":used_cyberware.duplicate(),"nextAttackBonus":next_attack_bonus,"norenState":{"energy":energy,"block":block,"stance":stance,"ammo":ammo,"parry":parry,"weak":weak,"exhaustPile":exhaust_pile.duplicate(),"powers":powers.duplicate(),"turnDamageBonus":turn_damage_bonus,"turnDiscount":turn_discount,"stanceDiscount":stance_discount,"pressureUsed":pressure_used,"dissectionUsed":dissection_used},"openingDrawDone":opening_draw_done}
-	if profile.get("encounterId", "") == "dancer_duet": saved.encounterPhase = encounter_phase
+	if profile.get("encounterId", "") in ["dancer_duet", "noss_sovereign"]: saved.encounterPhase = encounter_phase
 	if not buff_state.is_empty(): saved.buffs = buff_state.duplicate(true)
 	if not cyberware_cooldowns.is_empty(): saved.cyberwareCooldowns = cyberware_cooldowns.duplicate()
 	return saved
@@ -475,7 +480,7 @@ func enemy_damage(index: int, amount: int, bypass: bool = false, attack_damage: 
 	if death_pollution > 0:
 		buffs.apply(self,"pollution",death_pollution)
 		log_lines.append("%s 死亡，向角色施加 %d 层污染。" % [enemy.displayName,death_pollution])
-	return {"target":index,"damage":loss,"blocked":absorbed,"hpAfter":enemy.hp,"blockAfter":enemy.block,"killed":enemy.hp == 0,"deathPollution":death_pollution,"playerPollutionAfter":buffs.count(self,"pollution"),"electricChargeAfter":buffs.count(self,"electric_charge",index)}
+	return {"target":index,"damage":loss,"blocked":absorbed,"hpAfter":enemy.hp,"blockAfter":enemy.block,"killed":enemy.hp == 0,"deathPollution":death_pollution,"playerPollutionAfter":buffs.count(self,"pollution"),"electricChargeAfter":buffs.count(self,"electric_charge",index),"alienSinAfter":buffs.count(self,"alien_sin",index)}
 
 func player_damage(amount: int, attack_damage: bool = false) -> Dictionary:
 	if attack_damage: amount = buffs.incoming_damage(self, amount)
@@ -490,6 +495,8 @@ func apply_bleed(index: int, amount: int, card_stance: String, single: bool) -> 
 
 func resolve_outcome() -> void:
 	if player_hp <= 0: outcome = "lose"
+	elif profile.get("encounterId", "") == "noss_sovereign" and encounter_phase == 1 and profile.get("phaseOneEndEnemyId", "") == "noss" and enemies.any(func(enemy): return enemy.id == "noss" and enemy.hp <= 0):
+		outcome = "win"
 	elif enemies.all(func(enemy): return enemy.hp <= 0): outcome = "win"
 
 func advance_encounter_phase(player_turn_ended: bool = false, transition: Dictionary = {}) -> bool:
@@ -498,7 +505,7 @@ func advance_encounter_phase(player_turn_ended: bool = false, transition: Dictio
 	if player_hp <= 0:
 		outcome = "lose"
 		return false
-	if outcome != "win" or encounter_phase != 1 or profile.get("encounterId", "") != "dancer_duet": return false
+	if outcome != "win" or encounter_phase != 1 or profile.get("encounterId", "") not in ["dancer_duet", "noss_sovereign"]: return false
 	transition.discarded = []
 	transition.drawn = []
 	transition.turnEvents = []
@@ -534,7 +541,7 @@ func advance_encounter_phase(player_turn_ended: bool = false, transition: Dictio
 	energy = int(profile.get("energyPerTurn", 3))
 	advance_cyberware_cooldowns()
 	transition.drawn = draw_cards()
-	log_lines.append("灯光熄灭。双人舞者 · 第二幕。")
+	log_lines.append("诺斯展开光轮，进入至高敕令阶段。" if profile.get("encounterId") == "noss_sovereign" else "灯光熄灭。双人舞者 · 第二幕。")
 	return true
 
 func begin_dancer_enemy_turn() -> Array:
@@ -670,6 +677,8 @@ func end_noren_turn() -> Dictionary:
 	var turn_events: Array = buffs.player_turn_end(self)
 	resolve_outcome()
 	var attacks: Array = []
+	# Local to this resolved enemy phase; never a persistent save queue.
+	var deferred_guards: Array = []
 	var dancer_enemy_turn: bool = profile.get("encounterId", "") == "dancer_duet" and encounter_phase == 2
 	turn_events.append_array(begin_dancer_enemy_turn())
 	for index in enemies.size():
@@ -689,11 +698,24 @@ func end_noren_turn() -> Dictionary:
 				turn_events.append({"type":"status_apply","source":index,"target":-1,"buffId":kind,"amount":amount,"stacksAfter":buffs.count(self, kind)})
 				log_lines.append("%s 施加 %d 层%s。" % [enemy.displayName, amount, buffs.definition(kind).name])
 			elif kind == "fortify":
+				var hp_loss := int(intent.get("selfHpLoss", 0))
+				if hp_loss > 0:
+					var loss := enemy_damage(index, hp_loss, true)
+					loss.type = "self_hp_loss"
+					turn_events.append(loss)
+					log_lines.append("%s 苦修，失去 %d 点生命。" % [enemy.displayName, loss.damage])
+					if enemy.hp <= 0:
+						resolve_outcome()
+						continue
 				buffs.apply(self, "block", amount, index)
 				var strength := int(intent.get("strength",0))
 				buffs.apply(self, "strength", strength, index)
-				turn_events.append({"type":"status_apply","source":index,"target":index,"buffId":"block","amount":amount,"stacksAfter":buffs.count(self,"block",index)})
-				turn_events.append({"type":"status_apply","source":index,"target":index,"buffId":"strength","amount":strength,"stacksAfter":buffs.count(self,"strength",index)})
+				if amount > 0: turn_events.append({"type":"status_apply","source":index,"target":index,"buffId":"block","amount":amount,"stacksAfter":buffs.count(self,"block",index)})
+				if strength > 0: turn_events.append({"type":"status_apply","source":index,"target":index,"buffId":"strength","amount":strength,"stacksAfter":buffs.count(self,"strength",index)})
+				var charge := int(intent.get("charge", 0))
+				if charge > 0:
+					buffs.apply(self, "electric_charge", charge, index)
+					turn_events.append({"type":"status_apply", "source":index, "target":index, "buffId":"electric_charge", "amount":charge, "stacksAfter":buffs.count(self,"electric_charge",index)})
 				log_lines.append("%s 强化，获得 %d 格挡、%d 力量。" % [enemy.displayName,amount,strength])
 			elif kind == "charge":
 				buffs.apply(self, "electric_charge", amount, index)
@@ -711,20 +733,36 @@ func end_noren_turn() -> Dictionary:
 					ally.hp += restored
 					turn_events.append({"type":"heal", "source":index, "target":ally_index, "amount":restored, "hpAfter":ally.hp})
 					log_lines.append("%s 为%s恢复 %d 点生命。" % [enemy.displayName, ally.displayName, restored])
+			elif kind == "block_ally_deferred":
+				deferred_guards.append({"source":index, "amount":amount, "targetIds":intent.targetIds.duplicate()})
 			elif kind == "strength_allies":
+				var found_recipient := false
 				for ally_index in enemies.size():
 					if enemies[ally_index].hp <= 0 or not enemies[ally_index].id in intent.get("targetIds", []): continue
+					found_recipient = true
 					buffs.apply(self, "strength", amount, ally_index)
 					turn_events.append({"type":"status_apply","source":index,"target":ally_index,"buffId":"strength","amount":amount,"stacksAfter":buffs.count(self, "strength", ally_index)})
 					if enemies[ally_index].id == "dancer_white":
 						log_lines.append("%s 强化白舞者，力量 +%d。" % [enemy.displayName, amount])
 					else:
-						log_lines.append("%s 强化小弟，力量 +%d。" % [enemy.displayName, amount])
+						log_lines.append("%s 强化%s，力量 +%d。" % [enemy.displayName, enemies[ally_index].displayName, amount])
+				if not found_recipient and intent.get("fallbackSelf", false):
+					buffs.apply(self, "strength", amount, index)
+					turn_events.append({"type":"status_apply", "source":index, "target":index, "buffId":"strength", "amount":amount, "stacksAfter":buffs.count(self,"strength",index)})
 			turn_events.append_array(buffs.own_turn_end(self, index))
 			resolve_outcome()
 			continue
-		var per_hit := buffs.enemy_attack_damage(enemy, int(intent.get("amount", 0)))
+		var steal_limit := int(intent.get("stealBlock", 0))
+		if steal_limit > 0:
+			var stolen := mini(block, steal_limit)
+			block -= stolen
+			buffs.apply(self, "block", stolen, index)
+			turn_events.append({"type":"block_steal", "source":index, "target":index, "amount":stolen, "playerBlockAfter":block, "blockAfter":int(enemy.block)})
+			log_lines.append("%s 夺取 %d 点格挡。" % [enemy.displayName, stolen])
+		var per_hit := buffs.enemy_attack_damage(enemy, int(intent.get("amount", 0)), int(intent.get("sinMultiplier", 0)))
 		# Freeze the bonus for the whole attack, then consume it once for all hits.
+		var sin_used := buffs.count(self, "alien_sin", index) if int(intent.get("sinMultiplier", 0)) > 0 else 0
+		if int(intent.get("sinMultiplier", 0)) > 0: buffs.clear(self, "alien_sin", index)
 		var charge_used := buffs.count(self, "electric_charge", index)
 		buffs.clear(self, "electric_charge", index)
 		var total := buffs.incoming_damage(self, per_hit) * int(intent.get("hits", 1))
@@ -739,15 +777,29 @@ func end_noren_turn() -> Dictionary:
 			hits.append(hit)
 			if player_hp == 0: break
 		var counters: Array = buffs.after_enemy_attack(self, index, total)
-		var attack := {"type":"attack","index":index,"id":enemy.id,"damage":damage,"hits":hits,"counters":counters,"electricChargeUsed":charge_used,"electricChargeAfter":buffs.count(self,"electric_charge",index)}
+		var attack := {"type":"attack","index":index,"id":enemy.id,"damage":damage,"hits":hits,"counters":counters,"electricChargeUsed":charge_used,"electricChargeAfter":buffs.count(self,"electric_charge",index),"alienSinUsed":sin_used,"alienSinAfter":buffs.count(self,"alien_sin",index)}
 		attacks.append(attack)
 		turn_events.append(attack)
+		if int(intent.get("postSin", 0)) > 0 and enemy.hp > 0:
+			var gained_sin := int(intent.postSin)
+			buffs.apply(self, "alien_sin", gained_sin, index)
+			turn_events.append({"type":"status_apply", "source":index, "target":index, "buffId":"alien_sin", "amount":gained_sin, "stacksAfter":buffs.count(self,"alien_sin",index), "clearSourceBlock":false})
+		if int(intent.get("postBlock", 0)) > 0 and enemy.hp > 0:
+			var gained_block := int(intent.postBlock)
+			buffs.apply(self, "block", gained_block, index)
+			turn_events.append({"type":"status_apply", "source":index, "target":index, "buffId":"block", "amount":gained_block, "stacksAfter":int(enemy.block), "clearSourceBlock":false})
 		if int(intent.get("onHitWeak", 0)) > 0 and player_hp > 0:
 			buffs.apply(self, "weak", int(intent.onHitWeak))
 			turn_events.append({"type":"status_apply", "source":index, "target":-1, "buffId":"weak", "amount":int(intent.onHitWeak), "stacksAfter":weak, "clearSourceBlock":false})
 		turn_events.append_array(buffs.own_turn_end(self, index))
 		resolve_outcome()
 		if not outcome.is_empty(): break
+	if outcome.is_empty():
+		for guard in deferred_guards:
+			for target in enemies.size():
+				if enemies[target].id not in guard.targetIds or enemies[target].hp <= 0: continue
+				buffs.apply(self, "block", int(guard.amount), target)
+				turn_events.append({"type":"status_apply", "source":int(guard.source), "target":target, "buffId":"block", "amount":int(guard.amount), "stacksAfter":int(enemies[target].block), "clearSourceBlock":false})
 	var transition: Dictionary = {}
 	var phase_changed := advance_encounter_phase(true, transition)
 	if outcome.is_empty() and not phase_changed:

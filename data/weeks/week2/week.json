@@ -1,5 +1,14 @@
 {
   "weekId": 2,
-  "eventIds": [],
-  "status": "pending"
+  "eventIds": [
+    "E17",
+    "E18",
+    "E19",
+    "E20",
+    "E21",
+    "E22",
+    "E23"
+  ],
+  "bossEventId": "E23",
+  "status": "playable"
 }

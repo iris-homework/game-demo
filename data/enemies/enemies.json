@@ -390,5 +390,381 @@
     ],
     "prototype": false,
     "combatVisualId": "dancer_black"
+  },
+  "warden_shield": {
+    "id": "warden_shield",
+    "characterId": "warden_shield",
+    "displayName": "巡界盾手",
+    "battlePortraitAssetId": "",
+    "maxHp": 85,
+    "intentSequence": [
+      {
+        "type": "fortify",
+        "amount": 18,
+        "strength": 0
+      },
+      {
+        "type": "attack",
+        "amount": 14,
+        "hits": 1,
+        "animation": "pierce",
+        "postBlock": 8
+      },
+      {
+        "type": "attack",
+        "amount": 20,
+        "hits": 1,
+        "animation": "pierce"
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "warden_shield"
+  },
+  "chip_broker": {
+    "id": "chip_broker",
+    "characterId": "chip_broker",
+    "displayName": "筹码掮客",
+    "battlePortraitAssetId": "",
+    "maxHp": 72,
+    "intentSequence": [
+      {
+        "type": "vulnerable",
+        "amount": 2
+      },
+      {
+        "type": "attack",
+        "amount": 8,
+        "hits": 2,
+        "animation": "pierce"
+      },
+      {
+        "type": "attack",
+        "amount": 12,
+        "hits": 1,
+        "animation": "pierce",
+        "onHitWeak": 2
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "chip_broker"
+  },
+  "mutant_mouse": {
+    "id": "mutant_mouse",
+    "characterId": "mutant_mouse",
+    "displayName": "爬墙线鼠",
+    "battlePortraitAssetId": "",
+    "maxHp": 42,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 5,
+        "hits": 2,
+        "animation": "pierce"
+      },
+      {
+        "type": "pollution",
+        "amount": 3
+      },
+      {
+        "type": "attack",
+        "amount": 12,
+        "hits": 1,
+        "animation": "pierce"
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "mutant_mouse"
+  },
+  "luggage_lurker": {
+    "id": "luggage_lurker",
+    "characterId": "luggage_lurker",
+    "displayName": "行李潜伏客",
+    "battlePortraitAssetId": "",
+    "maxHp": 45,
+    "intentSequence": [
+      {
+        "type": "fortify",
+        "amount": 8,
+        "strength": 0,
+        "charge": 4
+      },
+      {
+        "type": "attack",
+        "amount": 5,
+        "hits": 2,
+        "animation": "pierce"
+      },
+      {
+        "type": "attack",
+        "amount": 8,
+        "hits": 1,
+        "animation": "pierce"
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "luggage_lurker"
+  },
+  "penitent_ascetic": {
+    "id": "penitent_ascetic",
+    "characterId": "penitent_ascetic",
+    "displayName": "赎罪苦修者",
+    "battlePortraitAssetId": "",
+    "maxHp": 80,
+    "intentSequence": [
+      {
+        "type": "fortify",
+        "amount": 0,
+        "strength": 3,
+        "selfHpLoss": 5
+      },
+      {
+        "type": "attack",
+        "amount": 14,
+        "hits": 1,
+        "animation": "pierce"
+      },
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 2,
+        "animation": "pierce"
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "penitent_ascetic"
+  },
+  "scavenger_hooker": {
+    "id": "scavenger_hooker",
+    "characterId": "scavenger_hooker",
+    "displayName": "拾荒钩客",
+    "battlePortraitAssetId": "",
+    "maxHp": 78,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 14,
+        "hits": 1,
+        "animation": "pierce"
+      },
+      {
+        "type": "attack",
+        "amount": 12,
+        "hits": 1,
+        "animation": "pierce",
+        "stealBlock": 8
+      },
+      {
+        "type": "fortify",
+        "amount": 14,
+        "strength": 0
+      },
+      {
+        "type": "attack",
+        "amount": 7,
+        "hits": 2,
+        "animation": "pierce"
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "scavenger_hooker"
+  },
+  "noss": {
+    "id": "noss",
+    "characterId": "noss",
+    "displayName": "理事长 诺斯",
+    "battlePortraitAssetId": "",
+    "maxHp": 100,
+    "combatVisualId": "noss",
+    "prototype": false,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 12,
+        "hits": 1,
+        "animation": "shoot"
+      },
+      {
+        "type": "strength_allies",
+        "amount": 1,
+        "targetIds": [
+          "noss_hand_left",
+          "noss_hand_right"
+        ],
+        "fallbackSelf": true
+      },
+      {
+        "type": "attack",
+        "amount": 5,
+        "hits": 2,
+        "animation": "shoot"
+      },
+      {
+        "type": "weak",
+        "amount": 2
+      }
+    ]
+  },
+  "noss_hand_left": {
+    "id": "noss_hand_left",
+    "characterId": "noss",
+    "displayName": "敕令之手 · 左",
+    "battlePortraitAssetId": "",
+    "maxHp": 40,
+    "combatVisualId": "noss_hand",
+    "prototype": false,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 1,
+        "animation": "hit"
+      },
+      {
+        "type": "fortify",
+        "amount": 8,
+        "strength": 0
+      },
+      {
+        "type": "attack",
+        "amount": 4,
+        "hits": 2,
+        "animation": "hit"
+      },
+      {
+        "type": "fortify",
+        "amount": 8,
+        "strength": 0
+      }
+    ]
+  },
+  "noss_hand_right": {
+    "id": "noss_hand_right",
+    "characterId": "noss",
+    "displayName": "敕令之手 · 右",
+    "battlePortraitAssetId": "",
+    "maxHp": 40,
+    "combatVisualId": "noss_hand",
+    "prototype": false,
+    "intentSequence": [
+      {
+        "type": "block_ally_deferred",
+        "amount": 12,
+        "targetIds": [
+          "noss"
+        ]
+      },
+      {
+        "type": "attack",
+        "amount": 8,
+        "hits": 1,
+        "animation": "hit"
+      },
+      {
+        "type": "attack",
+        "amount": 5,
+        "hits": 1,
+        "animation": "hit"
+      },
+      {
+        "type": "block_ally_deferred",
+        "amount": 12,
+        "targetIds": [
+          "noss"
+        ]
+      }
+    ]
+  },
+  "noss_phase2": {
+    "id": "noss_phase2",
+    "characterId": "noss_phase2",
+    "displayName": "诺斯 · 至高敕令",
+    "battlePortraitAssetId": "",
+    "maxHp": 160,
+    "combatVisualId": "noss_phase2",
+    "prototype": false,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 6,
+        "hits": 3,
+        "animation": "shoot",
+        "onHitWeak": 2
+      },
+      {
+        "type": "attack",
+        "amount": 10,
+        "hits": 1,
+        "animation": "shoot",
+        "postSin": 3
+      },
+      {
+        "type": "attack",
+        "amount": 18,
+        "hits": 1,
+        "animation": "halo_burst",
+        "sinMultiplier": 4
+      },
+      {
+        "type": "fortify",
+        "amount": 12,
+        "strength": 1
+      }
+    ]
+  },
+  "mutant_mouse_second": {
+    "id": "mutant_mouse_second",
+    "characterId": "mutant_mouse",
+    "displayName": "爬墙线鼠",
+    "battlePortraitAssetId": "",
+    "maxHp": 42,
+    "intentSequence": [
+      {
+        "type": "pollution",
+        "amount": 3
+      },
+      {
+        "type": "attack",
+        "amount": 12,
+        "hits": 1,
+        "animation": "pierce"
+      },
+      {
+        "type": "attack",
+        "amount": 5,
+        "hits": 2,
+        "animation": "pierce"
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "mutant_mouse"
+  },
+  "luggage_lurker_second": {
+    "id": "luggage_lurker_second",
+    "characterId": "luggage_lurker",
+    "displayName": "行李潜伏客",
+    "battlePortraitAssetId": "",
+    "maxHp": 45,
+    "intentSequence": [
+      {
+        "type": "attack",
+        "amount": 8,
+        "hits": 1,
+        "animation": "pierce"
+      },
+      {
+        "type": "fortify",
+        "amount": 8,
+        "strength": 0,
+        "charge": 4
+      },
+      {
+        "type": "attack",
+        "amount": 5,
+        "hits": 2,
+        "animation": "pierce"
+      }
+    ],
+    "prototype": false,
+    "combatVisualId": "luggage_lurker"
   }
 }

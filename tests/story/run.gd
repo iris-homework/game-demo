@@ -44,7 +44,7 @@ func _ready() -> void:
 	Game.meta_path = "user://automated_test_meta.json"
 	# Validate authored references, including legacy saved result nodes.
 	check(Game.places.size() == 17, "17 places including church")
-	check(Game.events.size() == 9 and Game.events.has("E01R") and Game.events.has("E16"), "opening, six commissions, gated return reward, and day-seven boss")
+	check(Game.events.size() == 15 and Game.events.has("E01R") and Game.events.has("E16") and Game.events.has("E22"), "first-week catalog and six second-week commissions")
 	for e in Game.events.values():
 		check(not Game.place_data(e.placeId).is_empty(), e.id + " place exists")
 		for n in e.nodes.values():

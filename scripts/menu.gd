@@ -127,14 +127,14 @@ func _build_training_panel() -> void:
 	shade.mouse_filter = Control.MOUSE_FILTER_STOP
 	panel(training_container, Vector2(270, 150), Vector2(900, 600), PANEL, CYAN)
 	label(training_container, "战斗演练", Vector2(310, 176), Vector2(820, 48), 32)
-	label(training_container, "第一周对手 · 沿用正式阵容与场景", Vector2(310, 238), Vector2(820, 30), 18, MUTED)
+	label(training_container, "第一周与第二周正式对手 · 固定阵容与场景", Vector2(310, 238), Vector2(820, 30), 18, MUTED)
 	var focus_buttons: Array[Button] = []
 	var choices := Game.training_enemy_choices()
 	for index in choices.size():
 		var choice: Dictionary = choices[index]
 		var id := str(choice.id)
 		var choice_button := _menu_button("enemy_choice_" + id, str(choice.displayName),
-			Vector2(310 + (index % 3) * 280, 310 + floori(index / 3.0) * 84), Vector2(260, 60),
+			Vector2(310 + (index % 3) * 280, 294 + floori(index / 3.0) * 62), Vector2(260, 48),
 			_select_training_enemy.bind(id), false, 18, training_container)
 		choice_button.tooltip_text = str(Game.place_data(choice.placeId).get("name", ""))
 		focus_buttons.append(choice_button)
@@ -206,12 +206,13 @@ func _menu_button(node_name: String, text: String, pos: Vector2, dimensions: Vec
 	return b
 
 func _summary_text() -> String:
+	if Game.is_week_complete(): return "第二周已完成 · 继续可查看结算" if int(Game.state.get("currentWeek", 1)) == 2 else "第一周已完成 · 继续可进入第2周"
 	if not Game.can_continue() and (not Game.state.is_empty() or Game.has_save()):
 		return "本次冒险已结束 · 请开始新的委托"
 	if not Game.state.is_empty():
 		var place_name := str(Game.place_data(Game.state.get("currentPlaceId", "")).get("name", ""))
 		var mode_name: String = Game.DIFFICULTIES.get(Game.state.get("difficulty", "normal"), "普通模式")
-		return "%s · %s" % [mode_name, place_name if not place_name.is_empty() else "进行中的委托"]
+		return "第2周 · %s" % place_name if Game.state.get("currentWeek", 1) == 2 else "%s · %s" % [mode_name, place_name if not place_name.is_empty() else "进行中的委托"]
 	if Game.has_save():
 		# 仅磁盘存档时只提示存在检查点，不触发读取、恢复或保存。
 		return "已有检查点"

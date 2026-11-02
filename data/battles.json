@@ -163,5 +163,167 @@
       "dancer_black",
       "dancer_white"
     ]
+  },
+  "B17": {
+    "id": "B17",
+    "eventId": "E17",
+    "name": "扣下的药箱",
+    "battleType": "normal",
+    "participants": [
+      "@player",
+      "warden_shield"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null,
+    "placeId": "camp",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "warden_shield"
+    ]
+  },
+  "B18": {
+    "id": "B18",
+    "eventId": "E18",
+    "name": "一条消息卖两遍",
+    "battleType": "normal",
+    "participants": [
+      "@player",
+      "chip_broker"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null,
+    "placeId": "bar",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "chip_broker"
+    ]
+  },
+  "B19": {
+    "id": "B19",
+    "eventId": "E19",
+    "name": "墙里的磨牙声",
+    "battleType": "normal",
+    "participants": [
+      "@player",
+      "mutant_mouse"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null,
+    "placeId": "hive",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "mutant_mouse",
+      "mutant_mouse_second"
+    ]
+  },
+  "B20": {
+    "id": "B20",
+    "eventId": "E20",
+    "name": "无人认领",
+    "battleType": "normal",
+    "participants": [
+      "@player",
+      "luggage_lurker"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null,
+    "placeId": "hotel",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "luggage_lurker",
+      "luggage_lurker_second"
+    ]
+  },
+  "B21": {
+    "id": "B21",
+    "eventId": "E21",
+    "name": "自愿签名",
+    "battleType": "normal",
+    "participants": [
+      "@player",
+      "penitent_ascetic"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null,
+    "placeId": "church",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "penitent_ascetic"
+    ]
+  },
+  "B22": {
+    "id": "B22",
+    "eventId": "E22",
+    "name": "钩住的维修料",
+    "battleType": "normal",
+    "participants": [
+      "@player",
+      "scavenger_hooker"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose",
+      "surrender": "surrender"
+    },
+    "rules": null,
+    "enemyStats": null,
+    "placeId": "junkyard",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "scavenger_hooker"
+    ]
+  },
+  "B23": {
+    "id": "B23",
+    "eventId": "E23",
+    "name": "太阳之下",
+    "battleType": "boss",
+    "participants": [
+      "@player",
+      "noss"
+    ],
+    "returnNodeByResult": {
+      "win": "win_01",
+      "lose": "lose"
+    },
+    "rules": null,
+    "enemyStats": null,
+    "placeId": "tower",
+    "prototypeProfileId": "attack_flow_v1",
+    "enemyIds": [
+      "noss_hand_left",
+      "noss_hand_right",
+      "noss"
+    ],
+    "encounterId": "noss_sovereign",
+    "phaseTwoEnemyIds": [
+      "noss_phase2"
+    ],
+    "phaseOneEndEnemyId": "noss"
   }
 }

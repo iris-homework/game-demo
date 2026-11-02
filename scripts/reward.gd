@@ -16,6 +16,7 @@ var card_subtitle: Label
 var card_status_label: Label
 var footer_label: Label
 var boss_finale := false
+var finale_week := "第一周"
 
 func current_reward_identity() -> Dictionary:
 	var identity: Dictionary = Game.state.get("battleReward", {}).duplicate(true)
@@ -71,10 +72,11 @@ func _ready() -> void:
 			open_picker())
 	card_status_label = label(card_row,"",Vector2(818,61),Vector2(180,37),21,CYAN)
 	label(self,"从三张不同的非初始牌中选择一张 · B 蓝 / A 红 / S 金",Vector2(216,695),Vector2(980,32),15,MUTED)
-	boss_finale = Game.state.activeEventId == "E16" and "E16" in Game.state.completedEventIds
+	boss_finale = Game.state.activeEventId == Game.week_boss_event() and Game.state.activeEventId in Game.state.completedEventIds
+	finale_week = "第二周" if int(Game.state.get("currentWeek", 1)) == 2 else "第一周"
 	var complete: bool = Game.state.flags.get("week1Complete",false) and Game.event_data().get("nodes", {}).get("finish", {}).get("effects", []).any(func(action): return action.get("op") == "finishWeek")
 	var time_text := "领奖不消耗时间。可以继续探索城市。" if event_reward else "时间推进1天。事件已更新到城市地图。"
-	if boss_finale: time_text = "领取奖励后，结束第一周。"
+	if boss_finale: time_text = "领取奖励后，结束%s。" % finale_week
 	label(self,"第一周 · 落幕。可返回地图探索剩余事件。" if complete else time_text,Vector2(216,754),Vector2(820,35),20,CYAN)
 	footer_label = label(self,"",Vector2(216,803),Vector2(775,31),16,MUTED)
 	exit_button = button(self,"",Vector2(1110,782),Vector2(276,61),leave_rewards,true)
@@ -115,10 +117,10 @@ func refresh_reward() -> bool:
 	var unclaimed: Array[String] = []
 	if credits_pending: unclaimed.append("信用点")
 	if pending: unclaimed.append("卡牌")
-	footer_label.text = "离开将放弃本次未领取的%s。" % "和".join(unclaimed) if not unclaimed.is_empty() else ("奖励已保存，可以结束第一周。" if boss_finale else "奖励已保存，可继续探索城市。")
+	footer_label.text = "离开将放弃本次未领取的%s。" % "和".join(unclaimed) if not unclaimed.is_empty() else ("奖励已保存，可以结束%s。" % finale_week if boss_finale else "奖励已保存，可继续探索城市。")
 	var abandoned := "奖励" if credits_pending and pending else "信用点" if credits_pending else "卡牌" if pending else ""
 	if boss_finale:
-		exit_button.text = "放弃%s并结束第一周 →" % abandoned if not abandoned.is_empty() else "结束第一周  →"
+		exit_button.text = "放弃%s并结束%s →" % [abandoned, finale_week] if not abandoned.is_empty() else "结束%s  →" % finale_week
 	else:
 		exit_button.text = "放弃%s并返回  →" % abandoned if not abandoned.is_empty() else "返回地图  →"
 	if focus_claimed and not is_instance_valid(picker):

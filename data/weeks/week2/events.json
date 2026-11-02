@@ -1,0 +1,1465 @@
+{
+  "E17": {
+    "id": "E17",
+    "title": "扣下的药箱",
+    "placeId": "camp",
+    "unlockCondition": {},
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "营地入口的送药车被巡界盾手扣下。他要追讨运输行的旧账，却拦住了居民已经付清的药品。",
+    "demoNote": "",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "营地入口的铁栅栏只开了半扇。送药车停在警戒线内，几只封好的药箱被一面拼接盾挡住。",
+        "next": "intro_02",
+        "portraits": {
+          "left": "@player",
+          "right": "warden_shield"
+        },
+        "type": "stage"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "药箱上的收货单我核过了。居民已经付了钱，让车进去。",
+        "next": "intro_03",
+        "portraits": {
+          "left": "@player",
+          "right": "warden_shield"
+        }
+      },
+      "intro_03": {
+        "id": "intro_03",
+        "speakerId": "warden_shield",
+        "speakerSide": "right",
+        "text": "运输行欠营地一批货。今天不把旧账说清楚，什么都不能搬走。",
+        "next": "intro_04",
+        "portraits": {
+          "left": "@player",
+          "right": "warden_shield"
+        }
+      },
+      "intro_04": {
+        "id": "intro_04",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "你扣的是居民的药。那笔货款，找收钱的人追。",
+        "next": "intro_05",
+        "portraits": {
+          "left": "@player",
+          "right": "warden_shield"
+        }
+      },
+      "intro_05": {
+        "id": "intro_05",
+        "speakerId": "warden_shield",
+        "speakerSide": "right",
+        "text": "车一进营地，运输行又能说已经送到了。上回我就是这么信的。",
+        "next": "intro_06",
+        "portraits": {
+          "left": "@player",
+          "right": "warden_shield"
+        }
+      },
+      "intro_06": {
+        "id": "intro_06",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "封条和签收单都能留底。把盾让开，我们把这几箱交到收货人手里。",
+        "next": "intro_07",
+        "portraits": {
+          "left": "@player",
+          "right": "warden_shield"
+        }
+      },
+      "intro_07": {
+        "id": "intro_07",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "盾手扫了一眼箱上的名字，仍将盾底压在车轮前，短锤敲了敲盾沿。",
+        "next": "intro_08",
+        "portraits": {
+          "left": "@player",
+          "right": "warden_shield"
+        },
+        "type": "stage"
+      },
+      "intro_08": {
+        "id": "intro_08",
+        "speakerId": "warden_shield",
+        "speakerSide": "right",
+        "text": "我守着这个入口。这次得按我的规矩来。",
+        "next": "intro_09",
+        "portraits": {
+          "left": "@player",
+          "right": "warden_shield"
+        }
+      },
+      "intro_09": {
+        "id": "intro_09",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "那我先替等药的人把路清出来。",
+        "next": "battle",
+        "portraits": {
+          "left": "@player",
+          "right": "warden_shield"
+        }
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "盾沿滑离车轮。盾手扶住栅栏，掉落的短锤停在他够不到的地方。",
+        "next": "win_02",
+        "portraits": {
+          "left": "@player",
+          "right": "warden_shield"
+        },
+        "type": "stage"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "warden_shield",
+        "speakerSide": "right",
+        "text": "……行，车推走。运输行欠的账还没完。",
+        "next": "win_03",
+        "portraits": {
+          "left": "@player",
+          "right": "warden_shield"
+        }
+      },
+      "win_03": {
+        "id": "win_03",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "账你另找人算。今天这批药，按箱上的名字交。",
+        "next": "win_04",
+        "portraits": {
+          "left": "@player",
+          "right": "warden_shield"
+        }
+      },
+      "win_04": {
+        "id": "win_04",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "{主角姓名}将送药车推出警戒线，按委托单核对完药箱和封条，入口重新让出了通路。",
+        "next": "finish",
+        "portraits": {
+          "left": "@player",
+          "right": "warden_shield"
+        },
+        "type": "stage"
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B17"
+      },
+      "lose": {
+        "id": "lose",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "战败结果已记录。此次事件尚未完成，未发放奖励。",
+        "portraits": {
+          "left": "@player",
+          "right": ""
+        }
+      },
+      "surrender": {
+        "id": "surrender",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "投降结果已记录。此次事件尚未完成，未发放奖励。",
+        "next": "@map",
+        "portraits": {
+          "left": "@player",
+          "right": ""
+        }
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": []
+      }
+    },
+    "refreshTimeRange": {
+      "startDay": null,
+      "endDay": null
+    },
+    "refreshWeekRange": {
+      "startWeek": 2,
+      "endWeek": 2
+    }
+  },
+  "E18": {
+    "id": "E18",
+    "title": "一条消息卖两遍",
+    "placeId": "bar",
+    "unlockCondition": {},
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "酒馆里有人反复兜售早已取消的货运情报。核对过的两份委托单，连漏写的船号都一模一样。",
+    "demoNote": "",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "吧台上摊着两张货运情报单，日期相差三天，船号却在同一个位置少了一位。卖消息的人还坐在后排。",
+        "next": "intro_02",
+        "portraits": {
+          "left": "@player",
+          "right": "chip_broker"
+        },
+        "type": "stage"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "码头已经回话了。这班船早停了，你今晚还在卖它的消息。",
+        "next": "intro_03",
+        "portraits": {
+          "left": "@player",
+          "right": "chip_broker"
+        }
+      },
+      "intro_03": {
+        "id": "intro_03",
+        "speakerId": "chip_broker",
+        "speakerSide": "right",
+        "text": "我只是牵线。船什么时候开，不由我定。",
+        "next": "intro_04",
+        "portraits": {
+          "left": "@player",
+          "right": "chip_broker"
+        }
+      },
+      "intro_04": {
+        "id": "intro_04",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "第一笔投诉是前天。把售卖记录交出来，买过的人得知道。",
+        "next": "intro_05",
+        "portraits": {
+          "left": "@player",
+          "right": "chip_broker"
+        }
+      },
+      "intro_05": {
+        "id": "intro_05",
+        "speakerId": "chip_broker",
+        "speakerSide": "right",
+        "text": "你替谁出头？名字给我，我可以单独照顾。",
+        "next": "intro_06",
+        "portraits": {
+          "left": "@player",
+          "right": "chip_broker"
+        }
+      },
+      "intro_06": {
+        "id": "intro_06",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "先把记录打开。退款让买家自己跟你算。",
+        "next": "intro_07",
+        "portraits": {
+          "left": "@player",
+          "right": "chip_broker"
+        }
+      },
+      "intro_07": {
+        "id": "intro_07",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "掮客伸手来接情报单，指缝中的筹码却转过半圈，露出一圈薄刃。",
+        "next": "intro_08",
+        "portraits": {
+          "left": "@player",
+          "right": "chip_broker"
+        },
+        "type": "stage"
+      },
+      "intro_08": {
+        "id": "intro_08",
+        "speakerId": "chip_broker",
+        "speakerSide": "right",
+        "text": "单子留下，今晚的事就到这里。",
+        "next": "intro_09",
+        "portraits": {
+          "left": "@player",
+          "right": "chip_broker"
+        }
+      },
+      "intro_09": {
+        "id": "intro_09",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "手拿开。你走之前，先把这笔生意说清楚。",
+        "next": "battle",
+        "portraits": {
+          "left": "@player",
+          "right": "chip_broker"
+        }
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "最后一枚筹码从掮客指间滑落。她看了看出口，将随身终端放上桌面。",
+        "next": "win_02",
+        "portraits": {
+          "left": "@player",
+          "right": "chip_broker"
+        },
+        "type": "stage"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "chip_broker",
+        "speakerSide": "right",
+        "text": "记录都在里面，买家的联系方式也有。别把终端砸了。",
+        "next": "win_03",
+        "portraits": {
+          "left": "@player",
+          "right": "chip_broker"
+        }
+      },
+      "win_03": {
+        "id": "win_03",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "打开售卖页面。让老板娘留份底，再通知买家。",
+        "next": "win_04",
+        "portraits": {
+          "left": "@player",
+          "right": "chip_broker"
+        }
+      },
+      "win_04": {
+        "id": "win_04",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "终端上的售卖记录与两张单据对上了号。{主角姓名}将记录留在吧台，划去了这批已经失效的货运情报。",
+        "next": "finish",
+        "portraits": {
+          "left": "@player",
+          "right": "chip_broker"
+        },
+        "type": "stage"
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B18"
+      },
+      "lose": {
+        "id": "lose",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "战败结果已记录。此次事件尚未完成，未发放奖励。",
+        "portraits": {
+          "left": "@player",
+          "right": ""
+        }
+      },
+      "surrender": {
+        "id": "surrender",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "投降结果已记录。此次事件尚未完成，未发放奖励。",
+        "next": "@map",
+        "portraits": {
+          "left": "@player",
+          "right": ""
+        }
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": []
+      }
+    },
+    "refreshTimeRange": {
+      "startDay": null,
+      "endDay": null
+    },
+    "refreshWeekRange": {
+      "startWeek": 2,
+      "endWeek": 2
+    }
+  },
+  "E19": {
+    "id": "E19",
+    "title": "墙里的磨牙声",
+    "placeId": "hive",
+    "unlockCondition": {},
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "公共线路被拖进墙缝筑巢，维修工具也遭到袭击。支路已经断电，先清开电缆槽，才能继续维修。",
+    "demoNote": "",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "蜂巢城寨的走廊只亮着应急灯。拆开的墙板旁放着维修委托，支路断电的标牌压在工具箱上。",
+        "next": "intro_02",
+        "portraits": {
+          "left": "@player",
+          "right": "mutant_mouse"
+        },
+        "type": "stage"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "断电标牌在，住户也避开了。先看看什么东西占着线槽。",
+        "next": "intro_03",
+        "portraits": {
+          "left": "@player",
+          "right": "mutant_mouse"
+        }
+      },
+      "intro_03": {
+        "id": "intro_03",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "一截铜线缓缓缩进墙洞，随后传出细密的磨牙声。洞边的钳柄上留着两排深深的齿痕。",
+        "next": "intro_04",
+        "portraits": {
+          "left": "@player",
+          "right": "mutant_mouse"
+        },
+        "type": "stage"
+      },
+      "intro_04": {
+        "id": "intro_04",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "连钳子都咬。难怪没人敢伸手。",
+        "next": "intro_05",
+        "portraits": {
+          "left": "@player",
+          "right": "mutant_mouse"
+        }
+      },
+      "intro_05": {
+        "id": "intro_05",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "两只钩爪搭上线槽边缘。线鼠拖着沾满金属屑的尾巴挤出墙洞，门齿间还夹着半截铜线。",
+        "next": "intro_06",
+        "portraits": {
+          "left": "@player",
+          "right": "mutant_mouse"
+        },
+        "type": "stage"
+      },
+      "intro_06": {
+        "id": "intro_06",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "线都让你搬走了。后面的配电箱可不能再给你钻。",
+        "next": "intro_07",
+        "portraits": {
+          "left": "@player",
+          "right": "mutant_mouse"
+        }
+      },
+      "intro_07": {
+        "id": "intro_07",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "{主角姓名}绕到配电箱前。线鼠压低身体，尾巴扫过地面，掉落的铁片在窄廊里接连作响。",
+        "next": "intro_08",
+        "portraits": {
+          "left": "@player",
+          "right": "mutant_mouse"
+        },
+        "type": "stage"
+      },
+      "intro_08": {
+        "id": "intro_08",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "来这边。把墙洞让出来。",
+        "next": "battle",
+        "portraits": {
+          "left": "@player",
+          "right": "mutant_mouse"
+        }
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "线鼠松开铜线，拖着尾巴退入废管道，钩爪的刮擦声渐渐远去。",
+        "next": "win_02",
+        "portraits": {
+          "left": "@player",
+          "right": "mutant_mouse"
+        },
+        "type": "stage"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "走了。先把这个破口封住。",
+        "next": "win_03",
+        "portraits": {
+          "left": "@player",
+          "right": "mutant_mouse"
+        }
+      },
+      "win_03": {
+        "id": "win_03",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "{主角姓名}将委托里备好的铁网压在洞口，固定住边缘。散落的铜线被拨到一旁，电缆槽重新露了出来。",
+        "next": "win_04",
+        "portraits": {
+          "left": "@player",
+          "right": "mutant_mouse"
+        },
+        "type": "stage"
+      },
+      "win_04": {
+        "id": "win_04",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "剩下交给维修员。重新送电前，还得把每根线查一遍。",
+        "next": "finish",
+        "portraits": {
+          "left": "@player",
+          "right": "mutant_mouse"
+        }
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B19"
+      },
+      "lose": {
+        "id": "lose",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "战败结果已记录。此次事件尚未完成，未发放奖励。",
+        "portraits": {
+          "left": "@player",
+          "right": ""
+        }
+      },
+      "surrender": {
+        "id": "surrender",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "投降结果已记录。此次事件尚未完成，未发放奖励。",
+        "next": "@map",
+        "portraits": {
+          "left": "@player",
+          "right": ""
+        }
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": []
+      }
+    },
+    "refreshTimeRange": {
+      "startDay": null,
+      "endDay": null
+    },
+    "refreshWeekRange": {
+      "startWeek": 2,
+      "endWeek": 2
+    }
+  },
+  "E20": {
+    "id": "E20",
+    "title": "无人认领",
+    "placeId": "hotel",
+    "unlockCondition": {},
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "寄存室里多出了一只没有登记的旅行箱。它不断挪动位置，还会把客人的行李拖进货架底下。",
+    "demoNote": "",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "末班车旅馆的寄存室挂着暂停取件的牌子。一只贴满旧站点贴纸的旅行箱歪在货架下，旁边散着断开的行李带。",
+        "next": "intro_02",
+        "portraits": {
+          "left": "@player",
+          "right": "luggage_lurker"
+        },
+        "type": "stage"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "登记本里没有你。被拖走的包倒都在这里。",
+        "next": "intro_03",
+        "portraits": {
+          "left": "@player",
+          "right": "luggage_lurker"
+        }
+      },
+      "intro_03": {
+        "id": "intro_03",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "{主角姓名}拿出寄存室交付的识别牌。箱侧的橙灯亮起，底部轮子向她转了半圈。",
+        "next": "intro_04",
+        "portraits": {
+          "left": "@player",
+          "right": "luggage_lurker"
+        },
+        "type": "stage"
+      },
+      "intro_04": {
+        "id": "intro_04",
+        "speakerId": "luggage_lurker",
+        "speakerSide": "right",
+        "text": "提货码匹配。目标转运。",
+        "next": "intro_05",
+        "portraits": {
+          "left": "@player",
+          "right": "luggage_lurker"
+        }
+      },
+      "intro_05": {
+        "id": "intro_05",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "这牌今天才换。你在等谁来取？",
+        "next": "intro_06",
+        "portraits": {
+          "left": "@player",
+          "right": "luggage_lurker"
+        }
+      },
+      "intro_06": {
+        "id": "intro_06",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "箱底伸出四条扁平支腿。张开的箱盖猛然夹向识别牌，金属固定扣在半空撞出一声脆响。",
+        "next": "intro_07",
+        "portraits": {
+          "left": "@player",
+          "right": "luggage_lurker"
+        },
+        "type": "stage"
+      },
+      "intro_07": {
+        "id": "intro_07",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "根本不认人。原来是套偷运东西的装置。",
+        "next": "intro_08",
+        "portraits": {
+          "left": "@player",
+          "right": "luggage_lurker"
+        }
+      },
+      "intro_08": {
+        "id": "intro_08",
+        "speakerId": "luggage_lurker",
+        "speakerSide": "right",
+        "text": "目标移动。执行回收。",
+        "next": "intro_09",
+        "portraits": {
+          "left": "@player",
+          "right": "luggage_lurker"
+        }
+      },
+      "intro_09": {
+        "id": "intro_09",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "{主角姓名}把识别牌抛向没有行李的空地，拔出武器。箱体转过来，轮子在地板上划出两道黑印。",
+        "next": "battle",
+        "portraits": {
+          "left": "@player",
+          "right": "luggage_lurker"
+        },
+        "type": "stage"
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "箱体侧翻，轮子空转几圈后停住。支腿缩回底座，松开的箱盖露出磨损的电机与夹具。",
+        "next": "win_02",
+        "portraits": {
+          "left": "@player",
+          "right": "luggage_lurker"
+        },
+        "type": "stage"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "luggage_lurker",
+        "speakerSide": "right",
+        "text": "驱动断开。转运中止。",
+        "next": "win_03",
+        "portraits": {
+          "left": "@player",
+          "right": "luggage_lurker"
+        }
+      },
+      "win_03": {
+        "id": "win_03",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "就留在这儿，别再通电。",
+        "next": "win_04",
+        "portraits": {
+          "left": "@player",
+          "right": "luggage_lurker"
+        }
+      },
+      "win_04": {
+        "id": "win_04",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "{主角姓名}按寄存清单将散落的行李归到空架，把停机的箱体推入维修隔间，取下了门上的暂停取件牌。",
+        "next": "finish",
+        "portraits": {
+          "left": "@player",
+          "right": "luggage_lurker"
+        },
+        "type": "stage"
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B20"
+      },
+      "lose": {
+        "id": "lose",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "战败结果已记录。此次事件尚未完成，未发放奖励。",
+        "portraits": {
+          "left": "@player",
+          "right": ""
+        }
+      },
+      "surrender": {
+        "id": "surrender",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "投降结果已记录。此次事件尚未完成，未发放奖励。",
+        "next": "@map",
+        "portraits": {
+          "left": "@player",
+          "right": ""
+        }
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": []
+      }
+    },
+    "refreshTimeRange": {
+      "startDay": null,
+      "endDay": null
+    },
+    "refreshWeekRange": {
+      "startWeek": 2,
+      "endWeek": 2
+    }
+  },
+  "E21": {
+    "id": "E21",
+    "title": "自愿签名",
+    "placeId": "church",
+    "unlockCondition": {},
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "侧廊看守者扣下了反悔申请者的证件，把登记意向当成不可撤销的承诺。委托要求取回证件，结束这次强迫。",
+    "demoNote": "",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "科技教会侧廊的登记台上压着一叠证件。委托单写明了其中一份的编号，申请者已经要求退出，证件却始终没能取回。",
+        "next": "intro_02",
+        "portraits": {
+          "left": "@player",
+          "right": "penitent_ascetic"
+        },
+        "type": "stage"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "这份编号对上了。本人已经撤回申请，把证件交出来。",
+        "next": "intro_03",
+        "portraits": {
+          "left": "@player",
+          "right": "penitent_ascetic"
+        }
+      },
+      "intro_03": {
+        "id": "intro_03",
+        "speakerId": "penitent_ascetic",
+        "speakerSide": "right",
+        "text": "每个人到这里都会害怕。我当年也一样，熬过去就好了。",
+        "next": "intro_04",
+        "portraits": {
+          "left": "@player",
+          "right": "penitent_ascetic"
+        }
+      },
+      "intro_04": {
+        "id": "intro_04",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "登记表只说明来问过。他现在不愿意继续。",
+        "next": "intro_05",
+        "portraits": {
+          "left": "@player",
+          "right": "penitent_ascetic"
+        }
+      },
+      "intro_05": {
+        "id": "intro_05",
+        "speakerId": "penitent_ascetic",
+        "speakerSide": "right",
+        "text": "仪式都准备好了。临到门前就转身，他永远也迈不过去。",
+        "next": "intro_06",
+        "portraits": {
+          "left": "@player",
+          "right": "penitent_ascetic"
+        }
+      },
+      "intro_06": {
+        "id": "intro_06",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "这是他的身体。什么时候迈过去，由他自己定。",
+        "next": "intro_07",
+        "portraits": {
+          "left": "@player",
+          "right": "penitent_ascetic"
+        }
+      },
+      "intro_07": {
+        "id": "intro_07",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "苦修者将证件压回登记台后，收紧手里的长链。挂在链末的空心义手擦过地面，堵住侧廊出口。",
+        "next": "intro_08",
+        "portraits": {
+          "left": "@player",
+          "right": "penitent_ascetic"
+        },
+        "type": "stage"
+      },
+      "intro_08": {
+        "id": "intro_08",
+        "speakerId": "penitent_ascetic",
+        "speakerSide": "right",
+        "text": "你今天带不走它。",
+        "next": "intro_09",
+        "portraits": {
+          "left": "@player",
+          "right": "penitent_ascetic"
+        }
+      },
+      "intro_09": {
+        "id": "intro_09",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "那就先把路让出来。",
+        "next": "battle",
+        "portraits": {
+          "left": "@player",
+          "right": "penitent_ascetic"
+        }
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "长链松落在地，苦修者扶着登记台跪坐下来。{主角姓名}取出编号相符的证件，逐页核对。",
+        "next": "win_02",
+        "portraits": {
+          "left": "@player",
+          "right": "penitent_ascetic"
+        },
+        "type": "stage"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "penitent_ascetic",
+        "speakerSide": "right",
+        "text": "我不是要害他。我也是这样熬过来的。",
+        "next": "win_03",
+        "portraits": {
+          "left": "@player",
+          "right": "penitent_ascetic"
+        }
+      },
+      "win_03": {
+        "id": "win_03",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "那是你的经历。不能替他签第二次字。",
+        "next": "win_04",
+        "portraits": {
+          "left": "@player",
+          "right": "penitent_ascetic"
+        }
+      },
+      "win_04": {
+        "id": "win_04",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "{主角姓名}带着完整证件走出侧廊，将扣留证件的情况与委托回执一并交回。登记台旁的长链没有再拦住出口。",
+        "next": "finish",
+        "portraits": {
+          "left": "@player",
+          "right": "penitent_ascetic"
+        },
+        "type": "stage"
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B21"
+      },
+      "lose": {
+        "id": "lose",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "战败结果已记录。此次事件尚未完成，未发放奖励。",
+        "portraits": {
+          "left": "@player",
+          "right": ""
+        }
+      },
+      "surrender": {
+        "id": "surrender",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "投降结果已记录。此次事件尚未完成，未发放奖励。",
+        "next": "@map",
+        "portraits": {
+          "left": "@player",
+          "right": ""
+        }
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": []
+      }
+    },
+    "refreshTimeRange": {
+      "startDay": null,
+      "endDay": null
+    },
+    "refreshWeekRange": {
+      "startWeek": 2,
+      "endWeek": 2
+    }
+  },
+  "E22": {
+    "id": "E22",
+    "title": "钩住的维修料",
+    "placeId": "junkyard",
+    "unlockCondition": {},
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "垃圾场出口的维修料被拾荒钩客截走。他把已经分拣封好的材料藏进背架，拒绝归还。",
+    "demoNote": "",
+    "rewardIds": [],
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "垃圾场出口留着一辆翻倒的料车。委托照片里的编号扎带挂在长钩上，同批维修料露出背篓边缘。",
+        "next": "intro_02",
+        "portraits": {
+          "left": "@player",
+          "right": "scavenger_hooker"
+        },
+        "type": "stage"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "找到了。扎带的编号和清单一致，把维修料放回车上。",
+        "next": "intro_03",
+        "portraits": {
+          "left": "@player",
+          "right": "scavenger_hooker"
+        }
+      },
+      "intro_03": {
+        "id": "intro_03",
+        "speakerId": "scavenger_hooker",
+        "speakerSide": "right",
+        "text": "在垃圾场里捡到的东西，谁钩出来就归谁。",
+        "next": "intro_04",
+        "portraits": {
+          "left": "@player",
+          "right": "scavenger_hooker"
+        }
+      },
+      "intro_04": {
+        "id": "intro_04",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "这批早就分拣封好了。你从出口料车上拿的，不是从废堆里捡的。",
+        "next": "intro_05",
+        "portraits": {
+          "left": "@player",
+          "right": "scavenger_hooker"
+        }
+      },
+      "intro_05": {
+        "id": "intro_05",
+        "speakerId": "scavenger_hooker",
+        "speakerSide": "right",
+        "text": "他们一车拉走，我忙一晚上也剩不下什么。就当分我一点。",
+        "next": "intro_06",
+        "portraits": {
+          "left": "@player",
+          "right": "scavenger_hooker"
+        }
+      },
+      "intro_06": {
+        "id": "intro_06",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "要谈回收工钱，拿工单去谈。居民等着修抽水机，这批料得送回去。",
+        "next": "intro_07",
+        "portraits": {
+          "left": "@player",
+          "right": "scavenger_hooker"
+        }
+      },
+      "intro_07": {
+        "id": "intro_07",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "钩客将手里的小齿轮塞进背篓，腕上的线轴咔哒一响。长钩横到料车前，钩尖扯紧了最后一根扎带。",
+        "next": "intro_08",
+        "portraits": {
+          "left": "@player",
+          "right": "scavenger_hooker"
+        },
+        "type": "stage"
+      },
+      "intro_08": {
+        "id": "intro_08",
+        "speakerId": "scavenger_hooker",
+        "speakerSide": "right",
+        "text": "有本事，自己拿。",
+        "next": "intro_09",
+        "portraits": {
+          "left": "@player",
+          "right": "scavenger_hooker"
+        }
+      },
+      "intro_09": {
+        "id": "intro_09",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "把钩放下。别把剩下的也扯坏了。",
+        "next": "battle",
+        "portraits": {
+          "left": "@player",
+          "right": "scavenger_hooker"
+        }
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "钩杆脱手落在地上。钩客扶住背架，三根弯管相互撞响，篓里的维修料散在了脚边。",
+        "next": "win_02",
+        "portraits": {
+          "left": "@player",
+          "right": "scavenger_hooker"
+        },
+        "type": "stage"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "scavenger_hooker",
+        "speakerSide": "right",
+        "text": "都在这儿……那枚齿轮也还你。",
+        "next": "win_03",
+        "portraits": {
+          "left": "@player",
+          "right": "scavenger_hooker"
+        }
+      },
+      "win_03": {
+        "id": "win_03",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "按清单装回去。缺哪一件，维修队都开不了工。",
+        "next": "win_04",
+        "portraits": {
+          "left": "@player",
+          "right": "scavenger_hooker"
+        }
+      },
+      "win_04": {
+        "id": "win_04",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "{主角姓名}核对编号，将维修料重新扎牢放回料车。钩客收起空背篓，退开了通往出口的窄道。",
+        "next": "finish",
+        "portraits": {
+          "left": "@player",
+          "right": "scavenger_hooker"
+        },
+        "type": "stage"
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B22"
+      },
+      "lose": {
+        "id": "lose",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "战败结果已记录。此次事件尚未完成，未发放奖励。",
+        "portraits": {
+          "left": "@player",
+          "right": ""
+        }
+      },
+      "surrender": {
+        "id": "surrender",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "投降结果已记录。此次事件尚未完成，未发放奖励。",
+        "next": "@map",
+        "portraits": {
+          "left": "@player",
+          "right": ""
+        }
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": []
+      }
+    },
+    "refreshTimeRange": {
+      "startDay": null,
+      "endDay": null
+    },
+    "refreshWeekRange": {
+      "startWeek": 2,
+      "endWeek": 2
+    }
+  },
+  "E23": {
+    "id": "E23",
+    "title": "太阳之下",
+    "placeId": "tower",
+    "unlockCondition": {},
+    "repeatPolicy": "once",
+    "startNodeId": "intro_01",
+    "description": "第二周第七天，诺斯在沃斯大楼发布街区封锁令。进入顶层，解除封锁。",
+    "demoNote": "一阶段诺斯及双金手；二阶段至高敕令。",
+    "rewardIds": [],
+    "refreshTimeRange": {
+      "startDay": 7,
+      "endDay": 7
+    },
+    "refreshWeekRange": {
+      "startWeek": 2,
+      "endWeek": 2
+    },
+    "nodes": {
+      "intro_01": {
+        "id": "intro_01",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "沃斯大楼外的广播反复播放封锁令。顶层大厅里，诺斯站在控制终端前，两只金色巨手悬在他的肩后。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss"
+        },
+        "next": "intro_02",
+        "type": "stage"
+      },
+      "intro_02": {
+        "id": "intro_02",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "撤掉街区封锁。送药的人和回家的工人都在楼下等着。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss"
+        },
+        "next": "intro_03"
+      },
+      "intro_03": {
+        "id": "intro_03",
+        "speakerId": "noss",
+        "speakerSide": "right",
+        "text": "你今天修开的路，明天就会成为新的冲突。城市需要同一个命令。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss"
+        },
+        "next": "intro_04"
+      },
+      "intro_04": {
+        "id": "intro_04",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "那就处理冲突。别把所有人锁在门外。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss"
+        },
+        "next": "intro_05"
+      },
+      "intro_05": {
+        "id": "intro_05",
+        "speakerId": "noss",
+        "speakerSide": "right",
+        "text": "他们把麻烦写成委托交给你，把明天交给别人。到最后，总得有一个人替他们决定。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss"
+        },
+        "next": "intro_06"
+      },
+      "intro_06": {
+        "id": "intro_06",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "我接的是委托，不是替人过一辈子的授权。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss"
+        },
+        "next": "intro_07"
+      },
+      "intro_07": {
+        "id": "intro_07",
+        "speakerId": "noss",
+        "speakerSide": "right",
+        "text": "放下武器。我可以给你一张永久通行证。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss"
+        },
+        "next": "intro_08"
+      },
+      "intro_08": {
+        "id": "intro_08",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "先把其他人的通行权限恢复。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss"
+        },
+        "next": "intro_09"
+      },
+      "intro_09": {
+        "id": "intro_09",
+        "speakerId": "noss",
+        "speakerSide": "right",
+        "text": "权限由我批准。你也一样。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss"
+        },
+        "next": "intro_10"
+      },
+      "intro_10": {
+        "id": "intro_10",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "诺斯抬起手掌。金色巨手收拢指节，一柄由光凝成的长剑在他身前亮起。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss"
+        },
+        "next": "intro_11",
+        "type": "stage"
+      },
+      "intro_11": {
+        "id": "intro_11",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "那我就先停掉这里发号施令的东西。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss"
+        },
+        "next": "battle"
+      },
+      "win_01": {
+        "id": "win_01",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "光轮的尖端逐一暗下。六只金手停在半空，控制终端上的封锁指令开始消退。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss_phase2"
+        },
+        "next": "win_02",
+        "type": "stage"
+      },
+      "win_02": {
+        "id": "win_02",
+        "speakerId": "noss_phase2",
+        "speakerSide": "right",
+        "text": "……没有我的命令，城市会乱。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss_phase2"
+        },
+        "next": "win_03"
+      },
+      "win_03": {
+        "id": "win_03",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "先让楼下的人回家。剩下的，让他们自己谈。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss_phase2"
+        },
+        "next": "win_04"
+      },
+      "win_04": {
+        "id": "win_04",
+        "speakerId": "noss_phase2",
+        "speakerSide": "right",
+        "text": "他们迟早还会选一个站在这里的人。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss_phase2"
+        },
+        "next": "win_05"
+      },
+      "win_05": {
+        "id": "win_05",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "那个人也得学会把门打开。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss_phase2"
+        },
+        "next": "win_06"
+      },
+      "win_06": {
+        "id": "win_06",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "大厅外传来门禁解除的提示音。人群开始通过入口，广播里第一次没有紧跟着新的命令。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss_phase2"
+        },
+        "next": "win_07",
+        "type": "stage"
+      },
+      "win_07": {
+        "id": "win_07",
+        "speakerId": "@player",
+        "speakerSide": "left",
+        "text": "这张委托，到这里结束。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss_phase2"
+        },
+        "next": "finish"
+      },
+      "battle": {
+        "id": "battle",
+        "type": "battle",
+        "battleId": "B23"
+      },
+      "finish": {
+        "id": "finish",
+        "type": "finish",
+        "effects": []
+      },
+      "lose": {
+        "id": "lose",
+        "type": "stage",
+        "speakerId": "",
+        "speakerSide": "",
+        "text": "金色光剑落下，大楼的门禁重新合拢。",
+        "portraits": {
+          "left": "@player",
+          "right": "noss"
+        }
+      }
+    },
+    "phaseTwoDialogue": [
+      {
+        "speakerId": "",
+        "text": "两只巨手落地，诺斯胸前的金扣接连崩开。落下的光没有熄灭，反而沿着他的衣领重新聚拢。",
+        "portrait": "noss"
+      },
+      {
+        "speakerId": "noss",
+        "text": "你以为击倒一个人，就能让城市摆脱命令？",
+        "portrait": "noss"
+      },
+      {
+        "speakerId": "@player",
+        "text": "命令是你发的。别把它算在城市头上。",
+        "portrait": "noss"
+      },
+      {
+        "speakerId": "",
+        "text": "诺斯的面容沉入一轮暗核，金色光轮在身后展开。三对金属手臂依次抬起，大厅里只剩下光剑成形的细响。",
+        "portrait": "noss_phase2"
+      },
+      {
+        "speakerId": "noss_phase2",
+        "text": "秩序不会向你让步。",
+        "portrait": "noss_phase2"
+      },
+      {
+        "speakerId": "@player",
+        "text": "那我就把这道封锁打穿。",
+        "portrait": "noss_phase2"
+      }
+    ]
+  }
+}

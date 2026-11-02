@@ -319,5 +319,20 @@
     "showBadge": true,
     "cardApply": false,
     "description": "灵魂连接 · {count} 层\n每个敌方回合开始时（双方行动前，先清除上轮格挡），存活的黑舞者仍有连接则给存活的白舞者10点格挡；存活的白舞者仍有连接则给存活的黑舞者2点力量。效果不随层数增加。黑卡移除白舞者1层，白卡移除黑舞者1层；降至0层后停止提供增益。任意一方倒下后，双方连接均不再触发；已获得的力量保留，已有格挡按正常时机清除。"
+  },
+  {
+    "id": "alien_sin",
+    "name": "异罪",
+    "category": "positive",
+    "target": "enemy",
+    "stacking": "add",
+    "maxStacks": 3,
+    "duration": "battle",
+    "handler": "alien_sin",
+    "icon": "alien_sin",
+    "color": "f5cf76",
+    "showBadge": true,
+    "cardApply": false,
+    "description": "异罪 · {count} 层\n只强化下一次「太阳之下」：每层增加4点基础伤害，重击生效时清空全部层数。每承受一段攻击减少1层，完全格挡及0伤害攻击也减少；裂伤、污染、弹反等非攻击伤害不削层。最多3层，不强化普通光剑。"
   }
 ]

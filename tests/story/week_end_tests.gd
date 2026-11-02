@@ -73,7 +73,7 @@ func completed_state() -> Dictionary:
 	check(Game.claim_rewards(Game.revision), "reward exit ends first week")
 	check(Game.page == "result" and Game.state.currentScene == "result", "completion retains result route")
 	check(Game.is_week_complete() and Game.is_run_over() and not Game.is_run_failed(), "completion is terminal victory, never defeat")
-	check(Game.state.flags.get("week1Complete", false) and not Game.can_continue(), "completion flag disables continue")
+	check(Game.state.flags.get("week1Complete", false) and Game.can_continue(), "completed first week can resume its next-week entry")
 	check(Game.state.result == "win" and Game.state.currentDay == 7 and "E16" in Game.state.completedEventIds, "victory identity and day-seven completion remain")
 	check(Game.state.battleReward.status == "claimed" and Game.state.deck.count(selected) == count_before + 1, "completion preserves claimed card")
 	check(Game.valid_save(Game.state), "completed checkpoint validates")
@@ -142,7 +142,7 @@ func test_navigation_and_roundtrip(done: Dictionary) -> void:
 	var disk = JSON.parse_string(FileAccess.get_file_as_string(Game.save_path))
 	check(disk.currentScene == "result" and disk.result == "win" and disk.flags.get("week1Complete", false), "save projection never converts completion into defeat")
 	Game.state = {}
-	check(not Game.can_continue(), "disk-only completed save disables continue")
+	check(Game.can_continue(), "disk-only completion can resume its next-week entry")
 	check(Game.load_game() and Game.is_week_complete() and not Game.is_run_failed(), "completed save reloads as victory")
 	check(same(Game.state, done), "completed save preserves card, credits and history")
 
@@ -206,11 +206,11 @@ func test_view(done: Dictionary) -> void:
 	if is_instance_valid(week_end):
 		var buttons := view.find_children("*", "BaseButton", true, false)
 		var back := week_end.find_child("return_to_menu", true, false) as Button
-		check(buttons.size() == 1 and is_instance_valid(back), "completion exposes exactly one return-to-menu button")
+		check(buttons.size() == 2 and is_instance_valid(back) and is_instance_valid(week_end.find_child("start_second_week", true, false)), "completion exposes next-week and return-to-menu buttons")
 		var title := week_end.find_child("week_end_title", true, false) as Label
 		var message := week_end.find_child("week_end_message", true, false) as Label
 		check(is_instance_valid(title) and title.text == "第一周结束", "completion title matches requested text")
-		check(is_instance_valid(message) and message.text == "后续内容开发中", "completion message matches requested text")
+		check(is_instance_valid(message) and message.text == "第二周 · 新的委托已开放", "completion advertises second-week entry")
 		check(week_end.hp_fill == null and week_end.credits_label == null, "completion omits adventure status controls")
 		check(view.handle_escape() and Game.page == "menu" and Game.is_week_complete() and not Game.is_run_failed(), "completion Escape returns to menu without creating defeat")
 		Game.page = "result"

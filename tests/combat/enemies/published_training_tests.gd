@@ -1,8 +1,8 @@
 extends Node
 ## Run in a copied project with a QA user directory and absolute QA_OUT_DIR.
 ## Model, menu and save-isolation assertions; no GPU or physical-input acceptance.
-const FORMAL_BATTLES := {"robot":"B02", "gang":"B04", "fish":"B11", "pruning_hound":"B13", "powerline_repairman":"B14", "beacon_jellyfish":"B15", "dancer_duet":"B16"}
-const RETIRED := ["warden_shield", "chip_broker", "mutant_mouse", "luggage_lurker", "penitent_ascetic", "rogue_drone", "mirror_inspector"]
+const FORMAL_BATTLES := {"robot":"B02", "gang":"B04", "fish":"B11", "pruning_hound":"B13", "powerline_repairman":"B14", "beacon_jellyfish":"B15", "dancer_duet":"B16", "warden_shield":"B17", "chip_broker":"B18", "mutant_mouse":"B19", "luggage_lurker":"B20", "penitent_ascetic":"B21", "scavenger_hooker":"B22", "noss_sovereign":"B23"}
+const RETIRED := ["rogue_drone", "mirror_inspector"]
 var output := ""
 var checks := 0
 var failures: Array[String] = []
@@ -45,6 +45,7 @@ func adventure() -> Dictionary:
 	var s := Game.initial_state()
 	s.currentScene = "map"
 	s.currentPlaceId = "hive"
+	s.difficulty = "advanced"
 	s.currentHp = 47
 	s.credits = 1234
 	s.deck = ["noren_01", "noren_02", "noren_01"]
@@ -61,17 +62,19 @@ func choice_for(id: String) -> Dictionary:
 
 func test_config() -> void:
 	var authored = Game.read_data("training_enemies.json")
-	check(authored is Array and authored.size() == 7, "Exactly seven authored week-one practice choices")
-	var week: Dictionary = Game.read_data("weeks/week1/week.json")
+	check(authored is Array and authored.size() == 14, "Seven formal encounters from each of the two playable weeks")
 	var actual_battles: Array = []
-	for event_id in week.eventIds:
-		for node in Game.events[event_id].nodes.values():
-			if node.get("type") == "battle" and not actual_battles.has(node.battleId): actual_battles.append(node.battleId)
+	for week_path in ["weeks/week1/week.json", "weeks/week2/week.json"]:
+		var week: Dictionary = Game.read_data(week_path)
+		for event_id in week.eventIds:
+			for node in Game.events[event_id].nodes.values():
+				if node.get("type") == "battle" and not actual_battles.has(node.battleId): actual_battles.append(node.battleId)
 	actual_battles.sort()
 	var expected := FORMAL_BATTLES.values()
 	expected.sort()
-	check(actual_battles == expected, "Practice battle set equals actual battle nodes in current week-one events")
+	check(actual_battles == expected, "Practice set equals all authored battle nodes in the two playable weeks")
 	var choices := Game.training_enemy_choices()
+	check(choices.map(func(choice): return choice.id) == FORMAL_BATTLES.keys(), "Menu order preserves week one, then the six week-two commissions, then Noss")
 	var ids: Array = []
 	for choice in choices:
 		ids.append(choice.id)
@@ -88,7 +91,7 @@ func test_config() -> void:
 	ids.sort()
 	var expected_ids := FORMAL_BATTLES.keys()
 	expected_ids.sort()
-	check(ids == expected_ids, "Exactly the seven first-week encounter choices, without duplicate or prototype entries")
+	check(ids == expected_ids, "Exactly fourteen formal encounter choices, without duplicate or prototype entries")
 	check(not Game.has_method("training_scenery_choices") and not Game.has_method("set_b04_scenery_choice"), "Player scenery-selection API removed")
 
 func test_dynamic_formal_choices() -> void:
@@ -136,13 +139,14 @@ func test_start_and_restore() -> void:
 			if not original.is_empty(): check(Game.state.equippedCyberwareIds == original.equippedCyberwareIds, label + ": equipped technology copied")
 			var model := CombatModel.new()
 			model.restore(Game.state.combat)
+			check(model.profile.get("difficulty") == "normal", label + ": practice uses normal difficulty independently of adventure")
 			check(model.enemies.size() == formal.enemyIds.size() and same(practice.enemyIds, formal.enemyIds) and Game.training_enemy_id.is_empty(), label + ": whole formal formation without temporary enemy")
 			for index in formal.enemyIds.size():
 				var definition: Dictionary = Game.enemy_catalog[formal.enemyIds[index]]
 				var enemy: Dictionary = model.enemies[index]
 				check(enemy.id == definition.id and enemy.hp == definition.maxHp and enemy.maxHp == definition.maxHp and same(enemy.intentSequence, definition.intentSequence) and enemy.combatVisualId == definition.combatVisualId, label + ": formal identity, HP, intents and visual in slot " + str(index))
 			check(Game.valid_combat(model.snapshot()), label + ": opening snapshot validates")
-			if id == "dancer_duet":
+			if id in ["dancer_duet", "noss_sovereign"]:
 				var stripped: Dictionary = model.snapshot()
 				stripped.erase("encounterPhase")
 				for key in ["encounterId", "phaseOneEnemies", "phaseTwoEnemies", "phaseTwoCards"]: stripped.profile.erase(key)
@@ -151,7 +155,7 @@ func test_start_and_restore() -> void:
 				forged.battleId = "B02"
 				check(not Game.valid_combat(forged), label + ": ordinary battle cannot claim Boss phase data")
 				check(model.encounter_phase == 1 and same(practice.phaseTwoEnemyIds, formal.phaseTwoEnemyIds), label + ": boss phase data retained")
-				model.enemy_damage(0, 999)
+				for index in model.enemies.size(): model.enemy_damage(index, 999)
 				model.resolve_outcome()
 				check(model.advance_encounter_phase() and model.encounter_phase == 2 and model.outcome.is_empty(), label + ": first phase opens second phase instead of winning")
 				check(model.enemies.size() == formal.phaseTwoEnemyIds.size(), label + ": full second-phase formation")
@@ -211,7 +215,7 @@ func test_terminal_restore() -> void:
 			if result == "win":
 				for index in model.enemies.size(): model.enemy_damage(index, 999)
 				model.resolve_outcome()
-				if id == "dancer_duet":
+				if id in ["dancer_duet", "noss_sovereign"]:
 					model.advance_encounter_phase()
 					for index in model.enemies.size(): model.enemy_damage(index, 999)
 					model.resolve_outcome()
@@ -250,7 +254,7 @@ func test_menu() -> void:
 	check(menu.training_open and modal.is_visible_in_tree(), "Practice entry opens modal")
 	check(menu.find_child("training_scenery", true, false) == null and menu.find_child("training_scenery_picker", true, false) == null and not menu.has_method("open_scenery_picker"), "No player scenery button, picker or opening method remains")
 	var buttons := modal.find_children("*", "Button", true, false)
-	check(buttons.size() == 8, "Exactly seven encounter buttons and return, with no duplicate classic section")
+	check(buttons.size() == 15, "Fourteen encounter buttons and return, with no duplicate classic section")
 	var bounds_seen: Array[Rect2] = []
 	var canvas := Rect2(Vector2.ZERO, Vector2(1440, 900))
 	for button in buttons:
@@ -275,7 +279,7 @@ func test_menu() -> void:
 		var original := Game.state.duplicate(true)
 		entry.pressed.emit()
 		var choice := modal.find_child("enemy_choice_" + id, true, false) as Button
-		check(choice != null, "Unified menu contains first-week choice: " + id)
+		check(choice != null, "Unified menu contains formal choice: " + id)
 		if choice != null: choice.pressed.emit()
 		check(Game.training_mode and Game.state.get("battleId", "") == "training_" + id and not menu.training_open, "Actual menu callback enters selected practice and closes modal: " + id)
 		Game.menu()

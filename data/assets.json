@@ -316,7 +316,7 @@
     "kind": "background"
   },
   "black_market_shopkeeper": {
-    "path": "res://assets/market/black-market-shopkeeper-layer-v2.png",
+    "path": "res://assets/characters/black_market_keeper.png",
     "kind": "portrait"
   },
   "woss_mall_shop": {
@@ -367,5 +367,47 @@
       0
     ],
     "trainingSelectable": true
+  },
+  "warden_shield_dialogue": {
+    "path": "res://assets/characters/enemies_dialogue_v1/warden_shield_dialogue_v1.png",
+    "kind": "portrait",
+    "whiteKey": false
+  },
+  "chip_broker_dialogue": {
+    "path": "res://assets/characters/enemies_dialogue_v1/chip_broker_dialogue_v1.png",
+    "kind": "portrait",
+    "whiteKey": false
+  },
+  "mutant_mouse_dialogue": {
+    "path": "res://assets/characters/enemies_dialogue_v1/mutant_mouse_dialogue_v1.png",
+    "kind": "portrait",
+    "whiteKey": false
+  },
+  "luggage_lurker_dialogue": {
+    "path": "res://assets/characters/enemies_dialogue_v1/luggage_lurker_dialogue_v1.png",
+    "kind": "portrait",
+    "whiteKey": false
+  },
+  "penitent_ascetic_dialogue": {
+    "path": "res://assets/characters/enemies_dialogue_v1/penitent_ascetic_dialogue_v1.png",
+    "kind": "portrait",
+    "whiteKey": false
+  },
+  "scavenger_hooker_dialogue": {
+    "path": "res://assets/characters/scavenger_hooker_dialogue_v1.png",
+    "kind": "portrait",
+    "whiteKey": false
+  },
+  "noss": {
+    "id": "noss",
+    "kind": "portrait",
+    "path": "res://assets/characters/noss.png",
+    "whiteKey": false
+  },
+  "noss_phase2": {
+    "id": "noss_phase2",
+    "kind": "portrait",
+    "path": "res://assets/characters/noss_phase2.png",
+    "whiteKey": false
   }
 }

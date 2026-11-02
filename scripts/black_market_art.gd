@@ -20,7 +20,8 @@ func _ready() -> void:
 		add_picture("black_market_fallback",Game.texture("black_market_shop"),Rect2(Vector2.ZERO,CANVAS))
 		return
 	add_picture("black_market_background",backdrop,Rect2(Vector2.ZERO,CANVAS))
-	add_picture("black_market_shopkeeper",shopkeeper,SHOPKEEPER_RECT)
+	var portrait := add_picture("black_market_shopkeeper",shopkeeper,SHOPKEEPER_RECT)
+	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	var foreground := Polygon2D.new()
 	foreground.name = "black_market_counter"
 	foreground.texture = backdrop

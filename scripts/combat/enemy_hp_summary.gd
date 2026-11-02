@@ -7,6 +7,8 @@ var hp_label: Label
 var status_label: Label
 const DIMENSIONS := Vector2(328,68)
 const BOSS_DIMENSIONS := Vector2(600,68)
+const MINION_DIMENSIONS := Vector2(210,52)
+const MINION_TRACK := Rect2(0,28,210,8)
 const TRACK := Rect2(18,44,170,12)
 const BOSS_TRACK := Rect2(18,44,442,12)
 const BOSS_SHIELD := Rect2(4,34,32,32)
@@ -28,7 +30,7 @@ func text_label(text: String, at: Vector2, dimensions: Vector2, font_size: int, 
 	add_child(result)
 	return result
 
-func setup(enemy: Dictionary, number: int, font: Font, boss: bool = false) -> void:
+func setup(enemy: Dictionary, number: int, font: Font, boss: bool = false, compact: bool = false) -> void:
 	add_theme_font_override("font",font)
 	show_background = not boss
 	size = BOSS_DIMENSIONS if boss else DIMENSIONS
@@ -61,6 +63,24 @@ func setup(enemy: Dictionary, number: int, font: Font, boss: bool = false) -> vo
 			font_size -= 1
 		status_label.add_theme_font_size_override("font_size",font_size)
 		status_label.add_theme_color_override("font_color",Color("e5f6f3"))
+	if compact:
+		size = MINION_DIMENSIONS
+		track = MINION_TRACK
+		show_background = false
+		name_label.position = Vector2.ZERO
+		name_label.size = Vector2(130,24)
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		name_label.add_theme_font_size_override("font_size",14)
+		hp_label.position = Vector2(132,0)
+		hp_label.size = Vector2(78,24)
+		hp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		hp_label.add_theme_font_size_override("font_size",13)
+		status_label.text = state
+		status_label.position = Vector2(0,36)
+		status_label.size = Vector2(210,16)
+		status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		status_label.add_theme_font_size_override("font_size",11)
+		if hp <= 0: name_label.add_theme_color_override("font_color",Color("a7b0be"))
 	queue_redraw()
 
 func _draw() -> void:
@@ -69,8 +89,8 @@ func _draw() -> void:
 		draw_rect(Rect2(0,67,size.x,1),Color("2f6178"))
 	draw_rect(track,Color("805071"))
 	draw_rect(track.grow(-1),Color("382333"))
-	draw_rect(Rect2(Vector2(20,46),Vector2((track.size.x-4)*clampf(float(hp)/max_hp,0,1),8)),Color("ff3158"))
-	if not show_background and hp > 0 and block > 0:
+	draw_rect(Rect2(track.position+Vector2(2,2),Vector2((track.size.x-4)*clampf(float(hp)/max_hp,0,1),track.size.y-4)),Color("ff3158"))
+	if track == BOSS_TRACK and not show_background and hp > 0 and block > 0:
 		var shield := PackedVector2Array([Vector2(4,38),Vector2(20,34),Vector2(36,38),Vector2(33,56),Vector2(20,66),Vector2(7,56)])
 		draw_colored_polygon(shield,Color("28668c"))
 		draw_polyline(shield+PackedVector2Array([shield[0]]),Color("b2ddec"),1.2,true)

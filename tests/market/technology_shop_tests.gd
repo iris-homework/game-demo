@@ -47,7 +47,7 @@ func test_catalog_and_purchase() -> void:
 		check(not Game.buy_shop_technology(index, rev) and Game.state == before and Game.revision == rev, "existing ownership cannot repurchase: " + offers[index].id)
 	check(Game.prototype_rules.cyberware.cards.size() == 12, "catalog retains six legacy definitions plus six real technologies")
 	for index in range(3,6): check(Game.buy_shop_technology(index,Game.revision), "fixture can purchase passive chip " + offers[index].id)
-	check(Game.equipped_cyberware_ids() == defaults, "purchasing chips preserves default active equipment")
+	check(Game.equipped_cyberware_ids() == defaults + ["money_chip"], "first passive purchase fills the fourth slot; later purchases preserve all four in order")
 	offers[0].price = 1
 	offers.clear()
 	check(Game.technology_shop_offers()[0].price == 125, "public offers are a deep copy")
@@ -60,17 +60,37 @@ func test_catalog_and_purchase() -> void:
 	check(Game.buy_shop_technology(0, rev), "unowned fixture purchase succeeds")
 	Game.status_changed.disconnect(on_status)
 	check(Game.revision == rev + 1 and notices[0] == 1, "purchase commits once and notifies once")
-	check(Game.state.credits == before.credits - 125 and Game.owned_cyberware_ids() == ["dimensional_pocket"], "purchase charges once and records ownership")
+	check(Game.state.credits == before.credits - 125 and Game.owned_cyberware_ids() == ["dimensional_pocket"] and Game.equipped_cyberware_ids() == ["dimensional_pocket"], "purchase charges once, records ownership and automatically equips")
 	before.credits -= 125
 	before.ownedCyberwareIds.append("dimensional_pocket")
-	check(Game.state == before, "purchase changes only credits and ownership, no time equipment or other state")
+	before.equippedCyberwareIds.append("dimensional_pocket")
+	check(Game.state == before, "purchase changes only credits, ownership and equipment without time or other state")
 	check(not Game.buy_shop_technology(0, rev) and not Game.buy_shop_technology(0, Game.revision), "stale and repeated purchase rejected")
 	check(Game.state == before and Game.revision == rev + 1, "rejected purchase leaves all state and revision unchanged")
 	for index in range(1, 6): check(Game.buy_shop_technology(index, Game.revision), "can buy remaining unowned technology " + str(index))
-	check(Game.owned_cyberware_ids() == defaults + ["money_chip","healing_chip","swift_chip"] and Game.equipped_cyberware_ids().is_empty(), "all six owned without automatically equipping")
+	check(Game.owned_cyberware_ids() == defaults + ["money_chip","healing_chip","swift_chip"] and Game.equipped_cyberware_ids() == defaults + ["money_chip"], "six sequential purchases own all six and automatically equip only the first four in order")
 	Game.state.currentDay = 7
 	check(not Game.buy_shop_technology(0, Game.revision), "day changes do not replenish owned technology")
 	check(Game.initial_state().ownedCyberwareIds.is_empty() and Game.initial_state().equippedCyberwareIds.is_empty(), "production new adventure starts without technologies")
+
+func test_auto_equipment_slots() -> void:
+	reset()
+	Game.page = "map"
+	Game.state.currentScene = "map"
+	var remaining := ["accelerated_clock", "backup_energy"]
+	check(Game.set_technology_loadout(remaining, Game.revision), "map can manually unequip an already owned technology")
+	Game.page = "place"
+	Game.state.currentScene = "place"
+	check(Game.buy_shop_technology(3, Game.revision), "new technology can be purchased after manually freeing a slot")
+	check(Game.equipped_cyberware_ids() == remaining + ["money_chip"], "new purchase appends after remaining equipment without restoring a manually removed item")
+	var before := Game.state.duplicate(true)
+	var rev := Game.revision
+	check(not Game.buy_shop_technology(0, rev) and Game.state == before and Game.revision == rev, "repurchasing a manually unequipped owned technology neither charges nor re-equips it")
+	check(Game.buy_shop_technology(4, Game.revision), "purchase fills the last remaining slot after a manual removal")
+	var equipped := remaining + ["money_chip", "healing_chip"]
+	check(Game.equipped_cyberware_ids() == equipped, "automatic equipment preserves manual choice and acquisition order up to four")
+	check(Game.buy_shop_technology(5, Game.revision), "full loadout can still acquire a new technology")
+	check(Game.owned_cyberware_ids().has("swift_chip") and Game.equipped_cyberware_ids() == equipped, "full loadout adds ownership without replacing an equipped item")
 
 func test_catalog_limits() -> void:
 	unowned_fixture()
@@ -141,7 +161,7 @@ func test_save_and_rollback() -> void:
 	Game.save_enabled = true
 	check(Game.buy_shop_technology(0, Game.revision), "purchase saves successfully")
 	var saved := Game.state.duplicate(true)
-	check(Game.valid_save(saved), "purchased technology produces a valid adventure save")
+	check(Game.valid_save(saved) and saved.equippedCyberwareIds == ["dimensional_pocket"], "purchase immediately saves a valid automatically equipped technology")
 	Game.state = {}
 	check(Game.load_game() and same(Game.state, saved), "disk roundtrip retains purchased ownership credits and equipment")
 	Game.page = "place"
@@ -161,7 +181,7 @@ func test_save_and_rollback() -> void:
 	check(Game.state == before and Game.revision == rev, "failed write rolls back balance ownership equipment and revision")
 	Game.save_path = good_path
 	check(Game.buy_shop_technology(0, rev), "same purchase can retry after storage recovers")
-	check(Game.load_game() and "dimensional_pocket" in Game.owned_cyberware_ids(), "successful retry persisted")
+	check(Game.load_game() and Game.owned_cyberware_ids() == ["dimensional_pocket"] and Game.equipped_cyberware_ids() == ["dimensional_pocket"], "successful retry persists both ownership and automatic equipment")
 
 func test_real_effects() -> void:
 	for index in 3:
@@ -169,9 +189,7 @@ func test_real_effects() -> void:
 		var offer: Dictionary = Game.technology_shop_offers()[index]
 		var definition := Game.cyberware_definition(offer.id)
 		check(Game.buy_shop_technology(index, Game.revision), "effect fixture purchases " + offer.id)
-		Game.page = "map"
-		Game.state.currentScene = "map"
-		check(Game.set_technology_loadout([offer.id], Game.revision), "map equips purchased " + offer.id)
+		check(Game.equipped_cyberware_ids() == [offer.id], "purchase automatically equips without a map configuration call: " + offer.id)
 		Game.state.battleId = "B02"
 		Game.state.currentScene = "battle"
 		Game.initialize_combat()
@@ -206,6 +224,7 @@ func _ready() -> void:
 	good_path = directory.path_join("checkpoint-test.json")
 	Game.meta_path = directory.path_join("meta-test.json")
 	test_catalog_and_purchase()
+	test_auto_equipment_slots()
 	test_catalog_limits()
 	test_guards()
 	test_save_and_rollback()

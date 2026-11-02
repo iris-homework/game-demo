@@ -55,7 +55,7 @@ func _ready() -> void:
 		Game.state = saved.duplicate(true)
 		Game.start_tutorial()
 		check_tutorial_setup()
-		check(Game.state.deck.is_empty() and Game.equipped_cyberware_ids().is_empty(), "Tutorial does not inherit the adventure deck or technology: " + outcome)
+		check(Game.state.deck.is_empty() and Game.equipped_cyberware_ids() == Game.TUTORIAL_CYBERWARE and Game.owned_cyberware_ids() == Game.TUTORIAL_CYBERWARE, "Tutorial uses fixed teaching technology instead of the adventure deck or technology: " + outcome)
 		if outcome == "exit": Game.menu()
 		else: check(Game.battle_exit(outcome, Game.revision), "Tutorial result uses normal training exit: " + outcome)
 		check(Game.state == saved and Game.page == "menu", "Adventure is restored byte-for-byte in memory: " + outcome)
@@ -123,6 +123,10 @@ func check_tutorial_setup() -> void:
 	check(snapshot.enemies.size() == 1 and snapshot.enemies[0].id == "fish" and snapshot.enemies[0].hp == 30, "Tutorial uses one existing 30 HP mutant fish")
 	check(Game.state.currentHp == 70 and Game.state.playerCharacterId == "noren", "Tutorial starts with healthy Noren")
 	check(Game.state.battleStart.is_empty(), "Tutorial does not create a persistent battle restart checkpoint")
+	check(Game.equipped_cyberware_ids() == ["backup_energy"] and Game.owned_cyberware_ids() == ["backup_energy"], "Tutorial owns and carries only temporary backup energy")
+	var model := CombatModel.new()
+	model.restore(snapshot)
+	check(model.cyberware_cards().map(func(definition): return definition.id) == ["backup_energy"] and model.cyberware_cooldown("backup_energy") == 0, "Tutorial combat freezes an unused real backup energy technology")
 
 func click_control(control: Control) -> void:
 	var presses: Array = []
@@ -157,7 +161,7 @@ func exercise_guide() -> void:
 	await capture_frame("tutorial-opening")
 	var guide: Control = view.tutorial_guide
 	var before: Dictionary = view.model.snapshot()
-	for index in 7:
+	for index in guide.LESSONS.size():
 		guide.set_step(index)
 		await get_tree().process_frame
 		check_guidance_geometry(guide, index)
@@ -199,17 +203,17 @@ func exercise_guide() -> void:
 	check(guide.guidance_targets.any(func(target): return target.get("kind", "") == "exhaust"), "After the ability is played its guidance moves to the real exhaust control")
 	check(target_contains_control(guide, view.exhaust_button), "Ability follow-up points at the actual exhaust button bounds")
 	await capture_frame("guide-exhaust-target")
-	guide.set_step(5)
+	guide.set_step(6)
 	check(not view.player_plate.badges.is_empty(), "Ability creates a real status badge to inspect")
 	await pointer(view.player_plate.badges[0].get_global_rect().get_center())
 	await get_tree().create_timer(0.9).timeout
-	check(guide.completed.get(5, false), "Hovering a real status badge completes buff inspection")
+	check(guide.completed.get(6, false), "Hovering a real status badge completes buff inspection")
 	await capture_frame("buff-tooltip")
-	guide.set_step(4)
+	guide.set_step(5)
 	await pointer(view.enemy_intents[0].get_global_rect().get_center())
 	check(guide.mouse_filter == Control.MOUSE_FILTER_IGNORE and get_viewport().gui_get_hovered_control() == view.enemy_intents[0], "Drawn leaders let real viewport hover reach the intended enemy control")
 	await get_tree().create_timer(0.9).timeout
-	check(guide.completed.get(4, false), "Hovering the real fish intent completes enemy inspection")
+	check(guide.completed.get(5, false), "Hovering the real fish intent completes enemy inspection")
 	check(view.enemy_intents[0].tooltip_text.contains("追加 2 层污染") and view.enemy_intents[0].tooltip_text.contains("死亡"), "Fish tooltip exposes its attack and death mechanics")
 	await capture_frame("enemy-tooltip")
 	guide.set_step(2)
@@ -242,11 +246,44 @@ func exercise_guide() -> void:
 	check(view.model.stance == "ranged" and guide.completed.get(3, false), "Changing stance through a real card completes protagonist practice")
 	check(view.model.energy == 0 and view.model.stance_discount, "Stance card uses last energy and grants ranged attack discount")
 	await capture_frame("ranged")
-	guide.set_step(6)
+	guide.set_step(4)
+	guide._update_highlights()
+	check(target_contains_control(guide, view.cyberware_button), "Technology lesson points at the actual activate technology button")
+	var technology_tag: Rect2 = guide._target_label_rect(guide.guidance_targets[0])
+	for control in [view.ammo_panel, view.energy_panel, view.cyberware_button]:
+		var bounds: Rect2 = guide.get_global_transform().affine_inverse() * control.get_global_rect()
+		check(not technology_tag.intersects(bounds), "Technology action label stays clear of adjacent HUD controls: " + str(control.name))
+	var before_technology: Dictionary = view.model.snapshot()
+	check(not guide.completed.get(4, false), "Reading the technology lesson does not complete its practice")
+	await capture_frame("technology-before")
+	await click_control(view.cyberware_button)
+	var technology: Control = view.pile_overlay
+	check(is_instance_valid(technology) and technology.card_buttons.size() == 1 and not technology.card_buttons[0].disabled, "Real technology button opens one available teaching technology")
+	check(not guide.visible and guide.guidance_targets.is_empty() and guide.leader_paths.is_empty(), "Technology modal hides the guide and clears its leaders")
+	check(not guide.completed.get(4, false) and view.model.snapshot() == before_technology, "Opening technology alone changes neither combat nor practice completion")
+	await capture_frame("technology-panel")
+	await click_control(technology.card_buttons[0])
+	await idle()
+	check(view.model.energy == 1 and view.model.cyberware_cooldown("backup_energy") == 3, "Clicking backup energy restores exactly one energy and starts three-turn cooldown")
+	check(not is_instance_valid(view.pile_overlay) and guide.visible and guide.completed.get(4, false), "Successful technology activation returns to battle and completes its practice")
+	guide._update_highlights()
+	check(target_contains_control(guide, view.cyberware_button), "Completed technology practice points back to reopening the cooldown display")
+	await capture_frame("technology-after")
+	await click_control(view.cyberware_button)
+	technology = view.pile_overlay
+	check(technology.card_buttons[0].disabled and technology.state_labels[0].text.contains("3"), "Reopening technology shows disabled backup energy with three cooldown turns")
+	await capture_frame("technology-cooldown")
+	var cooling_snapshot: Dictionary = view.model.snapshot()
+	await key(KEY_1)
+	check(view.model.snapshot() == cooling_snapshot and not guide.visible, "Technology number key cannot reactivate a cooling technology or reveal the guide")
+	await click_control(technology.close_button)
+	check(guide.visible and view.model.snapshot() == cooling_snapshot, "Closing the technology panel restores the guide without changing combat")
+	guide.set_step(7)
 	await click_control(view.end_button)
 	await idle()
-	check(view.model.turn == 2 and view.model.energy == 3 and view.model.hand.size() == 5 and guide.completed.get(6, false), "Real end-turn input runs fish action, refills energy and deals five cards")
-	check(guide.completed.size() == 7, "All seven practice goals were completed by their actual actions")
+	check(view.model.turn == 2 and view.model.energy == 3 and view.model.hand.size() == 5 and guide.completed.get(7, false), "Real end-turn input runs fish action, refills energy and deals five cards")
+	check(view.model.cyberware_cooldown("backup_energy") == 2, "Entering the next player turn decrements the real technology cooldown once")
+	check(guide.LESSONS.size() == 8 and guide.completed.size() == 8, "All eight practice goals were completed by their actual actions")
 	await capture_frame("next-turn")
 	await click_control(guide.next_button)
 	check(guide.collapsed, "Final lesson allows continuing free practice")
@@ -285,7 +322,7 @@ func target_contains_control(guide: Control, control: Control) -> bool:
 
 func check_guidance_follow(view: Control, guide: Control) -> void:
 	var before: Dictionary = view.model.snapshot()
-	guide.set_step(4)
+	guide.set_step(5)
 	guide._update_highlights()
 	if guide.guidance_targets.is_empty() or guide.leader_paths.is_empty():
 		check(false, "Enemy guidance exists before following its target")

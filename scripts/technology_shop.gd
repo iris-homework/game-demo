@@ -35,7 +35,7 @@ func _ready() -> void:
 	var leave := shop_button(self,"← 离开商场",Vector2(28,830),Vector2(244,48),Game.go_map)
 	leave.name = "return_map"
 	apply_soft_button_style(leave)
-	label(self,"购买后，在地图「科技配置」中携带",Vector2(744,837),Vector2(648,34),18,TEXT).horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	label(self,"有空位自动装配；满槽后可到地图调整",Vector2(744,837),Vector2(648,34),18,TEXT).horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	refresh_stock()
 	fade_in()
 
@@ -122,7 +122,7 @@ func refresh_stock() -> void:
 		buy.name = "buy_slot_%d" % i
 		buy.add_theme_font_size_override("font_size",16)
 		buy.disabled = owned or int(Game.state.credits) < int(offer.price)
-		buy.tooltip_text = "已加入已有科技，可在地图配置携带" if owned else "信用点不足" if buy.disabled else "查看详情并确认购买"
+		buy.tooltip_text = ("已装配，可在地图调整" if offer.id in Game.equipped_cyberware_ids() else "已拥有，可在地图装配") if owned else "信用点不足" if buy.disabled else "查看详情并确认购买"
 	refresh_hp()
 
 func open_purchase(index: int) -> void:
@@ -154,7 +154,8 @@ func open_purchase(index: int) -> void:
 	label(modal,str(definition.description),Vector2(594,370),Vector2(466,65),20,SOFT)
 	label(modal,TechnologyIcons.activation_label(definition),Vector2(594,442),Vector2(466,30),17,ROSE)
 	label(modal,"%d 信用点" % int(offer.price),Vector2(594,486),Vector2(466,42),28,ROSE)
-	label(modal,"余额 %d → %d  ·  购买后请到地图配置携带" % [int(Game.state.credits),int(Game.state.credits)-int(offer.price)],Vector2(370,553),Vector2(700,31),17,SOFT)
+	var equip_hint := "购买后自动装配" if Game.equipped_cyberware_ids().size() < CombatModel.CYBERWARE_LIMIT else "槽位已满，购买后可到地图调整"
+	label(modal,"余额 %d → %d  ·  %s" % [int(Game.state.credits),int(Game.state.credits)-int(offer.price),equip_hint],Vector2(370,553),Vector2(700,31),17,SOFT)
 	var cancel := shop_button(modal,"取消",Vector2(370,615),Vector2(195,48),close_modal)
 	cancel.name = "cancel_trade"
 	apply_soft_button_style(cancel)

@@ -98,5 +98,45 @@
     "displayName": "黑舞者",
     "portraitAssetId": "dancer_black_dialogue",
     "battlePortraitAssetId": ""
+  },
+  "warden_shield": {
+    "displayName": "巡界盾手",
+    "portraitAssetId": "warden_shield_dialogue",
+    "battlePortraitAssetId": ""
+  },
+  "chip_broker": {
+    "displayName": "筹码掮客",
+    "portraitAssetId": "chip_broker_dialogue",
+    "battlePortraitAssetId": ""
+  },
+  "mutant_mouse": {
+    "displayName": "爬墙线鼠",
+    "portraitAssetId": "mutant_mouse_dialogue",
+    "battlePortraitAssetId": ""
+  },
+  "luggage_lurker": {
+    "displayName": "行李潜伏客",
+    "portraitAssetId": "luggage_lurker_dialogue",
+    "battlePortraitAssetId": ""
+  },
+  "penitent_ascetic": {
+    "displayName": "赎罪苦修者",
+    "portraitAssetId": "penitent_ascetic_dialogue",
+    "battlePortraitAssetId": ""
+  },
+  "scavenger_hooker": {
+    "displayName": "拾荒钩客",
+    "portraitAssetId": "scavenger_hooker_dialogue",
+    "battlePortraitAssetId": ""
+  },
+  "noss": {
+    "displayName": "理事长 诺斯",
+    "portraitAssetId": "noss",
+    "battlePortraitAssetId": ""
+  },
+  "noss_phase2": {
+    "displayName": "理事长 诺斯",
+    "portraitAssetId": "noss_phase2",
+    "battlePortraitAssetId": ""
   }
 }

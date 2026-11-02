@@ -328,5 +328,146 @@
         "whiteKey": false
       }
     }
+  },
+  "noss": {
+    "id": "noss",
+    "placeholder": false,
+    "sourceFacing": "left",
+    "targetRect": [
+      -65,
+      -170,
+      130,
+      180
+    ],
+    "attackStyleOverride": "shoot",
+    "poseAliases": {
+      "block": "idle",
+      "move": "idle",
+      "retreat": "idle"
+    },
+    "hitEffectTexture": "",
+    "poses": {
+      "idle": {
+        "texture": "res://assets/combat_test/noss_boss/noss_idle.png",
+        "anchor": [
+          635,
+          1188
+        ],
+        "scale": 0.145,
+        "whiteKey": false
+      },
+      "shoot": {
+        "texture": "res://assets/combat_test/noss_boss/noss_attack_shoot.png",
+        "anchor": [
+          730,
+          1195
+        ],
+        "scale": 0.145,
+        "whiteKey": false
+      },
+      "damaged": {
+        "texture": "res://assets/combat_test/noss_boss/noss_damaged.png",
+        "anchor": [
+          650,
+          1188
+        ],
+        "scale": 0.145,
+        "whiteKey": false
+      }
+    }
+  },
+  "noss_hand": {
+    "id": "noss_hand",
+    "placeholder": false,
+    "sourceFacing": "left",
+    "targetRect": [
+      -75,
+      -115,
+      150,
+      120
+    ],
+    "attackStyleOverride": "hit",
+    "poseAliases": {
+      "block": "idle",
+      "move": "idle",
+      "hit": "attack_hit"
+    },
+    "hitEffectTexture": "",
+    "poses": {
+      "idle": {
+        "texture": "res://assets/combat_test/noss_boss/noss_hand_idle.png",
+        "anchor": [
+          720,
+          1200
+        ],
+        "scale": 0.105,
+        "whiteKey": false
+      },
+      "attack_hit": {
+        "texture": "res://assets/combat_test/noss_boss/noss_hand_attack_hit.png",
+        "anchor": [
+          700,
+          1200
+        ],
+        "scale": 0.105,
+        "whiteKey": false
+      },
+      "damaged": {
+        "texture": "res://assets/combat_test/noss_boss/noss_hand_damaged.png",
+        "anchor": [
+          740,
+          1200
+        ],
+        "scale": 0.105,
+        "whiteKey": false
+      }
+    }
+  },
+  "noss_phase2": {
+    "id": "noss_phase2",
+    "placeholder": false,
+    "sourceFacing": "left",
+    "targetRect": [
+      -120,
+      -220,
+      240,
+      230
+    ],
+    "attackStyleOverride": "shoot",
+    "poseAliases": {
+      "block": "idle",
+      "move": "idle",
+      "retreat": "idle"
+    },
+    "hitEffectTexture": "",
+    "poses": {
+      "idle": {
+        "texture": "res://assets/combat_test/noss_boss/noss_phase2_idle.png",
+        "anchor": [
+          655,
+          1205
+        ],
+        "scale": 0.18,
+        "whiteKey": false
+      },
+      "shoot": {
+        "texture": "res://assets/combat_test/noss_boss/noss_phase2_attack_shoot.png",
+        "anchor": [
+          785,
+          1205
+        ],
+        "scale": 0.18,
+        "whiteKey": false
+      },
+      "damaged": {
+        "texture": "res://assets/combat_test/noss_boss/noss_phase2_damaged.png",
+        "anchor": [
+          680,
+          1205
+        ],
+        "scale": 0.18,
+        "whiteKey": false
+      }
+    }
   }
 }

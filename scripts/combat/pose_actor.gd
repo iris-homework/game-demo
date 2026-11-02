@@ -273,6 +273,15 @@ func _apply_idle_motion() -> void:
 			"dancer_black", "dancer_white":
 				speed = 1.65
 				sway_size = 0.014
+			"noss", "noss_phase2":
+				speed = 1.15
+				breath_size = 0.006
+				sway_size = 0.002
+			"noss_hand":
+				speed = 1.3
+				breath_size = 0.0
+				sway_size = 0.002
+				hover_size = 1.5
 		var weight := smoothstep(0.0,1.0,_idle_weight)
 		var phase := _idle_elapsed*speed+_idle_phase
 		var breath := sin(phase)*breath_size*weight

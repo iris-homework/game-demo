@@ -19,6 +19,10 @@ static func describe(enemy: Dictionary, preview: String) -> Dictionary:
 			data.unit = "每段伤害 × 次数" if hits>1 else "点伤害"
 			data.summary = "将对你造成 %d 次伤害，每次 %d 点。" % [hits,damage] if hits>1 else "将对你造成 %d 点攻击伤害。" % damage
 			data.notes.append({"title":"伤害预览","body":"预计合计 %d 点，先由格挡抵消。数值已计入当前伤害修正。" % (damage*hits)})
+			if intent.get("animation", "") == "halo_burst":
+				data.title = "光环重击"
+				data.accent = Color("ffe66a")
+				data.summary = "在你周围显现光环，蓄光后爆炸，造成 %d 点攻击伤害。" % damage
 		"fortify":
 			data.title = "强化"
 			data.accent = Color("73cafa")
@@ -27,6 +31,13 @@ static func describe(enemy: Dictionary, preview: String) -> Dictionary:
 			data.summary = "获得 %d 点格挡，增加 %d 层力量。" % [amount,int(intent.get("strength",0))]
 			data.notes.append({"title":"格挡","body":"受到伤害时优先消耗，在自己的下一个行动回合开始时清除；角色与敌人均适用。"})
 			data.notes.append({"title":"力量","body":"每层使每段基础攻击伤害 +1，持续至本场战斗结束。"})
+		"block_ally_deferred":
+			data.title = "护主"
+			data.accent = Color("73cafa")
+			data.value = "+%d" % amount
+			data.unit = "点格挡 / 诺斯"
+			data.summary = "在本轮全部敌人行动结束后，为存活的诺斯提供 %d 点格挡。" % amount
+			data.notes.append({"title":"延后授盾","body":"格挡在整轮结束后生效，保留经过下一玩家回合，到诺斯下一次行动开始清除。诺斯已倒下或阶段结束时不再授予。"})
 		"energy_suit":
 			data.title = "强化"
 			data.accent = Color("81e4d4")
@@ -51,6 +62,11 @@ static func describe(enemy: Dictionary, preview: String) -> Dictionary:
 			if "dancer_white" in intent.get("targetIds", []):
 				data.unit = "层力量 / 存活白舞者"
 				data.summary = "为存活的白舞者增加 %d 层力量。" % amount
+			if "noss_hand_left" in intent.get("targetIds", []) or "noss_hand_right" in intent.get("targetIds", []):
+				data.unit = "层力量 / 每只存活金手"
+				data.summary = "为每只存活的敕令之手增加 %d 层力量。" % amount
+			if intent.get("fallbackSelf",false):
+				data.notes.append({"title":"敕令后备","body":"双手全部倒下时，改为诺斯自身获得 %d 层力量；不复活双手。" % amount})
 			data.notes.append({"title":"力量","body":"每层使每段基础攻击伤害 +1，持续至本场战斗结束。"})
 		"pollution":
 			data.title = "施加污染"
@@ -81,6 +97,29 @@ static func describe(enemy: Dictionary, preview: String) -> Dictionary:
 			var recipient := "黑舞者" if "dancer_black" in intent.get("targetIds", []) else "指定的存活同伴"
 			data.summary = "为%s恢复 %d 点生命。" % [recipient,amount]
 			data.notes.append({"title":"治疗","body":"最多恢复至生命上限；不会复活已倒下的同伴。"})
+	if int(intent.get("postSin",0)) > 0:
+		data.title = "聚日"
+		data.notes.append({"title":"攻击后蓄光","body":"整次攻击结束后，若诺斯仍存活，获得 %d 层异罪。异罪只强化下一次「太阳之下」，不强化普通光剑。" % int(intent.postSin)})
+		data.notes.append({"title":"削弱异罪","body":"蓄光后每承受一段攻击减少1层，完全格挡及0伤害攻击也减少；裂伤、污染、弹反等非攻击伤害不削层。"})
+	if int(intent.get("sinMultiplier",0)) > 0:
+		data.title = "太阳之下"
+		data.notes.append({"title":"异罪重击","body":"本招基础伤害为 %d＋%d×剩余异罪层数，再计算力量、虚弱与易伤；上方数字已计入当前修正。" % [amount,int(intent.sinMultiplier)]})
+		data.notes.append({"title":"可削弱的蓄光","body":"每承受一段攻击减少1层异罪，完全格挡也减少。重击生效时清空剩余异罪；第一轮3／2／1／0层对应30／26／22／18点基础伤害。"})
+	if int(intent.get("postBlock",0)) > 0:
+		data.notes.append({"title":"攻击后防守","body":"整次攻击及弹反结算后，若敌人仍存活，获得 %d 点格挡，保留到自己的下次行动开始。" % int(intent.postBlock)})
+	if int(intent.get("stealBlock",0)) > 0:
+		data.title = "拆盾钩"
+		data.notes.append({"title":"先夺取格挡","body":"攻击前夺取你当时实际拥有的格挡，最多 %d 点，并获得等量格挡。随后结算上方攻击伤害；没有格挡时不额外增伤。" % int(intent.stealBlock)})
+	if kind == "fortify" and int(intent.get("charge",0)) > 0:
+		data.title = "合箱充能"
+		data.value = "格挡 +%d / 电能 +%d" % [amount,int(intent.charge)]
+		data.summary = "获得 %d 点格挡及 %d 层电能。" % [amount,int(intent.charge)]
+		data.notes = [{"title":"格挡","body":"保留到自己的下次行动开始。"}, {"title":"可削弱的电能","body":"每受到一段攻击减少1层，完全格挡也减少。下次攻击每段增加剩余电能，整次攻击消耗全部电能；非攻击伤害不削层。"}]
+	if kind == "fortify" and int(intent.get("selfHpLoss",0)) > 0:
+		data.title = "苦修"
+		data.value = "生命 −%d / 力量 +%d" % [int(intent.selfHpLoss),int(intent.get("strength",0))]
+		data.summary = "先直接失去 %d 点生命，若仍存活，再永久获得 %d 层力量。" % [int(intent.selfHpLoss),int(intent.get("strength",0))]
+		data.notes = [{"title":"自损生命","body":"无视格挡，不属于攻击，不触发受攻击效果；生命耗尽会正常倒下。"}, {"title":"力量","body":"每层使每段基础攻击伤害 +1，持续至本场战斗结束，可以累加。"}]
 	if int(intent.get("onHitWeak",0)) > 0:
 		data.notes.append({"title":"攻击附带","body":"整次攻击结束后，对你施加 %d 层虚弱；即使攻击被格挡仍会施加。" % int(intent.onHitWeak)})
 	if enemy.has("allyDeathIntentSequence"):
