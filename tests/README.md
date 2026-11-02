@@ -1,5 +1,9 @@
 # 测试目录索引
 
+2026-11-02[诺斯眼墙专项](combat/presentation/noss_eye_wall_tests.tscn)追加原场景地面保留、双方脚底位于墙地边界之下、背景输入忽略、故障短闪／长静默、强制静默及强闪关键帧、动画不改模型、快照恢复地平线检查；两尺寸GPU会保存`phase2_neon_glitch`与安静背景对照。沿用独立工程、QA用户目录、绝对`QA_OUT_DIR`及顺序GPU约定。
+
+2026-11-02新增[诺斯眼墙专项](combat/presentation/noss_eye_wall_tests.tscn)：真实B23本体独杀后检查黑屏、逐只睁眼、原六句对白、输入遮挡、转场清理、常驻眼墙、隐藏时钟冻结、镜头边缘、二阶段快照恢复不重播，以及普通机器人战斗背景隔离。延续检查二阶段首轮实际行动与模型只读边界。须复制工程、使用独立含QA用户目录和绝对`QA_OUT_DIR`，`QA_CAPTURE=1`输出1280×800与1600×1000关键帧，无系统鼠标操作。现有`story/second_week_ui_tests`保留普通剧情背景检查，转阶段改查已全开的眼墙及同一套黑红对白布局。
+
 2026-11-02新增[近战绕行专项](combat/presentation/approach_motion_tests.tscn)：真实三敌舞台覆盖左右镜像后排绕路、直线接近及途中目标换边，检查圆角避让、实际逐帧位置／透明度／朝向、连续推进和精确接触；GPU可录制运动关键帧。须复制工程并使用含qa的独立用户目录，关闭保存，以绝对`QA_OUT_DIR`输出，`QA_CAPTURE=1`启用GPU录制；不移动系统鼠标。本轮结果、旧实现负对照及既有归位测试的污染预期边界见修改记录与`artifacts/qa/approach-motion-2026-11-02/verification.json`。
 
 2026-11-02演练目录扩为第一、第二周14组：`combat/enemies/published_training_tests.tscn`按两周正式事件战斗集合核对目录，覆盖14项冷启动／冒险／动态引用、15按钮布局／焦点、逐只阵容及胜败／退出／存档sentinel隔离。新增[真实菜单专项](combat/presentation/week2_training_menu_tests.tscn)，实际通过main菜单进入第二周六组、核对普通难度完整阵容及退出恢复，GPU输出两尺寸菜单和六场截图。使用复制工程、独立含QA的用户目录与绝对`QA_OUT_DIR`，不移动系统鼠标或写正式存档。实际结果见修改记录。

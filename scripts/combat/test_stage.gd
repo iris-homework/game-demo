@@ -52,10 +52,11 @@ var scenery_base_rect := Rect2()
 var dancer_duet := false
 var noss_encounter := false
 var dancer_lights: Node2D
+var noss_eye_wall: Node2D
 
 func set_noss_encounter(enemy_visuals: Array[EnemyVisualResolver.Visual]) -> void:
 	# Both initial entry and phase change use this isolated formation boundary.
-	# Preserve the player's pose/state and all scenery; only replace enemy actors.
+	# Preserve the player's pose/state; phase two also replaces the scenery.
 	noss_encounter = true
 	dancer_duet = false
 	if is_instance_valid(dancer_lights):
@@ -83,6 +84,7 @@ func set_noss_encounter(enemy_visuals: Array[EnemyVisualResolver.Visual]) -> voi
 		actors_root.add_child(actor)
 		actor.setup_enemy(visual,origin,-1.0)
 		enemies.append(actor)
+	set_noss_eye_wall(enemy_visuals.any(func(visual): return visual.id == "noss_phase2"))
 	if camera_tween != null and camera_tween.is_running(): camera_tween.kill()
 	zoom = 1.0
 	focus_x = 720.0
@@ -90,10 +92,25 @@ func set_noss_encounter(enemy_visuals: Array[EnemyVisualResolver.Visual]) -> voi
 	update_depth()
 	_update_camera()
 
+func set_noss_eye_wall(enabled: bool) -> void:
+	if enabled and not is_instance_valid(noss_eye_wall):
+		noss_eye_wall = preload("res://scripts/combat/noss_eye_wall.gd").new()
+		noss_eye_wall.name = "NossEyeWallBackground"
+		noss_eye_wall.wall_mode = true
+		noss_eye_wall.floor_horizon = position.y+floor_y-155.0
+		noss_eye_wall.reveal_progress = 1.0
+		noss_eye_wall.z_index = -2
+		# Full-canvas sibling, like scenery, avoids the actor-stage clip rectangle.
+		get_parent().add_child(noss_eye_wall)
+	if is_instance_valid(noss_eye_wall): noss_eye_wall.visible = enabled
+	# Preserve the calibrated lower artwork as the ground beneath the eye wall.
+	if is_instance_valid(scenery): scenery.visible = true
+
 func set_dancer_duet(enemy_visuals: Array[EnemyVisualResolver.Visual]) -> void:
 	# Called behind the blackout after the model has committed its second phase.
 	dancer_duet = true
 	noss_encounter = false
+	set_noss_eye_wall(false)
 	for actor in enemies:
 		actors_root.remove_child(actor)
 		actor.queue_free()
@@ -188,6 +205,7 @@ func setup_scenery(texture: Texture2D, ground_start: float, place_id: String = "
 
 func _exit_tree() -> void:
 	if is_instance_valid(scenery): scenery.queue_free()
+	if is_instance_valid(noss_eye_wall): noss_eye_wall.queue_free()
 
 func enemy_home(index: int, count: int, formation_slot: String = "") -> Vector2:
 	# Opt-in encounter slots leave every other battle's default depth lanes intact.
@@ -245,6 +263,12 @@ func _update_camera() -> void:
 		origin.y = clampf(origin.y,900.0-dimensions.y,0.0)
 		scenery.position = origin
 		scenery.size = dimensions
+	if is_instance_valid(noss_eye_wall):
+		# Match the battle camera without ever exposing a seam around the wall.
+		var wall_zoom := maxf(1.0,effective_zoom)
+		var wall_origin := position+world.position-position*wall_zoom
+		noss_eye_wall.scale = Vector2.ONE*wall_zoom
+		noss_eye_wall.position = Vector2(clampf(wall_origin.x,1440.0*(1.0-wall_zoom),0.0),clampf(wall_origin.y,900.0*(1.0-wall_zoom),0.0))
 
 func set_phase(value: String) -> void:
 	phase = value

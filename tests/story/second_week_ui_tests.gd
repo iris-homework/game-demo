@@ -86,7 +86,7 @@ func scene_background(root: Control) -> Texture2D:
 			return child.texture
 	return null
 
-func check_layout(root: Control, tag: String) -> void:
+func check_layout(root: Control, tag: String, eye_wall: bool = false) -> void:
 	var body := root.get_node_or_null("DialogueText") as Label
 	var speaker := root.get_node_or_null("SpeakerName") as Label
 	var hint := root.get_node_or_null("DialogueHint") as Label
@@ -99,7 +99,11 @@ func check_layout(root: Control, tag: String) -> void:
 	check(hint.position == Vector2(330,842) and hint.size == Vector2(650,26), tag + ": ordinary hint rectangle")
 	check(area.position == Vector2(0,180) and area.size == Vector2(1440,720), tag + ": ordinary advance area")
 	check(panel_signature(root) == ordinary_panel and ordinary_panel.size() == 9, tag + ": same black panel and eight red/black rails")
-	check(scene_background(root) == ordinary_background and ordinary_background != null, tag + ": same E23 dialogue background")
+	if eye_wall:
+		var eyes: Node2D = app.view.get_node_or_null("NossPhaseEyes")
+		check(scene_background(root) == null and eyes != null and eyes.reveal_progress == 1.0, tag + ": opened eye wall remains behind the dialogue")
+	else:
+		check(scene_background(root) == ordinary_background and ordinary_background != null, tag + ": same E23 dialogue background")
 
 func check_phase_line(interlude: Control) -> void:
 	# Presentation must not mutate the committed combat snapshot or authored lines.
@@ -108,7 +112,7 @@ func check_phase_line(interlude: Control) -> void:
 	var line: Dictionary = interlude.lines[index]
 	var root: Control = interlude.content
 	var tag := "phase line %d" % index
-	check_layout(root, tag)
+	check_layout(root, tag, true)
 	var body := root.get_node_or_null("DialogueText") as Label
 	var speaker_label := root.get_node_or_null("SpeakerName") as Label
 	var speaker: String = line.get("speakerId", "")

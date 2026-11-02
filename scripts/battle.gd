@@ -936,11 +936,20 @@ func present_encounter_phase() -> void:
 
 func present_noss_phase() -> void:
 	# No combat mutations here: the new enemies, turn and hand already exist.
-	var shade := rect(self, Vector2.ZERO, Vector2(1440,900), Color("090811f0"))
+	var shade := rect(self, Vector2.ZERO, Vector2(1440,900), Color.BLACK)
+	shade.name = "NossPhaseBlackout"
 	shade.z_index = 110
+	shade.modulate.a = 0.0
 	shade.mouse_filter = Control.MOUSE_FILTER_STOP
 	turn_hud.set_state(model.turn, "reveal")
-	await get_tree().create_timer(0.45).timeout
+	var darken := create_tween()
+	darken.tween_property(shade,"modulate:a",1.0,0.32)
+	await darken.finished
+	var eyes := preload("res://scripts/combat/noss_eye_wall.gd").new()
+	eyes.name = "NossPhaseEyes"
+	eyes.reveal_progress = 0.0
+	eyes.z_index = 111
+	add_child(eyes)
 	var visuals: Array[EnemyVisualResolver.Visual] = []
 	for enemy in model.enemies: visuals.append(Game.enemy_combat_visual(enemy))
 	stage.set_noss_encounter(visuals)
@@ -950,12 +959,27 @@ func present_noss_phase() -> void:
 	refresh_enemy_hud()
 	refresh_resources()
 	prepare_phase_deal_counts()
+	await get_tree().create_timer(0.35).timeout
+	var awakening := create_tween()
+	awakening.tween_property(eyes,"reveal_progress",1.0,4.2)
+	await awakening.finished
+	await get_tree().create_timer(0.4).timeout
 	var interlude := preload("res://scripts/combat/noss_phase_dialogue.gd").new()
 	interlude.lines = Game.events.E23.get("phaseTwoDialogue", []).duplicate(true)
+	interlude.eye_wall_background = true
 	add_child(interlude)
 	await interlude.finished
 	remove_child(interlude)
 	interlude.queue_free()
+	# Keep the same layout and animation phase while revealing the battle actors.
+	stage.noss_eye_wall.ambient_time = eyes.ambient_time
+	var reveal := create_tween().set_parallel(true)
+	reveal.tween_property(eyes,"modulate:a",0.0,0.65)
+	reveal.tween_property(shade,"modulate:a",0.0,0.65)
+	await reveal.finished
+	remove_child(eyes)
+	eyes.queue_free()
+	remove_child(shade)
 	shade.queue_free()
 	turn_hud.set_state(model.turn)
 

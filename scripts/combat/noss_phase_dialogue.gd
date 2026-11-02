@@ -5,6 +5,7 @@ const Presentation := preload("res://scripts/dialogue_presentation.gd")
 var lines: Array = []
 var cursor := 0
 var content: Control
+var eye_wall_background := false
 
 func _ready() -> void:
 	name = "NossPhaseDialogue"
@@ -25,7 +26,8 @@ func show_line() -> void:
 	content = Presentation.new()
 	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(content)
-	content.background(Game.place_data(Game.events.E23.placeId).backgroundAssetId, 0.19)
+	if not eye_wall_background:
+		content.background(Game.place_data(Game.events.E23.placeId).backgroundAssetId, 0.19)
 	var speaker: String = line.get("speakerId", "")
 	var side := "" if speaker.is_empty() else ("left" if speaker == Game.PLAYER_REFERENCE else "right")
 	content.dialogue_portraits({"left":Game.PLAYER_REFERENCE, "right":line.get("portrait", "noss_phase2")}, speaker, side)
