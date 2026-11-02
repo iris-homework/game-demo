@@ -12,8 +12,11 @@ float hash11(float n) {
 
 void fragment() {
 	vec2 p = UV*vec2(1440.0,900.0);
-	// The original scenery remains underneath. Expose its existing perspective floor.
-	float floor_mix = wall_mode ? smoothstep(floor_horizon-20.0,floor_horizon+50.0,p.y) : 0.0;
+	// A broad dark depth falloff joins the wall to the original perspective floor.
+	// Small, static irregularities avoid a ruler-straight fog band without moving it.
+	float horizon = floor_horizon + sin(p.x*0.006+0.8)*4.0 + sin(p.x*0.017)*1.5;
+	// Keep the source illustration's wall/columns fully covered above its floor.
+	float floor_mix = wall_mode ? smoothstep(horizon+6.0,horizon+146.0,p.y) : 0.0;
 	float alpha = mix(1.0,0.30,floor_mix);
 	vec3 color = mix(vec3(0.0),vec3(0.008,0.009,0.022),floor_mix);
 	// Inlaid gold follows the floor's vanishing point; never appears in dialogue.
@@ -31,7 +34,8 @@ void fragment() {
 			float band_width = 0.7+float(i)*0.3;
 			bands = max(bands,1.0-smoothstep(band_width,band_width+1.0,abs(p.y-floor_horizon-band_depth)));
 		}
-		float floor_mask = smoothstep(floor_horizon+20.0,floor_horizon+90.0,p.y);
+		// Distant inlays emerge with the floor rather than piercing the dark join.
+		float floor_mask = smoothstep(horizon+40.0,horizon+160.0,p.y);
 		float gold = max(max(rays,accents),bands*0.66)*floor_mask;
 		color = mix(color,vec3(0.86,0.56,0.16),gold*0.86);
 		alpha = mix(alpha,0.78,gold);

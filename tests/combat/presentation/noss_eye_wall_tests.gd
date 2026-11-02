@@ -10,6 +10,81 @@ func wait_for_eyes(battle: Control, progress: float) -> Node2D:
 	check(false,"eye reveal reaches %.2f within twenty seconds" % progress)
 	return null
 
+func check_gaze_binding(battle: Control, label: String) -> void:
+	var wall: Node2D = battle.stage.noss_eye_wall
+	var expected: Vector2 = wall.to_local(battle.stage.player.to_global(Vector2(0,-80)))
+	check(wall.gaze_target.distance_to(expected) < 0.1,label+" gaze follows the player's body in wall-local coordinates")
+	var material: ShaderMaterial = wall.get_node("CachedEyes").material
+	var shader_gaze: Vector2 = material.get_shader_parameter("gaze_position")
+	check(shader_gaze.distance_to(wall.gaze_position) < 0.1,label+" shader receives the smoothed gaze rather than the immediate target")
+	var summary: Control = battle.enemy_summary
+	for item in [["summary_region",summary],["intent_region",battle.enemy_intents[0]]]:
+		var rect: Rect2 = item[1].get_global_rect()
+		var local_origin: Vector2 = wall.to_local(rect.position)
+		var local_end: Vector2 = wall.to_local(rect.end)
+		var region: Vector4 = material.get_shader_parameter(item[0])
+		check(Vector2(region.x,region.y).distance_to(local_origin) < 0.1 and Vector2(region.z,region.w).distance_to(local_end-local_origin) < 0.1,label+" "+str(item[0])+" tracks the actual HUD rectangle through camera transforms")
+
+func wait_for_gaze(wall: Node2D) -> void:
+	var deadline := Time.get_ticks_msec()+8000
+	while wall.gaze_position.distance_to(wall.gaze_target) > 3.0 and Time.get_ticks_msec() < deadline:
+		await get_tree().process_frame
+	check(wall.gaze_position.distance_to(wall.gaze_target) <= 3.0,"gaze settles near its target within eight wall-clock seconds")
+
+func test_gaze(battle: Control) -> void:
+	var wall: Node2D = battle.stage.noss_eye_wall
+	var material: ShaderMaterial = wall.get_node("CachedEyes").material
+	var frames: Variant = material.get_shader_parameter("tracking_frames")
+	check(wall.eye_count == 82,"gaze and hierarchy preserve the authored 82-eye layout")
+	check(frames != null and frames.size() == 5,"only five main eyes receive tracking frames")
+	if frames != null and frames.size() == 5:
+		var aligned := true
+		for i in 5:
+			var eye: Dictionary = wall._eyes[i]
+			var frame: Vector4 = frames[i]
+			aligned = aligned and Vector2(frame.x,frame.y).distance_to(eye.center) < 0.01
+			aligned = aligned and Vector2(frame.z,frame.w).distance_to(Vector2(cos(eye.angle),sin(eye.angle))) < 0.01
+		check(aligned,"five tracking frames retain the authored eye centers and rotated local axes")
+	check_gaze_binding(battle,"wide camera")
+	var state_before: String = JSON.stringify(battle.model.snapshot())
+	var player: Node2D = battle.stage.player
+	var original_position: Vector2 = player.position
+	# Presentation-only fixtures: no card is played and no model position is changed.
+	player.position.x = 220.0
+	await get_tree().process_frame
+	await get_tree().process_frame
+	await wait_for_gaze(wall)
+	wall.set_process(false)
+	wall.ambient_time = 2.0
+	await shot("phase2_gaze_left")
+	wall.set_process(true)
+	var previous: Vector2 = wall.gaze_position
+	player.position.x = 940.0
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var shifted_target: Vector2 = wall.gaze_target
+	check(wall.gaze_position.distance_to(previous) > 0.01 and wall.gaze_position.distance_to(shifted_target) > 20.0,"moving the real actor starts a delayed gaze shift instead of snapping")
+	check(wall.gaze_position.distance_to(shifted_target) < previous.distance_to(shifted_target),"delayed gaze moves toward the new actor location")
+	await wait_for_gaze(wall)
+	wall.set_process(false)
+	wall.ambient_time = 2.0
+	await shot("phase2_gaze_right")
+	wall.set_process(true)
+	player.position = original_position
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var gaze_before_pause: Vector2 = wall.gaze_position
+	var clock_before_pause: float = wall.ambient_time
+	get_tree().paused = true
+	await get_tree().create_timer(0.12,true).timeout
+	check(wall.gaze_position.is_equal_approx(gaze_before_pause) and is_equal_approx(wall.ambient_time,clock_before_pause),"scene pause freezes gaze and the eye clock together")
+	get_tree().paused = false
+	player.position = original_position
+	await get_tree().process_frame
+	await get_tree().process_frame
+	await wait_for_gaze(wall)
+	check(JSON.stringify(battle.model.snapshot()) == state_before,"gaze motion and presentation fixtures leave every combat snapshot field unchanged")
+
 func _ready() -> void:
 	output = OS.get_environment("QA_OUT_DIR")
 	if not output.is_absolute_path() or not "qa" in output.to_lower() or not "qa" in OS.get_user_data_dir().to_lower():
@@ -40,6 +115,8 @@ func _ready() -> void:
 		get_tree().quit(2)
 		return
 	check(eyes.reveal_progress < 0.15,"transition begins in darkness before opening the eyes")
+	var reveal_gaze: Vector2 = eyes.gaze_position
+	eyes.gaze_target = Vector2(1100,500)
 	check(Game.battle_busy and battle.get_node("NossPhaseBlackout").mouse_filter == Control.MOUSE_FILTER_STOP,"blackout blocks battle input for the interlude")
 	var committed: String = JSON.stringify(battle.model.snapshot())
 	await shot("blackout")
@@ -51,6 +128,7 @@ func _ready() -> void:
 	await shot("eyes_spreading")
 	await wait_for_eyes(battle,1.0)
 	check(JSON.stringify(battle.model.snapshot()) == committed,"eye animation does not change the committed combat state")
+	check(eyes.gaze_position.is_equal_approx(reveal_gaze),"foreground reveal keeps its gaze fixed while only the battle wall tracks the player")
 	var deadline := Time.get_ticks_msec()+5000
 	while battle.get_node_or_null("NossPhaseDialogue") == null and Time.get_ticks_msec() < deadline:
 		await get_tree().process_frame
@@ -99,16 +177,24 @@ func _ready() -> void:
 	await shot("phase2_neon_glitch")
 	check(JSON.stringify(battle.model.snapshot()) == environment_state,"glitch and floor rendering leave combat state unchanged")
 	wall.set_process(true)
+	await test_gaze(battle)
 	var clock_before: float = wall.ambient_time
+	var gaze_before: Vector2 = wall.gaze_position
+	var player_position: Vector2 = battle.stage.player.position
 	wall.hide()
+	battle.stage.player.position.x += 100.0
 	await get_tree().create_timer(0.15).timeout
 	check(is_equal_approx(wall.ambient_time,clock_before),"hidden eye wall freezes its animation clock")
+	check(wall.gaze_position.is_equal_approx(gaze_before),"hidden eye wall also freezes gaze despite actor movement")
 	wall.show()
 	await get_tree().create_timer(0.15).timeout
 	check(wall.ambient_time > clock_before,"visible eye wall resumes ambient animation")
+	check(wall.gaze_position.distance_to(gaze_before) > 0.01,"showing the eye wall resumes delayed tracking")
+	battle.stage.player.position = player_position
 	await battle.stage.camera_to(1040,1.45,0.15).finished
 	await get_tree().process_frame
 	check(wall.scale.x > 1.0 and wall.position.x <= 0.01 and wall.position.x+1440.0*wall.scale.x >= 1439.99,"eye wall follows the combat camera without exposing an edge (x=%.4f, scale=%.4f)" % [wall.position.x,wall.scale.x])
+	check_gaze_binding(battle,"close camera")
 	await battle.stage.wide()
 	var saved_horizon: float = wall.floor_horizon
 	var saved: Dictionary = battle.model.snapshot()
@@ -120,6 +206,7 @@ func _ready() -> void:
 	check(battle.stage.scenery.visible and battle.stage.noss_eye_wall.floor_horizon == saved_horizon,"restoring phase two also restores its calibrated floor boundary")
 	check(battle.get_node_or_null("NossPhaseEyes") == null and battle.get_node_or_null("NossPhaseDialogue") == null and battle.get_node_or_null("NossPhaseNeonTransition") == null,"restored phase two does not replay the interlude or neon reveal")
 	check(JSON.stringify(battle.model.snapshot()) == JSON.stringify(saved),"phase-two restore preserves all combat data")
+	check_gaze_binding(battle,"restored phase two")
 	await shot("phase2_restored")
 	await turn(battle,"first eye-wall battle turn")
 	Game.start_training("B02")

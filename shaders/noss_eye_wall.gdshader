@@ -7,12 +7,35 @@ uniform float reveal_progress : hint_range(0.0, 1.0) = 0.0;
 uniform float ambient_time = 0.0;
 uniform bool wall_mode = false;
 uniform float floor_horizon = 402.0;
+uniform vec2 gaze_position = vec2(720.0, 280.0);
+// The first five authored anchors only: center XY and rotation cosine/sine.
+uniform vec4 tracking_frames[5];
+uniform vec4 summary_region = vec4(0.0);
+uniform vec4 intent_region = vec4(0.0);
 varying vec4 eye_data;
 varying vec2 artwork_position;
+varying vec2 gaze_offset;
 
 void vertex() {
 	eye_data = COLOR;
 	artwork_position = VERTEX.xy;
+	gaze_offset = vec2(0.0);
+	// Opening ranks of the five anchors precede the shuffled crowd.
+	float order = COLOR.g * 81.0 / 0.935;
+	if (wall_mode && order < 4.5) {
+		int index = int(clamp(floor(order + 0.5), 0.0, 4.0));
+		vec4 frame = tracking_frames[index];
+		vec2 direction = (gaze_position - frame.xy) / vec2(480.0, 300.0);
+		direction /= max(1.0, length(direction));
+		vec2 local_direction = vec2(dot(direction, frame.zw), dot(direction, vec2(-frame.w, frame.z)));
+		gaze_offset = local_direction * vec2(0.18, 0.10);
+	}
+}
+
+float quiet_region(vec2 point, vec4 region) {
+	if (region.z <= 0.0 || region.w <= 0.0) return 0.0;
+	vec2 distance_to_box = max(abs(point - region.xy - region.zw * 0.5) - region.zw * 0.5, vec2(0.0));
+	return 1.0 - smoothstep(4.0, 56.0, length(distance_to_box));
 }
 
 float hash11(float n) {
@@ -50,7 +73,7 @@ void fragment() {
 	vec3 hue = spectrum(fract(seed * 8.37 + 0.07));
 	vec3 line_color = mix(hue, vec3(1.0), 0.13);
 	// Artwork quads are wider than tall. Correct that aspect for circular rings.
-	vec2 iris_p = vec2(p.x, p.y * eye_data.a);
+	vec2 iris_p = vec2(p.x-gaze_offset.x, (p.y-gaze_offset.y) * eye_data.a);
 	float radius = length(iris_p);
 	float iris_radius = eye_data.a * 0.80;
 	float ring_outer = 1.0 - smoothstep(iris_radius-0.006, iris_radius+0.006, radius);
@@ -67,7 +90,15 @@ void fragment() {
 	float side = smoothstep(250.0, 630.0, abs(artwork_position.x - 720.0));
 	float background_dimming = mix(0.10, 0.72, lower_fade) + side * 0.06;
 	brightness *= wall_mode ? background_dimming : mix(0.60, 1.0, lower_fade);
+	if (wall_mode) {
+		float order = eye_data.g * 81.0 / 0.935;
+		float hierarchy = order < 4.5 ? 0.92 : (order < 26.5 ? 0.58 : 0.34);
+		float quiet = max(quiet_region(artwork_position, summary_region), quiet_region(artwork_position, intent_region));
+		brightness *= hierarchy * mix(1.0, 0.25, quiet);
+	}
 	color *= brightness;
-	float wall_mask = wall_mode ? 1.0-smoothstep(floor_horizon-42.0,floor_horizon+10.0,artwork_position.y) : 1.0;
+	// Let the lowest eyes sink into the same dark depth falloff as the floor.
+	float horizon = floor_horizon + sin(artwork_position.x*0.006+0.8)*4.0 + sin(artwork_position.x*0.017)*1.5;
+	float wall_mask = wall_mode ? 1.0-smoothstep(horizon-96.0,horizon+24.0,artwork_position.y) : 1.0;
 	COLOR = vec4(color, outer * visibility * wall_mask);
 }

@@ -269,6 +269,10 @@ func _update_camera() -> void:
 		var wall_origin := position+world.position-position*wall_zoom
 		noss_eye_wall.scale = Vector2.ONE*wall_zoom
 		noss_eye_wall.position = Vector2(clampf(wall_origin.x,1440.0*(1.0-wall_zoom),0.0),clampf(wall_origin.y,900.0*(1.0-wall_zoom),0.0))
+		if is_instance_valid(player):
+			noss_eye_wall.gaze_target = noss_eye_wall.to_local(player.to_global(Vector2(0,-80)))
+		# Camera tweens can run after the HUD's frame update: keep masks in sync.
+		noss_eye_wall.refresh_readability_regions()
 
 func set_phase(value: String) -> void:
 	phase = value

@@ -14,6 +14,7 @@ var held_card_uid := ""
 var held_shortcut_keys: Dictionary = {}
 var cards: Dictionary = {}
 var enemy_hud: Control
+var enemy_summary: Control
 var targets: Array[Button] = []
 var enemy_plates: Array[Control] = []
 var enemy_intents: Array[Control] = []
@@ -276,6 +277,7 @@ func refresh_enemy_hud() -> void:
 	enemy_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(enemy_hud)
 	var summary := Control.new()
+	enemy_summary = summary
 	enemy_hud.add_child(summary)
 	# Use the frozen battle type, including training and restored encounters.
 	var boss: bool = model.profile.get("battleType","normal") == "boss"
@@ -1468,6 +1470,9 @@ func update_enemy_plates() -> void:
 			head.y = minf(head.y, actor.sprite.to_global(Vector2.ZERO).y + 8.0)
 			intent_min_y = 222.0 if model.profile.get("encounterId", "") == "noss_sovereign" and shown_encounter_phase == 1 else 166.0
 		intent.global_position = Vector2(clampf(head.x-ENEMY_INTENT_SIZE.x*0.5,16,1424-ENEMY_INTENT_SIZE.x),clampf(head.y-ENEMY_INTENT_SIZE.y-8,intent_min_y,674))
+	if is_instance_valid(stage.noss_eye_wall) and is_instance_valid(enemy_summary) and not enemy_intents.is_empty():
+		var intent_area: Rect2 = enemy_intents[0].get_global_rect() if enemy_intents[0].visible else Rect2()
+		stage.noss_eye_wall.set_readability_regions(enemy_summary.get_global_rect(), intent_area)
 	# At melee distance, separate intersecting strips while retaining their foot anchors.
 	var plates: Array = [player_plate]+enemy_plates
 	for pass_index in 3:

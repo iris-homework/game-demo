@@ -49,6 +49,24 @@ var _ambient_time: float = 0.0
 var _eye_material: ShaderMaterial
 var _environment_material: ShaderMaterial
 var _eyes: Array[Dictionary] = []
+## Artwork-space presentation target, supplied by the stage after camera transforms.
+var gaze_target := Vector2(720.0, 280.0)
+var gaze_position := Vector2(720.0, 280.0)
+var _summary_region := Rect2()
+var _intent_region := Rect2()
+
+func set_readability_regions(summary: Rect2, intent: Rect2) -> void:
+	_summary_region = summary
+	_intent_region = intent
+	refresh_readability_regions()
+
+func refresh_readability_regions() -> void:
+	if _eye_material == null: return
+	var inverse := get_global_transform().affine_inverse()
+	var summary_local: Rect2 = inverse * _summary_region
+	var intent_local: Rect2 = inverse * _intent_region
+	_eye_material.set_shader_parameter("summary_region", Vector4(summary_local.position.x, summary_local.position.y, summary_local.size.x, summary_local.size.y))
+	_eye_material.set_shader_parameter("intent_region", Vector4(intent_local.position.x, intent_local.position.y, intent_local.size.x, intent_local.size.y))
 
 func _ready() -> void:
 	# Inherit scene pause even if the component is placed below an always-running UI.
@@ -66,7 +84,11 @@ func _process(delta: float) -> void:
 	# The dummy/headless backend reports minimized without an actual window.
 	if DisplayServer.get_name() != "headless" and get_window().mode == Window.MODE_MINIMIZED:
 		return
-	ambient_time += clampf(delta, 0.0, 0.1)
+	var step := clampf(delta, 0.0, 0.1)
+	ambient_time += step
+	if wall_mode:
+		gaze_position = gaze_position.lerp(gaze_target, 1.0-exp(-step/0.65))
+		_eye_material.set_shader_parameter("gaze_position", gaze_position)
 
 static func glitch_envelope_at(seconds: float) -> float:
 	# Several short broken strips, followed by a long quiet interval. No RNG.
@@ -207,6 +229,13 @@ func _build_mesh() -> void:
 	_eye_material.set_shader_parameter("ambient_time", _ambient_time)
 	_eye_material.set_shader_parameter("wall_mode", wall_mode)
 	_eye_material.set_shader_parameter("floor_horizon",floor_horizon)
+	_eye_material.set_shader_parameter("gaze_position", gaze_position)
+	var tracking_frames := PackedVector4Array()
+	for i in 5:
+		var eye: Dictionary = _eyes[i]
+		var center: Vector2 = eye.center
+		tracking_frames.append(Vector4(center.x, center.y, cos(float(eye.angle)), sin(float(eye.angle))))
+	_eye_material.set_shader_parameter("tracking_frames", tracking_frames)
 	var surface := MeshInstance2D.new()
 	surface.name = "CachedEyes"
 	surface.mesh = mesh
