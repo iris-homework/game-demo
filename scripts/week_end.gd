@@ -12,7 +12,7 @@ func _ready() -> void:
 	rect(self, Vector2(270,231), Vector2(900,1), Color("2f6178"))
 	polygon(self, [Vector2(270,231),Vector2(306,231),Vector2(270,267)], CYAN)
 	center_text("胜利，城市已解放" if second else "第一周结束", 300, 110, 64, CREAM, "week_end_title")
-	center_text("封锁已解除 · 后续章节开发中" if second else "第二周 · 新的委托已开放", 427, 52, 28, CYAN, "week_end_message")
+	center_text("封锁已解除" if second else "第二周 · 新的委托已开放", 427, 52, 28, CYAN, "week_end_message")
 	var rev := Game.revision
 	if not second:
 		next_week_button = button(self, "进入第二周    →", Vector2(360,548), Vector2(350,60), func(): Game.start_second_week(rev), true)
