@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://tests/combat/presentation/authored_attack_direction_tests.gd" id="1"]
+
+[node name="AuthoredAttackDirectionTests" type="Node"]
+script = ExtResource("1")

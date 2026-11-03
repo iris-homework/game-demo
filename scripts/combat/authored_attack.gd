@@ -35,6 +35,11 @@ static func play(stage, attacker, defender, style: String, config: Dictionary, h
 			await stage.move_actor(attacker, destination, stage.travel_duration(attacker, attacker.position.distance_to(destination)))
 	if stage.camera_tween != null and stage.camera_tween.is_running():
 		await stage.camera_tween.finished
+	# Obstacle avoidance can place us on the target's opposite side. Use the
+	# contact-side direction for the release, strike effects and camera feedback.
+	direction = 1.0 if defender.position.x >= attacker.position.x else -1.0
+	attacker.face_toward(defender.position)
+	defender.face_toward(attacker.position)
 	for i in hits.size():
 		var hit: Dictionary = hits[i]
 		var blocked := int(hit.get("blocked", 0)) > 0
