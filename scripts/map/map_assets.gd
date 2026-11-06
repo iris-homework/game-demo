@@ -26,8 +26,8 @@ static var _frames := {}
 static var _symbols := {}
 static var _icons := {}
 static var _catalog_loaded := false
-static var _map_texture: Texture2D = null
-static var _map_attempted := false
+# Large fallback artwork belongs to the visible map, not the static catalog.
+static var _map_texture: WeakRef
 static var _avatar_textures := {}
 
 static func avatar_texture(source: Texture2D = null, crop: Array = [0.0, 0.0, 1.0, 1.0]) -> Texture2D:
@@ -72,16 +72,16 @@ static func symbol(place_id: String) -> Texture2D:
 	return texture
 
 static func map_texture() -> Texture2D:
-	if _map_attempted:
-		return _map_texture
-	_map_attempted = true
+	if _map_texture != null:
+		var cached := _map_texture.get_ref() as Texture2D
+		if cached != null: return cached
 	for path in MAP_PATHS:
 		if ResourceLoader.exists(path):
 			var res = load(path)
 			if res is Texture2D:
-				_map_texture = res
-				break
-	return _map_texture
+				_map_texture = weakref(res)
+				return res
+	return null
 
 static func portrait_texture() -> Texture2D:
 	return Game.texture(Game.player_asset_id())

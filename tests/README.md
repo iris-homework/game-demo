@@ -1,5 +1,9 @@
 # 测试目录索引
 
+2026-11-06旧测试修复：[诺伦特效专项](combat/presentation/noren_slash_visual.tscn)明确检查黑帮小弟既有pierce攻击和block→idle别名，并增加诺伦原生block的全／部分格挡场景；支持绝对 `QA_OUT_DIR`，输出在其 `headless/` 或 `render/` 子目录，未设置时保留历史默认路径。[mipmap专项](rendering/mipmap_tests.tscn)在报告和退出前等待音频清理、销毁应用，增加两项收尾断言。两者均在复制工程、独立QA用户目录运行，mipmap沿用 `QA_OUT_DIR`／`--output-dir`。本轮headless分别339／456项通过，旧失败和故意破坏动作的负对照见[修改记录](../docs/修改记录.md#2026-11-06-旧特效测试预期与mipmap退出清理修复)。
+
+2026-11-06新增[纹理内存与生命周期专项](resource_memory_tests.tscn)：真实主界面固定种子进入三敌演练、返回菜单三轮，检查攻击图预热复用／离场释放、舞者音轨不被普通战斗保留、冒险状态恢复、地图弱缓存与mipmap复用。必须复制工程，将`project.godot`的自定义用户目录改为含`QA`的独立名称，并设置绝对`QA_OUT_DIR`；不能仅靠macOS的`APPDATA`隔离。headless35项检查；`QA_CAPTURE=1`配合GPU增加7张截图与断言，记录纹理／静态内存、RSS和帧间隔。GPU顺序运行，Dummy音频，不操作系统鼠标。最终通过及旧特效／mipmap测试的改前对照边界见[本轮记录](../docs/修改记录.md#2026-11-06-纹理生命周期优化与冗余资源清理)。
+
 2026-11-03新增[编排攻击换边方向专项](combat/presentation/authored_attack_direction_tests.tscn)：真实双行李潜伏客舞台，构造同伴挡住前四个接近位置、攻击者改从目标另一侧咬击的左右镜像，并保留普通接近对照；检查两段咬击的前扑、双方朝向／精灵镜像、镜头方向、回调及状态只读边界。复制工程、独立含QA的用户目录、绝对`QA_OUT_DIR`，关闭保存；使用headless与Dummy音频，不操作系统鼠标。
 
 2026-11-02[诺斯眼墙专项](combat/presentation/noss_eye_wall_tests.tscn)追加原场景地面保留、双方脚底位于墙地边界之下、背景输入忽略、故障短闪／长静默、强制静默及强闪关键帧、动画不改模型、快照恢复地平线检查；两尺寸GPU会保存`phase2_neon_glitch`与安静背景对照。沿用独立工程、QA用户目录、绝对`QA_OUT_DIR`及顺序GPU约定。

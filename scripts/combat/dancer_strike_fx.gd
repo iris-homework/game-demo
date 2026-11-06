@@ -1,8 +1,8 @@
 extends Node2D
 ## Noren's layered attack artwork with dancer-specific ink/white palettes; presentation only.
-const TEXTURE := preload("res://assets/combat_fx/noren_red_slash.png")
-const PIERCE_TEXTURE := preload("res://assets/combat_fx/noren_red_thrust_triangle_clean.png")
-const PIERCE_OPACITY_REFERENCE := preload("res://assets/combat_fx/noren_red_thrust_triangle_light.png")
+var slash_texture: Texture2D = load("res://assets/combat_fx/noren_red_slash.png")
+var pierce_texture: Texture2D = load("res://assets/combat_fx/noren_red_thrust_triangle_clean.png")
+var pierce_opacity_reference: Texture2D = load("res://assets/combat_fx/noren_red_thrust_triangle_light.png")
 const PALETTE_SHADER := preload("res://shaders/dancer_strike_palette.gdshader")
 const DRAW_SIZE := Vector2(340, 170)
 const PIERCE_DRAW_SIZE := Vector2(480, 132)
@@ -24,7 +24,7 @@ func _ready() -> void:
 	material = _palette_material(mode == "pierce", false)
 	if mode == "slash":
 		impact_flash = Sprite2D.new()
-		impact_flash.texture = TEXTURE
+		impact_flash.texture = slash_texture
 		impact_flash.centered = false
 		impact_flash.z_index = 1
 		impact_flash.material = _palette_material(false, true)
@@ -36,7 +36,7 @@ func _palette_material(piercing: bool, impact_only: bool) -> ShaderMaterial:
 	palette.shader = PALETTE_SHADER
 	palette.set_shader_parameter("piercing", piercing)
 	palette.set_shader_parameter("impact_only", impact_only)
-	palette.set_shader_parameter("opacity_reference", PIERCE_OPACITY_REFERENCE)
+	palette.set_shader_parameter("opacity_reference", pierce_opacity_reference)
 	return palette
 
 func _process(delta: float) -> void:
@@ -64,7 +64,7 @@ func _draw() -> void:
 		opacity *= 0.86
 	var draw_size: Vector2 = PIERCE_DRAW_SIZE if piercing else DRAW_SIZE
 	var contact: Vector2 = PIERCE_CONTACT if piercing else SLASH_CONTACT
-	var attack_texture: Texture2D = PIERCE_TEXTURE if piercing else TEXTURE
+	var attack_texture: Texture2D = pierce_texture if piercing else slash_texture
 	var mirror: float = -direction
 	var light := Color(1.0, 1.0, 1.0, opacity)
 	# Source edges face left. Both layers scale/turn around their own fixed body contact.
@@ -75,5 +75,5 @@ func _draw() -> void:
 		var flash_scale: Vector2 = Vector2(mirror, 1.0) * growth
 		impact_flash.position = (-STRIKE_CONTACT * draw_size * flash_scale).rotated(turn * mirror)
 		impact_flash.rotation = turn * mirror
-		impact_flash.scale = draw_size / TEXTURE.get_size() * flash_scale
+		impact_flash.scale = draw_size / slash_texture.get_size() * flash_scale
 		impact_flash.modulate = light

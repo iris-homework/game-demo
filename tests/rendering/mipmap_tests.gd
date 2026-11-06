@@ -3,6 +3,7 @@ extends Node
 
 const Icons = preload("res://scripts/technology_icons.gd")
 const BlackMarketArt = preload("res://scripts/black_market_art.gd")
+const AudioCleanup = preload("res://scripts/combat/audio_cleanup.gd")
 
 const MIPMAP_FILTER := CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 const PROJECT_DEFAULT_SETTING := "rendering/textures/canvas_textures/default_texture_filter"
@@ -62,7 +63,7 @@ func _ready() -> void:
 	await _test_mall_sampling()
 	await _test_card_library_and_ab()
 	await _test_formal_battle()
-	_finish()
+	await _finish()
 
 func _parse_cli() -> void:
 	var args := OS.get_cmdline_user_args()
@@ -514,6 +515,19 @@ func _finish() -> void:
 	Game.save_enabled = false
 	check(not FileAccess.file_exists(Game.save_path), "disabled autosave wrote no QA checkpoint")
 	check(not FileAccess.file_exists(Game.meta_path), "disabled autosave wrote no QA metadata")
+	# Stop the same audio owners as the real application before ending the test.
+	# Quitting with a live battle can leave playbacks on the audio thread even
+	# when all rendering assertions have passed.
+	if is_instance_valid(app):
+		app.process_mode = Node.PROCESS_MODE_DISABLED
+		if is_instance_valid(app.audio_hooks): app.audio_hooks.attach(null)
+		check(await AudioCleanup.release(app, get_tree()), "audio playbacks drain before QA application disposal")
+		var app_reference: WeakRef = weakref(app)
+		app.queue_free()
+		app = null
+		await get_tree().process_frame
+		await get_tree().process_frame
+		check(app_reference.get_ref() == null, "QA application is freed before test exit")
 	var report := {
 		"checks": checks,
 		"failures": failures,

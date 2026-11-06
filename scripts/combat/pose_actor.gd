@@ -80,8 +80,8 @@ func setup_player(origin: Vector2, direction: float) -> void:
 	frame_profile_id = "noren"
 	calibrations = NOREN.duplicate(true)
 	for key in calibrations:
-		poses[key] = load("res://assets/combat_test/noren/noren_%s.png" % key)
-	poses["shoot"] = preload("res://assets/combat_test/noren/noren_shoot_planted.png")
+		var file_pose := "shoot_planted" if key == "shoot" else str(key)
+		poses[key] = load("res://assets/combat_test/noren/noren_%s.png" % file_pose)
 	_apply_player_pipeline()
 	_place(origin,direction)
 	_configure_trails()
@@ -415,7 +415,11 @@ func _display_texture(source: Texture2D) -> Texture2D:
 	if cached is Texture2D and is_instance_valid(cached): return cached
 	var image := source.get_image()
 	if image == null: return source
-	if image.has_mipmaps(): return source
+	if image.has_mipmaps():
+		# Imported textures already have mipmaps. Remember that decision too so
+		# changing pose/attachments does not read the full image back every time.
+		_mipmapped_textures[key] = source
+		return source
 	if image.is_compressed(): image.decompress()
 	image.generate_mipmaps()
 	var texture := ImageTexture.create_from_image(image)

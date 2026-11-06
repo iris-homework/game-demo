@@ -134,7 +134,7 @@ func enter(params: Dictionary) -> void:
 		dancer_music.name = "DancerMusic"
 		dancer_music.bus = &"Music"
 		dancer_music.volume_db = -8.0
-		dancer_music.stream = preload("res://assets/audio/music/dancer_rain_loop.ogg")
+		dancer_music.stream = load("res://assets/audio/music/dancer_rain_loop.ogg")
 		add_child(dancer_music)
 		if shown_encounter_phase == 2:
 			setup_dancer_duet()

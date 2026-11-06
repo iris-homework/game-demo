@@ -59,9 +59,9 @@ func record_hit(hit: Dictionary, index: int) -> void:
 	if live != null and live.material is ShaderMaterial:
 		check(bool(live.material.get_shader_parameter("piercing")) == (expected_mode == "pierce"),"Actual attack selects the matching black thrust or white slash palette")
 		if expected_mode == "slash":
-			check(is_instance_valid(live.impact_flash) and live.impact_flash.texture == NorenSlash.TEXTURE,"White slash preserves Noren's separate crescent and contact burst artwork")
+			check(is_instance_valid(live.impact_flash) and live.impact_flash.texture == stage.strike_textures[0],"White slash preserves Noren's separate crescent and contact burst artwork")
 		else:
-			check(live.material.get_shader_parameter("opacity_reference") == NorenSlash.PIERCE_OPACITY_REFERENCE,"Black thrust preserves the existing airy interior opacity reference")
+			check(live.material.get_shader_parameter("opacity_reference") == stage.strike_textures[2],"Black thrust preserves the existing airy interior opacity reference")
 
 func destroy_stage() -> void:
 	check(await AudioCleanup.release(stage,get_tree()),"Attack audio references drain before stage disposal")
@@ -144,7 +144,11 @@ func _ready() -> void:
 	Game.meta_path = "user://dancer_strike_meta_unused.json"
 	var before: Dictionary = Game.state.duplicate(true)
 	var revision: int = Game.revision
-	check(Strike.TEXTURE == NorenSlash.TEXTURE and Strike.PIERCE_TEXTURE == NorenSlash.PIERCE_TEXTURE,"Dancers reuse Noren's exact slash and thrust silhouettes")
+	var dancer_art := Strike.new()
+	var noren_art := NorenSlash.new()
+	check(dancer_art.slash_texture == noren_art.slash_texture and dancer_art.pierce_texture == noren_art.pierce_texture,"Dancers reuse Noren's exact slash and thrust silhouettes")
+	dancer_art.free()
+	noren_art.free()
 	check(Strike.DRAW_SIZE.x > NorenSlash.DRAW_SIZE.x and Strike.DRAW_SIZE.y > NorenSlash.DRAW_SIZE.y,"White slash is broader and taller than Noren's reference slash")
 	check(Strike.PIERCE_DRAW_SIZE.x > NorenSlash.PIERCE_DRAW_SIZE.x and Strike.PIERCE_DRAW_SIZE.y > NorenSlash.PIERCE_DRAW_SIZE.y,"Black thrust is longer and thicker than Noren's reference thrust")
 	get_tree().create_timer(40.0).timeout.connect(func():

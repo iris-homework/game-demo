@@ -3,6 +3,11 @@ extends Node
 const Stage = preload("res://scripts/combat/test_stage.gd")
 const Slash = preload("res://scripts/combat/noren_slash_fx.gd")
 const Neon = preload("res://scripts/combat/prismatic_slash_fx.gd")
+const AudioCleanup = preload("res://scripts/combat/audio_cleanup.gd")
+# Explicit fixture contract from combat_visuals.json; never derive expectations
+# from the pose observed during playback.
+const HENCHMAN_ATTACK_POSE := "pierce"
+const HENCHMAN_BLOCK_POSE := "idle"
 var stage: Control
 var checks := 0
 var failures := 0
@@ -11,6 +16,8 @@ var case_name := ""
 var expected_new := true
 var expected_direction := 1.0
 var expected_style := "slash"
+var expected_attack_pose := "slash"
+var expected_block_pose := "idle"
 var case_effect_ids: Array[int] = []
 var callbacks: Array = []
 var impacts: Array = []
@@ -46,17 +53,17 @@ func on_phase(value: String) -> void:
 	created_ids.append(fx.get_instance_id())
 	case_effect_ids.append(fx.get_instance_id())
 	check(is_equal_approx(fx.direction,expected_direction),"Effect mirrors to actual attack direction")
-	check(stage.active_attacker.pose == expected_style,"Impact retains the requested attacking pose")
+	check(stage.active_attacker.pose == expected_attack_pose,"Impact retains the fixture's effective attacking pose")
 	check(callbacks.size() == impacts.size()+1,"Each impact follows exactly one hit callback")
 	if callbacks.is_empty(): return
 	var hit: Dictionary = callbacks[-1].hit
 	check(fx.blocked == (int(hit.get("blocked",0)) > 0),"Blocked presentation follows supplied hit")
-	check(stage.active_defender.pose == ("block" if fx.blocked else "damaged"),"Impact retains matching defender pose")
+	check(stage.active_defender.pose == (expected_block_pose if fx.blocked else "damaged"),"Impact retains matching defender pose")
 	if expected_new:
 		check(fx.mode == expected_style,"Authored artwork matches slash or pierce action")
 		check(fx.scale.is_equal_approx(Vector2.ONE*stage.depth_scale(stage.active_defender.position)),"Authored effect follows defender depth scale")
 		check(is_equal_approx(fx.duration,0.28 if fx.blocked else 0.34),"Readable effect lifetime retains a shorter blocked variant")
-	var record := {"case":case_name,"index":callbacks[-1].index,"direction":fx.direction,"scaleX":fx.scale.x,"attackerPose":stage.active_attacker.pose,"defenderPose":stage.active_defender.pose,"authored":expected_new,"style":expected_style,"blocked":fx.blocked}
+	var record := {"case":case_name,"index":callbacks[-1].index,"direction":fx.direction,"scaleX":fx.scale.x,"attackerPose":stage.active_attacker.pose,"defenderPose":stage.active_defender.pose,"expectedAttackerPose":expected_attack_pose,"expectedBlockPose":expected_block_pose,"authored":expected_new,"style":expected_style,"blocked":fx.blocked}
 	impacts.append(record)
 	all_impacts.append(record)
 	if DisplayServer.get_name() == "headless": return
@@ -81,6 +88,10 @@ func run_case(label: String, style: String, supplied_hits: Array, direction: flo
 	expected_new = new_effect
 	expected_direction = direction
 	expected_style = style
+	# The only enemy fixture is the henchman: slash requests resolve to pierce,
+	# and its authored block alias is idle. Noren retains the native block pose.
+	expected_attack_pose = HENCHMAN_ATTACK_POSE if enemy_attack else style
+	expected_block_pose = "block" if enemy_attack else HENCHMAN_BLOCK_POSE
 	case_effect_ids.clear()
 	callbacks.clear()
 	impacts.clear()
@@ -107,7 +118,14 @@ func _ready() -> void:
 	Game.save_enabled = false
 	Game.save_path = "user://noren_slash_qa_unused.json"
 	Game.meta_path = "user://noren_slash_qa_meta_unused.json"
-	output += "headless/" if DisplayServer.get_name() == "headless" else "render/"
+	var requested_output := OS.get_environment("QA_OUT_DIR")
+	if not requested_output.is_empty():
+		if not requested_output.is_absolute_path():
+			push_error("Noren slash QA requires an absolute QA_OUT_DIR")
+			get_tree().quit(2)
+			return
+		output = requested_output
+	output = output.path_join("headless" if DisplayServer.get_name() == "headless" else "render") + "/"
 	DirAccess.make_dir_recursive_absolute(output)
 	get_tree().create_timer(45.0).timeout.connect(func(): get_tree().quit(2))
 	var background := ColorRect.new()
@@ -126,8 +144,16 @@ func _ready() -> void:
 	stage.phase_changed.connect(on_phase)
 	await get_tree().process_frame
 	check(stage.player.kind == "noren","Stage uses the real Noren player")
-	check(Slash.TEXTURE.resource_path == "res://assets/combat_fx/noren_red_slash.png","New red slash source texture is used")
-	check(Slash.PIERCE_TEXTURE.resource_path == "res://assets/combat_fx/noren_red_thrust_triangle_clean.png","Triangle thrust source texture is used")
+	check(stage.enemies[0].kind == "gang_henchman","Enemy fixture resolves the intended henchman")
+	check(stage.enemies[0].attack_style_override == HENCHMAN_ATTACK_POSE,"Henchman fixture explicitly overrides attacks to pierce")
+	check(stage.enemies[0].pose_aliases.get("block") == HENCHMAN_BLOCK_POSE,"Henchman fixture explicitly maps block to idle")
+	check(stage.enemies[0].pose_aliases.get("slash") == HENCHMAN_ATTACK_POSE,"Henchman fixture explicitly maps slash to pierce")
+	check(stage.player.poses.has("block") and stage.player.pose_aliases.get("block","block") == "block","Noren fixture retains its native block pose")
+	var artwork_probe := Slash.new()
+	check(artwork_probe.slash_texture.resource_path == "res://assets/combat_fx/noren_red_slash.png","New red slash source texture is used")
+	check(artwork_probe.pierce_texture.resource_path == "res://assets/combat_fx/noren_red_thrust_triangle_clean.png","Triangle thrust source texture is used")
+	check(artwork_probe.slash_texture == stage.strike_textures[0] and artwork_probe.pierce_texture == stage.strike_textures[1],"Strike reuses art already owned by the active stage")
+	artwork_probe.free()
 	var hit := {"damage":6,"blocked":0,"hpAfter":94,"killed":false}
 	await run_case("right-far-single","slash",[hit],1.0,stage.floor_y-105)
 	await run_case("right-near-multi","slash",[hit,{"damage":0,"blocked":6,"hpAfter":94,"killed":false},{"damage":3,"blocked":3,"hpAfter":91,"killed":false}],1.0,stage.floor_y+45)
@@ -138,6 +164,8 @@ func _ready() -> void:
 	await run_case("right-near-pierce-multi","pierce",mixed_hits,1.0,stage.floor_y+45)
 	await run_case("left-pierce-multi","pierce",mixed_hits,-1.0,stage.floor_y-30)
 	await run_case("enemy-pierce","pierce",[hit],-1.0,stage.floor_y-30,true,false)
+	# Full and partial blocks must both display Noren's actual block pose at impact.
+	await run_case("enemy-pierce-blocked","pierce",mixed_hits.slice(1),-1.0,stage.floor_y-30,true,false)
 	# Verify the kind guard as well as the player-identity guard.
 	stage.player.kind = "qa_other_character"
 	await run_case("other-player-slash","slash",[hit],1.0,stage.floor_y-30,false,false)
@@ -155,6 +183,10 @@ func _ready() -> void:
 		manual.manual = false
 		await get_tree().create_timer(0.4).timeout
 		check(not is_instance_valid(manual),"Manual preview releases when automatic playback resumes")
+	check(await AudioCleanup.release(stage,get_tree()),"Stage audio playback references drain before exit")
+	stage.queue_free()
+	await get_tree().process_frame
+	await get_tree().process_frame
 	FileAccess.open(output+"result.json",FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures,"impacts":all_impacts,"physicalInput":false,"scope":"isolated real stage attacks; supplied hit results; no model or card input"},"\t"))
 	print("NOREN RED SLASH / THRUST: %d checks, %d failures; %s" % [checks,failures,output])
 	get_tree().quit(0 if failures == 0 else 1)

@@ -53,6 +53,9 @@ var dancer_duet := false
 var noss_encounter := false
 var dancer_lights: Node2D
 var noss_eye_wall: Node2D
+# Keep shared strike art ready throughout a battle. Effects reuse ResourceLoader's
+# live cache, and these large textures can release when the stage is destroyed.
+var strike_textures: Array[Texture2D] = []
 
 func set_noss_encounter(enemy_visuals: Array[EnemyVisualResolver.Visual]) -> void:
 	# Both initial entry and phase change use this isolated formation boundary.
@@ -144,6 +147,11 @@ func setup(feet_y: float, enemy_visuals: Array[EnemyVisualResolver.Visual], scen
 	# Noren and any lazily resolved actors use the just-applied catalog. Existing
 	# Visual instances already owned by a running battle are not touched.
 	PipelineCatalogScript.refresh()
+	strike_textures.assign([
+		load("res://assets/combat_fx/noren_red_slash.png"),
+		load("res://assets/combat_fx/noren_red_thrust_triangle_clean.png"),
+		load("res://assets/combat_fx/noren_red_thrust_triangle_light.png"),
+	])
 	var count := enemy_visuals.size()
 	# Rear-lane detours need headroom above the old y=270 cut line.
 	# Keep the lower edge at 690 so actors/effects stay out of the hand area.

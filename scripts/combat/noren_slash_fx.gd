@@ -1,8 +1,8 @@
 extends Node2D
 ## User-selected red slash/thrust artwork, animated only in presentation space.
-const TEXTURE := preload("res://assets/combat_fx/noren_red_slash.png")
-const PIERCE_TEXTURE := preload("res://assets/combat_fx/noren_red_thrust_triangle_clean.png")
-const PIERCE_OPACITY_REFERENCE := preload("res://assets/combat_fx/noren_red_thrust_triangle_light.png")
+var slash_texture: Texture2D = load("res://assets/combat_fx/noren_red_slash.png")
+var pierce_texture: Texture2D = load("res://assets/combat_fx/noren_red_thrust_triangle_clean.png")
+var pierce_opacity_reference: Texture2D = load("res://assets/combat_fx/noren_red_thrust_triangle_light.png")
 const PIERCE_OPACITY_SHADER := preload("res://shaders/noren_thrust_opacity.gdshader")
 const LAYER_SHADER := preload("res://shaders/noren_slash_layers.gdshader")
 const DRAW_SIZE := Vector2(270, 135)
@@ -30,7 +30,7 @@ func _ready() -> void:
 		blade_material.shader = LAYER_SHADER
 		material = blade_material
 		impact_flash = Sprite2D.new()
-		impact_flash.texture = TEXTURE
+		impact_flash.texture = slash_texture
 		impact_flash.centered = false
 		impact_flash.z_index = 1
 		var flash_material := ShaderMaterial.new()
@@ -41,7 +41,7 @@ func _ready() -> void:
 	elif mode == "pierce":
 		var thrust_material := ShaderMaterial.new()
 		thrust_material.shader = PIERCE_OPACITY_SHADER
-		thrust_material.set_shader_parameter("opacity_reference", PIERCE_OPACITY_REFERENCE)
+		thrust_material.set_shader_parameter("opacity_reference", pierce_opacity_reference)
 		material = thrust_material
 	queue_redraw()
 
@@ -70,7 +70,7 @@ func _draw() -> void:
 	var growth := lerpf(0.86, 1.0, release) + dissolve * 0.06
 	var draw_size := PIERCE_DRAW_SIZE if piercing else DRAW_SIZE
 	var contact := PIERCE_CONTACT if piercing else SLASH_CONTACT
-	var texture := PIERCE_TEXTURE if piercing else TEXTURE
+	var texture := pierce_texture if piercing else slash_texture
 	# Both source images have their leading edge on the left (crescent / tip).
 	# Mirror around the source contact point, keeping the hit fixed on the target.
 	var mirror := -direction
@@ -82,5 +82,5 @@ func _draw() -> void:
 		var flash_scale := Vector2(mirror, 1.0) * growth
 		impact_flash.position = (-STRIKE_CONTACT * draw_size * flash_scale).rotated(turn * mirror)
 		impact_flash.rotation = turn * mirror
-		impact_flash.scale = draw_size / TEXTURE.get_size() * flash_scale
+		impact_flash.scale = draw_size / slash_texture.get_size() * flash_scale
 		impact_flash.modulate = light
