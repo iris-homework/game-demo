@@ -1118,6 +1118,54 @@
           }
         ]
       }
+    },
+    "noren_44": {
+      "path": "res://assets/cards/noren_no_character_v3/noren_44.png",
+      "definition": {
+        "cost": 0,
+        "type": "skill",
+        "archetype": "通用",
+        "target": "self",
+        "artAssetId": "",
+        "exhaust": false,
+        "id": "noren_44",
+        "number": "44",
+        "name": "应急供能",
+        "rarity": "A",
+        "sortOrder": 44,
+        "description": "获得2点能量。",
+        "cardText": "获得2点能量。",
+        "effects": [
+          {
+            "type": "energy",
+            "amount": 2
+          }
+        ]
+      }
+    },
+    "noren_45": {
+      "path": "res://assets/cards/noren_no_character_v3/noren_45.png",
+      "definition": {
+        "cost": 0,
+        "type": "skill",
+        "archetype": "通用",
+        "target": "self",
+        "artAssetId": "",
+        "exhaust": true,
+        "id": "noren_45",
+        "number": "45",
+        "name": "瞬时演算",
+        "rarity": "B",
+        "sortOrder": 45,
+        "description": "抽2张牌。消耗。",
+        "cardText": "抽2张牌。消耗。",
+        "effects": [
+          {
+            "type": "draw",
+            "amount": 2
+          }
+        ]
+      }
     }
   }
 }

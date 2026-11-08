@@ -574,6 +574,10 @@ func remove_soul_link(effect: Dictionary) -> void:
 		if enemies[index].id == effect.enemyId and enemies[index].hp > 0:
 			buffs._write_count(self, "soul_link", maxi(0, buffs.count(self, "soul_link", index) - int(effect.amount)), index)
 
+static func valid_energy_effect(effect: Dictionary) -> bool:
+	var amount = effect.get("amount")
+	return (amount is int or amount is float) and is_finite(float(amount)) and amount > 0 and amount == floor(float(amount))
+
 func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_ammo: int) -> Dictionary:
 	if not play_error(uid).is_empty(): return {}
 	var definition := card(uid)
@@ -583,11 +587,12 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 	var effects: Array = definition.get("effects", [])
 	if definition.has("consumeAllAmmo") and not definition.consumeAllAmmo is bool: return {}
 	# Validate the complete transaction before spending resources or moving any card.
-	var allowed := ["damage","ammo","draw","stance","discard_attack","exhaust_hand","remove_soul_link"]
+	var allowed := ["damage","ammo","energy","draw","stance","discard_attack","exhaust_hand","remove_soul_link"]
 	for effect in effects:
 		if not effect is Dictionary: return {}
 		if not effect.get("type", "") in allowed and not buffs.valid_card_effect(effect): return {}
 		if effect.type == "remove_soul_link" and not valid_soul_removal(effect): return {}
+		if effect.type == "energy" and not valid_energy_effect(effect): return {}
 		if effect.has("amount"):
 			if not (effect.amount is int or effect.amount is float): return {}
 			if effect.amount < 0 and not (effect.get("id", effect.type) == "strength" and buffs.valid_card_effect(effect)): return {}
@@ -644,6 +649,7 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 						hits.append(hit)
 			"remove_soul_link": remove_soul_link(effect)
 			"ammo": gain_ammo(amount)
+			"energy": energy += amount
 			"draw": drawn.append_array(draw_cards(amount))
 			"stance": drawn.append_array(change_stance(effect.value))
 			"exhaust_hand":

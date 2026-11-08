@@ -73,12 +73,12 @@ func test_preferences() -> void:
 		file.close()
 
 func test_bindings() -> void:
-	check(Game.card_catalog.size() == 43, "Current catalogue contains forty-three cards")
+	check(Game.card_catalog.size() == 45, "Current catalogue contains forty-five cards")
 	var all_paths: Dictionary = {}
 	for style in STYLES:
 		var settings := FaceArt.config()
 		check(settings.get("templateId") == TEMPLATE_IDS[style], "Style uses its own template " + style)
-		check(settings.get("cards", {}).size() == 43, "Style binds all forty-three definitions " + style)
+		check(settings.get("cards", {}).size() == 45, "Style binds all forty-five definitions " + style)
 		for id in Game.card_catalog:
 			var definition: Dictionary = Game.card_catalog[id]
 			var entry: Dictionary = settings.get("cards", {}).get(id, {})
@@ -94,7 +94,7 @@ func test_bindings() -> void:
 			var frozen := definition.duplicate(true)
 			frozen.cardText += "（旧规则）"
 			check(FaceArt.resolve(frozen).is_empty(), style + ": frozen mismatched text falls back " + id)
-	check(loaded_art == 43 and all_paths.size() == 43, "The only set loads forty-three distinct production textures")
+	check(loaded_art == 45 and all_paths.size() == 45, "The only set loads forty-five distinct production textures")
 	var changed_settings := FaceArt.config().duplicate(true)
 	changed_settings.cards.noren_01.path = "res://assets/cards/missing-no-character-card.png"
 	check(FaceArt.resolve(Game.card_catalog.noren_01, changed_settings).is_empty(), "No-character configuration with missing image falls back")
@@ -123,7 +123,7 @@ func test_shared_views() -> void:
 		var library := Library.new()
 		library.owned_only = false
 		add_child(library)
-		check(library.card_views.size() == 43, style + ": full library retains forty-three read-only cards")
+		check(library.card_views.size() == 45, style + ": full library retains forty-five read-only cards")
 		for card in library.card_views:
 			check(card.face_texture == FaceArt.resolve(card.data).get("texture") and card.preview_only, style + ": library reuses selected artwork " + str(card.data.id))
 		library.free()
@@ -178,7 +178,7 @@ func check_geometry(card: CombatCard, style: String, tag: String) -> void:
 func test_dynamic_cards() -> void:
 	for style in STYLES:
 		for form in ["melee", "ranged"]:
-			for number in range(1, 44):
+			for number in range(1, 46):
 				var tag := "%s %s %02d" % [style, form, number]
 				var model := make_model(number, form)
 				model.next_attack_bonus = 3
@@ -243,5 +243,5 @@ func _ready() -> void:
 	var report := {"checks":checks, "failures":failures, "records":records, "loadedArt":loaded_art, "userDataDirectory":OS.get_user_data_dir(),  "scope":"isolated headless textures, synthetic modal signals and read-only dynamic cards; no visible window, mouse movement, physical-input or visual acceptance"}
 	var file := FileAccess.open(OUTPUT + "result.json", FileAccess.WRITE)
 	if file != null: file.store_string(JSON.stringify(report, "\t"))
-	print("CARD FACE STYLES: %d checks, %d failures; production artwork loaded %d/43" % [checks, failures.size(), loaded_art])
+	print("CARD FACE STYLES: %d checks, %d failures; production artwork loaded %d/45" % [checks, failures.size(), loaded_art])
 	get_tree().quit(0 if failures.is_empty() else 1)

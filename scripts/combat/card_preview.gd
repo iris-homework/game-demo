@@ -43,6 +43,7 @@ static func build(model, uid: String, target: int, extra: int) -> Dictionary:
 					lines.append("裂伤追加" + number + "点伤害。")
 			"attack_bleed": lines.append("剖解经验追加" + number + "层裂伤。")
 			"ammo": lines.append("获得" + number + "弹药。")
+			"energy": lines.append("获得" + number + "点能量。")
 			"attack_ammo": lines.append(("回弹" if model.stance == "melee" else "耗弹") + number + "。")
 			"draw": lines.append("抽" + number + "张牌。")
 			"stance": lines.append(row.text)
@@ -100,6 +101,7 @@ static func _card_text(definition: Dictionary, rows: Array) -> String:
 		var number := _numbers(row.samples)
 		match row.type:
 			"ammo": expression = "获得\\s*(\\d+)\\s*颗弹药"
+			"energy": expression = "获得\\s*(\\d+)\\s*点能量"
 			"draw": continue
 			"buff":
 				match row.id:
@@ -218,6 +220,9 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 				var previous: int = copy.ammo
 				copy.gain_ammo(amount)
 				rows.append({"type":"ammo", "values":[copy.ammo - previous]})
+			"energy":
+				copy.energy += amount
+				rows.append({"type":"energy", "values":[amount]})
 			"draw":
 				var drawn := mini(amount, draw_available)
 				draw_available -= drawn

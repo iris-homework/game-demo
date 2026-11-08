@@ -42,7 +42,7 @@ func test_bindings() -> void:
 	check(FaceArt.matches_canvas([1086, 1448]), "Integer dimensions match the fixed canvas")
 	for invalid_canvas in [[1086, 1447], [1086], [1086, 1448, 0], ["1086", 1448], null, Vector2(1086, 1448)]:
 		check(not FaceArt.matches_canvas(invalid_canvas), "Malformed or wrong canvas is rejected: " + str(invalid_canvas))
-	check(settings.cards.size() == 43, "Exactly forty-three explicit art bindings")
+	check(settings.cards.size() == 45, "Exactly forty-five explicit art bindings")
 	for id in Game.card_catalog:
 		var definition: Dictionary = Game.card_catalog[id]
 		check(FaceArt.matches_definition(definition, settings.cards[id]), id + " binds the complete current definition")
@@ -65,11 +65,11 @@ func test_bindings() -> void:
 	check(FaceArt.resolve(Game.card_catalog.noren_01, changed).is_empty(), "Missing fixed typeface falls back without substituting")
 	changed.templateId = "unknown"
 	check(FaceArt.resolve(Game.card_catalog.noren_01, changed).is_empty(), "Unknown template does not use hardcoded geometry")
-	if "--require-art" in OS.get_cmdline_user_args(): check(available_art == 43, "All forty-three production textures load")
+	if "--require-art" in OS.get_cmdline_user_args(): check(available_art == 45, "All forty-five production textures load")
 
 func test_dynamic_faces() -> void:
 	for form in ["melee", "ranged"]:
-		for number in range(1, 44):
+		for number in range(1, 46):
 			var model := fixture(number, form)
 			model.next_attack_bonus = 3
 			model.turn_damage_bonus = 4
@@ -163,7 +163,7 @@ func test_preview_and_input() -> void:
 	card.free()
 	var console = preload("res://scripts/card_console.gd").new()
 	add_child(console)
-	check(console.card_buttons.size() == 43, "Console retains all forty-three add-one buttons")
+	check(console.card_buttons.size() == 45, "Console retains all forty-five add-one buttons")
 	var tooltip: Control = console.card_buttons.noren_01._make_custom_tooltip("")
 	add_child(tooltip)
 	var tip_card: CombatCard = tooltip.get_child(0)
@@ -191,5 +191,5 @@ func _ready() -> void:
 	test_frozen_snapshot()
 	await test_preview_and_input()
 	await get_tree().process_frame
-	print("FIXED CARD FACES: %d checks, %d failures; production artwork loaded %d/43" % [checks, failures.size(), available_art])
+	print("FIXED CARD FACES: %d checks, %d failures; production artwork loaded %d/45" % [checks, failures.size(), available_art])
 	get_tree().quit(0 if failures.is_empty() else 1)

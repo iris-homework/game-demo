@@ -173,17 +173,17 @@ func _ready() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output))
 	Game.save_path = output + "noren-checkpoint.json"
 	Game.meta_path = output + "noren-meta.json"
-	check(Game.card_catalog.size() == 43,"43 definitions")
+	check(Game.card_catalog.size() == 45,"45 definitions")
 	var before_catalog := Game.card_catalog.duplicate(true)
 	var browser_cards := Game.library_cards()
-	var expected_order := [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,18,19,21,25,27,28,31,32,34,35,37,39,41,42,43,16,17,20,22,24,29,30,33,38,23,26,36,40]
+	var expected_order := [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,18,19,21,25,27,28,31,32,34,35,37,39,41,42,43,45,16,17,20,22,24,29,30,33,38,44,23,26,36,40]
 	check(browser_cards.map(func(c): return int(c.number))==expected_order,"Catalogue follows C B A S and original number within each rarity")
 	browser_cards[0].name="copy only"
 	check(Game.card_catalog==before_catalog,"Display sorting and returned edits leave definitions unchanged")
 	check(Game.card_display_before({"id":"legacy2"},{"id":"legacy10"}),"Unranked legacy cards retain natural ID fallback")
 	var rarities := {"C":0,"B":0,"A":0,"S":0}
 	for definition in Game.card_catalog.values(): rarities[definition.rarity] += 1
-	check(rarities == {"C":4,"B":26,"A":9,"S":4},"Rarity distribution")
+	check(rarities == {"C":4,"B":27,"A":10,"S":4},"Rarity distribution")
 	Game.state = Game.initial_state()
 	check(Game.state.deck.is_empty(),"No nonstarter owned on new adventure")
 	check(Game.owned_card_counts() == {"noren_01":4,"noren_02":4,"noren_03":1,"noren_04":1},"Exact initial ownership")
@@ -191,16 +191,16 @@ func _ready() -> void:
 	var ranged_damage := {1:9,9:12,13:15,14:9,16:14,17:24,19:12,20:42,21:12,25:21,26:66,27:9,28:10,29:21,35:9,37:9,38:9}
 	var blocks := {2:5,4:6,6:8,11:11,31:8,32:14,33:16,41:14,42:8,43:7}
 	for form in ["melee","ranged"]:
-		for number in range(1,44):
+		for number in range(1,46):
 			var m := fixture([number,1],form)
 			var result := play(m,0,0,"card_001" if number == 12 else "")
 			var label := "%02d %s" % [number,form]
 			check(not result.is_empty(),label+" playable")
 			if result.is_empty(): continue
 			check(result.damage == (base_damage if form == "melee" else ranged_damage).get(number,0),label+" exact damage")
-			check(m.energy == 3-int(Game.card_catalog["noren_%02d" % number].cost),label+" exact cost")
+			check(m.energy == (5 if number == 44 else 3-int(Game.card_catalog["noren_%02d" % number].cost)),label+" exact cost")
 			check(m.block == blocks.get(number,0),label+" block")
-			check(("card_000" in m.exhaust_pile) == (number in [5,8,15,22,23,34,36,40]),label+" exhaust/power destination")
+			check(("card_000" in m.exhaust_pile) == (number in [5,8,15,22,23,34,36,40,45]),label+" exhaust/power destination")
 			check(not "card_000" in m.hand and not "card_000" in m.draw_pile,label+" played card cannot redraw itself")
 			check(Game.valid_combat(m.snapshot()),label+" snapshot valid")
 			var saved_state: Dictionary=JSON.parse_string(JSON.stringify(m.snapshot()))
@@ -454,7 +454,7 @@ func _ready() -> void:
 	check(Game.owned_card_counts().get("noren_36")==2 and Game.state.combat.instances.size()==frozen.instances.size()+4 and Game.state.combat.hand==frozen.hand,"Adds owned copies directly to the running draw pile without changing its hand")
 	check(Game.valid_save(Game.state),"Console additions keep opening and live snapshots consistent")
 	var deck: Array=Game.state.deck.duplicate()
-	for command in ["addcard 不存在","addcard 44","addcard 1 0","addcard 1 -2","addcard 1 1.5","addcard 1 100","addcard 1 2 extra"]:
+	for command in ["addcard 不存在","addcard 46","addcard 1 0","addcard 1 -2","addcard 1 1.5","addcard 1 100","addcard 1 2 extra"]:
 		Game.console_command(command)
 		check(Game.state.deck==deck,"Invalid command atomic: "+command)
 	Game.initialize_combat()

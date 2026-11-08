@@ -1,0 +1,44 @@
+[
+  {
+    "cost": 0,
+    "type": "skill",
+    "archetype": "通用",
+    "target": "self",
+    "artAssetId": "",
+    "exhaust": false,
+    "id": "candidate_resource_01",
+    "number": "候选01",
+    "name": "应急供能",
+    "rarity": "A",
+    "sortOrder": 44,
+    "description": "获得2点能量。",
+    "cardText": "获得2点能量。",
+    "effects": [
+      {
+        "type": "energy",
+        "amount": 2
+      }
+    ]
+  },
+  {
+    "cost": 0,
+    "type": "skill",
+    "archetype": "通用",
+    "target": "self",
+    "artAssetId": "",
+    "exhaust": true,
+    "id": "candidate_resource_02",
+    "number": "候选02",
+    "name": "瞬时演算",
+    "rarity": "B",
+    "sortOrder": 45,
+    "description": "抽2张牌。消耗。",
+    "cardText": "抽2张牌。消耗。",
+    "effects": [
+      {
+        "type": "draw",
+        "amount": 2
+      }
+    ]
+  }
+]

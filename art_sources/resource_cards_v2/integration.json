@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-08",
+  "runtime_integrated": true,
+  "template": "neon-comic-title-v3",
+  "cards": [
+    {
+      "id": "noren_44",
+      "candidate_id": "candidate_resource_01",
+      "source_batch": "零费供能与抽牌_20261108_v2",
+      "png": "assets/cards/noren_no_character_v3/noren_44.png",
+      "sha256": "e9ff942ef087b72dcb2ed7a1e69b2d4ba7f9d8f73625e259f7d74ddc1a7f0ae8",
+      "pixel_copy_unchanged": true,
+      "definition": {
+        "cost": 0,
+        "type": "skill",
+        "archetype": "通用",
+        "target": "self",
+        "artAssetId": "",
+        "exhaust": false,
+        "id": "noren_44",
+        "number": "44",
+        "name": "应急供能",
+        "rarity": "A",
+        "sortOrder": 44,
+        "description": "获得2点能量。",
+        "cardText": "获得2点能量。",
+        "effects": [
+          {
+            "type": "energy",
+            "amount": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "noren_45",
+      "candidate_id": "candidate_resource_02",
+      "source_batch": "零费供能与抽牌_20261108_v2",
+      "png": "assets/cards/noren_no_character_v3/noren_45.png",
+      "sha256": "468f892f3e8be18290d7fde731085d83d543ffe47f36a061d919d3e17c865219",
+      "pixel_copy_unchanged": true,
+      "definition": {
+        "cost": 0,
+        "type": "skill",
+        "archetype": "通用",
+        "target": "self",
+        "artAssetId": "",
+        "exhaust": true,
+        "id": "noren_45",
+        "number": "45",
+        "name": "瞬时演算",
+        "rarity": "B",
+        "sortOrder": 45,
+        "description": "抽2张牌。消耗。",
+        "cardText": "抽2张牌。消耗。",
+        "effects": [
+          {
+            "type": "draw",
+            "amount": 2
+          }
+        ]
+      }
+    }
+  ],
+  "final_visual_user_acceptance": "pending",
+  "balance_acceptance": "pending"
+}

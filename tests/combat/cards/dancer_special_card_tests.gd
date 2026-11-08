@@ -75,7 +75,7 @@ func _ready() -> void:
 	Game.save_path = "user://dancer_special_card_unused.json"
 	Game.meta_path = "user://dancer_special_card_meta_unused.json"
 	var definitions: Dictionary = Game.read_data("cards/dancer_encounter_cards.json")
-	check(definitions.size() == 2 and Game.card_catalog.size() == 43,"two encounter-only definitions leave the forty-three-card permanent catalog intact")
+	check(definitions.size() == 2 and Game.card_catalog.size() == 45,"two encounter-only definitions leave the forty-five-card permanent catalog intact")
 	var model := phase_two()
 	var original := model.snapshot()
 	for color in ["black","white"]:

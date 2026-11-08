@@ -21,8 +21,8 @@ func _ready() -> void:
 	app.view.owned_only=false
 	app.view.refresh_library()
 	await get_tree().create_timer(0.35).timeout
-	check(app.view.definitions.map(func(c): return c.id)==order and order.size()==43,"Actual all-cards library loads forty-three definitions in C B A S order")
-	check(app.view.definitions.slice(0,4).all(func(c): return c.rarity=="C") and app.view.definitions.slice(39).all(func(c): return c.rarity=="S"),"C cards lead and S cards end the library")
+	check(app.view.definitions.map(func(c): return c.id)==order and order.size()==45,"Actual all-cards library loads forty-five definitions in C B A S order")
+	check(app.view.definitions.slice(0,4).all(func(c): return c.rarity=="C") and app.view.definitions.slice(41).all(func(c): return c.rarity=="S"),"C cards lead and S cards end the library")
 	check(Game.state==adventure and Game.card_catalog==catalog,"Library ordering leaves adventure and catalogue unchanged")
 	await shot("library-c-b")
 	app.view.scroll.scroll_vertical=int(app.view.scroll.get_v_scroll_bar().max_value)

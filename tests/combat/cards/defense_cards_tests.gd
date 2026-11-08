@@ -113,7 +113,7 @@ func test_weakness_and_block_lifetime() -> void:
 
 func test_catalog_rewards_and_faces() -> void:
 	var library: Array = Game.library_cards()
-	check(Game.card_catalog.size() == 43 and library.size() == 43, "Formal catalog and all-cards library enumerate forty-three definitions")
+	check(Game.card_catalog.size() == 45 and library.size() == 45, "Formal catalog and all-cards library enumerate forty-five definitions")
 	var expected_names := ["固守掩体","见招拆招","干扰屏障"]
 	for index in NEW_IDS.size():
 		var id: String = NEW_IDS[index]

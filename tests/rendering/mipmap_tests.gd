@@ -8,7 +8,7 @@ const AudioCleanup = preload("res://scripts/combat/audio_cleanup.gd")
 const MIPMAP_FILTER := CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 const PROJECT_DEFAULT_SETTING := "rendering/textures/canvas_textures/default_texture_filter"
 const EXPECTED_PROJECT_DEFAULT := Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-const EXPECTED_CARDS := 43
+const EXPECTED_CARDS := 45
 const DEFAULT_OUTPUT := "res://artifacts/qa/mipmap-2026-10-25"
 const CATEGORY_TEXTURES := {
 	"background": "res://assets/backgrounds/bar.png",
@@ -536,7 +536,7 @@ func _finish() -> void:
 		"outputDir": output_dir,
 		"screenshots": captured,
 		"noren03AB": ab_manifest,
-		"scope": "all 43 loaded card-face textures, project Viewport filter, representative background/character/pose/published/technology/market/menu imports and node filters, formal battle Actor sprite and attachment sampling, pose switching, and runtime fallback mipmap generation; no physical input or gameplay assertions",
+		"scope": "all 45 loaded card-face textures, project Viewport filter, representative background/character/pose/published/technology/market/menu imports and node filters, formal battle Actor sprite and attachment sampling, pose switching, and runtime fallback mipmap generation; no physical input or gameplay assertions",
 	}
 	var report_written := _write_json("result.json", report)
 	if not report_written:

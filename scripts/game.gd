@@ -1665,6 +1665,7 @@ func valid_frozen_card(definition) -> bool:
 		for key in ["amount", "hits", "cap", "executeBonus", "lastAmmoBonus", "rangedBonus", "requiresBleed", "bleedTriggers", "woundedMeleeAmount"]:
 			if effect.has(key) and (not (effect[key] is int or effect[key] is float) or not is_finite(float(effect[key]))): return false
 		if effect.type == "remove_soul_link" and not (effect.get("enemyId") in ["dancer_black", "dancer_white"] and buffs._valid_count(effect.get("amount"), 2) and effect.amount > 0): return false
+		if effect.type == "energy" and not CombatModel.valid_energy_effect(effect): return false
 		for key in ["allAmmoHits", "rangedIgnoreBlock"]:
 			if effect.has(key) and not effect[key] is bool: return false
 	return true
@@ -2117,14 +2118,23 @@ func valid_noren_state(c: Dictionary) -> bool:
 	for key in ["energy", "ammo"]:
 		var value = n.get(key)
 		if not (value is int or value is float) or not is_finite(float(value)) or value < 0 or value != floor(float(value)): return false
-	# Energy resets each turn; only technologies activated this turn can raise
-	# its ceiling. Use frozen definitions so older battles keep their own rules.
+	# Recyclable energy cards can be played repeatedly after shuffling; such a
+	# deck has no fixed per-turn ceiling. Inspect instances and frozen effects,
+	# preserving the old bound for decks without an actual energy-card copy.
+	var has_energy_card := false
+	for id in c.instances.values():
+		if not id is String: continue
+		var definition = c.cardCatalog.get(id)
+		if not valid_frozen_card(definition): continue
+		if definition.effects.any(func(effect): return effect.type == "energy"):
+			has_energy_card = true
+			break
 	var maximum_energy := int(c.profile.get("energyPerTurn", 3))
 	for definition in c.profile.get("cyberware", {}).get("cards", []).slice(0, CombatModel.CYBERWARE_LIMIT):
 		if definition.get("effect", "") != "gain_energy" or not definition.id in c.get("usedCyberware", []): continue
 		if int(c.get("cyberwareCooldowns", {}).get(definition.id, 1)) == int(definition.get("cooldownTurns", 1)):
 			maximum_energy += int(definition.amount)
-	if n.energy > maximum_energy or n.ammo > int(c.profile.get("ammoCap", 10)): return false
+	if (not has_energy_card and n.energy > maximum_energy) or n.ammo > int(c.profile.get("ammoCap", 10)): return false
 	if n.get("stance") not in ["melee", "ranged"]: return false
 	if not n.get("exhaustPile") is Array: return false
 	return buffs.valid_snapshot(c)

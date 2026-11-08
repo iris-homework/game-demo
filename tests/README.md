@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-11-08新增[零费资源卡专项](combat/cards/resource_cards_tests.tscn)与[窗口专项](combat/cards/resource_cards_visual.tscn)。覆盖44号0→2／3→5与反复洗回、非法energy整张原子拒绝、回合重置、45号抽牌／空堆／洗牌与消耗、只读预览、旧43牌冻结、新能量快照及HUD、奖励／黑市可达；GPU专项检查实际牌库和battle视图的两张卡面、0能量出牌及5／3超频显示。两入口均要求复制工程、含QA的独立用户目录与绝对`QA_OUT_DIR`；GPU分别使用1280×800与1600×1000，调用既有视图方法，不移动系统鼠标。正式目录数量相关预期更新至45，品级4／27／10／4；本轮证据位于`artifacts/qa/resource-cards-2026-11-08/`。
+
 2026-11-08新增[三张防御卡专项](combat/cards/defense_cards_tests.tscn)与[实际窗口专项](combat/cards/defense_cards_visual.tscn)：验证41—43号两形态、1费／不耗弹、非法目标原子拒绝、抽牌洗牌、自抽排除、虚弱持续、格挡清空、四牌区守恒、JSON恢复、B奖励可达及完整卡面绑定；窗口专项运行真实牌库和battle视图、连续出三卡并检查退出恢复。必须复制工程、设置名称含QA的独立用户目录与绝对`QA_OUT_DIR`；后者使用真实GPU、`--resolution 1280x800`或`1600x1000`，不移动系统鼠标。仅通过视图方法调用出牌，不宣称物理输入或真人平衡验收。数量相关的旧套件已同步43牌／B26；本轮结果见`artifacts/qa/defense-cards-2026-11-08/verification.json`。
 
 2026-11-06旧测试修复：[诺伦特效专项](combat/presentation/noren_slash_visual.tscn)明确检查黑帮小弟既有pierce攻击和block→idle别名，并增加诺伦原生block的全／部分格挡场景；支持绝对 `QA_OUT_DIR`，输出在其 `headless/` 或 `render/` 子目录，未设置时保留历史默认路径。[mipmap专项](rendering/mipmap_tests.tscn)在报告和退出前等待音频清理、销毁应用，增加两项收尾断言。两者均在复制工程、独立QA用户目录运行，mipmap沿用 `QA_OUT_DIR`／`--output-dir`。本轮headless分别339／456项通过，旧失败和故意破坏动作的负对照见[修改记录](../docs/修改记录.md#2026-11-06-旧特效测试预期与mipmap退出清理修复)。

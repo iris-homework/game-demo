@@ -72,6 +72,7 @@
               "block",
               "ammo",
               "draw",
+              "energy",
               "stance",
               "weak",
               "bleed",
@@ -111,7 +112,32 @@
             "minimum": 0,
             "description": "Explicit total bleed triggers per body hit, replacing the normal stance default."
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "energy"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "required": [
+                "amount"
+              ],
+              "properties": {
+                "amount": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        ]
       }
     },
     "exhaust": {

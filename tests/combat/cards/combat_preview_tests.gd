@@ -86,9 +86,9 @@ func contains(actual: String, expected: String, label: String) -> void:
 	check(expected in actual, "%s expected <%s>, got <%s>" % [label, expected, actual])
 
 func test_read_only_catalog() -> void:
-	check(Game.card_catalog.size() == 43, "All 43 formal cards are covered")
+	check(Game.card_catalog.size() == 45, "All 45 formal cards are covered")
 	for form in ["melee", "ranged"]:
-		for number in range(1, 44):
+		for number in range(1, 46):
 			var m := fixture([number, 1], form, 3)
 			m.next_attack_bonus = 3
 			m.turn_damage_bonus = 4
