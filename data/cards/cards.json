@@ -910,5 +910,76 @@
       }
     ],
     "cardText": "本场战斗中，近战每段攻击命中后施加1层裂伤。"
+  },
+  {
+    "rarity": "B",
+    "cost": 1,
+    "type": "skill",
+    "archetype": "通用",
+    "artAssetId": "",
+    "exhaust": false,
+    "id": "noren_41",
+    "number": "41",
+    "name": "固守掩体",
+    "target": "self",
+    "sortOrder": 41,
+    "description": "获得14点格挡。",
+    "cardText": "获得14点格挡。",
+    "effects": [
+      {
+        "type": "block",
+        "amount": 14
+      }
+    ]
+  },
+  {
+    "rarity": "B",
+    "cost": 1,
+    "type": "skill",
+    "archetype": "通用",
+    "artAssetId": "",
+    "exhaust": false,
+    "id": "noren_42",
+    "number": "42",
+    "name": "见招拆招",
+    "target": "self",
+    "sortOrder": 42,
+    "description": "获得8点格挡，抽1张牌。",
+    "cardText": "获得8点格挡，抽1张牌。",
+    "effects": [
+      {
+        "type": "block",
+        "amount": 8
+      },
+      {
+        "type": "draw",
+        "amount": 1
+      }
+    ]
+  },
+  {
+    "rarity": "B",
+    "cost": 1,
+    "type": "skill",
+    "archetype": "通用",
+    "artAssetId": "",
+    "exhaust": false,
+    "id": "noren_43",
+    "number": "43",
+    "name": "干扰屏障",
+    "target": "enemy",
+    "sortOrder": 43,
+    "description": "获得7点格挡，对一名敌人施加2层虚弱。",
+    "cardText": "获得7点格挡，对一名敌人施加2层虚弱。",
+    "effects": [
+      {
+        "type": "block",
+        "amount": 7
+      },
+      {
+        "type": "weak",
+        "amount": 2
+      }
+    ]
   }
 ]

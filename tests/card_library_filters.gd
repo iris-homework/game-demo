@@ -1,6 +1,7 @@
 extends Node
 ## Catalogue filters exercise the real browser without writing adventure saves.
 const Library = preload("res://scripts/card_library.gd")
+const AudioCleanup = preload("res://scripts/combat/audio_cleanup.gd")
 var checks := 0
 var failures: Array[String] = []
 var view: Control
@@ -74,11 +75,11 @@ func _ready() -> void:
 	check(view.get_node("scope_owned").button_pressed and not view.get_node("scope_all").button_pressed, "Default ownership is visibly selected")
 	await shot("01-owned")
 	await activate("scope_all")
-	check(ids().size() == 40 and not view.owned_only, "Pointer activation opens all forty definitions")
+	check(ids().size() == 43 and not view.owned_only, "Pointer activation opens all forty-three definitions")
 	check(view.get_node("scope_all").button_pressed and not view.get_node("scope_owned").button_pressed, "Scope selection persists independently of focus")
 	for rarity in ["C", "B", "A", "S"]:
 		view.set_filter("rarity", rarity)
-		check(ids().size() == {"C":4,"B":23,"A":9,"S":4}[rarity], "Rarity catalogue " + rarity)
+		check(ids().size() == {"C":4,"B":26,"A":9,"S":4}[rarity], "Rarity catalogue " + rarity)
 	view.clear_filters()
 	await activate("filter_rarity_B")
 	await activate("filter_cost_0")
@@ -176,6 +177,7 @@ func _ready() -> void:
 	await activate("close_library")
 	check(not is_instance_valid(app.deck_browser) and dialogue.process_mode != Node.PROCESS_MODE_DISABLED, "Close button restores underlying input after filtering")
 	check(Game.state == original_state and Game.revision == original_revision, "Actual overlay navigation leaves adventure and revision unchanged")
+	check(await AudioCleanup.release(app, get_tree()), "Adventure view audio drains before disposal")
 	remove_child(app)
 	app.queue_free()
 	await settle()
@@ -239,6 +241,7 @@ func test_reward_deck() -> void:
 				reward.close_picker()
 				check(not trigger.disabled and not reward.exit_button.disabled, "Picker close restores toolbar")
 		check(Game.claim_rewards(Game.revision) and Game.page == "map", source + " can leave rewards after browsing")
+		check(await AudioCleanup.release(app, get_tree()), "Reward view audio drains before disposal")
 		remove_child(app)
 		app.queue_free()
 		await settle()

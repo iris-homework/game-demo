@@ -94,7 +94,7 @@ func _ready() -> void:
 	await shot("owned")
 	app.view.owned_only=false;app.view.refresh_library()
 	await get_tree().process_frame
-	check(app.view.card_views.size()==40,"All forty cards rendered")
+	check(app.view.card_views.size()==43,"All forty-three cards rendered")
 	for card in app.view.card_views:
 		check(card.rarity_color()==CombatCard.RARITY_COLORS[card.data.rarity],card.data.name+" rarity color")
 		for node in card.get_children():

@@ -117,7 +117,7 @@ func _ready() -> void:
 		check(card.card_button.tooltip_text == card.data.description, "Library shows original tooltip: " + card.data.name)
 	check(view.model.snapshot() == frozen, "Library browsing preserves combat state")
 	await shot("library-original-values")
-	# Independent rendered matrix checks all 40 cards in both forms, with buffs.
+	# Independent rendered matrix checks the complete card catalogue in both forms, with buffs.
 	if is_instance_valid(app.deck_browser): app.close_current_deck()
 	view.select_card("card_002")
 	var played_card: CombatCard = view.cards.card_002
@@ -146,13 +146,13 @@ func _ready() -> void:
 	await shot("lethal-target-potential-status")
 	view.cancel_selection()
 	for form in ["melee", "ranged"]:
-		for page in 4:
+		for page in ceili(Game.card_catalog.size() / 10.0):
 			var board := Control.new()
 			board.z_index = 200
 			view.add_child(board)
 			view.rect(board, Vector2.ZERO, Vector2(1440,900), Color("07080c"))
-			view.label(board, "当前效果预览 · " + form + " · %d/4" % (page + 1), Vector2(40,30), Vector2(1200,50), 30)
-			for i in 10:
+			view.label(board, "当前效果预览 · " + form + " · %d/%d" % [page + 1, ceili(Game.card_catalog.size() / 10.0)], Vector2(40,30), Vector2(1200,50), 30)
+			for i in mini(10, Game.card_catalog.size() - page * 10):
 				var m: CombatModel = helper.fixture([page * 10 + i + 1], form)
 				m.turn_damage_bonus = 4
 				m.ammo = 5

@@ -1,5 +1,7 @@
 # 测试目录索引
 
+2026-11-08新增[三张防御卡专项](combat/cards/defense_cards_tests.tscn)与[实际窗口专项](combat/cards/defense_cards_visual.tscn)：验证41—43号两形态、1费／不耗弹、非法目标原子拒绝、抽牌洗牌、自抽排除、虚弱持续、格挡清空、四牌区守恒、JSON恢复、B奖励可达及完整卡面绑定；窗口专项运行真实牌库和battle视图、连续出三卡并检查退出恢复。必须复制工程、设置名称含QA的独立用户目录与绝对`QA_OUT_DIR`；后者使用真实GPU、`--resolution 1280x800`或`1600x1000`，不移动系统鼠标。仅通过视图方法调用出牌，不宣称物理输入或真人平衡验收。数量相关的旧套件已同步43牌／B26；本轮结果见`artifacts/qa/defense-cards-2026-11-08/verification.json`。
+
 2026-11-06旧测试修复：[诺伦特效专项](combat/presentation/noren_slash_visual.tscn)明确检查黑帮小弟既有pierce攻击和block→idle别名，并增加诺伦原生block的全／部分格挡场景；支持绝对 `QA_OUT_DIR`，输出在其 `headless/` 或 `render/` 子目录，未设置时保留历史默认路径。[mipmap专项](rendering/mipmap_tests.tscn)在报告和退出前等待音频清理、销毁应用，增加两项收尾断言。两者均在复制工程、独立QA用户目录运行，mipmap沿用 `QA_OUT_DIR`／`--output-dir`。本轮headless分别339／456项通过，旧失败和故意破坏动作的负对照见[修改记录](../docs/修改记录.md#2026-11-06-旧特效测试预期与mipmap退出清理修复)。
 
 2026-11-06新增[纹理内存与生命周期专项](resource_memory_tests.tscn)：真实主界面固定种子进入三敌演练、返回菜单三轮，检查攻击图预热复用／离场释放、舞者音轨不被普通战斗保留、冒险状态恢复、地图弱缓存与mipmap复用。必须复制工程，将`project.godot`的自定义用户目录改为含`QA`的独立名称，并设置绝对`QA_OUT_DIR`；不能仅靠macOS的`APPDATA`隔离。headless35项检查；`QA_CAPTURE=1`配合GPU增加7张截图与断言，记录纹理／静态内存、RSS和帧间隔。GPU顺序运行，Dummy音频，不操作系统鼠标。最终通过及旧特效／mipmap测试的改前对照边界见[本轮记录](../docs/修改记录.md#2026-11-06-纹理生命周期优化与冗余资源清理)。
