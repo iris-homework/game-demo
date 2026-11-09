@@ -9,6 +9,7 @@ import tempfile
 import zipfile
 from datetime import datetime
 from pathlib import Path
+from check_config import validate_project
 
 ROOT = Path(__file__).resolve().parents[1]
 RUNTIME_DIRS = ("assets", "data", "scenes", "scripts", "shaders",
@@ -100,6 +101,11 @@ def main():
     parser.add_argument("--godot", default="/Applications/Godot.app/Contents/MacOS/Godot")
     parser.add_argument("--output", type=Path, required=True, help="New directory; existing output is never overwritten")
     args = parser.parse_args()
+    report = validate_project(ROOT)
+    if report["errors"]:
+        for error in report["errors"]:
+            print(f'{error["file"]}:{error["field"]}: {error["message"]}')
+        raise SystemExit("Configuration validation failed; release build was not started.")
     output = args.output.expanduser().resolve()
     output.mkdir(parents=True, exist_ok=False)
     evidence = output / "构建记录"

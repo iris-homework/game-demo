@@ -1,5 +1,9 @@
 # 测试目录索引
 
+2026-11-09新增[音效观察清理专项](audio/sfx_hooks_cleanup_tests.tscn)：12轮真实卡牌／按钮／四类特效销毁、8轮正式牌库筛选、防重复登记、离树及重新入树、换页／detach与存活项音效，142项。`mercenary_tests`改为按两周分别核对索引并检查跨周唯一及完整覆盖；显式建立QA输出目录，以固定三项有效任务池验证迁移和真实存读不重抽，消除旧历史目录与两事件目录假设。
+
+统一入口为`python3 tools/run_core_qa.py`，自动复制工程并隔离Godot用户目录，顺序执行配置／工具负样例回归和七套headless核心场景；支持`--suite audio/story/combat`与`--godot`。独立配置检查为`python3 tools/check_config.py`。Python回归位于`tools/tests/`，含错误配置阻止构建、两种日志格式、缺汇总／非零退出／脚本错误／非零失败数／超时拒绝等负样例。完整范围与隔离方式见[工作流](../docs/开发工具与工作流.md#配置检查与核心回归2026-11-09)，本轮结果见[验证明细](../artifacts/qa/maintenance-2026-11-09/verification.json)。
+
 2026-11-08新增[零费资源卡专项](combat/cards/resource_cards_tests.tscn)与[窗口专项](combat/cards/resource_cards_visual.tscn)。覆盖44号0→2／3→5与反复洗回、非法energy整张原子拒绝、回合重置、45号抽牌／空堆／洗牌与消耗、只读预览、旧43牌冻结、新能量快照及HUD、奖励／黑市可达；GPU专项检查实际牌库和battle视图的两张卡面、0能量出牌及5／3超频显示。两入口均要求复制工程、含QA的独立用户目录与绝对`QA_OUT_DIR`；GPU分别使用1280×800与1600×1000，调用既有视图方法，不移动系统鼠标。正式目录数量相关预期更新至45，品级4／27／10／4；本轮证据位于`artifacts/qa/resource-cards-2026-11-08/`。
 
 2026-11-08新增[三张防御卡专项](combat/cards/defense_cards_tests.tscn)与[实际窗口专项](combat/cards/defense_cards_visual.tscn)：验证41—43号两形态、1费／不耗弹、非法目标原子拒绝、抽牌洗牌、自抽排除、虚弱持续、格挡清空、四牌区守恒、JSON恢复、B奖励可达及完整卡面绑定；窗口专项运行真实牌库和battle视图、连续出三卡并检查退出恢复。必须复制工程、设置名称含QA的独立用户目录与绝对`QA_OUT_DIR`；后者使用真实GPU、`--resolution 1280x800`或`1600x1000`，不移动系统鼠标。仅通过视图方法调用出牌，不宣称物理输入或真人平衡验收。数量相关的旧套件已同步43牌／B26；本轮结果见`artifacts/qa/defense-cards-2026-11-08/verification.json`。

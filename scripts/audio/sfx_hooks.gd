@@ -23,6 +23,11 @@ func attach(value: Control) -> void:
 		if is_instance_valid(source) and source.is_connected(item.signal_name,item.callback):
 			source.disconnect(item.signal_name,item.callback)
 	connections.clear()
+	for id in watched:
+		var node: Node = watched[id].get_ref()
+		var callback := _unwatch.bind(id)
+		if is_instance_valid(node) and node.tree_exiting.is_connected(callback):
+			node.tree_exiting.disconnect(callback)
 	view = value
 	cards.clear()
 	watched.clear()
@@ -52,12 +57,15 @@ func _node_added(node: Node) -> void:
 
 func _register_deferred(reference: WeakRef) -> void:
 	var node: Node = reference.get_ref()
-	if not is_instance_valid(node) or not is_instance_valid(view): return
+	if not is_instance_valid(node) or not node.is_inside_tree() or not is_instance_valid(view): return
 	if node == view or view.is_ancestor_of(node) or (is_instance_valid(ui_root) and (node == ui_root or ui_root.is_ancestor_of(node))): _watch(node)
 
 func _watch(node: Node) -> void:
 	if watched.has(node.get_instance_id()): return
-	watched[node.get_instance_id()] = true
+	var id := node.get_instance_id()
+	watched[id] = weakref(node)
+	# Bind only the instance id: the exit callback must not retain its source.
+	node.tree_exiting.connect(_unwatch.bind(id))
 	if node is CombatCard:
 		cards.append(weakref(node))
 		node.set_meta("audio_lab_hovered", false)
@@ -71,6 +79,26 @@ func _watch(node: Node) -> void:
 			"res://scripts/combat/exhaust_fx.gd": _cue("card_exhaust")
 			"res://scripts/combat/shuffle_fx.gd": _cue("card_shuffle")
 	for child in node.get_children(): _watch(child)
+
+func _unwatch(id: int) -> void:
+	var reference: WeakRef = watched.get(id)
+	if reference == null: return
+	var node: Node = reference.get_ref()
+	var callback := _unwatch.bind(id)
+	if is_instance_valid(node) and node.tree_exiting.is_connected(callback):
+		node.tree_exiting.disconnect(callback)
+	watched.erase(id)
+	for i in range(cards.size()-1, -1, -1):
+		var card: Object = cards[i].get_ref()
+		if not is_instance_valid(card) or card.get_instance_id() == id:
+			cards.remove_at(i)
+	for i in range(connections.size()-1, -1, -1):
+		var item := connections[i]
+		var source: Object = item.source.get_ref()
+		if not is_instance_valid(source) or source.get_instance_id() == id:
+			if is_instance_valid(source) and source.is_connected(item.signal_name, item.callback):
+				source.disconnect(item.signal_name, item.callback)
+			connections.remove_at(i)
 
 func _cue(cue: String) -> void:
 	if enabled and is_instance_valid(bank): bank.play_cue(cue)

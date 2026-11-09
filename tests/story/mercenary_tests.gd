@@ -1,6 +1,7 @@
 extends Node
 
-const OUTPUT := "res://artifacts/qa/free-mercenary-2026-10-15/"
+var output := OS.get_environment("QA_OUT_DIR")
+const MIGRATED_POOL := ["E02", "E11", "E13"]
 var checks := 0
 var failures := 0
 
@@ -25,11 +26,24 @@ func advance_to_result() -> void:
 	check(guard < 80 and Game.state.currentScene == "result", "Migrated port dialogue reaches settlement")
 
 func _ready() -> void:
+	if not output.is_absolute_path() or not "qa" in OS.get_user_data_dir().to_lower():
+		push_error("MERCENARY requires absolute QA_OUT_DIR and an isolated QA user directory")
+		get_tree().quit(2)
+		return
+	DirAccess.make_dir_recursive_absolute(output)
 	Game.save_enabled = false
-	Game.save_path = OUTPUT + "migration-checkpoint.json"
-	Game.meta_path = OUTPUT + "migration-meta.json"
+	Game.save_path = output.path_join("migration-checkpoint.json")
+	Game.meta_path = output.path_join("migration-meta.json")
 	check(not Game.initial_state().has("faction"), "New game has no allegiance")
-	check(Game.read_data("weeks/week1/week.json").eventIds == Game.events.keys(), "Week index matches active events")
+	var indexed_events: Array = []
+	for week_id in [1, 2]:
+		var week: Dictionary = Game.read_data("weeks/week%d/week.json" % week_id)
+		var authored: Dictionary = Game.read_data("weeks/week%d/events.json" % week_id)
+		check(week.eventIds.size() == authored.size() and week.eventIds.all(func(id): return authored.has(id)), "Week %d index matches its own events" % week_id)
+		for id in week.eventIds:
+			check(not id in indexed_events, "Event IDs are unique across playable weeks: " + id)
+			indexed_events.append(id)
+	check(indexed_events.size() == Game.events.size() and indexed_events.all(func(id): return Game.events.has(id)), "Playable week indexes cover all active events")
 	for p in Game.places: check(not p.has("unlockCondition"), "Places have no unlock conditions")
 	for e in Game.events.values():
 		check_condition(e.unlockCondition)
@@ -60,6 +74,8 @@ func _ready() -> void:
 			Game.state.currentPlaceId = legacy_events[event_id].placeId
 			Game.state.currentScene = "dialogue"
 			Game.state.completedEventIds = ["E01", "E03", "E04"]
+			# A valid persisted pool must survive migration and disk reload unchanged.
+			Game.state.refreshedEventIds = MIGRATED_POOL.duplicate()
 			Game.state.flags = {"alleyClue":true, "portClue":true}
 			Game.state.credits = 4321
 			Game.state.currentHp = 61
@@ -88,7 +104,7 @@ func _ready() -> void:
 			if node_id == "lose":
 				check(Game.page == "defeat" and not Game.can_continue(), "Legacy failure remains terminal " + label)
 			else:
-				check(Game.page == "map" and Game.map_target_events().map(func(e): return e.id) == ["E02", "E11"], "Retired checkpoint resumes remaining ungated events " + label)
+				check(Game.page == "map" and Game.state.refreshedEventIds == MIGRATED_POOL and Game.map_target_events().map(func(e): return e.id) == MIGRATED_POOL, "Retired checkpoint resumes its three retained eligible events without rerolling " + label)
 	# Old selected and pending rewards on retired encounters never duplicate credits/cards.
 	for bid in ["B09", "B10"]:
 		for reward_status in ["pending", "claimed", "skipped"]:
@@ -133,7 +149,7 @@ func _ready() -> void:
 	check(Game.valid_save(retained) and retained.combat == combat, "Retained combat unchanged")
 	# Check copies of the actual user saves, never reading or writing the live paths.
 	for name in ["checkpoint.json", "checkpoint.json.bak"]:
-		var path: String = OUTPUT + "save-backup/" + name
+		var path: String = output.path_join("save-backup/" + name)
 		if FileAccess.file_exists(path):
 			var old = JSON.parse_string(FileAccess.get_file_as_string(path))
 			check(Game.valid_save(Game.migrate_save(old)), "Actual checkpoint copy remains loadable " + name)

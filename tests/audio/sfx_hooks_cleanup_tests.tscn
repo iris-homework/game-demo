@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://tests/audio/sfx_hooks_cleanup_tests.gd" id="1"]
+
+[node name="SfxHooksCleanupTests" type="Node"]
+script = ExtResource("1")
