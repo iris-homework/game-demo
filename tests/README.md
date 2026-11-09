@@ -470,3 +470,7 @@ Node扫描、参数、发布与回退测试为
 上述真实场景同时检查二阶段 `halo_charge → halo_burst`、蓄光期间不提前显示扣血和爆炸后一次性揭示16点模型伤害，并截取光环／爆炸画面。`tests/combat/presentation/noss_visual_tests.tscn` 另覆盖二阶段光剑在目标头顶凝聚、完整剑柄位于裁切区域内、垂直加速砸落、14枚高速长光屑及命中一次性，并保留重击的目标中心、无光剑弹体、蓄光顺序、伤害／完全格挡对应姿势、站位／站姿恢复及节点清理；以专用QA用户目录运行，`NOSS_VISUAL_QA_OUT` 指定输出，`-- --capture` 启用GPU截图。
 
 重击视觉专项还检查爆炸光层存在、局部时钟实际推进和不拦截输入；真实场景保存爆光峰值及后续冲击波截图。`QA_CAPTURE=1 QA_SEQUENCE=1` 额外录制一次约1.65秒的真实GPU画面序列至 `heavy_sequence/`，`frames.json` 保留每帧测得时间、场景阶段及爆炸年龄，可用于动画预览编码；先在内存中收集实际图像，再写PNG，峰值静帧也从这些实际帧中挑选，避免压缩打断录制。无窗口运行不录制。
+
+## 六项科技扩展（2026-11-10）
+
+`technology_expansion_ui_tests.tscn`检查十二项目录分页、第二页绝对货位购买／隔离保存重载、确认模态翻页隔离、十二项已有列表滚动、长文布局、净化999冷却及新被动本回合状态。要求复制工程、独立QA用户目录和绝对`QA_OUT_DIR`；headless检查逻辑与节点几何，GPU运行额外输出实际截图。战斗模型入口为`combat/technology/technology_expansion_tests.tscn`，真实战斗表现入口为`combat/technology/technology_expansion_visual.tscn`；本轮结果见修改记录，截图不能替代物理输入或真人平衡。

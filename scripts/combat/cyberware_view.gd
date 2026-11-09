@@ -29,7 +29,7 @@ func _ready() -> void:
 	for i in CombatModel.CYBERWARE_LIMIT:
 		var pos := Vector2((1440-row_width)/2.0+i*300,282)
 		if i >= model.cyberware_cards().size():
-			var empty_slot := panel(self,pos,Vector2(270,340),Color("17131f"),Color("494053"))
+			var empty_slot := panel(self,pos,Vector2(270,390),Color("17131f"),Color("494053"))
 			label(empty_slot,"TECH / %02d" % (i+1),Vector2(20,13),Vector2(228,25),12,MUTED)
 			var empty_label := label(empty_slot,"空位",Vector2(20,146),Vector2(230,48),25,MUTED)
 			empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -39,7 +39,7 @@ func _ready() -> void:
 		var display_name := str(definition.name).replace("义体", "科技")
 		var description := str(definition.description).replace("义体", "科技")
 		var passive := CombatModel.is_passive_cyberware(definition)
-		var b := button(self,"",pos,Vector2(270,340),func():
+		var b := button(self,"",pos,Vector2(270,390),func():
 			if model.cyberware_available(definition.id): activation_requested.emit(definition.id))
 		for state_name in ["normal","hover","pressed","disabled","focus"]:
 			var fill := Color("251638")
@@ -54,10 +54,10 @@ func _ready() -> void:
 		TechnologyIcons.create(b,str(definition.id),Vector2(79,42),Vector2(112,112))
 		label(b,display_name,Vector2(20,166),Vector2(230,38),25)
 		rect(b,Vector2(20,209),Vector2(230,1),Color("74528f"))
-		var effect_label := label(b,description,Vector2(20,220),Vector2(230,50),17,CREAM)
+		var effect_label := label(b,description,Vector2(20,220),Vector2(230,100),17,CREAM)
 		effect_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		label(b,TechnologyIcons.activation_label(definition),Vector2(20,276),Vector2(230,25),15,PURPLE)
-		state_labels.append(label(b,"",Vector2(20,304),Vector2(235,31),17,PURPLE))
+		label(b,TechnologyIcons.activation_label(definition),Vector2(20,326),Vector2(230,25),15,PURPLE)
+		state_labels.append(label(b,"",Vector2(20,354),Vector2(235,31),17,PURPLE))
 		for child in b.get_children():
 			if child is Label: child.set_meta("active_color",child.get_theme_color("font_color"))
 			elif child is ColorRect: child.set_meta("active_color",child.color)
@@ -80,7 +80,9 @@ func refresh() -> void:
 			elif child is ColorRect: child.color = Color("606570") if used and not passive else child.get_meta("active_color")
 			elif child is TextureRect: child.modulate = Color(0.65,0.65,0.7,0.65) if used and not passive else Color.WHITE
 		if passive:
-			state_labels[i].text = "被动 · 无需激活"
+			var effect: String = model.cyberware_cards()[i].get("effect", "")
+			var marker: String = {"stance_block":"stanceBlockUsed","exhaust_draw":"exhaustDrawUsed","guarded_attack_bonus":"firstAttackUsed"}.get(effect, "")
+			state_labels[i].text = "本回合已结算" if not marker.is_empty() and model.technology_turn_state.get(marker,false) else "本回合待触发" if not marker.is_empty() else "被动 · 无需激活"
 		elif remaining > 0:
 			state_labels[i].text = "冷却中 · 下回合可用" if remaining == 1 else "冷却中 · 剩余 %d 回合" % remaining
 		else:

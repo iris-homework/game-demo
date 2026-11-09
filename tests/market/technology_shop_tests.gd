@@ -39,13 +39,13 @@ func test_catalog_and_purchase() -> void:
 	var defaults := Game.owned_cyberware_ids()
 	check(defaults == ["dimensional_pocket", "accelerated_clock", "backup_energy"], "fixture owns three original technologies")
 	var offers := Game.technology_shop_offers()
-	check(offers.size() == 6 and offers.map(func(offer): return offer.id) == defaults + ["money_chip","healing_chip","swift_chip"], "shop lists three original active technologies and three passive chips")
-	check(offers.all(func(offer): return offer.price == 125), "all six technologies cost 125")
+	check(offers.size() == 12 and offers.map(func(offer): return offer.id) == defaults + ["money_chip","healing_chip","swift_chip","emergency_forcefield","folding_magazine","purification_filter","phase_plating","recycling_protocol","counter_calibrator"], "shop lists all twelve formal technologies in stable order")
+	check(offers.all(func(offer): return offer.price == 125), "all twelve technologies cost 125")
 	for index in 3:
 		var before := Game.state.duplicate(true)
 		var rev := Game.revision
 		check(not Game.buy_shop_technology(index, rev) and Game.state == before and Game.revision == rev, "existing ownership cannot repurchase: " + offers[index].id)
-	check(Game.prototype_rules.cyberware.cards.size() == 12, "catalog retains six legacy definitions plus six real technologies")
+	check(Game.prototype_rules.cyberware.cards.size() == 18, "catalog retains six legacy definitions plus twelve real technologies")
 	for index in range(3,6): check(Game.buy_shop_technology(index,Game.revision), "fixture can purchase passive chip " + offers[index].id)
 	check(Game.equipped_cyberware_ids() == defaults + ["money_chip"], "first passive purchase fills the fourth slot; later purchases preserve all four in order")
 	offers[0].price = 1
@@ -67,8 +67,8 @@ func test_catalog_and_purchase() -> void:
 	check(Game.state == before, "purchase changes only credits, ownership and equipment without time or other state")
 	check(not Game.buy_shop_technology(0, rev) and not Game.buy_shop_technology(0, Game.revision), "stale and repeated purchase rejected")
 	check(Game.state == before and Game.revision == rev + 1, "rejected purchase leaves all state and revision unchanged")
-	for index in range(1, 6): check(Game.buy_shop_technology(index, Game.revision), "can buy remaining unowned technology " + str(index))
-	check(Game.owned_cyberware_ids() == defaults + ["money_chip","healing_chip","swift_chip"] and Game.equipped_cyberware_ids() == defaults + ["money_chip"], "six sequential purchases own all six and automatically equip only the first four in order")
+	for index in range(1, 12): check(Game.buy_shop_technology(index, Game.revision), "can buy remaining unowned technology " + str(index))
+	check(Game.owned_cyberware_ids() == Game.technology_shop_offers().map(func(offer): return offer.id) and Game.equipped_cyberware_ids() == defaults + ["money_chip"], "twelve sequential purchases own all twelve and automatically equip only the first four in order")
 	Game.state.currentDay = 7
 	check(not Game.buy_shop_technology(0, Game.revision), "day changes do not replenish owned technology")
 	check(Game.initial_state().ownedCyberwareIds.is_empty() and Game.initial_state().equippedCyberwareIds.is_empty(), "production new adventure starts without technologies")
@@ -101,17 +101,17 @@ func test_catalog_limits() -> void:
 	check(Game.technology_shop_offers().is_empty() and not Game.buy_shop_technology(0, Game.revision) and Game.state == before, "empty catalog has no purchasable positions")
 	Game.technology_shop_rules = {"offers":rules.offers.slice(0,3).duplicate(true)}
 	check(Game.technology_shop_offers().size() == 3, "three-offer catalog accepted")
-	for index in 3:
+	for index in 9:
 		var definition := Game.cyberware_definition("backup_energy").duplicate(true)
 		definition.id = "qa_catalog_extra_" + str(index)
 		Game.prototype_rules.cyberware.cards.append(definition)
 		Game.technology_shop_rules.offers.append({"id":definition.id, "price":125})
-	check(Game.technology_shop_offers().size() == 6 and Game.buy_shop_technology(5, Game.revision), "six valid offers accepted using temporary in-memory definitions")
+	check(Game.technology_shop_offers().size() == 12 and Game.buy_shop_technology(11, Game.revision), "twelve valid offers accepted using temporary in-memory definitions")
 	var seventh := Game.cyberware_definition("backup_energy").duplicate(true)
-	seventh.id = "qa_catalog_extra_3"
+	seventh.id = "qa_catalog_extra_9"
 	Game.prototype_rules.cyberware.cards.append(seventh)
 	Game.technology_shop_rules.offers.append({"id":seventh.id, "price":125})
-	check(Game.technology_shop_offers().is_empty() and not Game.buy_shop_technology(0, Game.revision), "more than six offers rejected")
+	check(Game.technology_shop_offers().is_empty() and not Game.buy_shop_technology(0, Game.revision), "more than twelve offers rejected")
 	Game.technology_shop_rules = {"offers":[{"id":"test_cyberware_01", "price":125}]}
 	check(Game.technology_shop_offers().is_empty() and not Game.buy_shop_technology(0, Game.revision), "legacy test placeholders cannot be sold")
 	Game.technology_shop_rules = rules
@@ -136,7 +136,7 @@ func test_guards() -> void:
 			"owned_invalid": Game.state.ownedCyberwareIds = ["UNKNOWN"]
 		var before := Game.state.duplicate(true)
 		var actual_rev := Game.revision
-		var index := -1 if mode == "index_low" else (6 if mode == "index_high" else 0)
+		var index := -1 if mode == "index_low" else (12 if mode == "index_high" else 0)
 		check(not Game.buy_shop_technology(index, rev), "reject purchase guard: " + mode)
 		check(Game.state == before and Game.revision == actual_rev, "guard atomicity: " + mode)
 	unowned_fixture()

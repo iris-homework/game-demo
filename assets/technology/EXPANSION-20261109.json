@@ -1,0 +1,44 @@
+{
+  "emergency_forcefield": {
+    "source": "/Users/anyone/.codex/generated_images/01a1c103-2340-73b2-b423-e83c0cae1d63/exec-61d0babf-cb1b-422c-a4c3-2a4646362ac8.png",
+    "prompt": "Use case: stylized-concept. Asset type: premium illustrated physical cyberpunk gadget icon for Godot card game. Square 1024x1024, REAL TRANSPARENT alpha background. ONE isolated centered object filling 78 percent of canvas with clear equal margins, all parts fully inside. Hand-inked anime comic game asset: bold irregular near-black contour, chunky angular industrial charcoal/navy metal, worn cream edge plates, subtle scratches, restrained hot magenta lights and tiny cyan indicators. 3/4 isometric perspective. Match illustrated rugged hardware inventory icons, NOT photorealistic, NOT 3D render, NOT flat vector. No card frame, no tile, no backdrop, no ground shadow, no UI, no text, no letters or numbers, no watermark, no extra objects. Subject: an emergency forcefield emitter, squat hexagonal dark metal wrist-sized projector with three short armored fins around a central cyan luminous lens, a small contained translucent magenta shield-shaped projection rising just above the emitter. Clearly protective hardware, distinct from a battery.",
+    "target": "icons/emergency_forcefield-v1.png",
+    "mode": "built-in imagegen",
+    "transparent_background": true
+  },
+  "folding_magazine": {
+    "source": "/Users/anyone/.codex/generated_images/01a1c103-2340-73b2-b423-e83c0cae1d63/exec-edc62972-8464-4386-9de9-d520bff6ce34.png",
+    "prompt": "Use case: stylized-concept. Asset type: premium illustrated physical cyberpunk gadget icon for Godot card game. Square 1024x1024, REAL TRANSPARENT alpha background. ONE isolated centered object filling 78 percent of canvas with clear equal margins, all parts fully inside. Hand-inked anime comic game asset: bold irregular near-black contour, chunky angular industrial charcoal/navy metal, worn cream edge plates, subtle scratches, restrained hot magenta lights and tiny cyan indicators. 3/4 isometric perspective. Match illustrated rugged hardware inventory icons, NOT photorealistic, NOT 3D render, NOT flat vector. No card frame, no tile, no backdrop, no ground shadow, no UI, no text, no letters or numbers, no watermark, no extra objects. Subject: a folded articulated ammunition magazine: two compact black armored cartridge stacks joined by a visible hinge, one side half unfolded in a compact V, three brass cartridge tips clearly visible, cream edge guards, tiny cyan status light and magenta release latch. Clearly an ammunition magazine, no gun.",
+    "target": "icons/folding_magazine-v1.png",
+    "mode": "built-in imagegen",
+    "transparent_background": true
+  },
+  "purification_filter": {
+    "source": "/Users/anyone/.codex/generated_images/01a1c103-2340-73b2-b423-e83c0cae1d63/exec-25ec0c0b-05c8-4c1e-9bdf-cc377d333975.png",
+    "prompt": "Use case: stylized-concept. Asset type: premium illustrated physical cyberpunk gadget icon for Godot card game. Square 1024x1024, REAL TRANSPARENT alpha background. ONE isolated centered object filling 78 percent of canvas with clear equal margins, all parts fully inside. Hand-inked anime comic game asset: bold irregular near-black contour, chunky angular industrial charcoal/navy metal, worn cream edge plates, subtle scratches, restrained hot magenta lights and tiny cyan indicators. 3/4 isometric perspective. Match illustrated rugged hardware inventory icons, NOT photorealistic, NOT 3D render, NOT flat vector. No card frame, no tile, no backdrop, no ground shadow, no UI, no text, no letters or numbers, no watermark, no extra objects. Subject: a compact cylindrical purification filter cartridge with angular black armored endcaps, cream clasp, transparent small central chamber showing a clean cyan filtration core and two fine magenta rings, visible layered filter vanes, small dark hose connector. Clearly a detox cleansing filter, no syringe, no medical cross.",
+    "target": "icons/purification_filter-v1.png",
+    "mode": "built-in imagegen",
+    "transparent_background": true
+  },
+  "phase_plating": {
+    "source": "/Users/anyone/.codex/generated_images/01a1c103-2340-73b2-b423-e83c0cae1d63/exec-f0599b8f-e3bb-4947-a4c9-40bd5fc99f13.png",
+    "prompt": "Use case: stylized-concept. Asset type: premium illustrated physical cyberpunk gadget icon for Godot card game. Square 1024x1024, REAL TRANSPARENT alpha background. ONE isolated centered object filling 78 percent of canvas with clear equal margins, all parts fully inside. Hand-inked anime comic game asset: bold irregular near-black contour, chunky angular industrial charcoal/navy metal, worn cream edge plates, subtle scratches, restrained hot magenta lights and tiny cyan indicators. 3/4 isometric perspective. Match illustrated rugged hardware inventory icons, NOT photorealistic, NOT 3D render, NOT flat vector. No card frame, no tile, no backdrop, no ground shadow, no UI, no text, no letters or numbers, no watermark, no extra objects. Subject: a compact overlapping pair of angular dark armor plates forming one physical module, cream beveled scuffed borders, a magenta phase coil sandwiched between the plates, a subtle offset cyan translucent echo edge attached closely to the silhouette. Clearly wearable defensive phase armor hardware.",
+    "target": "icons/phase_plating-v1.png",
+    "mode": "built-in imagegen",
+    "transparent_background": true
+  },
+  "recycling_protocol": {
+    "source": "/Users/anyone/.codex/generated_images/01a1c103-2340-73b2-b423-e83c0cae1d63/exec-c555d2e6-180e-49b5-a363-64c1ed45616d.png",
+    "prompt": "Use case: stylized-concept. Asset type: premium illustrated physical cyberpunk gadget icon for Godot card game. Square 1024x1024, REAL TRANSPARENT alpha background. ONE isolated centered object filling 78 percent of canvas with clear equal margins, all parts fully inside. Hand-inked anime comic game asset: bold irregular near-black contour, chunky angular industrial charcoal/navy metal, worn cream edge plates, subtle scratches, restrained hot magenta lights and tiny cyan indicators. 3/4 isometric perspective. Match illustrated rugged hardware inventory icons, NOT photorealistic, NOT 3D render, NOT flat vector. No card frame, no tile, no backdrop, no ground shadow, no UI, no text, no letters or numbers, no watermark, no extra objects. Subject: a compact dark metal material recycling module, open small angular feed slot on top receiving a single folded scrap metal chip, three linked magenta luminous arrow shapes engraved around a central circular processing chamber, cream reinforced corners and cyan indicator. One cohesive gadget, no loose floating objects.",
+    "target": "icons/recycling_protocol-v1.png",
+    "mode": "built-in imagegen",
+    "transparent_background": true
+  },
+  "counter_calibrator": {
+    "source": "/Users/anyone/.codex/generated_images/01a1c103-2340-73b2-b423-e83c0cae1d63/exec-14157fff-414b-4a3f-83a9-2157ce18d910.png",
+    "prompt": "Use case: stylized-concept. Asset type: premium illustrated physical cyberpunk gadget icon for Godot card game. Square 1024x1024, REAL TRANSPARENT alpha background. ONE isolated centered object filling 78 percent of canvas with clear equal margins, all parts fully inside. Hand-inked anime comic game asset: bold irregular near-black contour, chunky angular industrial charcoal/navy metal, worn cream edge plates, subtle scratches, restrained hot magenta lights and tiny cyan indicators. 3/4 isometric perspective. Match illustrated rugged hardware inventory icons, NOT photorealistic, NOT 3D render, NOT flat vector. No card frame, no tile, no backdrop, no ground shadow, no UI, no text, no letters or numbers, no watermark, no extra objects. Subject: a compact rugged tactical counterattack calibration device, angular black rectangular sensor body with cream guards, a prominent circular cyan targeting lens, two short symmetrical magenta calibration prongs, a tiny mechanical adjustment dial. One cohesive small hardware module, no weapon, no text.",
+    "target": "icons/counter_calibrator-v1.png",
+    "mode": "built-in imagegen",
+    "transparent_background": true
+  }
+}

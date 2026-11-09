@@ -1,6 +1,6 @@
 extends Node
 const Icons = preload("res://scripts/technology_icons.gd")
-const OUTPUT := "res://artifacts/qa/passive-technologies-2026-10-24/icons"
+const OUTPUT := "res://artifacts/qa/technology-expansion-2026-11-09/icons"
 var checks := 0
 var failures: Array[String] = []
 var original_state: Dictionary
@@ -20,6 +20,8 @@ func stage(page: String = "map") -> void:
 	Game.battle_busy = false
 	Game.training_mode = false
 	Game.state = Game.initial_state()
+	Game.state.ownedCyberwareIds = ["dimensional_pocket","accelerated_clock","backup_energy"]
+	Game.state.equippedCyberwareIds = Game.state.ownedCyberwareIds.duplicate()
 	Game.state.currentScene = page
 	Game.state.currentPlaceId = "mall" if page == "place" else "bar"
 	Game.state.credits = 2000
@@ -73,7 +75,7 @@ func collect_layout(node: Node, items: Array) -> void:
 	for child in node.get_children(): collect_layout(child,items)
 
 func test_resolver() -> void:
-	check(Icons.ids() == ["dimensional_pocket","accelerated_clock","backup_energy","money_chip","healing_chip","swift_chip"], "single mapping contains all six real technologies")
+	check(Icons.ids() == ["dimensional_pocket","accelerated_clock","backup_energy","money_chip","healing_chip","swift_chip","emergency_forcefield","folding_magazine","purification_filter","phase_plating","recycling_protocol","counter_calibrator"], "single mapping contains all twelve real technologies")
 	for id in Icons.ids():
 		var texture := Icons.texture_for(id)
 		check(texture != null and texture.get_width() > 0 and texture.get_height() > 0, "real PNG loads: " + id)
@@ -87,12 +89,16 @@ func test_shop() -> void:
 	add_child(shop)
 	await get_tree().process_frame
 	var offers := Game.technology_shop_offers()
-	check(offers.size() == 6 and offers.all(func(offer): return offer.price == 150), "shop lists six offers at 150")
+	check(offers.size() == 12 and offers.all(func(offer): return offer.price == 125), "shop lists twelve offers at 125")
 	for i in 6:
 		var tile: Control = shop.stock.get_node("technology_tile_%d" % i)
-		check_icon(tile.get_node("technology_icon"),offers[i].id,Vector2(112,100),"shop " + offers[i].id)
+		check_icon(tile.get_node("technology_icon"),offers[i].id,Vector2(112,84),"shop " + offers[i].id)
 		check(shop.stock.get_node("buy_slot_%d" % i).disabled == (i < 3), "only starter-owned offers disabled")
-	unchanged("opening shop does not alter state")
+	shop.change_page(1)
+	for i in range(6,12):
+		check_icon(shop.stock.get_node("technology_tile_%d" % i).get_node("technology_icon"),offers[i].id,Vector2(112,84),"second-page shop " + offers[i].id)
+	shop.change_page(-1)
+	unchanged("opening and paging shop does not alter state")
 	export_layout(shop,"shop")
 	Game.state.ownedCyberwareIds = []
 	Game.state.equippedCyberwareIds = []
@@ -147,7 +153,7 @@ func test_battle() -> void:
 	await get_tree().process_frame
 	for i in model.cyberware_cards().size():
 		check_icon(view.card_buttons[i].get_node("technology_icon"),model.cyberware_cards()[i].id,Vector2(112,112),"battle " + str(i))
-		check(view.card_buttons[i].size.y == 340, "battle card has enough illustration and text space")
+		check(view.card_buttons[i].size.y == 390, "battle card has enough illustration and text space")
 	check(model.snapshot() == before, "opening technology panel preserves frozen combat")
 	unchanged("opening battle panel does not change adventure")
 	export_layout(view,"battle")
@@ -181,8 +187,10 @@ func test_archive() -> void:
 	var view = preload("res://scenes/cyberware.tscn").instantiate()
 	add_child(view)
 	await get_tree().process_frame
-	for id in Icons.ids():
-		check_icon(view.get_node("archive_" + id).get_node("technology_icon"),id,Vector2(120,120),"archive " + id)
+	for page in 2:
+		for id in Icons.ids().slice(page*6,(page+1)*6):
+			check_icon(view.catalog.get_node("archive_" + id).get_node("technology_icon"),id,Vector2(120,120),"archive " + id)
+		if page == 0: view.change_page(1)
 	unchanged("archive only displays technologies without ownership or equipment changes")
 	check(Game.meta_profile == meta and view.get_node("return_menu") is Button, "archive keeps meta untouched and retains menu return")
 	export_layout(view,"archive")

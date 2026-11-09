@@ -46,6 +46,7 @@ static func build(model, uid: String, target: int, extra: int) -> Dictionary:
 			"energy": lines.append("获得" + number + "点能量。")
 			"attack_ammo": lines.append(("回弹" if model.stance == "melee" else "耗弹") + number + "。")
 			"draw": lines.append("抽" + number + "张牌。")
+			"technology_draw": lines.append("回收协议：抽" + number + "张牌。")
 			"stance": lines.append(row.text)
 			"discard_attack": lines.append("弃置另一张攻击牌。")
 			"exhaust_hand": lines.append("消耗另一张手牌。")
@@ -156,6 +157,7 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 	var attack: bool = definition.get("type", "") == "attack"
 	if attack:
 		if copy.is_noren(): segment_bonus=copy.buffs.attack_segment_bonus(copy)
+		if copy.is_noren(): segment_bonus += copy.guarded_attack_bonus()
 		bonus = copy.buffs.begin_attack(copy, form) if copy.is_noren() else copy.next_attack_bonus
 		if copy.is_noren():
 			if form == "ranged": copy.ammo = 0 if definition.get("consumeAllAmmo",false) else copy.ammo - 1 - extra
@@ -234,6 +236,8 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 				var text := "切换至近战。" if value == "melee" else "切换至远程。"
 				if changed:
 					copy.stance = value
+					var gained: int = copy.trigger_stance_technology()
+					if gained > 0: text += "获得%d点格挡。" % gained
 					if value == "melee":
 						var drawn := mini(2, draw_available)
 						draw_available -= drawn
@@ -245,6 +249,10 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 				rows.append({"type":"stance", "text":text})
 			"exhaust_hand":
 				rows.append({"type":"exhaust_hand"})
+				if copy.is_noren() and not copy.technology_turn_state.exhaustDrawUsed and copy.passive_technology_amount("exhaust_draw") > 0:
+					var drawn := _exhaust_draw(copy, draw_available)
+					draw_available -= drawn
+					rows.append({"type":"technology_draw", "values":[drawn]})
 			"discard_attack":
 				if copy.profile.get("recycleDiscardWhenEmpty", true) and not copy.discard_candidates(uid).is_empty(): draw_available += 1
 				rows.append({"type":"discard_attack"})
@@ -279,7 +287,16 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 				else:
 					rows.append({"type":"buff", "id":id, "sourceType":effect.type, "finalCount":copy.buffs.count(copy, id, index), "name":entry.name, "enemy":enemy, "unit":"点" if id in ["block", "next_damage", "next_hit_damage", "next_discount"] else "层", "values":[gained]})
 					rows.back().merge(branches)
+	if copy.is_noren() and (definition.get("exhaust", false) or definition.get("type") == "power") and not copy.technology_turn_state.exhaustDrawUsed and copy.passive_technology_amount("exhaust_draw") > 0:
+		rows.append({"type":"technology_draw", "values":[_exhaust_draw(copy, draw_available)]})
 	return rows
+
+static func _exhaust_draw(copy, available: int) -> int:
+	if not copy.is_noren() or copy.technology_turn_state.exhaustDrawUsed: return 0
+	var amount: int = copy.passive_technology_amount("exhaust_draw")
+	if amount <= 0: return 0
+	copy.technology_turn_state.exhaustDrawUsed = true
+	return mini(amount, available)
 
 static func _bleed_branch_gain(model, effect: Dictionary, before: Array, target: int, wounded: bool, single: bool) -> int:
 	var branch = model.get_script().new()

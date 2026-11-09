@@ -37,6 +37,7 @@ var stance_discount := false
 var pressure_used := false
 var dissection_used := false
 var opening_draw_done := false
+var technology_turn_state := {"stanceBlockUsed":false, "exhaustDrawUsed":false, "firstAttackUsed":false}
 # Only new definitions without legacy fields use this optional state.
 var buff_state: Dictionary = {}
 
@@ -72,16 +73,16 @@ static func valid_cyberware_definition(definition: Dictionary) -> bool:
 	if kind == "passive":
 		if definition.has("cooldownTurns") or definition.has("nextAttackBonus"): return false
 		var amount = definition.get("amount")
-		return definition.get("effect") in ["victory_credits", "victory_heal", "opening_draw"] and (amount is int or amount is float) and is_finite(float(amount)) and amount > 0 and amount == floor(float(amount))
+		return definition.get("effect") in ["victory_credits", "victory_heal", "opening_draw", "stance_block", "exhaust_draw", "guarded_attack_bonus"] and (amount is int or amount is float) and is_finite(float(amount)) and amount > 0 and amount == floor(float(amount))
 	var cooldown = definition.get("cooldownTurns", 1)
 	if not (cooldown is int or cooldown is float) or not is_finite(float(cooldown)) or cooldown < 1 or cooldown != floor(float(cooldown)): return false
 	match definition.get("effect", "next_attack_bonus"):
 		"next_attack_bonus":
 			var bonus = definition.get("nextAttackBonus")
 			return (bonus is int or bonus is float) and is_finite(float(bonus)) and bonus > 0 and bonus == floor(float(bonus))
-		"toggle_stance", "redraw_hand":
+		"toggle_stance", "redraw_hand", "cleanse_debuffs":
 			return not definition.has("nextAttackBonus")
-		"gain_energy":
+		"gain_energy", "gain_block", "gain_ammo":
 			var amount = definition.get("amount")
 			return not definition.has("nextAttackBonus") and (amount is int or amount is float) and is_finite(float(amount)) and amount > 0 and amount == floor(float(amount))
 	return false
@@ -119,6 +120,9 @@ func activate_cyberware(id: String) -> bool:
 				hand.clear()
 				draw_cards(amount)
 			"gain_energy": energy += int(definition.amount)
+			"gain_block": buffs.apply(self, "block", int(definition.amount))
+			"gain_ammo": gain_ammo(int(definition.amount))
+			"cleanse_debuffs": buffs.cleanse_negative(self)
 		used_cyberware.append(id)
 		cyberware_cooldowns[id] = int(definition.get("cooldownTurns", 1))
 		log_lines.append("%s 已激活：%s" % [definition.name, definition.get("description", "下次攻击伤害增加。")])
@@ -381,6 +385,7 @@ func snapshot() -> Dictionary:
 	if profile.get("encounterId", "") in ["dancer_duet", "noss_sovereign"]: saved.encounterPhase = encounter_phase
 	if not buff_state.is_empty(): saved.buffs = buff_state.duplicate(true)
 	if not cyberware_cooldowns.is_empty(): saved.cyberwareCooldowns = cyberware_cooldowns.duplicate()
+	if has_turn_technology(): saved.technologyTurnState = technology_turn_state.duplicate()
 	return saved
 
 func restore(data: Dictionary) -> void:
@@ -422,6 +427,31 @@ func restore(data: Dictionary) -> void:
 	pressure_used = n.get("pressureUsed", false)
 	dissection_used = n.get("dissectionUsed", false)
 	opening_draw_done = data.get("openingDrawDone", not (hand.is_empty() and turn == 1 and discard_pile.is_empty()))
+	reset_turn_technology()
+	technology_turn_state.merge(data.get("technologyTurnState", {}), true)
+
+func has_turn_technology() -> bool:
+	return cyberware_cards().any(func(entry): return is_passive_cyberware(entry) and entry.get("effect") in ["stance_block", "exhaust_draw", "guarded_attack_bonus"])
+
+func reset_turn_technology() -> void:
+	technology_turn_state = {"stanceBlockUsed":false, "exhaustDrawUsed":false, "firstAttackUsed":false}
+
+func guarded_attack_bonus() -> int:
+	return passive_technology_amount("guarded_attack_bonus") if is_noren() and not technology_turn_state.firstAttackUsed and block > 0 else 0
+
+func trigger_stance_technology() -> int:
+	var amount := passive_technology_amount("stance_block") if is_noren() else 0
+	if amount <= 0 or technology_turn_state.stanceBlockUsed: return 0
+	technology_turn_state.stanceBlockUsed = true
+	buffs.apply(self, "block", amount)
+	return amount
+
+func trigger_exhaust_technology() -> Array:
+	var amount := passive_technology_amount("exhaust_draw") if is_noren() else 0
+	if amount <= 0 or technology_turn_state.exhaustDrawUsed: return []
+	# Consume the opportunity even if no drawable cards remain.
+	technology_turn_state.exhaustDrawUsed = true
+	return draw_cards(amount)
 
 func card_cost(uid: String) -> int:
 	var definition := card(uid)
@@ -460,6 +490,7 @@ func change_stance(value: String) -> Array:
 	if value == "toggle": value = "ranged" if stance == "melee" else "melee"
 	if value == stance: return []
 	stance = value
+	trigger_stance_technology()
 	if stance == "melee": return draw_cards(2)
 	buffs.apply(self, "stance_discount")
 	return []
@@ -537,6 +568,7 @@ func advance_encounter_phase(player_turn_ended: bool = false, transition: Dictio
 		instances[card_uid] = card_id
 		draw_pile.insert(randi_range(0, draw_pile.size()), card_uid)
 	turn += 1
+	reset_turn_technology()
 	buffs.own_turn_start(self)
 	energy = int(profile.get("energyPerTurn", 3))
 	advance_cyberware_cooldowns()
@@ -615,6 +647,8 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 	energy -= card_cost(uid)
 	if attack:
 		segment_bonus = buffs.attack_segment_bonus(self)
+		segment_bonus += guarded_attack_bonus()
+		if passive_technology_amount("guarded_attack_bonus") > 0: technology_turn_state.firstAttackUsed = true
 		bonus = buffs.begin_attack(self, at_start)
 		if at_start == "ranged": ammo = 0 if definition.get("consumeAllAmmo",false) else ammo - 1 - extra_ammo
 	hand.erase(uid)
@@ -656,6 +690,7 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 				hand.erase(discard_uid)
 				exhaust_pile.append(discard_uid)
 				exhausted_cards.append(discard_uid)
+				drawn.append_array(trigger_exhaust_technology())
 			"discard_attack":
 				hand.erase(discard_uid)
 				discard_pile.append(discard_uid)
@@ -663,7 +698,9 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 			_:
 				buffs.apply_card_effect(self, effect, targets_to_hit, {"stance":at_start, "before":before, "single":target_kind == "enemy"})
 	var exhausted: bool = definition.get("exhaust", false) or definition.type == "power"
-	if exhausted: exhaust_pile.append(uid)
+	if exhausted:
+		exhaust_pile.append(uid)
+		drawn.append_array(trigger_exhaust_technology())
 	else: discard_pile.append(uid)
 	resolve_outcome()
 	var transition: Dictionary = {}
@@ -810,6 +847,7 @@ func end_noren_turn() -> Dictionary:
 	var phase_changed := advance_encounter_phase(true, transition)
 	if outcome.is_empty() and not phase_changed:
 		turn += 1
+		reset_turn_technology()
 		buffs.own_turn_start(self)
 		energy = int(profile.get("energyPerTurn", 3))
 		advance_cyberware_cooldowns()

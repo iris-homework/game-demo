@@ -6,7 +6,13 @@ const PATHS := {
 	"backup_energy":"res://assets/technology/icons/backup_energy-v1.png",
 	"money_chip":"res://assets/technology/icons/money_chip-v1.png",
 	"healing_chip":"res://assets/technology/icons/healing_chip-v1.png",
-	"swift_chip":"res://assets/technology/icons/swift_chip-v1.png"
+	"swift_chip":"res://assets/technology/icons/swift_chip-v1.png",
+	"emergency_forcefield":"res://assets/technology/icons/emergency_forcefield-v1.png",
+	"folding_magazine":"res://assets/technology/icons/folding_magazine-v1.png",
+	"purification_filter":"res://assets/technology/icons/purification_filter-v1.png",
+	"phase_plating":"res://assets/technology/icons/phase_plating-v1.png",
+	"recycling_protocol":"res://assets/technology/icons/recycling_protocol-v1.png",
+	"counter_calibrator":"res://assets/technology/icons/counter_calibrator-v1.png"
 }
 
 static func ids() -> Array:

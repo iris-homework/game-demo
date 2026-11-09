@@ -50,8 +50,8 @@ func _ready() -> void:
 		TechnologyIcons.create(card,id,Vector2(20,18),Vector2(96,96))
 		label(card,str(definition.name),Vector2(134,25),Vector2(222,40),24)
 		label(card,TechnologyIcons.activation_label(definition),Vector2(134,78),Vector2(222,26),16,PURPLE)
-		label(card,str(definition.description),Vector2(20,119),Vector2(336,50),17)
-		label(card,"",Vector2(20,174),Vector2(336,26),17,PURPLE).name = "selection_state"
+		label(card,str(definition.description),Vector2(20,119),Vector2(336,62),14)
+		label(card,"",Vector2(20,184),Vector2(336,26),17,PURPLE).name = "selection_state"
 		technology_buttons[id] = card
 	if technology_buttons.is_empty():
 		label(grid,"当前角色暂无已有科技",Vector2.ZERO,Vector2(1100,60),25,MUTED)

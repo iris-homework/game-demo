@@ -83,6 +83,53 @@
       "type": "passive",
       "effect": "opening_draw",
       "amount": 2
+    },
+    {
+      "id": "emergency_forcefield",
+      "name": "应急力场",
+      "description": "获得10点格挡。",
+      "effect": "gain_block",
+      "amount": 10,
+      "cooldownTurns": 3
+    },
+    {
+      "id": "folding_magazine",
+      "name": "折叠弹匣",
+      "description": "获得3颗弹药，不超过弹药上限。",
+      "effect": "gain_ammo",
+      "amount": 3,
+      "cooldownTurns": 4
+    },
+    {
+      "id": "purification_filter",
+      "name": "净化滤芯",
+      "description": "清除自身所有负面效果。",
+      "effect": "cleanse_debuffs",
+      "cooldownTurns": 999
+    },
+    {
+      "id": "phase_plating",
+      "name": "相位镀层",
+      "description": "每个玩家回合首次切换形态时，获得4点格挡。",
+      "type": "passive",
+      "effect": "stance_block",
+      "amount": 4
+    },
+    {
+      "id": "recycling_protocol",
+      "name": "回收协议",
+      "description": "每个玩家回合首次因卡牌效果消耗牌时，抽1张牌。",
+      "type": "passive",
+      "effect": "exhaust_draw",
+      "amount": 1
+    },
+    {
+      "id": "counter_calibrator",
+      "name": "反击校准器",
+      "description": "每个玩家回合首张打出的攻击牌，若自身有格挡，每段基础伤害＋2。",
+      "type": "passive",
+      "effect": "guarded_attack_bonus",
+      "amount": 2
     }
   ]
 }

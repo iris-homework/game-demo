@@ -20,6 +20,8 @@ var modal: Control
 var suspended: Array = []
 var last_trigger: Button
 var expected_revision := 0
+var page_index := 0
+const PAGE_SIZE := 6
 
 func _ready() -> void:
 	rect(self,Vector2.ZERO,Vector2(1440,900),Color("eee7e0"))
@@ -29,7 +31,6 @@ func _ready() -> void:
 	label(self,"沃 斯 商 场",Vector2(49,108),Vector2(248,46),31,TEXT)
 	panel(self,Vector2(464,96),Vector2(948,716),Color("f5f0e9d9"),EDGE)
 	label(self,"科技精选",Vector2(484,111),Vector2(460,45),30,TEXT)
-	label(self,"战斗科技  /  六个展示位",Vector2(920,123),Vector2(472,28),17,SOFT).horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	rect(self,Vector2(484,174),Vector2(896,1),EDGE)
 	rect(self,Vector2(484,173),Vector2(72,3),ROSE)
 	var leave := shop_button(self,"← 离开商场",Vector2(28,830),Vector2(244,48),Game.go_map)
@@ -49,6 +50,7 @@ func shop_button(parent: Node, caption: String, pos: Vector2, dimensions: Vector
 	b.add_theme_color_override("font_color",Color.WHITE if primary else TEXT)
 	b.add_theme_color_override("font_hover_color",Color.WHITE if primary else ROSE)
 	b.add_theme_color_override("font_pressed_color",Color.WHITE if primary else TEXT)
+	b.add_theme_color_override("font_focus_color",Color.WHITE if primary else ROSE)
 	b.add_theme_color_override("font_disabled_color",SOFT)
 	for state_name in ["normal","hover","pressed","disabled","focus"]:
 		var fill := ROSE if primary else Color("fffcf7")
@@ -101,11 +103,21 @@ func refresh_stock() -> void:
 	add_child(stock)
 	expected_revision = Game.revision
 	var offers: Array = Game.technology_shop_offers()
-	for i in 6:
-		var origin := ORIGIN + Vector2((i%3)*STEP.x,floori(float(i)/3.0)*STEP.y)
+	var page_count := maxi(1,ceili(float(offers.size())/PAGE_SIZE))
+	page_index = clampi(page_index,0,page_count-1)
+	var previous := shop_button(stock,"‹",Vector2(1048,117),Vector2(56,38),change_page.bind(-1))
+	previous.name = "previous_page"
+	previous.disabled = page_index == 0
+	var next := shop_button(stock,"›",Vector2(1324,117),Vector2(56,38),change_page.bind(1))
+	next.name = "next_page"
+	next.disabled = page_index >= page_count-1
+	label(stock,"第 %d / %d 页 · 共 %d 项" % [page_index+1,page_count,offers.size()],Vector2(1110,120),Vector2(208,31),16,SOFT).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	for local_index in PAGE_SIZE:
+		var i := page_index*PAGE_SIZE+local_index
+		var origin := ORIGIN + Vector2((local_index%3)*STEP.x,floori(float(local_index)/3.0)*STEP.y)
 		var tile := panel(stock,origin,TILE_SIZE,PAPER,EDGE)
 		tile.name = "technology_tile_%d" % i
-		label(tile,"TECH / %02d" % (i+1),Vector2(17,11),Vector2(166,24),12,SOFT)
+		label(tile,"TECH / %02d" % (i+1),Vector2(17,11),Vector2(166,20),12,SOFT)
 		if i >= offers.size():
 			label(tile,"—",Vector2(20,85),Vector2(248,50),32,EDGE).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			label(tile,"暂未上架",Vector2(20,151),Vector2(248,35),20,SOFT).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -113,10 +125,10 @@ func refresh_stock() -> void:
 		var offer: Dictionary = offers[i]
 		var definition: Dictionary = Game.cyberware_definition(offer.id)
 		var owned: bool = offer.id in Game.owned_cyberware_ids()
-		label(tile,"已拥有" if owned else "被动科技" if CombatModel.is_passive_cyberware(definition) else "主动科技",Vector2(190,11),Vector2(80,24),12,ROSE).horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		icon(tile,offer.id,Vector2(88,38),Vector2(112,92))
-		label(tile,str(definition.name),Vector2(16,132),Vector2(256,30),22,TEXT).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		label(tile,str(definition.description),Vector2(20,166),Vector2(248,48),14,SOFT).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label(tile,"已拥有" if owned else "被动科技" if CombatModel.is_passive_cyberware(definition) else "主动科技",Vector2(190,11),Vector2(80,20),12,ROSE).horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		icon(tile,offer.id,Vector2(88,32),Vector2(112,84))
+		label(tile,str(definition.name),Vector2(16,120),Vector2(256,30),22,TEXT).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label(tile,str(definition.description),Vector2(20,153),Vector2(248,63),13,SOFT).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label(tile,TechnologyIcons.activation_label(definition),Vector2(20,216),Vector2(248,20),12,ROSE).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		var buy := shop_button(stock,("已拥有  %d 信用点" if owned else "购买  %d 信用点") % int(offer.price),origin+Vector2(14,238),Vector2(260,34),open_purchase.bind(i),not owned)
 		buy.name = "buy_slot_%d" % i
@@ -124,6 +136,15 @@ func refresh_stock() -> void:
 		buy.disabled = owned or int(Game.state.credits) < int(offer.price)
 		buy.tooltip_text = ("已装配，可在地图调整" if offer.id in Game.equipped_cyberware_ids() else "已拥有，可在地图装配") if owned else "信用点不足" if buy.disabled else "查看详情并确认购买"
 	refresh_hp()
+
+func change_page(delta: int) -> void:
+	if is_instance_valid(modal): return
+	var total := maxi(1,ceili(float(Game.technology_shop_offers().size())/PAGE_SIZE))
+	var requested := clampi(page_index+delta,0,total-1)
+	if requested == page_index: return
+	page_index = requested
+	refresh_stock()
+	stock.get_node("previous_page" if delta > 0 else "next_page").grab_focus()
 
 func open_purchase(index: int) -> void:
 	if is_instance_valid(modal) or Game.transition_locked or Game.battle_busy: return

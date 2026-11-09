@@ -53,7 +53,7 @@ func finish_story() -> void:
 func test_definitions() -> void:
 	check(Game.initial_state().ownedCyberwareIds.is_empty(), "production new adventure starts without technologies")
 	check(Game.initial_state().equippedCyberwareIds == Game.initial_state().ownedCyberwareIds, "default equipped technologies unchanged")
-	check(Game.technology_shop_offers().size() == 6 and Game.technology_shop_offers().all(func(o): return o.price == 125), "six offers all cost 125")
+	check(Game.technology_shop_offers().size() == 12 and Game.technology_shop_offers().all(func(o): return o.price == 125), "twelve offers all cost 125")
 	for id in PASSIVES:
 		var definition := Game.cyberware_definition(id)
 		check(CombatModel.is_passive_cyberware(definition) and CombatModel.valid_cyberware_definition(definition) and not definition.has("cooldownTurns"), "passive has valid effect and no cooldown: " + id)

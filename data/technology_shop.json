@@ -23,6 +23,30 @@
     {
       "id": "swift_chip",
       "price": 125
+    },
+    {
+      "id": "emergency_forcefield",
+      "price": 125
+    },
+    {
+      "id": "folding_magazine",
+      "price": 125
+    },
+    {
+      "id": "purification_filter",
+      "price": 125
+    },
+    {
+      "id": "phase_plating",
+      "price": 125
+    },
+    {
+      "id": "recycling_protocol",
+      "price": 125
+    },
+    {
+      "id": "counter_calibrator",
+      "price": 125
     }
   ]
 }

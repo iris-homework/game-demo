@@ -131,6 +131,14 @@ func apply(model, id: String, amount: int = 1, enemy_index: int = -1, context: D
 func clear(model, id: String, enemy_index: int = -1) -> void:
 	if accepts(id, enemy_index) and enemy_index < model.enemies.size(): _write_count(model, id, 0, enemy_index)
 
+func cleanse_negative(model) -> void:
+	# Use the catalog, including optional generic statuses; signed reductions
+	# such as negative strength are harmful despite their positive base category.
+	for entry in _definitions().values():
+		if not accepts(entry.id, -1): continue
+		if entry.category == NEGATIVE or count(model, entry.id) < 0:
+			clear(model, entry.id)
+
 func is_card_effect(kind: String) -> bool:
 	return has(kind) or kind in ["parry_fill", "power", "buff"]
 

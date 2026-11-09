@@ -1895,6 +1895,19 @@ func valid_cyberware_state(c: Dictionary) -> bool:
 		# Only historical one-turn definitions may omit the new cooldown state.
 		for id in used:
 			if cooldown_limits[id] != 1: return false
+	# New turn-triggered technologies must retain their spent opportunities.
+	# Frozen old battles have none of these effects and need no added state.
+	var turn_effects := {"stanceBlockUsed":"stance_block", "exhaustDrawUsed":"exhaust_draw", "firstAttackUsed":"guarded_attack_bonus"}
+	var equipped_effects: Array = []
+	for definition in rules.get("cards", []).slice(0, CombatModel.CYBERWARE_LIMIT):
+		if CombatModel.is_passive_cyberware(definition): equipped_effects.append(definition.get("effect", ""))
+	var requires_turn_state := equipped_effects.any(func(effect): return effect in turn_effects.values())
+	if requires_turn_state or c.has("technologyTurnState"):
+		var triggers = c.get("technologyTurnState")
+		if not triggers is Dictionary or triggers.size() != turn_effects.size(): return false
+		for key in turn_effects:
+			if not triggers.get(key) is bool: return false
+			if triggers[key] and turn_effects[key] not in equipped_effects: return false
 	return bonus <= maximum
 
 func valid_removed_starting_cards(subject: Dictionary) -> bool:
@@ -1917,7 +1930,7 @@ func full_deck_ids(subject: Dictionary = {}) -> Array:
 func technology_shop_offers() -> Array:
 	# Fixed catalog; adventure ownership is the purchase record, with no restock.
 	var offers = technology_shop_rules.get("offers")
-	if not offers is Array or offers.size() > 6: return []
+	if not offers is Array or offers.size() > 12: return []
 	var seen := []
 	for offer in offers:
 		if not offer is Dictionary or not offer.get("id") is String or offer.id in seen: return []
