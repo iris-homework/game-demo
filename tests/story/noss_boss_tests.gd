@@ -32,6 +32,9 @@ func fresh(week: int = 2, day: int = 7, difficulty: String = "normal") -> void:
 
 func start_boss(difficulty: String = "normal") -> CombatModel:
 	fresh(2, 7, difficulty)
+	return enter_boss()
+
+func enter_boss() -> CombatModel:
 	check(Game.start_event("E23"), "second-week day-seven Boss starts through map event")
 	Game.skip_dialogue(Game.revision)
 	check(Game.page == "battle" and Game.state.battleId == "B23", "intro/skip enters formal B23")
@@ -118,6 +121,63 @@ func test_phase_rules_and_validation() -> void:
 	check(result.get("phaseChanged", false) and model.encounter_phase == 2 and model.turn == 2, "enemy-turn parry advances once")
 	check(model.enemies[0].hp == 160 and result.attacks.all(func(a): return a.id != "noss_phase2"), "new phase does not act in the old enemy turn")
 
+func check_report_bosses(summary: Control, dancer_won: bool) -> void:
+	var bosses := summary.find_child("final_boss_value", true, false) as Label
+	check(bosses != null and bosses.text.count("理事长 诺斯") == 1, "report includes the defeated Noss exactly once")
+	check(bosses != null and bosses.text.count("双人舞者") == int(dancer_won), "report counts only evidenced dancer victories, once")
+
+func check_final_report(selected: String, capture: bool = false) -> void:
+	var before := Game.state.duplicate(true)
+	var summary := preload("res://scenes/result.tscn").instantiate() as Control
+	add_child(summary)
+	var deck_list := summary.find_child("final_deck_list", true, false) as VBoxContainer
+	check(deck_list != null, "second-week result renders a final deck list")
+	if deck_list != null:
+		var rows: Array[String] = []
+		for row: Label in deck_list.find_children("*", "Label", true, false):
+			rows.append(row.text)
+		# One of four initial 01s was removed, and both 45s were acquired in the run.
+		var expected := {"noren_01": 3, "noren_02": 4, "noren_03": 1, "noren_04": 1, "noren_45": 2}
+		expected[selected] = int(expected.get(selected, 0)) + 1
+		for id in expected:
+			var text := "%s ×%d" % [Game.card_catalog[id].name, expected[id]]
+			check(rows.count(text) == 1, "final deck has one exact row for " + text)
+		check(rows.size() == expected.size(), "final deck has no extra rows")
+	var reward := summary.find_child("final_reward_card", true, false) as Label
+	check(reward != null and reward.text.contains(Game.card_catalog[selected].name), "final reward identifies the selected Boss card")
+	var health := summary.find_child("final_health_value", true, false) as Label
+	check(health != null and health.text == "17 / 70", "report shows remaining HP and maximum HP")
+	var technology := summary.find_child("final_technology_value", true, false) as Label
+	check(technology != null and technology.text.contains("后备能源") and not technology.text.contains("金钱芯片"), "report lists the equipped technology and excludes the unequipped owned chip")
+	check_report_bosses(summary, true)
+	if capture and OS.get_environment("QA_CAPTURE") == "1" and DisplayServer.get_name() != "headless":
+		var previous_size := DisplayServer.window_get_size()
+		for size in [Vector2i(1280, 800), Vector2i(1600, 1000)]:
+			DisplayServer.window_set_size(size)
+			await get_tree().create_timer(0.25).timeout
+			await shot("final_report_%dx%d" % [size.x, size.y])
+		DisplayServer.window_set_size(previous_size)
+	summary.free()
+	check(same(Game.state, before), "rendering the final report preserves the adventure")
+
+func test_boss_report_evidence() -> void:
+	var completed := Game.state.duplicate(true)
+	# Earlier saves can retain either the battle receipt or the event completion.
+	Game.state.battleHistory = []
+	check_boss_report_view(true)
+	Game.state.completedEventIds.erase("E16")
+	Game.state.battleHistory = [{"battleId": "B16", "result": "lose"}]
+	check_boss_report_view(false)
+	Game.state.battleHistory = [{"battleId": "B16", "result": "win"}]
+	check_boss_report_view(true)
+	Game.state = completed
+
+func check_boss_report_view(dancer_won: bool) -> void:
+	var summary := preload("res://scenes/result.tscn").instantiate() as Control
+	add_child(summary)
+	check_report_bosses(summary, dancer_won)
+	summary.free()
+
 func test_save_restart_and_completion() -> void:
 	var model := start_boss("advanced")
 	var opening: Dictionary = Game.state.battleStart.duplicate(true)
@@ -125,7 +185,16 @@ func test_save_restart_and_completion() -> void:
 	check(Game.commit_combat(model) and Game.valid_battle_start(Game.state), "phase-two live model agrees with frozen opening")
 	check(Game.save_game() and Game.load_game(), "in-progress phase two can save/reload")
 	check(same(Game.state.combat, opening) and Game.state.combat.encounterPhase == 1, "reload follows existing full-battle restart policy")
-	model = start_boss()
+	fresh()
+	Game.state.currentHp = 17
+	Game.state.removedStartingCards = ["noren_01"]
+	Game.state.deck = ["noren_45", "noren_45"]
+	Game.state.ownedCyberwareIds = ["money_chip", "backup_energy"]
+	Game.state.equippedCyberwareIds = ["backup_energy"]
+	Game.state.flags.week1Complete = true
+	Game.state.completedEventIds.append("E16")
+	Game.state.battleHistory.append({"battleId": "B16", "result": "win"})
+	model = enter_boss()
 	phase_two(model)
 	model.enemy_damage(0, 999)
 	model.resolve_outcome()
@@ -142,10 +211,15 @@ func test_save_restart_and_completion() -> void:
 	check(Game.card_catalog[selected].rarity == "S" and Game.choose_reward_card(selected, Game.revision), "Boss gives one real S-grade choice")
 	check(Game.claim_rewards(Game.revision) and Game.is_week_complete() and Game.state.flags.week2Complete, "reward exit ends second week")
 	check(Game.is_run_over() and not Game.start_second_week(Game.revision), "no unimplemented third-week entry")
-	check(Game.valid_save(Game.state) and Game.save_game() and Game.load_game() and Game.is_week_complete(), "finished second-week summary reloads")
+	await check_final_report(selected, true)
+	check(Game.valid_save(Game.state) and Game.save_game(), "finished second-week summary saves to the QA checkpoint")
+	Game.state = {}
+	check(Game.load_game() and Game.is_week_complete(), "finished second-week summary reloads")
 	Game.menu()
 	Game.resume()
 	check(Game.page == "result" and Game.is_week_complete(), "continue restores second-week summary")
+	await check_final_report(selected)
+	test_boss_report_evidence()
 	check(not Game.claim_rewards(Game.revision), "duplicate reward exit rejected")
 	var menu_view = load("res://scenes/menu.tscn").instantiate()
 	check(menu_view._summary_text() == "第二周已完成 · 继续可查看结算", "menu does not advertise re-entering second week after Noss")
@@ -246,8 +320,9 @@ func test_first_phase_bar_updates(view) -> void:
 
 func test_views() -> void:
 	start_boss()
-	var view = load("res://scenes/battle.tscn").instantiate()
-	add_child(view)
+	var app = preload("res://scenes/main.tscn").instantiate()
+	add_child(app)
+	var view = app.view
 	await get_tree().create_timer(3.5).timeout
 	check(view.stage.enemies.size() == 3 and not Game.battle_busy, "actual battle view displays usable first-phase formation")
 	check_first_phase_bars(view)
@@ -272,7 +347,8 @@ func test_views() -> void:
 	# old hand, presents the phase and actually animates the fresh draw.
 	view.call_deferred("resume_console_combat")
 	var interlude: Node
-	for frame in 150:
+	var dialogue_deadline := Time.get_ticks_msec() + 15000
+	while Time.get_ticks_msec() < dialogue_deadline:
 		interlude = view.get_node_or_null("NossPhaseDialogue")
 		if interlude != null: break
 		await get_tree().create_timer(0.02).timeout
@@ -320,7 +396,8 @@ func test_views() -> void:
 	check(view.model.player_hp == hp_before - 30 and view.shown_player_hp == view.model.player_hp, "phase-two halo explosion reveals committed thirty damage once")
 	check(heavy_phases == ["halo_charge","halo_burst"], "real phase-two intent dispatches charge then explosion")
 	await get_tree().create_timer(0.3).timeout
-	view.free()
+	await preload("res://scripts/combat/audio_cleanup.gd").release(app, get_tree())
+	app.free()
 	Game.battle_busy = false
 	# Actual dialogue pages, reward button and final-week summary.
 	fresh()
@@ -361,7 +438,7 @@ func _ready() -> void:
 	DirAccess.make_dir_recursive_absolute(output)
 	test_gates_and_dialogue()
 	test_phase_rules_and_validation()
-	test_save_restart_and_completion()
+	await test_save_restart_and_completion()
 	test_training()
 	if OS.get_environment("QA_CAPTURE") == "1": await test_views()
 	var file := FileAccess.open(output.path_join("result.json"), FileAccess.WRITE)

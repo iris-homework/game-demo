@@ -211,6 +211,8 @@ func test_view(done: Dictionary) -> void:
 		var message := week_end.find_child("week_end_message", true, false) as Label
 		check(is_instance_valid(title) and title.text == "第一周结束", "completion title matches requested text")
 		check(is_instance_valid(message) and message.text == "第二周 · 新的委托已开放", "completion advertises second-week entry")
+		for field in ["final_deck_list", "final_health_value", "final_technology_value", "final_boss_value"]:
+			check(week_end.find_child(field, true, false) == null, "first-week summary omits second-week report field: " + field)
 		check(week_end.hp_fill == null and week_end.credits_label == null, "completion omits adventure status controls")
 		check(view.handle_escape() and Game.page == "menu" and Game.is_week_complete() and not Game.is_run_failed(), "completion Escape returns to menu without creating defeat")
 		Game.page = "result"
