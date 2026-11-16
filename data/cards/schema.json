@@ -102,6 +102,11 @@
             "type": "boolean",
             "description": "In ranged stance, total hits equal 1 plus ammo before payment."
           },
+          "meleeBonus": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Flat base damage bonus in melee stance."
+          },
           "rangedBonus": {
             "type": "integer",
             "minimum": 0,

@@ -41,7 +41,7 @@ func test_zero_cost_resources() -> void:
 			var result := model.play_card("card_000",-1)
 			check(not result.is_empty() and model.energy == starting_energy + 2 and int(model.profile.energyPerTurn) == 3, label + ": increases current energy without changing three-per-turn recovery or capping at three")
 			check(model.ammo == 0 and model.stance == form and model.stance_discount and model.turn_discount == 1 and result.hits.is_empty(), label + ": skill preserves unrelated combat resources")
-			check(model.discard_pile == ["card_000"] and model.exhaust_pile.is_empty() and not result.exhausted, label + ": reusable supply enters ordinary discard")
+			check(model.exhaust_pile == ["card_000"] and model.discard_pile.is_empty() and result.exhausted, label + ": supply enters exhaust after granting energy")
 			conserved(model,label)
 			var saved: Dictionary = JSON.parse_string(JSON.stringify(model.snapshot()))
 			var restored := CombatModel.new()
@@ -58,7 +58,20 @@ func test_zero_cost_resources() -> void:
 		conserved(model,"Instant calculation " + form)
 
 func test_recycling_and_order() -> void:
-	var model: CombatModel = fixtures.fixture([44,45])
+	var model: CombatModel = fixtures.fixture([44,44,45])
+	model.exhaust_pile = model.draw_pile.duplicate()
+	model.draw_pile.clear()
+	model.play_card("card_000",-1)
+	model.play_card("card_001",-1)
+	var calculation := model.play_card("card_002",-1)
+	check(model.energy == 7 and calculation.drawn.is_empty() and model.hand.is_empty() and model.discard_pile.is_empty(), "Two supply copies grant four energy and neither can be redrawn")
+	conserved(model,"Two exhausted supply copies")
+	# Battles started with the previous reusable supply keep their frozen definition.
+	model = fixtures.fixture([44,45])
+	model.card_catalog.noren_44.exhaust = false
+	var legacy := CombatModel.new()
+	legacy.restore(JSON.parse_string(JSON.stringify(model.snapshot())))
+	model = legacy
 	model.exhaust_pile = model.draw_pile.duplicate()
 	model.draw_pile.clear()
 	check(not model.play_card("card_000",-1).is_empty() and model.energy == 5, "Supply first grants two energy immediately")
@@ -153,7 +166,7 @@ func test_catalog_faces_and_resource_hud() -> void:
 	for number in [44,45]:
 		var id := "noren_%02d" % number
 		var definition: Dictionary = Game.card_catalog[id]
-		check(definition.name == ("应急供能" if number == 44 else "瞬时演算") and definition.cost == 0 and definition.type == "skill" and definition.target == "self" and definition.rarity == ("A" if number == 44 else "B") and definition.get("exhaust",false) == (number == 45), id + ": exact current identity, zero cost and exhaustion flag")
+		check(definition.name == ("应急供能" if number == 44 else "瞬时演算") and definition.cost == 0 and definition.type == "skill" and definition.target == "self" and definition.rarity == ("A" if number == 44 else "B") and definition.get("exhaust",false), id + ": exact current identity, zero cost and exhaustion flag")
 		check(Game.valid_frozen_card(definition) and Game.reward_rules.cards.get(id) == definition and FaceArt.matches_definition(definition,FaceArt.config().get("cards",{}).get(id,{})), id + ": valid formal definition, reward entry and complete baked-face binding")
 		var art := FaceArt.resolve(definition)
 		check(not art.is_empty() and art.get("template_id") == FaceArt.TEMPLATE_ID and art.texture.get_size() == FaceArt.CANVAS, id + ": current v3 card PNG and font load successfully")

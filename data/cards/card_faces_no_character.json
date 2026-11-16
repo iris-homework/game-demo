@@ -352,22 +352,23 @@
         "cost": 1,
         "type": "attack",
         "archetype": "爆发直伤流",
-        "description": "造成 6 点伤害。近身技：施加 1 层虚弱。",
+        "description": "造成 6 点伤害。近身技：改为造成 9 点伤害，施加 2 层虚弱。",
         "target": "enemy",
         "sortOrder": 14,
         "artAssetId": "",
         "effects": [
           {
             "type": "damage",
-            "amount": 6
+            "amount": 6,
+            "meleeBonus": 3
           },
           {
             "type": "weak",
-            "amount": 1,
+            "amount": 2,
             "when": "melee"
           }
         ],
-        "cardText": "造成6点伤害。近身技：施加1层虚弱。"
+        "cardText": "造成6点伤害。近身技：改为造成9点伤害，施加2层虚弱。"
       }
     },
     "noren_15": {
@@ -998,22 +999,22 @@
         "cost": 1,
         "type": "skill",
         "archetype": "裂伤流",
-        "description": "选择一名敌人，抽 3 张牌。若该敌人在本牌使用前拥有至少 3 层裂伤，额外抽 1 张牌。",
+        "description": "选择一名敌人，抽 2 张牌。若该敌人在本牌使用前拥有至少 3 层裂伤，额外抽 2 张牌。",
         "target": "enemy",
         "sortOrder": 39,
         "artAssetId": "",
         "effects": [
           {
             "type": "draw",
-            "amount": 3
+            "amount": 2
           },
           {
             "type": "draw",
-            "amount": 1,
+            "amount": 2,
             "requiresBleed": 3
           }
         ],
-        "cardText": "选择一名敌人，抽 3 张牌。若该敌人在本牌使用前拥有至少 3 层裂伤，额外抽 1 张牌。"
+        "cardText": "抽2张牌。若目标已有至少3层裂伤，额外抽2张牌。"
       }
     },
     "noren_40": {
@@ -1127,14 +1128,14 @@
         "archetype": "通用",
         "target": "self",
         "artAssetId": "",
-        "exhaust": false,
+        "exhaust": true,
         "id": "noren_44",
         "number": "44",
         "name": "应急供能",
         "rarity": "A",
         "sortOrder": 44,
-        "description": "获得2点能量。",
-        "cardText": "获得2点能量。",
+        "description": "获得2点能量。消耗。",
+        "cardText": "获得2点能量。消耗。",
         "effects": [
           {
             "type": "energy",

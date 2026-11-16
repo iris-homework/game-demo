@@ -187,7 +187,7 @@ func _ready() -> void:
 	Game.state = Game.initial_state()
 	check(Game.state.deck.is_empty(),"No nonstarter owned on new adventure")
 	check(Game.owned_card_counts() == {"noren_01":4,"noren_02":4,"noren_03":1,"noren_04":1},"Exact initial ownership")
-	var base_damage := {1:6,9:8,13:10,14:6,16:9,17:16,19:8,20:9,21:8,25:14,26:30,27:6,28:6,29:14,35:6,37:6,38:6}
+	var base_damage := {1:6,9:8,13:10,14:9,16:9,17:16,19:8,20:9,21:8,25:14,26:30,27:6,28:6,29:14,35:6,37:6,38:6}
 	var ranged_damage := {1:9,9:12,13:15,14:9,16:14,17:24,19:12,20:42,21:12,25:21,26:66,27:9,28:10,29:21,35:9,37:9,38:9}
 	var blocks := {2:5,4:6,6:8,11:11,31:8,32:14,33:16,41:14,42:8,43:7}
 	for form in ["melee","ranged"]:
@@ -200,7 +200,7 @@ func _ready() -> void:
 			check(result.damage == (base_damage if form == "melee" else ranged_damage).get(number,0),label+" exact damage")
 			check(m.energy == (5 if number == 44 else 3-int(Game.card_catalog["noren_%02d" % number].cost)),label+" exact cost")
 			check(m.block == blocks.get(number,0),label+" block")
-			check(("card_000" in m.exhaust_pile) == (number in [5,8,15,22,23,34,36,40,45]),label+" exhaust/power destination")
+			check(("card_000" in m.exhaust_pile) == (number in [5,8,15,22,23,34,36,40,44,45]),label+" exhaust/power destination")
 			check(not "card_000" in m.hand and not "card_000" in m.draw_pile,label+" played card cannot redraw itself")
 			check(Game.valid_combat(m.snapshot()),label+" snapshot valid")
 			var saved_state: Dictionary=JSON.parse_string(JSON.stringify(m.snapshot()))
@@ -317,7 +317,8 @@ func _ready() -> void:
 	test_hand_exhaust()
 	m=fixture([17]);m.ammo=9;play(m)
 	check(m.ammo==10,"Ammo cap applies to normal and extra gains")
-	m=fixture([14]);play(m);check(m.enemies[0].weak==1,"Melee butt applies weak")
+	m=fixture([14]);play(m);check(m.enemies[0].weak==2,"Melee gunstock applies two weak")
+	m=fixture([14],"ranged");play(m);check(m.enemies[0].weak==0,"Ranged gunstock applies no weak")
 	m=fixture([11],"ranged");play(m);check(m.enemies[0].weak==1 and m.block==11,"Ranged steady targets enemy and grants eleven block")
 	for form in ["melee","ranged"]:
 		m=fixture([19],form);result=play(m)
@@ -424,7 +425,7 @@ func _ready() -> void:
 	m=fixture([24]);play(m);m.end_turn()
 	check(m.buffs.count(m,"next_hit_damage")==6,"Unused per-hit bonus survives turn end")
 	m=fixture([39]);m.enemies[0].bleed=2
-	check(play(m).drawn.size()==3 and m.block==0,"Tracking below three bleed draws three")
+	check(play(m).drawn.size()==2 and m.block==0,"Tracking below three bleed draws two")
 	m=fixture([39]);m.enemies[0].bleed=3
 	check(play(m).drawn.size()==4 and m.block==0,"Tracking includes exactly three bleed and draws a fourth")
 	m=fixture([16]);result=play(m)

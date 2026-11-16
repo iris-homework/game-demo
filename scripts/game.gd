@@ -1665,6 +1665,7 @@ func valid_frozen_card(definition) -> bool:
 		for key in ["amount", "hits", "cap", "executeBonus", "lastAmmoBonus", "rangedBonus", "requiresBleed", "bleedTriggers", "woundedMeleeAmount"]:
 			if effect.has(key) and (not (effect[key] is int or effect[key] is float) or not is_finite(float(effect[key]))): return false
 		if effect.type == "remove_soul_link" and not (effect.get("enemyId") in ["dancer_black", "dancer_white"] and buffs._valid_count(effect.get("amount"), 2) and effect.amount > 0): return false
+		if effect.has("meleeBonus") and not buffs._valid_count(effect.meleeBonus): return false
 		if effect.type == "energy" and not CombatModel.valid_energy_effect(effect): return false
 		for key in ["allAmmoHits", "rangedIgnoreBlock"]:
 			if effect.has(key) and not effect[key] is bool: return false

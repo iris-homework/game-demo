@@ -47,28 +47,44 @@ func test_one_cost_skills() -> void:
 				var before := model.snapshot()
 				var preview := model.card_preview("card_000",0)
 				check(model.snapshot() == before and not preview.is_empty(), "Skill preview stays read only: %d %s" % [number,form])
-				var expected := (2 if number == 24 else 3) + (1 if number == 39 and bleed >= 3 else 0)
+				var expected := (3 if number == 7 else 2) + (2 if number == 39 and bleed >= 3 else 0)
 				var result := play(model)
 				check(result.drawn.size() == expected and model.hand.size() == expected and model.energy == 2, "One-cost skill exact total draw: %d %s bleed %d" % [number,form,bleed])
 				check(Game.valid_combat(model.snapshot()), "Extra draw preserves card zones: %d" % number)
 	# Restore old frozen definitions without substituting today's catalogue or art.
-	for number in [6,7,11,24,31,39]:
+	var old_amounts := {6:6, 7:2, 11:9, 24:1, 31:6, 39:3}
+	for number in old_amounts:
 		var model: CombatModel = fixtures.fixture([number])
 		var id := "noren_%02d" % number
 		var definition: Dictionary = model.card_catalog[id]
 		var kind := "block" if number in [6,11,31] else "draw"
 		for effect in definition.effects:
 			if effect.type == kind:
-				effect.amount -= 2 if kind == "block" else 1
+				effect.amount = old_amounts[number]
 				break
+		if number == 39:
+			definition.effects[1].amount = 1
 		var saved: Dictionary = JSON.parse_string(JSON.stringify(model.snapshot()))
 		check(Game.valid_combat(saved), "Old frozen skill is valid: " + id)
 		var restored := CombatModel.new()
 		restored.restore(saved)
 		check(restored.card_catalog[id] == saved.cardCatalog[id] and FaceArt.resolve(restored.card_catalog[id]).is_empty(), "Restore preserves old rules and rejects mismatched current art: " + id)
 		var result := play(restored)
-		var expected := 9 if number == 11 else (6 if kind == "block" else (1 if number == 24 else 2))
-		check((restored.block if kind == "block" else result.drawn.size()) == expected, "Old frozen skill retains original value: " + id)
+		check((restored.block if kind == "block" else result.drawn.size()) == old_amounts[number], "Old frozen skill retains original value: " + id)
+
+func test_gunstock_frozen_rules() -> void:
+	var model: CombatModel = fixtures.fixture([14])
+	var definition: Dictionary = model.card_catalog.noren_14
+	definition.effects[0].erase("meleeBonus")
+	definition.effects[1].amount = 1
+	var saved: Dictionary = JSON.parse_string(JSON.stringify(model.snapshot()))
+	var restored := CombatModel.new()
+	restored.restore(saved)
+	check(Game.valid_combat(saved) and play(restored).damage == 6 and restored.enemies[0].weak == 1, "Frozen melee gunstock keeps six damage and one weak")
+	for invalid_bonus in [-1, 1.5, "3"]:
+		definition.effects[0].meleeBonus = invalid_bonus
+		var before := model.snapshot()
+		check(not Game.valid_combat(before) and play(model).is_empty() and before == model.snapshot(), "Invalid melee bonus rejects snapshot and play: " + str(invalid_bonus))
 
 func test_each_attack_segment() -> void:
 	var model := fixture([35,1])
@@ -190,6 +206,7 @@ func _ready() -> void:
 	Game.save_enabled = false
 	test_card_values()
 	test_one_cost_skills()
+	test_gunstock_frozen_rules()
 	test_each_attack_segment()
 	test_targets_and_card_bleed()
 	test_stance_and_other_damage()

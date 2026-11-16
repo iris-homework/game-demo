@@ -68,6 +68,9 @@ static func _card_text(definition: Dictionary, rows: Array) -> String:
 	var pattern := RegEx.new()
 	pattern.compile("造成\\s*(\\d+)\\s*点伤害(?:[，,]\\s*共\\s*(\\d+)\\s*次)?")
 	var matches := pattern.search_all(text)
+	# A single hit can print both base damage and its melee replacement.
+	if matches.size() == 2 and damage_rows.size() == 1 and damage_rows[0].get("meleeAlternative", false):
+		matches.remove_at(0)
 	# Work backwards so replacements cannot shift the remaining source offsets.
 	for index in range(mini(matches.size(), damage_rows.size()) - 1, -1, -1):
 		var found: RegExMatch = matches[index]
@@ -214,7 +217,7 @@ static func _variant(model, uid: String, target: int, extra: int) -> Array:
 						bleeding.append(layers)
 						# Keep HP/block intact for potential damage, advancing only nominal layers.
 						if active and layers>0 and copy.buffs.count(copy,"persistent_bleed")==0: copy.enemies[target].bleed=layers-1
-				rows.append({"type":"damage", "values":hits if active else [0], "dynamicHits":effect.get("allAmmoHits", false), "bypass":copy.is_noren() and form == "ranged" and effect.get("rangedIgnoreBlock", false)})
+				rows.append({"type":"damage", "values":hits if active else [0], "meleeAlternative":form == "melee" and effect.has("meleeBonus"), "dynamicHits":effect.get("allAmmoHits", false), "bypass":copy.is_noren() and form == "ranged" and effect.get("rangedIgnoreBlock", false)})
 				rows.append({"type":"bleed_damage", "values":bleeding if active else [0]})
 				if copy.is_noren() and attack and form == "melee" and copy.buffs.count(copy, "melee_attack_bleed") > 0:
 					rows.append({"type":"attack_bleed", "values":[attack_bleed]})

@@ -285,7 +285,7 @@ class Validator:
                     self.ref(effect.get("id"), buffs, "data/cards/cards.json", f"$[{index}].effects[{n}].id")
                 if effect.get("type") in ("damage", "draw", "ammo") and "amount" not in effect:
                     self.error("data/cards/cards.json", at + ".amount", "required field missing")
-                for key in ("amount", "hits", "rangedBonus", "bleedTriggers", "requiresBleed"):
+                for key in ("amount", "hits", "rangedBonus", "meleeBonus", "bleedTriggers", "requiresBleed"):
                     if key in effect and not integer(effect[key], -999 if key == "amount" and effect.get("id", effect.get("type")) == "strength" else 0):
                         self.error("data/cards/cards.json", at + "." + key, "expected finite integer in allowed range")
         self.ref(data["config.json"].get("defaultPlayerCharacterId"), data["player_characters.json"], "data/config.json", "$.defaultPlayerCharacterId")

@@ -257,6 +257,8 @@ func attack_hit_amount(definition: Dictionary, effect: Dictionary, form: String,
 		base += extra * int(definition.get("extraAmmoBonus", 0))
 		if ammo_before == 1: base += int(effect.get("lastAmmoBonus", 0))
 		if int(enemy_before.hp) * 2 <= int(enemy_before.maxHp): base += int(effect.get("executeBonus", 0))
+	elif form == "melee":
+		base += int(effect.get("meleeBonus", 0))
 	var multiplier := (2.0 if buffs.count(self,"ranged_mastery") > 0 else 1.5) if form == "ranged" else 1.0
 	return roundi(maxi(0, base) * multiplier * (0.75 if definition.get("type") == "attack" and weak > 0 else 1.0))
 
@@ -631,7 +633,7 @@ func play_noren_card(uid: String, target_index: int, discard_uid: String, extra_
 		if effect.type == "discard_attack" and not discard_uid in discard_candidates(uid): return {}
 		if effect.type == "exhaust_hand" and not discard_uid in exhaust_candidates(uid): return {}
 		if effect.has("allAmmoHits") and not effect.allAmmoHits is bool: return {}
-		for key in ["bleedTriggers","rangedBonus"]:
+		for key in ["bleedTriggers","rangedBonus","meleeBonus"]:
 			if effect.has(key) and (not (effect[key] is int or effect[key] is float) or not is_finite(float(effect[key])) or effect[key] < 0 or effect[key] != floor(float(effect[key]))): return {}
 	var at_start := stance
 	var ammo_before := ammo

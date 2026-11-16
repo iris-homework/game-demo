@@ -217,8 +217,8 @@ func test_numeric_effects() -> void:
 	m.enemies[2].bleed = 8
 	m.enemies[2].hp = 0
 	contains(preview_text(m, 0), "抽0张牌。", "Conditional third draw excludes two bleed")
-	contains(preview_text(m, 1), "抽1张牌。", "Conditional third draw includes three bleed")
-	contains(preview_text(m, -1), "抽0–1张牌。", "Untargeted third draw gives live target range")
+	contains(preview_text(m, 1), "抽2张牌。", "Conditional bonus draw includes three bleed")
+	contains(preview_text(m, -1), "抽0–2张牌。", "Untargeted bonus draw gives live target range")
 	m = fixture([20], "ranged")
 	for bullets in [1,2,3,10]:
 		m.ammo=bullets
@@ -420,10 +420,18 @@ func _ready() -> void:
 	var m := fixture([1])
 	m.next_attack_bonus = 2
 	check(m.card_preview("card_000").cardText == "造成8点伤害。", "Basic attack gains damage but no implicit ammo line")
+	for form in ["melee", "ranged"]:
+		m = fixture([14], form)
+		m.next_attack_bonus = 2
+		var numbers := [6,11] if form == "melee" else [12,9]
+		var expected := "造成%d点伤害。近身技：改为造成%d点伤害，施加2层虚弱。" % numbers
+		var gunstock := m.card_preview("card_000", 0)
+		check(gunstock.cardText == expected and gunstock.description.replace(" ", "") == expected, "Gunstock preview updates active stance damage: " + form)
+		check(m.play_card("card_000", 0).damage == (11 if form == "melee" else 12), "Gunstock executes previewed damage: " + form)
 	m = fixture([39], "melee", 2)
 	m.enemies[1].bleed = 4
 	check(m.card_preview("card_000", 0).cardText.replace(" ","").ends_with("额外抽0张牌。"), "Conditional third draw becomes zero below threshold: "+m.card_preview("card_000",0).cardText)
-	check(m.card_preview("card_000", 1).cardText.replace(" ","").ends_with("额外抽1张牌。"), "Conditional third draw stays one above threshold: "+m.card_preview("card_000",1).cardText)
+	check(m.card_preview("card_000", 1).cardText.replace(" ","").ends_with("额外抽2张牌。"), "Conditional draw grants two above threshold: "+m.card_preview("card_000",1).cardText)
 	m = fixture([6])
 	m.ammo = 9
 	check(m.card_preview("card_000").cardText == "获得1颗弹药和8点格挡。", "Only authored ammo and block numbers update")
