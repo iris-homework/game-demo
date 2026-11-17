@@ -70,6 +70,13 @@ def player_files(folder, platform):
         "XSXB-LICENSE.txt": "enemy_asset_pipeline/runtime/LICENSE-XSXB.txt",
         "Ruina-RIGHTS.txt": "assets/audio/combat/ruina_reference/RIGHTS.txt",
         "Ruina-sources.json": "assets/audio/combat/ruina_reference/sources.json",
+        "Music-SOURCES.txt": "assets/audio/music/README.md",
+        "Music-sources.json": "assets/audio/music/sources.json",
+        "ChronoArk-source.json": "assets/audio/music/chrono_ark_battle2_1_source.json",
+        "Enemy-audio-SOURCES.txt": "assets/audio/combat/enemy_reference/README.md",
+        "Enemy-audio-sources.json": "assets/audio/combat/enemy_reference/sources.json",
+        "Ruina-Roland-SOURCES.txt": "assets/audio/combat/ruina_reference/roland/README.md",
+        "Ruina-Roland-sources.json": "assets/audio/combat/ruina_reference/roland/sources.json",
     }.items():
         shutil.copy2(ROOT / source, licenses / name)
     for source in sorted((ROOT / "assets/audio/game/licenses").glob("*.txt")):
@@ -77,20 +84,20 @@ def player_files(folder, platform):
     launch = ("完整解压后，双击 MidnightCommission.exe。请保持同目录的 MidnightCommission.pck 与 exe 放在一起。"
               if platform == "Windows" else
               "解压后，双击 MidnightCommission.app；也可以先拖入“应用程序”。兼容 Intel 与 Apple 芯片。\n"
-              "此试玩包为临时签名，未做 Apple 公证。若下载后被系统拦截，请在“系统设置 → 隐私与安全性”中允许此次打开。")
-    text = """午夜委托 · 第一周 Demo
-游戏版本：0.4.0-noren-cards；内容构建日期：%s
+              "此发行包为临时签名，未做 Apple 公证。若下载后被系统拦截，请在“系统设置 → 隐私与安全性”中允许此次打开。")
+    text = """午夜委托 · 1.0.0 正式版
+游戏版本：1.0.0；内容构建日期：%s
 
 启动：%s
 无需安装 Godot，无需联网。Windows 使用 64 位系统；Mac 的 Intel 版本要求 macOS 11+，Apple 芯片要求 macOS 13+。
-首次进入可选“新的委托”开始冒险，也可选“战斗演练”。
+首次进入可选择“新手教程”，再通过“新的委托”开始两周冒险。“战斗演练”可独立体验14组正式对手。
 
 操作：点击卡牌再点目标，或拖动卡牌至目标；右键/Esc 取消；数字 1～9/0 选牌；点击结束回合；点击牌堆查看。
 退出时请使用游戏内菜单，让程序完成存档。发行包不附带个人存档。
 存档位置：Windows 为 %%APPDATA%%/MidnightCommissionDemo；macOS 为 ~/Library/Application Support/MidnightCommissionDemo。
 与工程试玩共用该存档目录，已有进度会继续保留。删除或移动程序不会删除进度。
 
-许可与来源见 Licenses。现用 Balatro 和 Library of Ruina 音频尚未确立公开再分发许可；本包不代表已完成对外发布的版权审核。
+许可与来源见 Licenses。现用 Balatro、Library of Ruina、Team Energy、Rain, In Your Black Eyes 与超时空方舟战斗配乐的公开再分发许可尚未核实。
 Godot 引擎及其第三方组件、Noto 字体、XSXB 的许可随包附带。
 """ % (datetime.now().astimezone().strftime("%Y-%m-%d %z"), launch)
     (folder / "开始游玩.txt").write_text(text, encoding="utf-8-sig")
