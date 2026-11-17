@@ -823,9 +823,10 @@ func is_week_complete(subject: Dictionary = {}) -> bool:
 func start_second_week(expected_revision: int) -> bool:
 	if not pending_save_kind.is_empty() or transition_locked or battle_busy or training_mode or tutorial_mode: return false
 	if expected_revision != revision or page != "result" or state.get("currentScene") != "result" or int(state.get("currentWeek", 1)) != 1 or not is_week_complete(): return false
-	# Carry all earned progression forward; clear only the settled encounter context.
+	# Begin the new week at full health and carry earned progression forward.
 	state.currentWeek = 2
 	state.currentDay = 1
+	state.currentHp = state.maxHp
 	state.currentScene = "map"
 	state.currentPlaceId = "bar"
 	state.activeEventId = "E16"

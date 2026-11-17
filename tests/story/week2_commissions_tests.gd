@@ -71,6 +71,8 @@ func test_week_gate_and_transition() -> void:
 		for c in CASES:
 			check(not Game.event_in_refresh_range(Game.events[c[0]]) and not Game.start_event(c[0]), c[0] + " hidden throughout first week")
 	completed_week_one()
+	Game.state.maxHp = 137
+	Game.state.currentHp = 7
 	var done := Game.state.duplicate(true)
 	var revision: int = Game.revision
 	check(not Game.start_second_week(revision - 1) and same(done, Game.state), "stale summary callback is rejected")
@@ -85,14 +87,17 @@ func test_week_gate_and_transition() -> void:
 	Game.resume()
 	check(Game.page == "result" and Game.is_week_complete(), "continue reopens settled first-week summary")
 	check(Game.start_second_week(Game.revision), "current summary action advances once")
-	for field in ["currentHp", "maxHp", "credits", "deck", "ownedCyberwareIds", "equippedCyberwareIds", "difficulty", "playerCharacterId", "completedEventIds", "claimedRewardIds", "battleHistory", "dialogueHistory"]:
+	check(Game.state.currentHp == 137, "week transition restores injured player to their actual max HP")
+	for field in ["maxHp", "credits", "deck", "ownedCyberwareIds", "equippedCyberwareIds", "difficulty", "playerCharacterId", "completedEventIds", "claimedRewardIds", "battleHistory", "dialogueHistory"]:
 		check(same(Game.state[field], done[field]), "week transition retains " + field)
 	check(Game.state.flags.week1Complete and not Game.boss_has_appeared(Game.state) and not Game.is_run_over(), "historic first-week flags do not end or suppress second week")
-	check(not Game.start_second_week(Game.revision), "double next-week activation is rejected")
 	check(Game.state.battleReward.is_empty() and Game.state.combat.is_empty() and Game.state.battleId.is_empty(), "settled battle context cleared without reissuing rewards")
 	check(Game.state.blackMarket.week == 2 and Game.state.blackMarket.restockDay == 1, "existing market refreshes for new week")
 	check(Game.valid_save(Game.state), "second-week checkpoint validates")
 	check(Game.save_game() and Game.load_game() and Game.state.currentWeek == 2 and Game.page == "map", "week two reload is not migrated back to first-week summary")
+	check(Game.state.currentHp == 137, "full health persists through week two reload")
+	Game.state.currentHp = 63
+	check(not Game.start_second_week(Game.revision) and Game.state.currentHp == 63, "double next-week activation cannot heal again")
 	for invalid in [0, -1, 1.5, 3, "2"]:
 		var bad := Game.state.duplicate(true)
 		bad.currentWeek = invalid
@@ -205,6 +210,7 @@ func test_commission(c: Array) -> void:
 func test_transition_save_retry() -> void:
 	completed_week_one()
 	var blocker := output.path_join("write-blocker")
+	Game.state.currentHp = 1
 	var file := FileAccess.open(blocker, FileAccess.WRITE)
 	file.store_string("QA-only blocker")
 	file.close()
@@ -212,10 +218,12 @@ func test_transition_save_retry() -> void:
 	Game.save_path = blocker.path_join("checkpoint.json")
 	check(not Game.start_second_week(Game.revision) and Game.pending_save_kind == "scene", "failed week transition checkpoint requires save retry")
 	var waiting := Game.state.duplicate(true)
+	check(waiting.currentHp == waiting.maxHp, "pending week checkpoint includes full health")
 	check(Game.state.currentWeek == 2 and not Game.start_second_week(Game.revision), "pending checkpoint prevents duplicate transition")
 	Game.save_path = output.path_join("checkpoint.json")
 	check(Game.retry_pending_save() and Game.page == "map" and same(waiting, Game.state), "save retry preserves same week/pool/progression")
 	check(Game.load_game() and Game.state.currentWeek == 2, "retried second-week checkpoint survives reload")
+	check(Game.state.currentHp == Game.state.maxHp, "retried week checkpoint retains full health after reload")
 	Game.save_enabled = false
 
 func test_full_second_week() -> void:
