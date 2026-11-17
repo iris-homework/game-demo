@@ -113,7 +113,7 @@ func _ready() -> void:
 	var player_hp: int = view.model.player_hp
 	await view.end_turn_pressed()
 	await idle()
-	check(fish_hits == 1 and view.model.player_hp == player_hp-6 and view.model.buffs.count(view.model,"pollution") == 5,"First fish bites for six with two contact stacks; second fish applies three")
+	check(fish_hits == 1 and view.model.player_hp == player_hp-6 and view.model.buffs.count(view.model,"pollution") == 3,"First fish bites for six with one contact stack; second fish applies two")
 	check("bite" in observed and "bite_close" in observed,"Enemy attack displays open then closed jaws")
 	check(view.model.turn == 2 and view.model.hand.size() == 5,"Next turn starts after bite and return")
 	check(fish.position == fish.home and fish.pose == "idle" and view.stage.player.position == view.stage.player.home,"Both actors return to their own feet anchors")
@@ -127,7 +127,7 @@ func _ready() -> void:
 	player_hp = view.model.player_hp
 	await view.end_turn_pressed()
 	await idle()
-	check(view.model.player_hp == player_hp and fish_hits == 4 and view.model.buffs.count(view.model,"pollution") == 4,"Full guard absorbs pollution and all three bite segments without extra pollution")
+	check(view.model.player_hp == player_hp and fish_hits == 4 and view.model.buffs.count(view.model,"pollution") == 2,"Full guard absorbs pollution and all three bite segments without extra pollution")
 	check("move" in observed,"Fish advancement art is used when approaching from home")
 	check(get_tree().get_nodes_in_group("bite_hit_fx").is_empty(),"Blocked bite effect also cleans up")
 	var snapshot: Dictionary = view.model.snapshot()

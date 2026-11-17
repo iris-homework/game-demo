@@ -42,7 +42,7 @@ func test_catalog_and_cycles() -> void:
 		check(enemy.hp == 30 and enemy.maxHp == 30, "Fish %d starts at 30 HP" % index)
 		check(enemy.get("combatVisualId", "") == "fish", "Fish %d shares fish visual" % index)
 		check(enemy.get("deathPollution", 0) == 3, "Fish %d has three-stack death pollution" % index)
-		check(enemy.get("attackPollution", 0) == 2, "Fish %d has two-stack contact pollution" % index)
+		check(enemy.get("attackPollution", 0) == 1, "Fish %d has one-stack contact pollution" % index)
 		check(enemy.intentSequence.size() == 3, "Fish %d has exactly three intents" % index)
 	# Seven actual end-turn transitions exercise both full cycles and wrap again.
 	# A large player block each round keeps the intent test independent of death.
@@ -67,10 +67,10 @@ func test_catalog_and_cycles() -> void:
 func test_attack_pollution() -> void:
 	for row in [
 		{"amount":6, "hits":1, "block":6, "damage":0, "stacks":0},
-		{"amount":6, "hits":1, "block":4, "damage":2, "stacks":2},
-		{"amount":2, "hits":2, "block":0, "damage":4, "stacks":4},
-		{"amount":2, "hits":2, "block":2, "damage":2, "stacks":2},
-		{"amount":2, "hits":2, "block":1, "damage":3, "stacks":4},
+		{"amount":6, "hits":1, "block":4, "damage":2, "stacks":1},
+		{"amount":2, "hits":2, "block":0, "damage":4, "stacks":2},
+		{"amount":2, "hits":2, "block":2, "damage":2, "stacks":1},
+		{"amount":2, "hits":2, "block":1, "damage":3, "stacks":2},
 		{"amount":0, "hits":2, "block":0, "damage":0, "stacks":0}
 	]:
 		var m := fish_fixture(["fish"])
@@ -83,7 +83,7 @@ func test_attack_pollution() -> void:
 		check(events(result, "status_tick").is_empty(), label + " new pollution waits for player's next turn end")
 		var running := 0
 		for hit in result.attacks[0].hits:
-			if hit.damage > 0: running += 2
+			if hit.damage > 0: running += 1
 			check(hit.get("pollutionAfter", -1) == running, label + " hit carries chronological pollution")
 		check(events(result, "attack").size() == 1 and events(result, "attack")[0].get("index", -1) == 0, label + " attack event identifies source")
 	var m: CombatModel = fixtures.fixture()
@@ -122,7 +122,7 @@ func test_ticks_and_death() -> void:
 	m.buffs.apply(m, "pollution", 2, 1)
 	var result := m.end_turn()
 	check(result.get("turnEvents", []).map(func(e): return e.type) == ["status_tick", "attack", "status_tick", "status_apply", "status_tick"], "Player tick before enemy actions; each enemy ticks after own action")
-	check(m.player_hp == 91 and m.buffs.count(m, "pollution") == 6, "Player old pollution ticks before fish adds four new layers")
+	check(m.player_hp == 91 and m.buffs.count(m, "pollution") == 5, "Player old pollution ticks before fish adds three new layers")
 	check(m.enemies[0].hp == 26 and m.enemies[1].hp == 28 and m.buffs.count(m, "pollution", 0) == 3 and m.buffs.count(m, "pollution", 1) == 1, "Both enemies tick and decay once at own turn end")
 	# Direct hook isolates block handling from the enemy own-turn-start clear.
 	m = fish_fixture(["fish"])
@@ -217,7 +217,7 @@ func test_death_pollution() -> void:
 	m.parry = 2
 	result = m.end_turn()
 	check(result.outcome == "win" and result.attacks[0].counters.size() == 1, "Lethal parry stops remaining counters")
-	check(m.buffs.count(m, "pollution") == 5 and result.attacks[0].counters[0].playerPollutionAfter == 5, "Parry death adds three after two attack-contact stacks")
+	check(m.buffs.count(m, "pollution") == 4 and result.attacks[0].counters[0].playerPollutionAfter == 4, "Parry death adds three after one attack-contact stack")
 	m = fish_fixture(["fish_second"])
 	m.enemies[0].hp = 1
 	m.buffs.apply(m, "pollution", 1, 0)
@@ -275,6 +275,11 @@ func test_snapshot_and_training() -> void:
 	check(restored.player_hp == 99 and restored.buffs.count(restored, "pollution") == 0, "Old fish snapshot without contact trait keeps old attack")
 	restored.enemy_damage(0, 99)
 	check(restored.buffs.count(restored, "pollution") == 0, "Old frozen fish without death trait keeps old death behavior")
+	var old_contact := json_snapshot(fish_fixture(["fish"]))
+	old_contact.enemies[0].attackPollution = 2
+	restored.restore(old_contact)
+	restored.end_turn()
+	check(Game.valid_combat(old_contact) and restored.buffs.count(restored,"pollution") == 2, "Restoring a pre-balance fish keeps two contact stacks")
 	# Already-running battles retain their frozen intent amount.
 	var old_intent := fish_fixture(["fish_second"]).snapshot()
 	old_intent.enemies[0].intentSequence[0].amount = 3

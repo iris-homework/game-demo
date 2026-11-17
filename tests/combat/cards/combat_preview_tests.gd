@@ -232,7 +232,7 @@ func test_numeric_effects() -> void:
 	contains(preview_text(m),"造成88点伤害。","Mastery changes Finisher multiplier to two")
 	m = fixture([21], "ranged")
 	m.ammo = 1
-	contains(preview_text(m), "造成18点伤害。", "Last bullet uses prepayment ammo")
+	contains(preview_text(m), "造成21点伤害。", "Last bullet uses prepayment ammo")
 	m.ammo = 2
 	contains(preview_text(m), "造成12点伤害。", "Postpayment last bullet does not qualify")
 	m = fixture([25], "ranged", 3)

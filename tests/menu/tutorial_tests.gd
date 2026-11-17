@@ -222,7 +222,7 @@ func exercise_guide() -> void:
 	check(guide.mouse_filter == Control.MOUSE_FILTER_IGNORE and get_viewport().gui_get_hovered_control() == view.enemy_intents[0], "Drawn leaders let real viewport hover reach the intended enemy control")
 	await get_tree().create_timer(0.9).timeout
 	check(guide.completed.get(5, false), "Hovering the real fish intent completes enemy inspection")
-	check(view.enemy_intents[0].tooltip_text.contains("追加 2 层污染") and view.enemy_intents[0].tooltip_text.contains("死亡"), "Fish tooltip exposes its attack and death mechanics")
+	check(view.enemy_intents[0].tooltip_text.contains("追加 1 层污染") and view.enemy_intents[0].tooltip_text.contains("死亡"), "Fish tooltip exposes its attack and death mechanics")
 	await capture_frame("enemy-tooltip")
 	guide.set_step(2)
 	guide._update_highlights()

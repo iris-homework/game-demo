@@ -130,7 +130,7 @@
     ],
     "prototype": false,
     "combatVisualId": "fish",
-    "attackPollution": 2,
+    "attackPollution": 1,
     "deathPollution": 3
   },
   "mech_boss": {
@@ -167,7 +167,7 @@
     ],
     "prototype": false,
     "combatVisualId": "fish",
-    "attackPollution": 2,
+    "attackPollution": 1,
     "deathPollution": 3
   },
   "gang_henchman": {

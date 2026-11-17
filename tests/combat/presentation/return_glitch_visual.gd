@@ -70,7 +70,7 @@ func _ready() -> void:
 	check(view.model.enemies.size() == 2,"Fish fixture contains both enemies")
 	var first_intent: Dictionary = view.model.enemies[0].intent
 	var second_intent: Dictionary = view.model.enemies[1].intent
-	check(first_intent.type == "attack" and int(first_intent.amount) == 6 and int(first_intent.get("hits",1)) == 1 and second_intent.type == "pollution" and int(second_intent.amount) == 3,"Fish fixture starts with one six-damage attack and three-stack pollution intent")
+	check(first_intent.type == "attack" and int(first_intent.amount) == 6 and int(first_intent.get("hits",1)) == 1 and second_intent.type == "pollution" and int(second_intent.amount) == 2,"Fish fixture starts with one six-damage attack and two-stack pollution intent")
 	# No cards played: defender stays home while fish attack / apply pollution.
 	cycle = "melee-turn"
 	stationary_player = true
@@ -79,7 +79,7 @@ func _ready() -> void:
 	check(view.model.player_hp == initial_hp-6 and view.shown_player_hp == view.model.player_hp,"Enemy turn deals exactly six damage from configured starting HP (%d -> %d), display agrees" % [initial_hp,view.model.player_hp])
 	check(view.model.turn == initial_turn+1,"Enemy turn advances the round exactly once")
 	check(view.model.hand.size() == 5,"Next player round deals exactly five cards")
-	check(view.model.buffs.count(view.model,"pollution") == 5 and view.shown_player_pollution == 5,"Two contact stacks plus three intent stacks wait until the next player turn end")
+	check(view.model.buffs.count(view.model,"pollution") == 3 and view.shown_player_pollution == 3,"One contact stack plus two intent stacks wait until the next player turn end")
 	check(not Game.battle_busy and view.cards.size() == 5,"Next hand opens after return")
 	await capture(cycle+"-complete")
 	# All actors stay at home, but face the wrong way after a hit / turn.

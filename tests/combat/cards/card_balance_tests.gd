@@ -31,7 +31,7 @@ func test_card_values() -> void:
 		var effects: Array = Game.card_catalog["noren_%02d" % number].effects
 		var expected: Array = exact[number]
 		check(effects.any(func(e): return e.type == expected[0] and e.get("amount") == expected[1]), "Approved exact value: %02d" % number)
-	check(Game.card_catalog.noren_21.effects[0].lastAmmoBonus == 4, "Last-ammo bonus four")
+	check(Game.card_catalog.noren_21.effects[0].lastAmmoBonus == 6, "Last-ammo bonus six")
 	check(Game.card_catalog.noren_25.effects[0].executeBonus == 8, "Execute bonus eight")
 	check(Game.card_catalog.noren_40.effects == [{"type":"power","value":"melee_attack_bleed"}], "Forty grants the new ability")
 	check(Game.card_catalog.noren_35.effects[0].amount == 2 and Game.card_catalog.noren_35.effects[0].hits == 3, "Triple attack remains two times three")

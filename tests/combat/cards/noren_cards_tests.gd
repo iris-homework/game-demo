@@ -258,7 +258,7 @@ func _ready() -> void:
 	var before := m.snapshot()
 	check(not play(m,1).is_empty() and m.powers==["melee_attack_bleed"] and m.exhaust_pile.size()==2 and m.energy==1,"Duplicate ability leaves cycle and pays cost without stacking")
 	m = fixture([21],"ranged"); m.ammo=1
-	check(play(m).damage == 18 and m.ammo == 0,"Last bullet checks prepayment ammo")
+	check(play(m).damage == 21 and m.ammo == 0,"Last bullet checks prepayment ammo")
 	m = fixture([25],"ranged");m.enemies[0].hp = 500
 	check(play(m).damage == 33,"Execution includes exactly 50 percent")
 	m = fixture([25],"ranged");m.enemies[0].hp = 501
@@ -302,6 +302,14 @@ func _ready() -> void:
 	check(result.damage==0 and m.ammo==4 and m.stance=="ranged" and m.stance_discount,"Quick Reload grants ammo then switches as a skill")
 	m=fixture([9],"ranged");result=play(m)
 	check(result.damage==12 and m.ammo==1 and m.stance=="melee" and result.drawn.size()==2,"Cut-in attacks ranged then enters melee and draws two")
+	m=fixture([22])
+	m.energy=0
+	var initiative_preview := m.card_preview("card_000",-1)
+	check("抽1张牌" in initiative_preview.cardText and "消耗" in initiative_preview.cardText, "Initiative previews both draw and exhaust")
+	result=play(m)
+	check(result.drawn.size()==1 and m.hand==result.drawn and m.exhaust_pile==["card_000"] and m.energy==0, "Initiative draws from an attack-only deck and exhausts at zero energy")
+	var attack_uid: String = m.hand[0]
+	check(m.card_cost(attack_uid)==0 and not m.play_card(attack_uid,0).is_empty() and m.turn_discount==0, "Newly drawn attack uses the discount immediately")
 	m=fixture([22,1]);play(m);m.stance_discount=true
 	check(m.card_cost("card_001")==0,"Multiple reductions floor at zero")
 	m.end_turn()

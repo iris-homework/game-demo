@@ -5,6 +5,12 @@ func on_phase(phase: String) -> void:
 	if phase != "impact" or app.view.stage.active_attacker == app.view.stage.player: return
 	hit_states.append([app.view.stage.enemies.find(app.view.stage.active_attacker),app.view.shown_player_hp,app.view.shown_player_pollution])
 
+func shot(name: String) -> void:
+	print("capture ", name)
+	await get_tree().process_frame
+	RenderingServer.force_draw()
+	check(get_viewport().get_texture().get_image().save_png(output + name + ".png") == OK, "Capture " + name)
+
 func _ready() -> void:
 	output = "res://artifacts/qa/enemy-round-death-2026-10-19/fish-rules/"
 	DirAccess.make_dir_recursive_absolute(output)
@@ -23,19 +29,19 @@ func _ready() -> void:
 	check(view.model.enemies.all(func(e): return e.hp == 30),"Both start at 30 HP in enemy test")
 	check(view.model.enemy_intent_text(view.model.enemies[0]) == "攻击 6","First opening intent")
 	check(view.model.enemy_intent_text(view.model.enemies[1]) == "污染 2","Second opening intent")
-	check(view.targets[0].tooltip_text.contains("追加 2 层污染"),"Fish passive tooltip")
-	check(view.targets[0].tooltip_text.contains("死亡时，对你施加 3 层污染"),"Fish death tooltip uses three stacks independently of two-stack contact")
+	check(view.targets[0].tooltip_text.contains("追加 1 层污染"),"Fish passive tooltip")
+	check(view.targets[0].tooltip_text.contains("死亡时，对你施加 3 层污染"),"Fish death tooltip uses three stacks independently of one-stack contact")
 	view.stage.phase_changed.connect(on_phase)
 	await shot("opening-two-fish")
 	var opening_hp: int = view.model.player_hp
 	var hp_offset := opening_hp - 100
-	var expected_hp := [94 + hp_offset,80 + hp_offset,67 + hp_offset,47 + hp_offset]
-	var expected_pollution := [4,9,14,17]
+	var expected_hp := [94 + hp_offset,81 + hp_offset,72 + hp_offset,58 + hp_offset]
+	var expected_pollution := [3,5,8,10]
 	var expected_hits := [
-		[[0,94 + hp_offset,2]],
-		[[0,88 + hp_offset,5],[0,86 + hp_offset,7],[1,80 + hp_offset,9]],
-		[[1,69 + hp_offset,12],[1,67 + hp_offset,14]],
-		[[0,47 + hp_offset,15]]
+		[[0,94 + hp_offset,1]],
+		[[0,89 + hp_offset,3],[0,87 + hp_offset,4],[1,81 + hp_offset,5]],
+		[[1,74 + hp_offset,7],[1,72 + hp_offset,8]],
+		[[0,58 + hp_offset,8]]
 	]
 	for round_index in 4:
 		hit_states.clear()

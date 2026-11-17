@@ -470,7 +470,7 @@
     "cost": 1,
     "type": "attack",
     "archetype": "爆发直伤流",
-    "description": "造成 8 点伤害。远程技：若打出本牌前恰好拥有 1 颗弹药，本牌基础伤害增加 4。",
+    "description": "造成 8 点伤害。远程技：若打出本牌前恰好拥有 1 颗弹药，本牌基础伤害增加 6。",
     "target": "enemy",
     "sortOrder": 21,
     "artAssetId": "",
@@ -478,10 +478,10 @@
       {
         "type": "damage",
         "amount": 8,
-        "lastAmmoBonus": 4
+        "lastAmmoBonus": 6
       }
     ],
-    "cardText": "造成8点伤害。远程技：若打出本牌前恰好拥有1颗弹药，本牌基础伤害增加4。"
+    "cardText": "造成8点伤害。远程技：若打出本牌前恰好拥有1颗弹药，本牌基础伤害增加6。"
   },
   {
     "id": "noren_22",
@@ -491,18 +491,22 @@
     "cost": 0,
     "type": "skill",
     "archetype": "爆发直伤流",
-    "description": "本回合下一张攻击牌的费用降低 1，最低为 0。消耗。",
+    "description": "抽 1 张牌。本回合下一张攻击牌的费用降低 1，最低为 0。消耗。",
     "target": "self",
     "sortOrder": 22,
     "artAssetId": "",
     "effects": [
+      {
+        "type": "draw",
+        "amount": 1
+      },
       {
         "type": "next_discount",
         "amount": 1
       }
     ],
     "exhaust": true,
-    "cardText": "本回合下一张攻击牌的费用降低1，最低为0。消耗。"
+    "cardText": "抽1张牌。本回合下一张攻击牌的费用降低1，最低为0。消耗。"
   },
   {
     "id": "noren_23",
