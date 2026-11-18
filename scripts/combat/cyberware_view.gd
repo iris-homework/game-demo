@@ -96,10 +96,12 @@ func _input(event: InputEvent) -> void:
 		if not event.pressed or event.is_echo(): return
 		if event.keycode in [KEY_ESCAPE,KEY_ENTER,KEY_KP_ENTER]:
 			closed.emit()
-		elif event.keycode >= KEY_1 and event.keycode <= KEY_4:
-			var index: int = event.keycode-KEY_1
-			if index < card_buttons.size() and not card_buttons[index].disabled:
-				activation_requested.emit(model.cyberware_cards()[index].id)
+			return
+		var index: int = event.keycode - KEY_1
+		if event.keycode >= KEY_KP_1 and event.keycode <= KEY_KP_4:
+			index = event.keycode - KEY_KP_1
+		if index >= 0 and index < card_buttons.size() and not card_buttons[index].disabled:
+			activation_requested.emit(model.cyberware_cards()[index].id)
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
 		get_viewport().set_input_as_handled()
 		closed.emit()

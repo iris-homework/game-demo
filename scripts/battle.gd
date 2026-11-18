@@ -1255,6 +1255,7 @@ func activate_cyberware(id: String) -> void:
 	# Commit the complete model result once; then present discarded/drawn cards.
 	# Redraw can return the same UIDs after recycling, so retire every old view.
 	close_pile()
+	refresh_enemy_hud()
 	set_busy(true)
 	var retired_views: Array = []
 	if redraw:

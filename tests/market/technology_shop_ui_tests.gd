@@ -162,6 +162,7 @@ func _ready() -> void:
 	Game.skip_dialogue(Game.revision)
 	await settle()
 	check(app.view.get_script().resource_path.ends_with("black_market.gd"),"Black-market routing retained")
+	check(await preload("res://scripts/combat/audio_cleanup.gd").release(app, get_tree()), "Shop audio playback released before test teardown")
 	app.queue_free()
 	await settle()
 	var report := {"checks":checks,"failures":failures,"headless":true,"physicalInput":false,"pixelReview":false}

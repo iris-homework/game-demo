@@ -83,6 +83,54 @@ func activate(id: String) -> void:
 	check(view.model.snapshot() == committed and Game.state.combat == committed,"Activation animation preserves one committed result: "+id)
 	check(not is_instance_valid(view.pile_overlay),"Successful activation returns to battle: "+id)
 
+func check_robot_preview(damage: int) -> void:
+	var intent = view.enemy_intents[0]
+	check(intent.value_label.text == str(damage), "Robot overhead preview shows %d damage" % damage)
+	for control in [intent, view.targets[0]]:
+		var tooltip: Control = control._make_custom_tooltip(control.tooltip_text)
+		check(is_instance_valid(tooltip), "%s builds its hover panel" % control.name)
+		if not is_instance_valid(tooltip): continue
+		var labels := tooltip.find_children("*", "Label", true, false)
+		check(labels.any(func(label): return label.text == str(damage)), "%s hover shows %d damage" % [control.name, damage])
+		check(control.tooltip_text.contains("预计合计 %d 点" % damage), "%s tooltip total matches %d damage" % [control.name, damage])
+		tooltip.free()
+
+func press_slot(code: Key) -> void:
+	for pressed in [true, false]:
+		var event := InputEventKey.new()
+		event.keycode = code
+		event.physical_keycode = code
+		event.pressed = pressed
+		get_viewport().push_input(event, true)
+		await get_tree().process_frame
+
+func test_slot_shortcuts() -> void:
+	var active := [FORCE, MAG, CLEAN, "backup_energy"]
+	var key_rows := [[KEY_1, KEY_2, KEY_3, KEY_4], [KEY_KP_1, KEY_KP_2, KEY_KP_3, KEY_KP_4]]
+	for codes in key_rows:
+		await start(active, [])
+		var requested := []
+		for slot in active.size():
+			view.show_cyberware()
+			view.pile_overlay.activation_requested.connect(func(id): requested.append(id))
+			await press_slot(codes[slot])
+			await idle()
+			check(requested == active.slice(0, slot + 1) and view.model.cyberware_cooldown(active[slot]) > 0,
+				"%s activates its equipped technology once" % OS.get_keycode_string(codes[slot]))
+			if is_instance_valid(view.pile_overlay): view.close_pile()
+	await start([FORCE, PHASE], [])
+	await activate(FORCE)
+	view.show_cyberware()
+	var blocked_requests := []
+	view.pile_overlay.activation_requested.connect(func(id): blocked_requests.append(id))
+	var before: Dictionary = view.model.snapshot()
+	for codes in key_rows:
+		for code in codes:
+			await press_slot(code)
+			check(blocked_requests.is_empty() and view.model.snapshot() == before and is_instance_valid(view.pile_overlay),
+				"%s leaves cooling, passive or empty slot inactive" % OS.get_keycode_string(code))
+	view.close_pile()
+
 func _ready() -> void:
 	Game.save_enabled = false
 	Game.save_path = "user://unused_technology_battle_visual.json"
@@ -107,8 +155,12 @@ func _ready() -> void:
 	view.model.buffs.apply(view.model,"weak",3)
 	view.model.buffs.apply(view.model,"vulnerable",2)
 	await view.commit()
+	# The fixture applied debuffs directly. Establish the same preview as normal battle playback.
+	view.refresh_enemy_hud()
+	check_robot_preview(15)
 	await shot("02-before-cleanse")
 	await activate(CLEAN)
+	check_robot_preview(10)
 	check(view.shown_player_pollution == 0 and view.shown_player_weak == 0 and not view.shown_player_buffs.has("vulnerable") and view.shown_player_block == 10,"Cleanse removes all shown debuffs and retains block")
 	view.show_cyberware()
 	check(view.pile_overlay.state_labels[2].text.contains("999"),"Filter overlay displays actual 999-turn remaining cooldown")
@@ -136,9 +188,10 @@ func _ready() -> void:
 	view.show_cyberware()
 	await shot("04-passives-after-trigger")
 	view.close_pile()
+	await test_slot_shortcuts()
 	view.queue_free()
 	await get_tree().process_frame
 	await settle(0.3)
 	print("TECHNOLOGY BATTLE VISUAL: %d checks, %d failures" % [checks,failures.size()])
-	FileAccess.open(output.path_join("result.json"),FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures,"physicalInput":false,"scope":"real battle UI commands and screenshots"},"\t"))
+	FileAccess.open(output.path_join("result.json"),FileAccess.WRITE).store_string(JSON.stringify({"checks":checks,"failures":failures,"physicalInput":false,"scope":"real battle controls, overhead and tooltip values, synthetic viewport keyboard input; screenshots only with a display"},"\t"))
 	get_tree().quit(0 if failures.is_empty() else 1)
